@@ -1,5 +1,5 @@
 {
-    "name": "manager-app",
+    "name": "routes",
     "dependencies" : {
 	"jashkenas/backbone": "*",
 	"jashkenas/underscore": "*",
@@ -7,6 +7,7 @@
     },
     "scripts": ["routes.js"],
     "local": [
+        "application",
 	"login"
 	]
 }

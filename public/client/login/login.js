@@ -3,40 +3,33 @@ Backbone.Marionette = require('backbone.marionette');
 var $ = require('jquery');
 var _ = require('underscore');
 var Handlebars = require('handlebars.js');
+var app = require('application');
 
-var lapp = new Backbone.Marionette.Application();
-lapp.addRegions({
-    appRegion: '#content'
-});
+module.exports = function () {
+    var Login = Backbone.Marionette.LayoutView.extend({
+        template: Handlebars.compile(require('./login.html')),
+        events: {'click .login': 'doLogin'},
 
-lapp.addInitializer(function (options) {
-    lapp.appRegion.show(new Login());
-});
+        initialize: function () {
+	    // bind it so context is layout not a DOM object
+	    _.bindAll(this, 'doLogin');
+        },
 
-var Login = Backbone.Marionette.LayoutView.extend({
-    template: Handlebars.compile(require('./login.html')),
-    events: {'click .login': 'doLogin'},
+        doLogin: function () {
+	    $.post('/authenticate',
+	           {username: this.$('input[name="username"]').val(),
+		    password: this.$('input[name="password"]').val()})
+	        .then(function (data) {
+		    $('#logged-in-user').text(window.Messages('app.account.logged_in_as', data['username']));
+	        })
+	        .fail(function () {
+		    alert('Log in failed');
+	        });
 
-    initialize: function () {
-	// bind it so context is layout not a DOM object
-	_.bindAll(this, 'doLogin');
-    },
+	    return false;
+        }
+    });
 
-    doLogin: function () {
-	$.post('/authenticate',
-	       {username: this.$('input[name="username"]').val(),
-		password: this.$('input[name="password"]').val()})
-	    .then(function (data) {
-		$('#logged-in-user').text(window.Messages('app.account.logged_in_as', data['username']));
-	    })
-	    .fail(function () {
-		alert('Log in failed');
-	    });
-
-	return false;
-    }
-});
-
-$(document).ready(function() {
-    lapp.start();
-});
+    // show your work
+    app.appRegion.show(new Login());
+}

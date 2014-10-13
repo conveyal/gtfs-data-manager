@@ -7,6 +7,9 @@
 	"marionettejs/backbone.marionette": "*",
 	"components/handlebars.js": "*"
     },
+    "local" : [
+        "application"
+    ],
     "scripts": ["login.js"],
     "templates": ["login.html"]
 }
