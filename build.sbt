@@ -10,5 +10,7 @@ libraryDependencies ++= Seq(
   javaJdbc,
   javaEbean,
   cache,
-  javaWs
+  javaWs,
+  "org.mapdb" % "mapdb" % "1.0.6",
+  "org.julienrf" %% "play-jsmessages" % "1.6.2"
 )

@@ -2,8 +2,20 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# Home page
-GET     /                           controllers.Application.index()
+# Auth
+POST    /authenticate                   controllers.Application.authenticate()
+
+# API CRUD stuff
+GET     /api/feedcollections/:id        controllers.api.FeedCollectionController.get(id:String)
+POST    /api/feedcollections/           controllers.api.FeedCollectionController.create()
+
+GET     /api/users/:id                  controllers.api.UserController.get(id:String)
+POST    /api/users/                     controllers.api.UserController.create()
+PUT     /api/users/:id                  controllers.api.UserController.update(id:String)
+
+GET     /messages.js                    controllers.Application.jsMessages()
+GET     /loggedInUser                   controllers.Application.getLoggedInUser()
+GET     /logout                         controllers.Application.logout()
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               controllers.Assets.at(path="/public", file)
+GET     /*file               controllers.Assets.at(path="/public", file)
