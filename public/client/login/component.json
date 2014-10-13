@@ -1,0 +1,12 @@
+{
+    "name": "login",
+    "dependencies": {
+	"jashkenas/backbone": "*",
+	"jashkenas/underscore": "*",
+	"components/jquery": "*",
+	"marionettejs/backbone.marionette": "*",
+	"components/handlebars.js": "*"
+    },
+    "scripts": ["login.js"],
+    "templates": ["login.html"]
+}

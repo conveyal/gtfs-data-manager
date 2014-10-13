@@ -1,0 +1,12 @@
+{
+    "name": "manager-app",
+    "dependencies" : {
+	"jashkenas/backbone": "*",
+	"jashkenas/underscore": "*",
+	"components/jquery": "*"
+    },
+    "scripts": ["routes.js"],
+    "local": [
+	"login"
+	]
+}
