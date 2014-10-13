@@ -1,92 +1,119 @@
 package models;
 
 import java.io.Serializable;
-import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
 
-import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.DigestUtils;
 
-import play.Play;
+import play.Logger;
+import utils.DataStore;
+import utils.HashUtils;
 
-/**
- * Represents a user of the GTFS Data Manager.
- * @author mattwigway
- *
- */
-public class User extends Model implements Serializable {    
-    private static final long serialVersionUID = 1L;
+public class User implements Serializable {
 
-    private static DataStore<User> userStore = new DataStore<User>("users");
-    
-    /**
-     * This user's login name
-     */
-    public String username;
-    
-    /**
-     * The user's real/display name
-     */
-    public String displayName;
-    
-    private String hashedPassword;
-    
-    /**
-     * The method used to hash this password. We store this with the user to allow
-     * password hash upgrades easily; since hashes are (intended to be) one-way, there
-     * is no way to upgrade the hash method en masse, so when upgrades are needed we upgrade as
-     * users log in.
-     */
-    private String hashMethod;
-    
-    /**
-     * Is this user an admin user?
-     */
-    public boolean admin;
-    
-    /**
-     * What is this user's email address?
-     */
-    public String email;
-    
-    public User (String username, String password, String displayName, String email, boolean admin) {
-        // make sure username is unique
-        if (userStore.hasId(username)) {
-            // don't make a new user
-            throw new IllegalArgumentException("User with username " + username + " already exists.");
-        }
-        
-        this.username = username;
-        this.id = username;
-        // TODO: make configurable
-        this.hashMethod = "SHA-256";
-        this.hashedPassword = hash(password);
-        this.displayName = displayName;
-        this.email = email;
-        this.admin = admin;
-        // users are not owned by other users
-        this.userId = null;
-        // no call to super because Users don't have generated IDs
-    }
-    
-    private String hash(String password) {
-        try
-        {
-            // TODO: include application secret here
-            byte[] bytes = (password.trim()).getBytes("UTF-8");
+	private static final long serialVersionUID = 1L;
 
-            MessageDigest md = MessageDigest.getInstance(this.hashMethod);
-            byte[] digest = md.digest(bytes);
+	static private DataStore<User> userData = new DataStore<User>("users");
+	
+	public String id;
+	public String username;
+	public String passwordHash;
+	public String email;
+	
+	public Boolean active;
+	public Boolean admin;
+	
+	public ArrayList<ProjectPermissions> projectPermissions;
 
-            String hexString = new String(Hex.encodeHex(digest));
+	public User(String username, String password, String email) {
+		
+		this.username = username.toLowerCase();
+		this.email = email;
+		this.active = true;
+		this.admin = false;
+		
+		try {
+			
+			byte[] bytesOfMessage = password.getBytes("UTF-8");	
+			
+			this.passwordHash = DigestUtils.shaHex(bytesOfMessage);
+			
+		}
+		catch(Exception e) {
+			
+			this.active = false;
+			this.passwordHash = "";
+		}
+		
+	}
+	
+	public void save() {
+		
+		// assign id at save
+		if(id == null || id.isEmpty()) {
+			
+			Date d = new Date();
+			id = getUserId(this.username);
+			
+			Logger.info("created user u " + id);
+		}
+		
+		userData.save(id, this);
+		
+		Logger.info("saved user u " +id);
+	}
+	
+	public void delete() {
+		userData.delete(id);
+		
+		Logger.info("delete user u " +id);
+	}
 
-            return hexString;
-        }
-        catch(Exception e)
-        {
-            return null;
-        }
-    }
+	public Boolean checkPassword(String password) {	
+		try {
+			
+			byte[] bytesOfMessage = password.getBytes("UTF-8");	
+			
+			String pHash = DigestUtils.shaHex(bytesOfMessage);
+			
+			return pHash.equals(this.passwordHash);
+			
+		}
+		catch(Exception e) {
+			
+			return false;
+		}
+	}
+	
+	static public String getUserId(String username) {
+		return HashUtils.hashString("u_" + username);
+	}
 
-    public static User get (String id) {
-        return userStore.getById(id);
-    }
+	static public User getUser(String id) {
+		
+		return userData.getById(id);	
+	}
+	
+	static public User getUserByUsername(String username) {
+		
+		return userData.getById(getUserId(username));	
+	}
+	
+	static public Collection<User> getProjects() {
+		
+		return userData.getAll();
+		
+	}
+	
+	static class ProjectPermissions {
+		
+		String project_id;
+		Boolean read;
+		Boolean write;
+		Boolean admin;
+		
+	}
+
 }

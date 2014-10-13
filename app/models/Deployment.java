@@ -3,6 +3,8 @@ package models;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import utils.DataStore;
+
 /**
  * A deployment of (a given version of) OTP on a given set of feeds.
  * @author mattwigway

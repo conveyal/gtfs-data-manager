@@ -1,7 +1,10 @@
 package models;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * The base class for all of the models used by GTFS Data Manager.
@@ -9,17 +12,19 @@ import java.util.UUID;
  * @author mattwigway
  */
 public abstract class Model {
-    public Model (User user) {
-        this(user, null);
-    }
-    
-    public Model (User user, List<Note> notes) {
-        this.userId = user.id;
-        this.notes = notes;
+ 
+    public Model () {
         this.id = UUID.randomUUID().toString();
     }
     
     protected String id;
+    
+    /**
+     * IDs can't be set by any class, but they are visible to any class.
+     */
+    public String getId () {
+        return id;
+    }
     
     /**
      * The ID of the user who owns this object.
@@ -37,6 +42,13 @@ public abstract class Model {
      * @return the User object
      */
     public User getUser () {
-        return User.get(userId);
+        return User.getUser(userId);
+    }
+    
+    /**
+     * Set the owner of this object
+     */
+    public void setUser (User user) {
+        userId = user.username;
     }
 }
