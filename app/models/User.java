@@ -7,6 +7,8 @@ import java.util.Date;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import play.Logger;
 import utils.DataStore;
 import utils.HashUtils;
@@ -19,7 +21,8 @@ public class User implements Serializable {
 	
 	public String id;
 	public String username;
-	protected String passwordHash;
+	@JsonIgnore
+	public String passwordHash;
 	public String email;
 	
 	public Boolean active;

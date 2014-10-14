@@ -17,7 +17,7 @@ public class FeedVersion extends Model {
     private static DataStore<FeedVersion> versionStore = new DataStore<FeedVersion>("feedversions");
     
     /** The feed source this is associated with */
-    private String feedSourceId;
+    public String feedSourceId;
     
     public FeedSource getFeedSource () {
         return FeedSource.get(feedSourceId);
@@ -28,10 +28,10 @@ public class FeedVersion extends Model {
     }
 
     /** The file on the file system */
-    private String feedFileId;
+    public String feedFileId;
     
     /** The MD5 sum of the feed file, for quick checking if the file has been updated */
-    private String md5sum;
+    public String md5sum;
     
     public File getFeed() {
         // TODO: hacked together
