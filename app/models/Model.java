@@ -3,6 +3,8 @@ package models;
 import java.util.List;
 import java.util.UUID;
 
+import javax.persistence.MappedSuperclass;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
@@ -10,12 +12,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * We don't use the Play model object because we're not saving things to a relational database.
  * @author mattwigway
  */
+@MappedSuperclass
 public abstract class Model {
  
     public Model () {
         this.id = UUID.randomUUID().toString();
     }
-    
+        
     public String id;
     
     /**
