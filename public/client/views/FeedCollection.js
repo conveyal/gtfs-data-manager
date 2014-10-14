@@ -11,19 +11,35 @@ var Handlebars = require('handlebars');
 var FeedCollectionItemView = Backbone.Marionette.ItemView.extend({
     template: Handlebars.compile(require('./FeedCollection.html')),
     tagName: 'li',
-    events: { 'change .input': 'update' },
-
-    initialize: function () {
-        _.bindAll(this, 'update');
+    events: { 
+        'click .toggle-edit': 'edit'
     },
 
-    // update a feed collection, or save it for the first time
-    update: function (e) {
-        var $t = $(e.target);
-        var attr = {};
-        attr[$t.attr('name')] = $t.val();
-        this.model.set(attr);
-        this.model.save();
+    initialize: function () {
+        _.bindAll(this, 'edit');
+        // keep track of whether the field is currently being edited or not
+        this.editing = false;
+    },
+
+    // toggle editing of a field
+    edit: function (e) {
+        this.$('.input').toggleClass('hidden');
+
+        this.$('.glyphicon').toggleClass('glyphicon-pencil').toggleClass('glyphicon-ok');
+
+        if (this.editing) {
+            // save
+            this.model.set({name: this.$('input').val()});
+            this.model.save();
+
+            this.$('.label').text(Messages('app.save'));
+            this.render();
+        }
+        else {
+            this.$('.label').text(Messages('app.edit'));
+        }
+        
+        this.editing = !this.editing;
     }
 });
 
