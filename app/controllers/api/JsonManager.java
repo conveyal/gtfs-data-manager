@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -24,8 +25,8 @@ public class JsonManager<T> {
      * @return the JSON string
      * @throws JsonProcessingException 
      */
-    public String write (T o) throws JsonProcessingException {
-        return om.writeValueAsString(o);
+    public JsonNode write (T o) throws JsonProcessingException {
+        return om.valueToTree(o);
     }
     
     public T read (String s) throws JsonParseException, JsonMappingException, IOException {
