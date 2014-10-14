@@ -19,7 +19,7 @@ public class User implements Serializable {
 	
 	public String id;
 	public String username;
-	public String passwordHash;
+	protected String passwordHash;
 	public String email;
 	
 	public Boolean active;
