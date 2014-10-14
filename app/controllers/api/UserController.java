@@ -15,10 +15,14 @@ import play.mvc.Result;
 public class UserController extends Controller {
     private static JsonManager<User> json = new JsonManager<User>();
     
+    public static JsonManager<User> getJsonManager() {
+        return json;
+    }
+    
     public static Result get (String id) throws JsonProcessingException {
         User u = User.getUser(id);
         // TODO: cheesy way to not expose hashed passwords
-        u.passwordHash = "";
+            u.passwordHash = "";
         return ok(json.write(u));
     }
     

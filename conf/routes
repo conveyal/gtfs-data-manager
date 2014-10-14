@@ -6,8 +6,10 @@
 POST    /authenticate                   controllers.Application.authenticate()
 
 # API CRUD stuff
-GET     /api/feedcollections/:id        controllers.api.FeedCollectionController.get(id:String)
-POST    /api/feedcollections/           controllers.api.FeedCollectionController.create()
+GET      /api/feedcollections/:id       controllers.api.FeedCollectionController.get(id:String)
+GET      /api/feedcollections           controllers.api.FeedCollectionController.getAll()
+PUT      /api/feedcollections/:id       controllers.api.FeedCollectionController.update(id:String)
+POST     /api/feedcollections           controllers.api.FeedCollectionController.create()
 
 GET     /api/users/:id                  controllers.api.UserController.get(id:String)
 POST    /api/users/                     controllers.api.UserController.create()

@@ -1,6 +1,7 @@
 package controllers.api;
 
 import java.io.IOException;
+import java.util.Collection;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
@@ -27,6 +28,15 @@ public class JsonManager<T> {
      */
     public JsonNode write (T o) throws JsonProcessingException {
         return om.valueToTree(o);
+    }
+    
+    /**
+     * Convert a collection of objects to their JSON representation.
+     * @param c the collection
+     * @return A JsonNode representing the collection
+     */
+    public JsonNode write (Collection<T> c) {
+        return om.valueToTree(c);
     }
     
     public T read (String s) throws JsonParseException, JsonMappingException, IOException {

@@ -1,10 +1,7 @@
 package models;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * The base class for all of the models used by GTFS Data Manager.
@@ -49,6 +46,6 @@ public abstract class Model {
      * Set the owner of this object
      */
     public void setUser (User user) {
-        userId = user.username;
+        userId = user.id != null ? user.id : User.getUserId(user.username);
     }
 }

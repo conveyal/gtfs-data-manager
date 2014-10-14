@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import controllers.api.UserController;
 import models.User;
 import play.*;
 import play.libs.Json;
@@ -44,9 +45,7 @@ public class Application extends Controller {
     // used by the web app to see who is logged in
     public static Result getLoggedInUser () throws JsonProcessingException {
         if (session("username") != null) {
-            ObjectNode result = Json.newObject();
-            result.put("username", session("username"));
-            return ok(result);
+            return ok(UserController.getJsonManager().write(User.getUserByUsername(session("username"))));
         }
         else {
             return unauthorized();
