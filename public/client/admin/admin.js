@@ -15,7 +15,7 @@ module.exports = function () {
             var agencies = new m.FeedCollectionCollection();
             var instance = this;
             agencies.fetch().done(function () {
-                instance.collectionRegion.show(new v.FeedCollectionCollectionView({collection: agencies}));
+                instance.collectionRegion.show(new v.FeedCollectionEditableView({collection: agencies}));
             })
         }
     });

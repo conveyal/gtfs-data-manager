@@ -6,6 +6,7 @@
         "marionettejs/backbone.marionette": "*",
         "components/handlebars.js": "*"
     },
+    "local": ["models"],
     "scripts": ["FeedCollection.js"],
-    "templates": ["FeedCollection.html"]
+    "templates": ["FeedCollection.html", "FeedCollectionEditable.html"]
 }
