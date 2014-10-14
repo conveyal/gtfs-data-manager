@@ -13,5 +13,6 @@ module.exports.FeedCollection = Backbone.Model.extend({
 // brought to you by your local department of redundancy department
 module.exports.FeedCollectionCollection = Backbone.Collection.extend({
     model: module.exports.FeedCollection,
-    url: 'api/feedcollections'
+    url: 'api/feedcollections',
+    comparator: 'name'
 });
