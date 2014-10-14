@@ -1,7 +1,10 @@
 package models;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import utils.DataStore;
 
@@ -33,5 +36,22 @@ public class FeedCollection extends Model implements Serializable {
 
     public void save() {
         collectionStore.save(this.id, this);
+    }
+    
+    /**
+     * Get all the feed sources for this feed
+     */
+    @JsonIgnore
+    public Collection<FeedSource> getFeedSources () {
+        ArrayList<FeedSource> ret = new ArrayList<FeedSource>();
+        
+        // TODO: use index, but not important for now because we generally only have one FeedCollection
+        for (FeedSource fs : FeedSource.getAll()) {
+            if (this.id.equals(fs.feedCollectionId)) {
+                ret.add(fs);
+            }
+        }
+        
+        return ret;
     }
 }

@@ -15,6 +15,9 @@ GET     /api/users/:id                  controllers.api.UserController.get(id:St
 POST    /api/users/                     controllers.api.UserController.create()
 PUT     /api/users/:id                  controllers.api.UserController.update(id:String)
 
+GET     /api/feedsources/:id            controllers.api.FeedSourceController.get(id:String)
+GET     /api/feedsources                controllers.api.FeedSourceController.getAll()
+
 GET     /messages.js                    controllers.Application.jsMessages()
 GET     /loggedInUser                   controllers.Application.getLoggedInUser()
 GET     /logout                         controllers.Application.logout()
