@@ -21,8 +21,6 @@ public class UserController extends Controller {
     
     public static Result get (String id) throws JsonProcessingException {
         User u = User.getUser(id);
-        // TODO: cheesy way to not expose hashed passwords
-            u.passwordHash = "";
         return ok(json.write(u));
     }
     
@@ -44,8 +42,6 @@ public class UserController extends Controller {
         
         u.save();
         
-        u.passwordHash = "";
-        
         return ok(json.write(u));
     }
     
@@ -58,8 +54,6 @@ public class UserController extends Controller {
             u.admin = "true".equals(params.get("admin")[0]);
         
         u.save();
-        
-        u.passwordHash = "";
         
         return ok(json.write(u));
     }
