@@ -1,0 +1,13 @@
+{
+    "name": "admin",
+    "dependencies": {
+	"jashkenas/backbone": "*",
+	"jashkenas/underscore": "*",
+	"components/jquery": "*",
+	"marionettejs/backbone.marionette": "*",
+	"components/handlebars.js": "*"
+    },
+    "local": ["application", "models", "views"],
+    "scripts": ["admin.js"],
+    "templates": ["admin.html"]
+}

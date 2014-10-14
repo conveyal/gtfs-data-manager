@@ -1,0 +1,11 @@
+{
+    "name": "application",
+    "dependencies": {
+        "jashkenas/backbone": "*",
+        "jashkenas/underscore": "*",
+        "components/jquery": "*",
+        "marionettejs/backbone.marionette": "*",
+        "components/handlebars.js": "*"
+    },
+    "scripts": ["application.js"]
+}

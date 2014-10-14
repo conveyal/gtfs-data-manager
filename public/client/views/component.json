@@ -1,0 +1,11 @@
+{
+    "name":"views",
+    "dependencies" : {
+        "jashkenas/backbone": "*",
+        "jashkenas/underscore": "*",
+        "marionettejs/backbone.marionette": "*",
+        "components/handlebars.js": "*"
+    },
+    "scripts": ["FeedCollection.js"],
+    "templates": ["FeedCollection.html"]
+}

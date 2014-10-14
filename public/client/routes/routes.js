@@ -5,10 +5,12 @@ var app = require('application');
 
 var Router = Backbone.Router.extend({
     routes: {
-	"login": "login"
+	"login": "login",
+        "admin": "admin"
     },
 
-    login: require('login')
+    login: require('login'),
+    admin: require('admin')
 });
 
 // start up the app
