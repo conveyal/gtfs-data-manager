@@ -1,5 +1,6 @@
 package controllers;
 
+import models.User;
 import play.mvc.Result;
 import play.mvc.Security;
 import play.mvc.Http.Context;
@@ -12,6 +13,12 @@ import play.mvc.Http.Context;
 public class Secured extends Security.Authenticator {
     @Override
     public String getUsername(Context ctx) {
-        return ctx.session().get("username");
+        User u = User.getUserByUsername(ctx.session().get("username"));
+        if (u != null && u.active) {
+            return u.username;
+        }
+        else {
+            return null;
+        }
     }
 }
