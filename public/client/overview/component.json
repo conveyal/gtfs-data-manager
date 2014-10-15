@@ -1,0 +1,14 @@
+{
+    "name": "overview",
+    "description": "An overview of a feed collection: what feeds are defined, &c.",
+    "dependencies": {
+        "jashkenas/backbone": "*",
+        "jashkenas/underscore": "*",
+        "components/jquery": "*",
+        "marionettejs/backbone.marionette": "*",
+        "components/handlebars.js": "*"
+    },
+    "local": ["application", "models", "views"],
+    "scripts": ["overview.js"],
+    "templates": ["overview.html"]
+}

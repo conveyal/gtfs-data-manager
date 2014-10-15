@@ -28,9 +28,12 @@ public class FeedSource extends Model {
     /**
      * Get the FeedCollection of which this feed is a part
      */
-    @JsonIgnore
     public FeedCollection getFeedCollection () {
         return FeedCollection.get(feedCollectionId);
+    }
+    
+    public void setFeedCollection(FeedCollection c) {
+        this.feedCollectionId = c.id;
     }
     
     /** The name of this feed source, e.g. MTA New York City Subway */

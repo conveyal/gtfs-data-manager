@@ -9,6 +9,7 @@
     "local": [
         "application",
 	"login",
-        "admin"
+        "admin",
+        "overview"
 	]
 }

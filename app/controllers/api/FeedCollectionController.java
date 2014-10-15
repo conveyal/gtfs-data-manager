@@ -49,7 +49,7 @@ public class FeedCollectionController extends Controller {
         // TODO: feed collection admins
         
         if (Boolean.TRUE.equals(currentUser.admin) || currentUser.equals(c.getUser())) {
-            JsonNode name = params.findValue("name");
+            JsonNode name = params.get("name");
             if (name != null) {
                 c.name = name.asText();
             }
@@ -57,11 +57,12 @@ public class FeedCollectionController extends Controller {
         
         // only allow admins to change feed collection owners
         if (Boolean.TRUE.equals(currentUser.admin)) {
-            JsonNode uname = params.findValue("user/username");
+            JsonNode uname = params.get("user");
         
+            // TODO: test
             User u = null;
-            if (uname != null)
-                u = User.getUserByUsername(uname.asText());
+            if (uname != null && uname.has("username"))
+                u = User.getUserByUsername(uname.get("username").asText());
         
             if (u != null)
                 c.setUser(u);
@@ -83,8 +84,8 @@ public class FeedCollectionController extends Controller {
         FeedCollection c = new FeedCollection();
         
         // TODO: fail gracefully
-        c.name = params.findValue("name").asText();
-        JsonNode uname = params.findValue("user/username");
+        c.name = params.get("name").asText();
+        JsonNode uname = params.get("user/username");
         
         User u = null;
         if (uname != null)

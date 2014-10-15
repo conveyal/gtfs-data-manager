@@ -9,6 +9,6 @@
     },
     "local": ["models"],
     "main": "views.js",
-    "scripts": ["views.js", "EditableText.js", "FeedCollection.js"],
-    "templates": ["EditableText.html", "FeedCollectionEditable.html"]
+    "scripts": ["views.js", "EditableText.js", "FeedCollection.js", "FeedSource.js"],
+    "templates": ["EditableText.html", "FeedCollectionEditable.html", "FeedSource.html", "FeedSourceTable.html"]
 }

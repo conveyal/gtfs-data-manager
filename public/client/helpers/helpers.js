@@ -2,5 +2,6 @@
 
 // put helpers you want to be loaded here
 module.exports = [
-    require('./t.js')
+    require('./t.js'),
+    require('./fancyCheckbox.js')
 ];

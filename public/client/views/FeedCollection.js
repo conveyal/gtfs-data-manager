@@ -12,7 +12,10 @@ var EditableTextView = require('./EditableText.js').EditableTextView;
  */
 var FeedCollectionItemView = EditableTextView.extend({
     tagName: 'li',
-    attribute: 'name'    
+    attribute: 'name',
+    href: function () { 
+        return '#overview/' + this.model.get('id');
+    }
 });
 
 /**

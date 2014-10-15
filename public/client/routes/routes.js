@@ -6,11 +6,13 @@ var app = require('application');
 var Router = Backbone.Router.extend({
     routes: {
 	"login": "login",
-        "admin": "admin"
+        "admin": "admin",
+        "overview/:feedCollectionId": "overview"
     },
 
     login: require('login'),
-    admin: require('admin')
+    admin: require('admin'),
+    overview: require('overview')
 });
 
 // start up the app

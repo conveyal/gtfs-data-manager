@@ -16,7 +16,10 @@ module.exports.EditableTextView = Backbone.Marionette.ItemView.extend({
         'click .toggle-edit': 'edit'
     },
 
-    initialize: function () {
+    initialize: function (attr) {
+        this.attribute = attr['attribute'] || this.attribute;
+        this.href = attr['href'] || this.href;
+
         _.bindAll(this, 'edit');
         // keep track of whether the field is currently being edited or not
         this.editing = false;
@@ -45,10 +48,21 @@ module.exports.EditableTextView = Backbone.Marionette.ItemView.extend({
         this.editing = !this.editing;
     },
 
-    // we override serializeDate because we need to get the text of a particular field, and the
+    // we override serializeData because we need to get the text of a particular field, and the
     // view doesn't know which field that is
     serializeData: function () {
-        return {text: this.model.get(this.attribute), href: this.href || '#'};
+        var href;
+
+        if (typeof this.href == "function")
+            href = this.href();
+
+        else if (typeof href == "undefined")
+            href = '#';
+
+        else
+            href = this.href;
+
+        return {text: this.model.get(this.attribute), href: href};
     }
 });
 
