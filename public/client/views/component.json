@@ -4,9 +4,11 @@
         "jashkenas/backbone": "*",
         "jashkenas/underscore": "*",
         "marionettejs/backbone.marionette": "*",
-        "components/handlebars.js": "*"
+        "components/handlebars.js": "*",
+        "components/jquery": "*"
     },
     "local": ["models"],
-    "scripts": ["FeedCollection.js"],
-    "templates": ["FeedCollection.html", "FeedCollectionEditable.html"]
+    "main": "views.js",
+    "scripts": ["views.js", "EditableText.js", "FeedCollection.js"],
+    "templates": ["EditableText.html", "FeedCollectionEditable.html"]
 }

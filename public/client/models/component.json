@@ -4,5 +4,5 @@
 	"jashkenas/backbone": "*",
 	"jashkenas/underscore": "*"
     },
-    "scripts": ["FeedCollection.js"]
+    "scripts": ["FeedCollection.js", "FeedSource.js"]
 }

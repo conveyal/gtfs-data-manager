@@ -5,42 +5,14 @@ var _ = require('underscore');
 var m = require('models');
 var Handlebars = require('handlebars');
 
+var EditableTextView = require('./EditableText.js').EditableTextView;
+
 /**
  * An item view of a single FeedCollection
  */
-var FeedCollectionItemView = Backbone.Marionette.ItemView.extend({
-    template: Handlebars.compile(require('./FeedCollection.html')),
+var FeedCollectionItemView = EditableTextView.extend({
     tagName: 'li',
-    events: { 
-        'click .toggle-edit': 'edit'
-    },
-
-    initialize: function () {
-        _.bindAll(this, 'edit');
-        // keep track of whether the field is currently being edited or not
-        this.editing = false;
-    },
-
-    // toggle editing of a field
-    edit: function (e) {
-        this.$('.input').toggleClass('hidden');
-
-        this.$('.glyphicon').toggleClass('glyphicon-pencil').toggleClass('glyphicon-ok');
-
-        if (this.editing) {
-            // save
-            this.model.set({name: this.$('input').val()});
-            this.model.save();
-
-            this.$('.label').text(Messages('app.save'));
-            this.render();
-        }
-        else {
-            this.$('.label').text(Messages('app.edit'));
-        }
-        
-        this.editing = !this.editing;
-    }
+    attribute: 'name'    
 });
 
 /**

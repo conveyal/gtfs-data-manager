@@ -1,0 +1,5 @@
+{
+    "name": "helpers",
+    "description": "Handlebars helpers for the GTFS Data Manager",
+    "scripts": ["helpers.js", "t.js"]
+}
