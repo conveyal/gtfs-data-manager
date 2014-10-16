@@ -1,0 +1,32 @@
+<div class="panel-group">
+  {{#each errors}}
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a href="#" role="button" data-toggle="collapse" data-target="#errors-{{ name }}" onclick="return false;">
+          {{ name }} ({{ length }} {{ t 'app.feed_version.warnings' }}) {{!-- priority this --}}&nbsp;&nbsp;<span class="caret"></span>
+        </a>
+      </h4>
+    </div>
+    <div class="panel collapse" id="errors-{{ name }}">
+      <table class="table">
+        <thead>
+          <th>{{ t 'app.feed_version.problem_type' }}</th>
+          <th>{{ t 'app.feed_version.affected_entity' }}</th>
+          <th>{{ t 'app.feed_version.affected_field' }}</th>
+          <th>{{ t 'app.feed_version.description' }}</th>
+        </thead>
+        <tbody>
+          {{!-- this is a list, with some extra properties (e.g. name) --}}
+          {{#each this}}
+            <tr>
+              <td>{{ problemType }}</td>
+              <td>{{ affectedEntity }}</td>
+              <td>{{ affectedField }}</td>
+              <td>{{ problemDescription }}</td>
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+  {{/each}}
+</div>

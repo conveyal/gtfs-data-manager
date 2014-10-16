@@ -1,0 +1,14 @@
+{
+    "name": "feedsource",
+    "description": "What is the status of a feed source: latest validation results, etc.",
+    "dependencies": {
+        "jashkenas/backbone": "*",
+        "jashkenas/underscore": "*",
+        "components/jquery": "*",
+        "marionettejs/backbone.marionette": "*",
+        "components/handlebars.js": "*"
+    },
+    "local": ["application", "models", "views"],
+    "scripts": ["feedsource.js"],
+    "templates": ["FeedSource.html"]
+}

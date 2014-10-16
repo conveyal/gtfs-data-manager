@@ -1,0 +1,41 @@
+{{#if (neq validationResult null)}}
+  <table class="table">
+    <tbody>
+      {{#with validationResult}}
+        <tr><th>Load Status</th><td>{{ loadStatus }}</td></tr>
+        {{#if (eq loadStatus 'SUCCESS') }}
+        <tr><th>{{ t 'app.feed_version.agency_count' }}</th><td class="{{ highlightZero agencyCount }}">{{ agencyCount }}</td></tr>
+        <tr><th>{{ t 'app.feed_version.route_count' }}</th><td class="{{ highlightZero routeCount }}">{{ routeCount }}</td></tr>
+        <tr><th>{{ t 'app.feed_version.trip_count' }}</th><td class="{{ highlightZero tripCount }}">{{ tripCount }}</td></tr>
+        <tr><th>{{ t 'app.feed_version.stop_times_count' }}</th><td class="{{ highlightZero stopTimesCount }}">{{ stopTimesCount }}</td></tr>
+        <tr>
+          <th>Service Range</th>
+          {{!-- if the stop times count is 0, then there are no service dates, so if we did not suppress them we would see Dec 31 1969 19:00:00 -0500 --}}
+          {{#if (gt stopTimesCount 0) }}
+          <td>
+            <div style="display: inline-block" class="{{ getClassForStartDate startDate }}">{{ dateRender startDate false }}</div>
+            {{ t 'app.feed_version.to' }}
+            <div style="display: inline-block" class="{{ getClassForEndDate endDate }}">{{ dateRender endDate false }}</div>
+          </td>
+
+          {{else}}
+          <td>-</td>
+          {{/if}}
+        </tr>
+
+        {{else}}
+        <tr><th>{{ t 'app.feed_version.reason' }}</th><td>{{ loadFailureReason }}</td></tr>
+        {{/if}}
+      {{/with}}
+    </tbody>
+  </table>
+{{/if}}
+
+<h2>{{ t 'app.feed_version.route_warnings' }}</h1>
+<div id="routes"></div>
+<h2>{{ t 'app.feed_version.stop_warnings' }}</h1>
+<div id="stops"></div>
+<h2>{{ t 'app.feed_version.trip_warnings' }}</h1>
+<div id="trips"></div>
+<h2>{{ t 'app.feed_version.shape_warnings' }}</h1>
+<div id="shapes"></div>
