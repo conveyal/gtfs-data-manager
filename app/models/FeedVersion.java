@@ -1,11 +1,19 @@
 package models;
 
 import java.io.File;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 
+import play.Logger;
+import play.Play;
 import utils.DataStore;
+import utils.FeedStore;
+import utils.HashUtils;
 
+import com.conveyal.gtfs.validator.json.FeedProcessor;
 import com.conveyal.gtfs.validator.json.FeedValidationResult;
 
 /**
@@ -13,8 +21,22 @@ import com.conveyal.gtfs.validator.json.FeedValidationResult;
  * @author mattwigway
  *
  */
-public class FeedVersion extends Model {
+public class FeedVersion extends Model {    
     private static DataStore<FeedVersion> versionStore = new DataStore<FeedVersion>("feedversions");
+    private static FeedStore feedStore = new FeedStore(Play.application().configuration().getString("application.data.gtfs")); 
+    
+    /**
+     * We generate IDs manually, but we need a bit of information to do so
+     */
+    public FeedVersion (FeedSource source) {
+        this.updated = new Date();
+        
+        // ISO time
+        DateFormat df = new SimpleDateFormat("yyyyMMdd'T'HHmmssX");
+        
+        // since we store directly on the file system, this lets users look at the DB directly
+        this.id = source.name + "_" + df.format(this.updated) + "_" + source.id + ".zip";
+    }
     
     /** The feed source this is associated with */
     public String feedSourceId;
@@ -26,16 +48,16 @@ public class FeedVersion extends Model {
     public void setFeedSource (FeedSource source) {
         this.feedSourceId = source.id;
     }
-
-    /** The file on the file system */
-    public String feedFileId;
     
-    /** The MD5 sum of the feed file, for quick checking if the file has been updated */
-    public String md5sum;
+    /** The hash of the feed file, for quick checking if the file has been updated */
+    public String hash;
     
     public File getFeed() {
-        // TODO: hacked together
-        return new File(feedFileId);
+        return feedStore.getFeed(id);
+    }
+    
+    public File newFeed() {
+        return feedStore.newFeed(id);
     }
     
     /** The results of validating this feed */
@@ -50,5 +72,32 @@ public class FeedVersion extends Model {
     public static FeedVersion get(String id) {
         // TODO Auto-generated method stub
         return versionStore.getById(id);
+    }
+
+    public static Collection<FeedVersion> getAll() {
+        return versionStore.getAll();
+    }
+
+    public void validate() { 
+        File feed = getFeed();
+        FeedProcessor fp = new FeedProcessor(feed);
+        
+        try {
+            fp.run();
+        } catch (IOException e) {
+            Logger.error("Unable to validate feed {}", this);
+            this.validationResult = null;
+            return;
+        }
+        
+        this.validationResult = fp.getOutput();
+    }
+
+    public void save() {
+        versionStore.save(this.id, this);
+    }
+
+    public void hash () {
+        this.hash = HashUtils.hashFile(getFeed());
     }
 }

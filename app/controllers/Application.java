@@ -1,6 +1,9 @@
 package controllers;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import jobs.FetchGtfsJob;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,13 +12,15 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import controllers.api.UserController;
 import models.User;
 import play.*;
+import play.libs.Akka;
 import play.libs.Json;
 import play.mvc.*;
+import scala.concurrent.duration.Duration;
 import views.html.*;
 
 public class Application extends Controller {
     private static ObjectMapper json = new ObjectMapper();
-    public static String dataPath = Play.application().configuration().getString("application.data");
+    public static String dataPath = Play.application().configuration().getString("application.data.mapdb");
     public static String secret = Play.application().configuration().getString("application.secret");
     final static jsmessages.JsMessages messages = jsmessages.JsMessages.create(play.Play.application());
 
@@ -64,5 +69,20 @@ public class Application extends Controller {
         return ok(messages.generate("window.Messages"));
     }
     
+    // kick off a gtfs update
+    @Security.Authenticated(Secured.class)
+    public static Result fetchGtfs () {
+        User u = User.getUserByUsername(session("username"));
+        if (!Boolean.TRUE.equals(u.admin))
+            return unauthorized("Only admins may trigger GTFS refetch");
+        
+        Akka.system().scheduler().scheduleOnce(
+                Duration.create(50, TimeUnit.MILLISECONDS),
+                new FetchGtfsJob(),
+                Akka.system().dispatcher()
+                );
+        
+        return ok("Running");
+    }
     // all of the hard stuff is in controllers.api
 }
