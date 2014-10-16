@@ -262,4 +262,4 @@ public class FeedSource extends Model {
             this.endDate = result.endDate;
         }
     }
-}
+     }
