@@ -25,8 +25,11 @@ var getMonth = function (month) {
  * whether to include the time, or just the date (default: include time)
  */
 module.exports = [
-    'renderDate',
+    'dateRender',
     function (date, includeTime) {
+        if (date == 0 || date == null)
+            return '-';
+
         if (typeof(includeTime) == 'undefined' || includeTime == null) {
             var includeTime = true;
         }
