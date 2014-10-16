@@ -1,8 +1,8 @@
 <td class="name"></td>
-<td>{{ fancyCheckbox isPublic }}</td>
-<td>{{ fancyCheckbox autofetch }}</td>
+<td><input class="edit-bool" type="checkbox" name="isPublic" {{ ? isPublic 'checked' '' }} /></td>
+<td><input class="edit-bool" type="checkbox" name="autofetch" {{ ? autofetch 'checked' '' }} /></td>
 <td class="url"></td>
-<td>{{ renderDate lastUpdated true }}</td>
+<td>{{ dateRender lastUpdated true }}</td>
 
 {{#if (neq latestValidation null)}}
   {{#if (eq latestValidation.loadStatus 'SUCCESS')}}
@@ -20,7 +20,7 @@
     </tr>
   {{else}}
     <td class="bg-danger">{{ t 'app.no' }}</span></td>
-    <td colspan="5">{{ latestValidation.loadFailureReason }}</td>
+    <td colspan="6">{{ latestValidation.loadFailureReason }}</td>
   {{/if}}
 {{else}}
     <td colspan="6">-</td>

@@ -17,6 +17,25 @@ var FeedSourceItemView = Backbone.Marionette.LayoutView.extend({
     },
     template: Handlebars.compile(require('./FeedSource.html')),
     tagName: 'tr',
+
+    events: { 'click .edit-bool': 'editBool' },
+    initialize: function () {
+        _.bindAll(this, 'editBool');
+    },
+
+    // edit a boolean value
+    editBool: function (e) {
+        var $t = $(e.target);
+
+        var attr = {};
+        attr[$t.attr('name')] = $t.is(':checked');
+        
+        this.model.set(attr);
+        this.model.save();
+
+        // no need to re-render because the checkbox has already been rendered by the browser
+    },
+
     onShow: function () {
         this.nameRegion.show(new EditableTextView({
             model: this.model,
