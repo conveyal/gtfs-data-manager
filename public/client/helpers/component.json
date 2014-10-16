@@ -5,5 +5,5 @@
         "components/handlebars.js": "*"
     },
     "main": "helpers.js",
-    "scripts": ["helpers.js", "t.js", "fancyCheckbox.js"]
+    "scripts": ["helpers.js", "t.js", "fancyCheckbox.js", "dateRender.js"]
 }

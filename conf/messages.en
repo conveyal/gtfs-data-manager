@@ -16,3 +16,17 @@ app.feed_source.public=Public
 app.feed_source.autofetch=Fetch automatically
 app.feed_source.url=URL
 app.feed_source.last_updated=Last updated
+
+# date rendering
+app.date.january=January
+app.date.february=February
+app.date.march=March
+app.date.april=April
+app.date.may=May
+app.date.june=June
+app.date.july=July
+app.date.august=August
+app.date.september=September
+app.date.october=October
+app.date.november=November
+app.date.december=December
