@@ -21,6 +21,7 @@ module.exports = function () {
 		    password: this.$('input[name="password"]').val()})
 	        .then(function (data) {
 		    $('#logged-in-user').text(window.Messages('app.account.logged_in_as', data['username']));
+                    window.location.hash = '#admin';
 	        })
 	        .fail(function () {
 		    alert('Log in failed');
