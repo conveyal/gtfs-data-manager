@@ -6,6 +6,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
+import java.util.regex.Pattern;
 
 import play.Logger;
 import play.Play;
@@ -35,7 +36,16 @@ public class FeedVersion extends Model {
         DateFormat df = new SimpleDateFormat("yyyyMMdd'T'HHmmssX");
         
         // since we store directly on the file system, this lets users look at the DB directly
-        this.id = source.name + "_" + df.format(this.updated) + "_" + source.id + ".zip";
+        this.id = getCleanName(source.name) + "_" + df.format(this.updated) + "_" + source.id + ".zip";
+    }
+
+    /**
+     * Clean a name to make it filesystem-friendly
+     * @param name a name with any letters
+     * @return a new name with weird letters removed/transliterated.
+     */
+    public static String getCleanName (String name) {
+        return name.replace(' ', '_').replaceAll("[^A-Za-z0-9_-]", "");
     }
     
     /** The feed source this is associated with */
