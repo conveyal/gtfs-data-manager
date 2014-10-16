@@ -19,6 +19,8 @@ import com.conveyal.gtfs.validator.json.FeedProcessor;
 import com.conveyal.gtfs.validator.json.FeedValidationResult;
 import com.conveyal.gtfs.validator.json.LoadStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import play.Logger;
 import utils.DataStore;
@@ -204,6 +206,7 @@ public class FeedSource extends Model {
         return latest != null ? latest.updated : null;
     }
     
+    @JsonInclude(Include.NON_NULL)
     public FeedValidationResultSummary getLatestValidation () {
         FeedVersion latest = getLatest();
         return latest != null ? new FeedValidationResultSummary(latest.validationResult) : null;
@@ -223,14 +226,13 @@ public class FeedSource extends Model {
      */
     public static class FeedValidationResultSummary implements Serializable {
         public LoadStatus loadStatus;
+        
+        @JsonInclude(Include.ALWAYS)
         public String loadFailureReason;
         public Collection<String> agencies;
+      
+        public int errorCount;
         
-        public int routeErrors;
-        public int stopErrors;
-        public int tripErrors;
-        public int shapeErrors;
-
         // statistics
         public int agencyCount;
         public int routeCount;
@@ -238,9 +240,11 @@ public class FeedSource extends Model {
         public int stopTimesCount;
         
         /** The first date the feed has service, either in calendar.txt or calendar_dates.txt */
+        @JsonInclude(Include.ALWAYS)
         public Date startDate;
         
         /** The last date the feed has service, either in calendar.txt or calendar_dates.txt */
+        @JsonInclude(Include.ALWAYS)
         public Date endDate;
         
         /**
@@ -251,15 +255,20 @@ public class FeedSource extends Model {
             this.loadStatus = result.loadStatus;
             this.loadFailureReason = result.loadFailureReason;
             this.agencies = result.agencies;
-            this.routeErrors = result.routes.invalidValues.size();
-            this.stopErrors = result.stops.invalidValues.size();
-            this.tripErrors = result.trips.invalidValues.size();
-            this.shapeErrors = result.shapes.invalidValues.size();
-            this.agencyCount = result.agencyCount;
-            this.routeCount = result.routeCount;
-            this.stopTimesCount = result.stopTimesCount;
-            this.startDate = result.startDate;
-            this.endDate = result.endDate;
+            
+            if (loadStatus == LoadStatus.SUCCESS) {
+                this.errorCount = 
+                        result.routes.invalidValues.size() +
+                        result.stops.invalidValues.size() +
+                        result.trips.invalidValues.size() +
+                        result.shapes.invalidValues.size();
+                
+                this.agencyCount = result.agencyCount;
+                this.routeCount = result.routeCount;
+                this.stopTimesCount = result.stopTimesCount;
+                this.startDate = result.startDate;
+                this.endDate = result.endDate;
+            }
         }
     }
      }

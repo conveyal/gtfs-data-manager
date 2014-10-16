@@ -3,4 +3,25 @@
 <td>{{ fancyCheckbox autofetch }}</td>
 <td class="url"></td>
 <td>{{ renderDate lastUpdated true }}</td>
-{{!-- TODO: latest validation results --}}
+
+{{#if (neq latestValidation null)}}
+  {{#if (eq latestValidation.loadStatus 'SUCCESS')}}
+    <td class="{{ ? latestValidation.errorCount 'bg-warning' 'bg-success' }}">{{ t 'app.yes' }}</span></td>
+    <td>{{ latestValidation.errorCount }}</td>
+    <td class="{{ highlightZero latestValidation.routeCount }}">{{ latestValidation.routeCount }}</td>
+    <td class="{{ highlightZero latestValidation.tripCount }}">{{ latestValidation.tripCount }}</td>
+    <td class="{{ highlightZero latestValidation.stopTimesCount }}">{{ latestValidation.stopTimesCount }}</td>
+    {{#if (gt latestValidation.stopTimesCount 0)}}
+      <td class="{{ getClassForStartDate latestValidation.startDate }}">{{ dateRender latestValidation.startDate false }}</td>
+      <td class="{{ getClassForEndDate latestValidation.endDate }}">{{ dateRender latestValidation.endDate false }}</td>
+    {{else}}
+      <td>-</td><td>-</td>
+    {{/if}}
+    </tr>
+  {{else}}
+    <td class="bg-danger">{{ t 'app.no' }}</span></td>
+    <td colspan="5">{{ latestValidation.loadFailureReason }}</td>
+  {{/if}}
+{{else}}
+    <td colspan="6">-</td>
+{{/if}}

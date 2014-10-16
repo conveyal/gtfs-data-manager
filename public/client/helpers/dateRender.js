@@ -35,7 +35,8 @@ module.exports = [
         
         // TODO: time zone?
         if (includeTime) {
-            return d.getDate() + ' ' + getMonth(d.getMonth()) + ' ' + d.getFullYear() + ' ' + d.getHours() + ':' + d.getMinutes() + ' ';
+            return d.getDate() + ' ' + getMonth(d.getMonth()) + ' ' + d.getFullYear() + ' ' + d.getHours() + ':' + 
+                (d.getMinutes() < 10 ? '0' + d.getMinutes() : d.getMinutes());
         }
         else {
             return d.getDate() + ' ' + getMonth(d.getMonth()) + ' ' + d.getFullYear();

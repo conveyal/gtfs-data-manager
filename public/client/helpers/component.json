@@ -5,5 +5,17 @@
         "components/handlebars.js": "*"
     },
     "main": "helpers.js",
-    "scripts": ["helpers.js", "t.js", "fancyCheckbox.js", "dateRender.js"]
+    "scripts": [
+        "helpers.js",
+        "t.js",
+        "fancyCheckbox.js",
+        "dateRender.js",
+        "getClassForStartDate.js",
+        "getClassForEndDate.js",
+        "ternary.js",
+        "highlightZero.js",
+        "eq.js",
+        "neq.js",
+        "gt.js"
+    ]
 }
