@@ -24,6 +24,13 @@ var Overview = Backbone.Marionette.LayoutView.extend({
                 feedCollectionId: instance.feedCollectionId
             }));
         });
+
+        var feedCollection = new m.FeedCollection({id: this.feedCollectionId});
+        feedCollection.fetch().done(function () {
+            app.nav.setLocation([
+                {name: feedCollection.get('name'), href: '#overview/' + feedCollection.get('id')}
+            ]);
+        });
     }
 });
 

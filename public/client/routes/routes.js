@@ -8,11 +8,13 @@ var Router = Backbone.Router.extend({
         "": "admin",
 	"login": "login",
         "admin": "admin",
-        "overview/:feedCollectionId": "overview"
+        "overview/:feedCollectionId": "overview",
+        "feed/:feedSourceId": "feedsource"
     },
 
     login: require('login'),
     admin: require('admin'),
+    feedsource: require('feedsource'),
     overview: require('overview'),
 });
 

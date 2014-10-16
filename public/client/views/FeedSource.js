@@ -40,13 +40,13 @@ var FeedSourceItemView = Backbone.Marionette.LayoutView.extend({
         this.nameRegion.show(new EditableTextView({
             model: this.model,
             attribute: 'name', 
-            href: function () {return '#'}
+            href: function () {return '#feed/' + this.model.id}
         }));
 
         this.urlRegion.show(new EditableTextView({
             model: this.model,
             attribute: 'url',
-            href: function () { return this.model.get('url') }    
+            href: function () { return this.model.get('url') }
         }));
     }
 });

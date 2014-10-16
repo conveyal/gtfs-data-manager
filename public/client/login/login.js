@@ -28,6 +28,13 @@ module.exports = function () {
 	        });
 
 	    return false;
+        },
+
+        onShow: function () {
+            // init nav
+            app.nav.setLocation([
+                {name: Messages('app.location.login'), href: '#login'}
+            ]);
         }
     });
 

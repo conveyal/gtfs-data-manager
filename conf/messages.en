@@ -32,9 +32,25 @@ app.date.november=November
 app.date.december=December
 
 app.feed_version.loaded_successfully=Loaded successfully
+app.feed_version.agency_count=Agency count
 app.feed_version.error_count=Error count
 app.feed_version.route_count=Route count
 app.feed_version.trip_count=Trip count
 app.feed_version.stop_times_count=Stop time count
 app.feed_version.start_date=Valid from
 app.feed_version.end_date=Valid until
+app.feed_version.service_span=Service span
+# as in June 4 to June 7
+app.feed_version.to=to
+app.feed_version.reason=Reason
+app.feed_version.problem_type=Problem type
+app.feed_version.affected_entity=Affected entity
+app.feed_version.affected_field=Affected field
+app.feed_version.description=Description
+app.feed_version.warnings=warnings
+app.feed_version.route_warnings=Route warnings
+app.feed_version.stop_warnings=Stop warnings
+app.feed_version.trip_warnings=Trip warnings
+app.feed_version.shape_warnings=Shape warnings
+app.location.home=Home
+app.location.login=Log in

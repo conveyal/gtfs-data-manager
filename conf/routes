@@ -20,6 +20,8 @@ GET     /api/feedsources                controllers.api.FeedSourceController.get
 PUT     /api/feedsources/:id            controllers.api.FeedSourceController.update(id:String)
 POST    /api/feedsources/               controllers.api.FeedSourceController.create()
 
+GET      /api/feedversions/:id          controllers.api.FeedVersionController.get(id:String)
+
 GET     /fetchGtfs                      controllers.Application.fetchGtfs()
 GET     /messages.js                    controllers.Application.jsMessages()
 GET     /loggedInUser                   controllers.Application.getLoggedInUser()

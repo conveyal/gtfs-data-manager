@@ -10,6 +10,7 @@
         "application",
 	"login",
         "admin",
-        "overview"
+        "overview",
+        "feedsource"
 	]
 }

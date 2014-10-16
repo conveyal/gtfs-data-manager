@@ -21,6 +21,12 @@ var FeedSourceLayout = Backbone.Marionette.LayoutView.extend({
         latest.fetch().done(function () {
             instance.latestValidationRegion.show(new v.FeedVersion({model: latest}));
         });
+
+        // set up nav
+        app.nav.setLocation([
+            {name: this.model.get('feedCollection').name, href: '#overview/' + this.model.get('feedCollection').id},
+            {name: this.model.get('name'), href: '#feed/' + this.model.get('id')},
+        ]);
     }
 })
 

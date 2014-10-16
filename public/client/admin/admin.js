@@ -17,6 +17,8 @@ module.exports = function () {
             agencies.fetch().done(function () {
                 instance.collectionRegion.show(new v.FeedCollectionEditableView({collection: agencies}));
             })
+
+            app.nav.setLocation([]);
         }
     });
     
