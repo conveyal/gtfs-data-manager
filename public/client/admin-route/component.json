@@ -1,0 +1,14 @@
+{
+    "name": "admin-route",
+    "description": "Route to show all of the defined feed collections",
+    "dependencies": {
+	"jashkenas/backbone": "*",
+	"jashkenas/underscore": "*",
+	"components/jquery": "*",
+	"marionettejs/backbone.marionette": "*",
+	"components/handlebars.js": "*"
+    },
+    "local": ["application", "feed-collection-collection", "feed-collection-collection-view"],
+    "scripts": ["admin-route.js"],
+    "templates": ["admin-route.html"]
+}

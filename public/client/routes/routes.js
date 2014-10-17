@@ -13,10 +13,10 @@ var Router = Backbone.Router.extend({
         "feed/:feedSourceId": "feedsource"
     },
 
-    login: require('login'),
-    admin: require('admin'),
-    feedsource: require('feedsource'),
-    overview: require('overview'),
+    login: require('login-route'),
+    admin: require('admin-route'),
+    feedsource: require('feed-source-route'),
+    overview: require('feed-collection-route'),
 });
 
 // start up the app

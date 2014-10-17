@@ -10,7 +10,7 @@ var FeedCollectionCollection = require('feed-collection-collection');
 module.exports = function () {
     var Admin = Backbone.Marionette.LayoutView.extend({
         regions: {collectionRegion: '#collection'},
-        template: Handlebars.compile(require('./admin.html')),
+        template: Handlebars.compile(require('./admin-route.html')),
         onShow: function () {
             var agencies = new FeedCollectionCollection();
             var instance = this;

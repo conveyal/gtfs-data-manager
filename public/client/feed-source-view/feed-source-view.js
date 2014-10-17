@@ -13,8 +13,8 @@ var FeedSource = require('feed-source');
 var FeedVersionView = require('feed-version-view');
 var FeedUploadView = require('feed-upload-view');
 
-var FeedSourceLayout = Backbone.Marionette.LayoutView.extend({
-    template: Handlebars.compile(require("./FeedSource.html")),
+module.exports = Backbone.Marionette.LayoutView.extend({
+    template: Handlebars.compile(require("./feed-source-view.html")),
     regions: {latestValidationRegion: '#latest-validation'},
 
     events: {'click .upload-feed': 'uploadFeed' },
@@ -42,10 +42,3 @@ var FeedSourceLayout = Backbone.Marionette.LayoutView.extend({
         ]);
     }
 })
-
-module.exports = function (feedSourceId) {
-    var model = new FeedSource({id: feedSourceId});
-    model.fetch().done(function () {
-        app.appRegion.show(new FeedSourceLayout({model: model}));
-    });
-};

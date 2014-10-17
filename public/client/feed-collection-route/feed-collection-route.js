@@ -10,7 +10,7 @@ var FeedSourceCollectionView = require('feed-source-collection-view');
 
 var Overview = Backbone.Marionette.LayoutView.extend({
     regions: {feedSourceRegion: '#feed-sources'},
-    template: Handlebars.compile(require('./overview.html')),
+    template: Handlebars.compile(require('./feed-collection-route.html')),
 
     initialize: function (attr) {
         this.feedCollectionId = attr.feedCollectionId;

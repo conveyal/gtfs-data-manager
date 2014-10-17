@@ -6,7 +6,7 @@ var Handlebars = require('handlebars.js');
 var app = require('application');
 
 var Login = Backbone.Marionette.LayoutView.extend({
-    template: Handlebars.compile(require('./login.html')),
+    template: Handlebars.compile(require('./login-route.html')),
     events: {'click .login': 'doLogin'},
 
     initialize: function (attr) {

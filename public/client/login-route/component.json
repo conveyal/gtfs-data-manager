@@ -1,5 +1,5 @@
 {
-    "name": "admin",
+    "name": "login-route",
     "dependencies": {
 	"jashkenas/backbone": "*",
 	"jashkenas/underscore": "*",
@@ -7,7 +7,9 @@
 	"marionettejs/backbone.marionette": "*",
 	"components/handlebars.js": "*"
     },
-    "local": ["application", "feed-collection-collection", "feed-collection-collection-view"],
-    "scripts": ["admin.js"],
-    "templates": ["admin.html"]
+    "local" : [
+        "application"
+    ],
+    "scripts": ["login-route.js"],
+    "templates": ["login-route.html"]
 }

@@ -1,5 +1,5 @@
 {
-    "name": "feedsource",
+    "name": "feed-source-view",
     "description": "What is the status of a feed source: latest validation results, etc.",
     "dependencies": {
         "jashkenas/backbone": "*",
@@ -9,6 +9,6 @@
         "components/handlebars.js": "*"
     },
     "local": ["application", "feed-version", "feed-source", "feed-upload-view", "feed-version-view"],
-    "scripts": ["feedsource.js"],
-    "templates": ["FeedSource.html"]
+    "scripts": ["feed-source-view.js"],
+    "templates": ["feed-source-view.html"]
 }

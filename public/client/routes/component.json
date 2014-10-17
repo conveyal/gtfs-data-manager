@@ -8,9 +8,9 @@
     "scripts": ["routes.js"],
     "local": [
         "application",
-	"login",
-        "admin",
-        "overview",
-        "feedsource"
+	"login-route",
+        "admin-route",
+        "feed-collection-route",
+        "feed-source-route"
 	]
 }
