@@ -68,6 +68,13 @@ public class User implements Serializable {
 		Logger.info("saved user u " +id);
 	}
 	
+	/**
+	 * @return true if any users exist
+	 */
+	public static boolean usersExist () {
+	    return userData.size() > 0;
+	}
+	
 	public void delete() {
 		userData.delete(id);
 		

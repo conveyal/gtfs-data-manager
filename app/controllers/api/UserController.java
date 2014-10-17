@@ -11,7 +11,11 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 import play.mvc.Controller;
 import play.mvc.Result;
+import play.mvc.Security;
 
+import controllers.Secured;
+
+@Security.Authenticated(Secured.class)
 public class UserController extends Controller {
     private static JsonManager<User> json = new JsonManager<User>();
     
@@ -20,16 +24,23 @@ public class UserController extends Controller {
     }
     
     public static Result get (String id) throws JsonProcessingException {
+        User currentUser = User.getUserByUsername(session("username"));
         User u = User.getUser(id);
-        return ok(json.write(u));
+        
+        if (!(currentUser.equals(u)))
+            return unauthorized();
+        else
+            return ok(json.write(u));
     }
     
-    public static Result update (String id) throws JsonProcessingException {
+    public static Result update (String id) throws JsonProcessingException {        
         Map<String,String[]> params = request().body().asFormUrlEncoded();
         
+        User currentUser = User.getUserByUsername(session("username"));
         User u = User.getUser(id);
         
-        // TODO: access control
+        if (!(currentUser.equals(u)))
+            return unauthorized();
         
        // if (params.containsKey("password"))
        //     u.setPassword(params.get("password")[0]);
@@ -47,6 +58,11 @@ public class UserController extends Controller {
     
     public static Result create () throws JsonParseException, JsonMappingException, IOException {
         Map<String,String[]> params = request().body().asFormUrlEncoded();
+        
+        User currentUser = User.getUserByUsername(session("username"));
+        
+        if (!(Boolean.TRUE.equals(currentUser.admin)))
+            return unauthorized();
         
         User u = new User(params.get("username")[0], params.get("password")[0], params.get("email")[0]);
         

@@ -1,11 +1,14 @@
 package controllers;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import jobs.FetchGtfsJob;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -28,7 +31,6 @@ public class Application extends Controller {
         Map<String,String[]> params = request().body().asFormUrlEncoded();
         
         if (!params.containsKey("username") || !params.containsKey("password"))
-            // TODO: not actually ok
             return unauthorized();
         
         // check if the user successfully authenticated
@@ -57,12 +59,20 @@ public class Application extends Controller {
         }
     }
     
-    private static class LoginStatus {
-        public String username;
+    public static Result createInitialUser () throws JsonParseException, JsonMappingException, IOException {
+        Map<String,String[]> params = request().body().asFormUrlEncoded();
+        
+        if (User.usersExist())
+            return unauthorized();
 
-        public LoginStatus(String username) {
-            this.username = username;
-        }
+        User u = new User(params.get("username")[0], params.get("password")[0], params.get("email")[0]);
+        
+        if (params.containsKey("admin"))
+            u.admin = "true".equals(params.get("admin")[0]);
+        
+        u.save();
+        
+        return ok("user created");
     }
     
     public static Result jsMessages() {
