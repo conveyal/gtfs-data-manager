@@ -4,7 +4,7 @@ var $ = require('jquery');
 var _ = require('underscore');
 var Handlebars = require('handlebars.js');
 var app = require('application');
-var FeedCollectionCollectionView = require('feedcollectioncollectionview');
+var FeedCollectionCollectionView = require('feed-collection-collection-view');
 var m = require('models');
 
 module.exports = function () {
