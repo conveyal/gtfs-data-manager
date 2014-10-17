@@ -6,11 +6,10 @@ var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var $ = require('jquery');
 var _ = require('underscore');
-var m = require('models');
 var Handlebars = require('handlebars');
 
 module.exports = Backbone.Marionette.ItemView.extend({
-    template: Handlebars.compile(require('./EditableTextWidget.html')),
+    template: Handlebars.compile(require('./editable-text-widget.html')),
     tagName: 'span',
     events: { 
         'click .toggle-edit': 'edit'

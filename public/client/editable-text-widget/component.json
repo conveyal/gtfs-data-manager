@@ -11,5 +11,5 @@
     "main": "editable-text-widget.js",
     "scripts": ["editable-text-widget.js"],
     "templates": ["editable-text-widget.html"],
-    "styles": ["editable-text-widget.html"]
+    "styles": ["editable-text-widget.css"]
 }

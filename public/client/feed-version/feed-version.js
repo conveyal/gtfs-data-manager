@@ -5,7 +5,7 @@
 var _ = require('underscore');
 var Backbone = require('Backbone');
 
-module.exports.FeedVersion = Backbone.Model.extend({
+module.exports = Backbone.Model.extend({
     defaults: {
         id: null,
         feedSource: null,

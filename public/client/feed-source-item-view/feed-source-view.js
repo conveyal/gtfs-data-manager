@@ -2,7 +2,6 @@ var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var $ = require('jquery');
 var _ = require('underscore');
-var m = require('models');
 var Handlebars = require('handlebars');
 
 var EditableTextWidget = require('editable-text-widget');

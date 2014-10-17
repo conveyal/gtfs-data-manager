@@ -7,9 +7,6 @@
         "components/handlebars.js": "*",
         "components/jquery": "*"
     },
-    "local": [
-        "models"
-    ],
     "main": "feed-upload-view.js",
     "scripts": ["feed-upload-view.js"],
     "templates": ["feed-upload-view.html"]

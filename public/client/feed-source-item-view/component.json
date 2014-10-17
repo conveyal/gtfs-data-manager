@@ -8,7 +8,6 @@
         "components/jquery": "*"
     },
     "local": [
-        "models",
         "editable-text-widget"
     ],
     "main": "feed-source-view.js",

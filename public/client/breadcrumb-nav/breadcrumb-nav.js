@@ -4,7 +4,6 @@ var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var $ = require('jquery');
 var _ = require('underscore');
-var m = require('models');
 var Handlebars = require('handlebars');
 
 // this is just a backbone view; we don't need the machinery of models here
