@@ -5,7 +5,6 @@ var _ = require('underscore');
 var Handlebars = require('handlebars.js');
 var app = require('application');
 var FeedCollectionCollectionView = require('feedcollectioncollectionview');
-var v = require('views');
 var m = require('models');
 
 module.exports = function () {

@@ -10,7 +10,7 @@ var m = require('models');
 var Handlebars = require('handlebars');
 
 module.exports.FeedUpload = Backbone.Marionette.ItemView.extend({
-    template: Handlebars.compile(require('./feedUpload.html')),
+    template: Handlebars.compile(require('./feed-upload-view.html')),
     onShow: function () {
         this.$('.modal').modal();
     }    

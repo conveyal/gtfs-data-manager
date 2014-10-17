@@ -9,7 +9,8 @@ var _ = require('underscore');
 var Handlebars = require('handlebars.js');
 var app = require('application');
 var m = require('models');
-var v = require('views');
+var FeedVersionView = require('feed-version-view');
+var FeedUploadView = require('feed-upload-view');
 
 var FeedSourceLayout = Backbone.Marionette.LayoutView.extend({
     template: Handlebars.compile(require("./FeedSource.html")),
@@ -23,14 +24,14 @@ var FeedSourceLayout = Backbone.Marionette.LayoutView.extend({
     // show the feed upload dialog
     uploadFeed: function (e) {
         // model is so that it knows what feed source to upload to
-        app.modalRegion.show(new v.FeedUpload({model: this.model}));
+        app.modalRegion.show(new FeedUploadView({model: this.model}));
     },
     
     onShow: function () {
         var latest = new m.FeedVersion({id: this.model.get('latestVersionId')});
         var instance = this;
         latest.fetch().done(function () {
-            instance.latestValidationRegion.show(new v.FeedVersion({model: latest}));
+            instance.latestValidationRegion.show(new FeedVersionView({model: latest}));
         });
 
         // set up nav

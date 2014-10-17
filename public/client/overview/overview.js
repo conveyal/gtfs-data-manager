@@ -5,7 +5,6 @@ var _ = require('underscore');
 var Handlebars = require('handlebars.js');
 var app = require('application');
 var m = require('models');
-var v = require('views');
 var FeedSourceCollectionView = require('feed-source-collection-view');
 
 var Overview = Backbone.Marionette.LayoutView.extend({

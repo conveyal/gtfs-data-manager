@@ -13,7 +13,7 @@ var Handlebars = require('handlebars');
 var InvalidValuesList = Backbone.Marionette.ItemView.extend({
     // rather than having a ton of levels of nested views, since we're not editing, most of the
     // recursion occurs in the template
-    template: Handlebars.compile(require('./InvalidValuesList.html')),
+    template: Handlebars.compile(require('./invalid-values-list.html')),
 
     initialize: function (attr) {
         // group them by error type
@@ -36,8 +36,8 @@ var InvalidValuesList = Backbone.Marionette.ItemView.extend({
     }   
 });
 
-module.exports.FeedVersion = Backbone.Marionette.LayoutView.extend({
-    template: Handlebars.compile(require('./FeedVersion.html')),
+module.exports = Backbone.Marionette.LayoutView.extend({
+    template: Handlebars.compile(require('./feed-version-view.html')),
 
     regions: {
         routesRegion: '#routes',

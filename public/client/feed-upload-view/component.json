@@ -1,5 +1,5 @@
 {
-    "name":"views",
+    "name":"feed-upload-view",
     "dependencies" : {
         "jashkenas/backbone": "*",
         "jashkenas/underscore": "*",
@@ -8,10 +8,9 @@
         "components/jquery": "*"
     },
     "local": [
-        "models",
-        "editabletextwidget"
+        "models"
     ],
-    "main": "views.js",
-    "scripts": ["views.js", "FeedVersion.js", "FeedUpload.js"],
-    "templates": ["FeedVersion.html", "InvalidValuesList.html", "FeedUpload.html"]
+    "main": "feed-upload-view.js",
+    "scripts": ["feed-upload-view.js"],
+    "templates": ["feed-upload-view.html"]
 }
