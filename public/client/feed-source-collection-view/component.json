@@ -1,0 +1,18 @@
+{
+    "name":"feed-source-collection-view",
+    "dependencies" : {
+        "jashkenas/backbone": "*",
+        "jashkenas/underscore": "*",
+        "marionettejs/backbone.marionette": "*",
+        "components/handlebars.js": "*",
+        "components/jquery": "*"
+    },
+    "local": [
+        "models",
+        "editabletextwidget",
+        "feed-source-view"
+    ],
+    "main": "feed-source-collection-view.js",
+    "scripts": ["feed-source-collection-view.js"],
+    "templates": ["feed-source-collection-view.html"]
+}

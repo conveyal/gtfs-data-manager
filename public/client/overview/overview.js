@@ -6,6 +6,7 @@ var Handlebars = require('handlebars.js');
 var app = require('application');
 var m = require('models');
 var v = require('views');
+var FeedSourceCollectionView = require('feed-source-collection-view');
 
 var Overview = Backbone.Marionette.LayoutView.extend({
     regions: {feedSourceRegion: '#feed-sources'},
@@ -19,7 +20,7 @@ var Overview = Backbone.Marionette.LayoutView.extend({
         var feedSources = new m.FeedSourceCollection();
         var instance = this;
         feedSources.fetch({data: {feedcollection: this.feedCollectionId}}).done(function () {
-            instance.feedSourceRegion.show(new v.FeedSourceEditableView({
+            instance.feedSourceRegion.show(new FeedSourceCollectionView({
                 collection: feedSources,
                 feedCollectionId: instance.feedCollectionId
             }));
