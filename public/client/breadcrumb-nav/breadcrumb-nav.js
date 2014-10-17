@@ -8,8 +8,8 @@ var m = require('models');
 var Handlebars = require('handlebars');
 
 // this is just a backbone view; we don't need the machinery of models here
-module.exports.BreadCrumb = Backbone.View.extend({
-    template: Handlebars.compile(require('./BreadCrumb.html')),
+module.exports = Backbone.View.extend({
+    template: Handlebars.compile(require('./breadcrumb-nav.html')),
     tagName: 'ol',
     className: 'breadcrumb',
     

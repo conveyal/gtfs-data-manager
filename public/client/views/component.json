@@ -12,7 +12,7 @@
         "editabletextwidget"
     ],
     "main": "views.js",
-    "scripts": ["views.js", "FeedVersion.js", "BreadCrumb.js", "FeedUpload.js"],
-    "templates": ["FeedVersion.html", "InvalidValuesList.html", "BreadCrumb.html", "FeedUpload.html"],
+    "scripts": ["views.js", "FeedVersion.js", "FeedUpload.js"],
+    "templates": ["FeedVersion.html", "InvalidValuesList.html", "FeedUpload.html"],
     "styles": ["style.css"]
 }

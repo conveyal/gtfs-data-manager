@@ -1,7 +1,7 @@
 var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var Handlebars = require('Handlebars');
-var v = require('views');
+var Breadcrumb = require('breadcrumb-nav');
 
 // register Handlebars helpers
 var helpers = require('helpers');
@@ -19,7 +19,7 @@ app.addRegions({
 });
 
 // initialize breadcrumb navigation
-app.nav = new v.BreadCrumb();
+app.nav = new Breadcrumb();
 
 app.addInitializer(function () {
     app.navRegion.show(app.nav);
