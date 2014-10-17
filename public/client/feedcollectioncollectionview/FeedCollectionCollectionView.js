@@ -5,12 +5,12 @@ var _ = require('underscore');
 var m = require('models');
 var Handlebars = require('handlebars');
 
-var EditableText = require('editabletext');
+var EditableTextWidget = require('editabletextwidget');
 
 /**
  * An item view of a single FeedCollection
  */
-var FeedCollectionItemView = EditableText.extend({
+var FeedCollectionItemView = EditableTextWidget.extend({
     tagName: 'li',
     attribute: 'name',
     href: function () { 
@@ -18,8 +18,8 @@ var FeedCollectionItemView = EditableText.extend({
     },
 
     onShow: function () {
-        if (typeof(EditableTextView.prototype.onShow) == 'function')
-            EditableTextView.prototype.onShow.call(this);
+        if (typeof(EditableTextWidget.prototype.onShow) == 'function')
+            EditableTextWidget.prototype.onShow.call(this);
 
         if (this.model.get('id') == null)
             // new feed
@@ -28,19 +28,12 @@ var FeedCollectionItemView = EditableText.extend({
 });
 
 /**
- * An immutable view of a FeedCollectionCollection
- */
-module.exports.FeedCollectionCollectionView = Backbone.Marionette.CollectionView.extend({
-    childView: FeedCollectionItemView,
-    tagName: 'ul'
-});
-
-/**
  * An editable view of a FeedCollectionCollection
  */
-module.exports.FeedCollectionEditableView = Backbone.Marionette.LayoutView.extend({
-    regions: { collectionRegion: '#feedcollection' },
-    template: Handlebars.compile(require('./FeedCollectionEditable.html')),
+module.exports = Backbone.Marionette.CollectionView.extend({
+    template: Handlebars.compile(require('./FeedCollectionCollectionView.html')),
+    childView: FeedCollectionItemView,
+    childViewContainer: 'ul',
 
     // set up event handlers
     events: {
@@ -48,12 +41,6 @@ module.exports.FeedCollectionEditableView = Backbone.Marionette.LayoutView.exten
     },
     initialize: function () {
         _.bindAll(this, 'add');
-    },
-
-    // show the child view
-    onShow: function () {
-        // pass the collection down
-        this.collectionRegion.show(new module.exports.FeedCollectionCollectionView({collection: this.collection}))
     },
     
     /** Add an item to the collection */

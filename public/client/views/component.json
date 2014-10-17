@@ -9,10 +9,10 @@
     },
     "local": [
         "models",
-        "editabletext"
+        "editabletextwidget"
     ],
     "main": "views.js",
-    "scripts": ["views.js", "FeedCollection.js", "FeedSource.js", "FeedVersion.js", "BreadCrumb.js", "FeedUpload.js"],
-    "templates": ["FeedCollectionEditable.html", "FeedSource.html", "FeedSourceTable.html", "FeedVersion.html", "InvalidValuesList.html", "BreadCrumb.html", "FeedUpload.html"],
+    "scripts": ["views.js", "FeedSource.js", "FeedVersion.js", "BreadCrumb.js", "FeedUpload.js"],
+    "templates": ["FeedSource.html", "FeedSourceTable.html", "FeedVersion.html", "InvalidValuesList.html", "BreadCrumb.html", "FeedUpload.html"],
     "styles": ["style.css"]
 }

@@ -5,7 +5,7 @@ var _ = require('underscore');
 var m = require('models');
 var Handlebars = require('handlebars');
 
-var EditableText = require('editabletext');
+var EditableTextWidget = require('editabletextwidget');
 
 /**
  * An item view of a single FeedSource
@@ -37,7 +37,7 @@ var FeedSourceItemView = Backbone.Marionette.LayoutView.extend({
     },
 
     onShow: function () {
-        var nameField = new EditableText({
+        var nameField = new EditableTextWidget({
             model: this.model,
             attribute: 'name', 
             href: function () {
@@ -56,7 +56,7 @@ var FeedSourceItemView = Backbone.Marionette.LayoutView.extend({
         if (this.model.get('id') == null)
             nameField.edit();
 
-        this.urlRegion.show(new EditableText({
+        this.urlRegion.show(new EditableTextWidget({
             model: this.model,
             attribute: 'url',
             href: function () { return this.model.get('url') }

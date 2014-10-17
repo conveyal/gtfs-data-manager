@@ -1,5 +1,5 @@
 {
-    "name":"editabletext",
+    "name":"editabletextwidget",
     "description":"An editable text widget for a model",
     "dependencies" : {
         "jashkenas/backbone": "*",
@@ -8,7 +8,7 @@
         "components/handlebars.js": "*",
         "components/jquery": "*"
     },
-    "main": "EditableText.js",
-    "scripts": ["EditableText.js"],
-    "templates": ["EditableText.html"]
+    "main": "EditableTextWidget.js",
+    "scripts": ["EditableTextWidget.js"],
+    "templates": ["EditableTextWidget.html"]
 }
