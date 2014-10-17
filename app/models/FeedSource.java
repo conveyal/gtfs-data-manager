@@ -195,8 +195,10 @@ public class FeedSource extends Model {
         return latest;
     }
     
+    @JsonInclude(Include.NON_NULL)
     public String getLatestVersionId () {
-        return getLatest().id;
+        FeedVersion latest = getLatest();
+        return latest != null ? latest.id : null;
     }
     
     /**
@@ -205,6 +207,7 @@ public class FeedSource extends Model {
      * @param id
      * @return
      */
+    @JsonInclude(Include.NON_NULL)
     public Date getLastUpdated() {
         FeedVersion latest = getLatest();
         return latest != null ? latest.updated : null;
