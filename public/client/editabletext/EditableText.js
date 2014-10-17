@@ -9,7 +9,7 @@ var _ = require('underscore');
 var m = require('models');
 var Handlebars = require('handlebars');
 
-module.exports.EditableTextView = Backbone.Marionette.ItemView.extend({
+module.exports = Backbone.Marionette.ItemView.extend({
     template: Handlebars.compile(require('./EditableText.html')),
     tagName: 'span',
     events: { 

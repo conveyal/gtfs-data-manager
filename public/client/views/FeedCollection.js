@@ -5,12 +5,12 @@ var _ = require('underscore');
 var m = require('models');
 var Handlebars = require('handlebars');
 
-var EditableTextView = require('./EditableText.js').EditableTextView;
+var EditableText = require('editabletext');
 
 /**
  * An item view of a single FeedCollection
  */
-var FeedCollectionItemView = EditableTextView.extend({
+var FeedCollectionItemView = EditableText.extend({
     tagName: 'li',
     attribute: 'name',
     href: function () { 

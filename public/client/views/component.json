@@ -7,9 +7,12 @@
         "components/handlebars.js": "*",
         "components/jquery": "*"
     },
-    "local": ["models"],
+    "local": [
+        "models",
+        "editabletext"
+    ],
     "main": "views.js",
-    "scripts": ["views.js", "EditableText.js", "FeedCollection.js", "FeedSource.js", "FeedVersion.js", "BreadCrumb.js", "FeedUpload.js"],
-    "templates": ["EditableText.html", "FeedCollectionEditable.html", "FeedSource.html", "FeedSourceTable.html", "FeedVersion.html", "InvalidValuesList.html", "BreadCrumb.html", "FeedUpload.html"],
+    "scripts": ["views.js", "FeedCollection.js", "FeedSource.js", "FeedVersion.js", "BreadCrumb.js", "FeedUpload.js"],
+    "templates": ["FeedCollectionEditable.html", "FeedSource.html", "FeedSourceTable.html", "FeedVersion.html", "InvalidValuesList.html", "BreadCrumb.html", "FeedUpload.html"],
     "styles": ["style.css"]
 }
