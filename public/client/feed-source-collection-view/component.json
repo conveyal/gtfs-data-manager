@@ -10,7 +10,7 @@
     "local": [
         "models",
         "editabletextwidget",
-        "feed-source-view"
+        "feed-source-item-view"
     ],
     "main": "feed-source-collection-view.js",
     "scripts": ["feed-source-collection-view.js"],

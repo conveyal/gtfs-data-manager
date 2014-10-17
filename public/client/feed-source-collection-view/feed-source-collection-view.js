@@ -6,13 +6,13 @@ var m = require('models');
 var Handlebars = require('handlebars');
 
 var EditableTextWidget = require('editabletextwidget');
-var FeedSourceView = require('feed-source-view');
+var FeedSourceItemView = require('feed-source-item-view');
 
 /**
  * An editable table of FeedSources
  */
 module.exports = Backbone.Marionette.CompositeView.extend({
-    childView: FeedSourceView,
+    childView: FeedSourceItemView,
     childViewContainer: 'tbody',
     template: Handlebars.compile(require('./feed-source-collection-view.html')),
     
