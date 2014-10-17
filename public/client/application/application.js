@@ -23,6 +23,9 @@ app.nav = new v.BreadCrumb();
 
 app.addInitializer(function () {
     app.navRegion.show(app.nav);
+
+    // set up the name
+    $('#appName').text(Messages('app.name'));
 });
 
 module.exports = app;

@@ -62,3 +62,8 @@ app.feed_version.initiate_upload=Upload new feed version
 app.location.home=Home
 app.location.login=Log in
 app.close=Close
+
+app.projects=Select a project
+
+app.name=NYSDOT GTFS Data Manager
+app.title={0} - NYSDOT GTFS Data Manager

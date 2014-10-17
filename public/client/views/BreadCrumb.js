@@ -21,6 +21,8 @@ module.exports.BreadCrumb = Backbone.View.extend({
         location.splice(0, 0, {name: Messages('app.location.home'), href: '#'});
 
         this.$el.empty().append(this.template({location: location}));
+
+        $('head > title').text(Messages('app.title', location[location.length - 1].name));
     }
 }); 
             
