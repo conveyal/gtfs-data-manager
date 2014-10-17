@@ -8,7 +8,7 @@
         "components/handlebars.js": "*",
         "components/jquery": "*"
     },
-    "locals": ["editable-text-widget"],
+    "locals": ["editable-text-widget", "feed-collection"],
     "main": "feed-collection-collection-view.js",
     "scripts": ["feed-collection-collection-view.js"],
     "templates": ["feed-collection-collection-view.html"]

@@ -2,7 +2,7 @@ var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var $ = require('jquery');
 var _ = require('underscore');
-var m = require('models');
+var FeedSource = require('feed-source');
 var Handlebars = require('handlebars');
 
 var FeedSourceItemView = require('feed-source-item-view');
@@ -23,7 +23,7 @@ module.exports = Backbone.Marionette.CompositeView.extend({
     
     add: function () {
         this.collection.add(
-            new m.FeedSource({
+            new FeedSource({
                 name: Messages('app.new_feed_source_name'),
                 isPublic: true,
                 autofetch: false,

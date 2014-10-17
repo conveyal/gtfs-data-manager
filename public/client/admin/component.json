@@ -7,7 +7,7 @@
 	"marionettejs/backbone.marionette": "*",
 	"components/handlebars.js": "*"
     },
-    "local": ["application", "models", "feedcollectioncollectionview"],
+    "local": ["application", "feed-collection-collection", "feed-collection-collection-view"],
     "scripts": ["admin.js"],
     "templates": ["admin.html"]
 }

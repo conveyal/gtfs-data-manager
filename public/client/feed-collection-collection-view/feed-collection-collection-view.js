@@ -2,7 +2,8 @@ var Backbone = require('backbone');
 Backbone.Marionette = require('backbone.marionette');
 var $ = require('jquery');
 var _ = require('underscore');
-var m = require('models');
+var FeedCollection = require('feed-collection');
+
 var Handlebars = require('handlebars');
 
 var EditableTextWidget = require('editable-text-widget');
@@ -47,6 +48,6 @@ module.exports = Backbone.Marionette.CollectionView.extend({
     add: function () {
         // note that this is not persisted to the server here; it won't be, until they change the name
         // this is by design
-        this.collection.add(new m.FeedCollection({name: window.Messages('app.new_feed_collection_name')}));
+        this.collection.add(new FeedCollection({name: window.Messages('app.new_feed_collection_name')}));
     }
 });

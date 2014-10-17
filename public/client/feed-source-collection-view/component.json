@@ -8,7 +8,7 @@
         "components/jquery": "*"
     },
     "local": [
-        "models",
+        "feed-source",
         "feed-source-item-view"
     ],
     "main": "feed-source-collection-view.js",

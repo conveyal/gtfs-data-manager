@@ -5,14 +5,14 @@ var _ = require('underscore');
 var Handlebars = require('handlebars.js');
 var app = require('application');
 var FeedCollectionCollectionView = require('feed-collection-collection-view');
-var m = require('models');
+var FeedCollectionCollection = require('feed-collection-collection');
 
 module.exports = function () {
     var Admin = Backbone.Marionette.LayoutView.extend({
         regions: {collectionRegion: '#collection'},
         template: Handlebars.compile(require('./admin.html')),
         onShow: function () {
-            var agencies = new m.FeedCollectionCollection();
+            var agencies = new FeedCollectionCollection();
             var instance = this;
             agencies.fetch().done(function () {
                 instance.collectionRegion.show(new FeedCollectionCollectionView({collection: agencies}));

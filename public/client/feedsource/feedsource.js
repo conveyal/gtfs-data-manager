@@ -8,7 +8,8 @@ var $ = require('jquery');
 var _ = require('underscore');
 var Handlebars = require('handlebars.js');
 var app = require('application');
-var m = require('models');
+var FeedVersion = require('feed-version');
+var FeedSource = require('feed-source');
 var FeedVersionView = require('feed-version-view');
 var FeedUploadView = require('feed-upload-view');
 
@@ -28,7 +29,7 @@ var FeedSourceLayout = Backbone.Marionette.LayoutView.extend({
     },
     
     onShow: function () {
-        var latest = new m.FeedVersion({id: this.model.get('latestVersionId')});
+        var latest = new FeedVersion({id: this.model.get('latestVersionId')});
         var instance = this;
         latest.fetch().done(function () {
             instance.latestValidationRegion.show(new FeedVersionView({model: latest}));
@@ -43,7 +44,7 @@ var FeedSourceLayout = Backbone.Marionette.LayoutView.extend({
 })
 
 module.exports = function (feedSourceId) {
-    var model = new m.FeedSource({id: feedSourceId});
+    var model = new FeedSource({id: feedSourceId});
     model.fetch().done(function () {
         app.appRegion.show(new FeedSourceLayout({model: model}));
     });
