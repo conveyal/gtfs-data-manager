@@ -36,7 +36,7 @@ public class Application extends Controller {
         // check if the user successfully authenticated
         User u = User.getUserByUsername(params.get("username")[0]);
         if (u != null && u.checkPassword(params.get("password")[0])) {
-            session("username", u.username);
+            session("username", u.username);            
             return getLoggedInUser();
         }
         else {
@@ -46,7 +46,9 @@ public class Application extends Controller {
     
     public static Result logout () {
         session().clear();
-        return ok();
+        ObjectNode result = Json.newObject();
+        result.put("status", "logged_out");
+        return ok(result);
     }
     
     // used by the web app to see who is logged in
