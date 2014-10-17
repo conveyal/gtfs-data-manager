@@ -32,6 +32,7 @@ public class FeedVersion extends Model {
      */
     public FeedVersion (FeedSource source) {
         this.updated = new Date();
+        this.setFeedSource(source);     
         
         // ISO time
         DateFormat df = new SimpleDateFormat("yyyyMMdd'T'HHmmssX");

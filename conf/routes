@@ -21,6 +21,7 @@ PUT     /api/feedsources/:id            controllers.api.FeedSourceController.upd
 POST    /api/feedsources/               controllers.api.FeedSourceController.create()
 
 GET      /api/feedversions/:id          controllers.api.FeedVersionController.get(id:String)
+POST     /api/feedversions/             controllers.api.FeedVersionController.create()
 
 GET     /fetchGtfs                      controllers.Application.fetchGtfs()
 GET     /messages.js                    controllers.Application.jsMessages()

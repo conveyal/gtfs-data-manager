@@ -52,5 +52,13 @@ app.feed_version.route_warnings=Route warnings
 app.feed_version.stop_warnings=Stop warnings
 app.feed_version.trip_warnings=Trip warnings
 app.feed_version.shape_warnings=Shape warnings
+app.feed_version.upload_feed_for=Upload feed for {0}
+app.feed_version.choose_feed=Choose feed file
+# For actually taking the action
+app.feed_version.upload_feed=Upload feed
+# For opening the dialog with which to take the action
+app.feed_version.initiate_upload=Upload new feed version
+
 app.location.home=Home
 app.location.login=Log in
+app.close=Close

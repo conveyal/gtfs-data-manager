@@ -185,7 +185,8 @@ public class FeedSource extends Model {
         FeedVersion latest = null;
     
         for (FeedVersion version : FeedVersion.getAll()) {
-            if (version.feedSourceId.equals(this.id)) {
+            // there could be feedsources in the datastore that haven't finished initializing
+            if (this.id.equals(version.feedSourceId)) {
                 if (latest == null || version.updated.after(latest.updated)) {
                     latest = version;
                 }
@@ -272,6 +273,7 @@ public class FeedSource extends Model {
                 
                 this.agencyCount = result.agencyCount;
                 this.routeCount = result.routeCount;
+                this.tripCount = result.tripCount;
                 this.stopTimesCount = result.stopTimesCount;
                 this.startDate = result.startDate;
                 this.endDate = result.endDate;
