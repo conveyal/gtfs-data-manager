@@ -39,6 +39,8 @@ public class FeedStore {
     public File getFeed (String id) {
         File feed = new File(path, id);
         if (!feed.exists()) return null;
+        // don't let folks get feeds outside of the directory
+        if (!feed.getParentFile().equals(path)) return null;
         else return feed;
     }
     
