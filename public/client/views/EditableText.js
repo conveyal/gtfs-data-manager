@@ -36,10 +36,13 @@ module.exports.EditableTextView = Backbone.Marionette.ItemView.extend({
             var attr = [];
             attr[this.attribute] = this.$('input').val();
             this.model.set(attr);
-            this.model.save();
+
+            var instance = this;
+            this.model.save().done(function () {
+                instance.render();
+            });
 
             this.$('.label').text(Messages('app.save'));
-            this.render();
         }
         else {
             this.$('.label').text(Messages('app.edit'));
