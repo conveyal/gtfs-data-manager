@@ -10,5 +10,6 @@
     },
     "main": "EditableTextWidget.js",
     "scripts": ["EditableTextWidget.js"],
-    "templates": ["EditableTextWidget.html"]
+    "templates": ["EditableTextWidget.html"],
+    "styles": ["style.css"]
 }

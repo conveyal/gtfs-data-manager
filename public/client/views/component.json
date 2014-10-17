@@ -13,6 +13,5 @@
     ],
     "main": "views.js",
     "scripts": ["views.js", "FeedVersion.js", "FeedUpload.js"],
-    "templates": ["FeedVersion.html", "InvalidValuesList.html", "FeedUpload.html"],
-    "styles": ["style.css"]
+    "templates": ["FeedVersion.html", "InvalidValuesList.html", "FeedUpload.html"]
 }
