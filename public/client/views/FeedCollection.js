@@ -15,6 +15,15 @@ var FeedCollectionItemView = EditableTextView.extend({
     attribute: 'name',
     href: function () { 
         return '#overview/' + this.model.get('id');
+    },
+
+    onShow: function () {
+        if (typeof(EditableTextView.prototype.onShow) == 'function')
+            EditableTextView.prototype.onShow.call(this);
+
+        if (this.model.get('id') == null)
+            // new feed
+            this.edit();
     }
 });
 

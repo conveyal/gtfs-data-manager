@@ -46,6 +46,7 @@ module.exports.EditableTextView = Backbone.Marionette.ItemView.extend({
         }
         else {
             this.$('.label').text(Messages('app.edit'));
+            this.$('input').focus();
         }
         
         this.editing = !this.editing;

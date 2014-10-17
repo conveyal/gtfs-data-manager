@@ -37,11 +37,24 @@ var FeedSourceItemView = Backbone.Marionette.LayoutView.extend({
     },
 
     onShow: function () {
-        this.nameRegion.show(new EditableTextView({
+        var nameField = new EditableTextView({
             model: this.model,
             attribute: 'name', 
-            href: function () {return '#feed/' + this.model.id}
-        }));
+            href: function () {
+                if (this.model.id == null) {
+                    // make it a no-op until saved
+                    return '#overview/' + this.model.get('feedCollection').id;
+                }
+                else {
+                    return '#feed/' + this.model.get('id');
+                }
+            }
+        });
+        this.nameRegion.show(nameField);
+
+        // start out editing name if it's new; this way we ensure it is saved before 
+        if (this.model.get('id') == null)
+            nameField.edit();
 
         this.urlRegion.show(new EditableTextView({
             model: this.model,
