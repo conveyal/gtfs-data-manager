@@ -14,6 +14,17 @@ var v = require('views');
 var FeedSourceLayout = Backbone.Marionette.LayoutView.extend({
     template: Handlebars.compile(require("./FeedSource.html")),
     regions: {latestValidationRegion: '#latest-validation'},
+
+    events: {'click .upload-feed': 'uploadFeed' },
+    initialize: function () {
+        _.bindAll(this, 'uploadFeed');
+    },
+
+    // show the feed upload dialog
+    uploadFeed: function (e) {
+        // model is so that it knows what feed source to upload to
+        app.modalRegion.show(new v.FeedUpload({model: this.model}));
+    },
     
     onShow: function () {
         var latest = new m.FeedVersion({id: this.model.get('latestVersionId')});

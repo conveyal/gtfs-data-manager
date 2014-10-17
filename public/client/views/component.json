@@ -9,6 +9,6 @@
     },
     "local": ["models"],
     "main": "views.js",
-    "scripts": ["views.js", "EditableText.js", "FeedCollection.js", "FeedSource.js", "FeedVersion.js", "BreadCrumb.js"],
-    "templates": ["EditableText.html", "FeedCollectionEditable.html", "FeedSource.html", "FeedSourceTable.html", "FeedVersion.html", "InvalidValuesList.html", "BreadCrumb.html"]
+    "scripts": ["views.js", "EditableText.js", "FeedCollection.js", "FeedSource.js", "FeedVersion.js", "BreadCrumb.js", "FeedUpload.js"],
+    "templates": ["EditableText.html", "FeedCollectionEditable.html", "FeedSource.html", "FeedSourceTable.html", "FeedVersion.html", "InvalidValuesList.html", "BreadCrumb.html", "FeedUpload.html"]
 }

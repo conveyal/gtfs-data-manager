@@ -14,9 +14,9 @@ var app = new Backbone.Marionette.Application();
 
 app.addRegions({
     appRegion: '#content',
-    navRegion: '#nav'
+    navRegion: '#nav',
+    modalRegion: '#modal'
 });
-
 
 // initialize breadcrumb navigation
 app.nav = new v.BreadCrumb();
