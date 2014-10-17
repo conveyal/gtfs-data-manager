@@ -7,6 +7,7 @@ var Router = Backbone.Router.extend({
     routes: {
         "": "admin",
 	"login": "login",
+        "login/*returnTo": "login",
         "admin": "admin",
         "overview/:feedCollectionId": "overview",
         "feed/:feedSourceId": "feedsource"
@@ -37,6 +38,8 @@ $(document).ready(function () {
         })
         .fail(function () {
             // assume that we are not logged in
-            document.location.hash = '#login';
+            // don't let us go to #login/login/login/login/login/overview
+            if (window.location.hash.indexOf('login') != 1)
+                document.location.hash = '#login/' + window.location.hash.slice(1);
         });
 });

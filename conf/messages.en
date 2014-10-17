@@ -62,6 +62,7 @@ app.feed_version.initiate_upload=Upload new feed version
 app.location.home=Home
 app.location.login=Log in
 app.close=Close
+app.logout=Log out
 
 app.projects=Select a project
 
