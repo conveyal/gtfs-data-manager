@@ -5,7 +5,6 @@ var _ = require('underscore');
 var m = require('models');
 var Handlebars = require('handlebars');
 
-var EditableTextWidget = require('editabletextwidget');
 var FeedSourceItemView = require('feed-source-item-view');
 
 /**

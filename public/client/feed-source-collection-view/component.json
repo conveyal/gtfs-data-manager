@@ -9,7 +9,6 @@
     },
     "local": [
         "models",
-        "editabletextwidget",
         "feed-source-item-view"
     ],
     "main": "feed-source-collection-view.js",

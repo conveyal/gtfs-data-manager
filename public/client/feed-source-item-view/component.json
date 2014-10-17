@@ -9,7 +9,7 @@
     },
     "local": [
         "models",
-        "editabletextwidget"
+        "editable-text-widget"
     ],
     "main": "feed-source-view.js",
     "scripts": ["feed-source-view.js"],
