@@ -1,7 +1,7 @@
 var _ = require('underscore');
 var Backbone = require('Backbone');
 
-module.exports.FeedSource = Backbone.Model.extend({
+module.exports = Backbone.Model.extend({
     defaults: {
         name: null,
         isPublic: null,
@@ -14,10 +14,4 @@ module.exports.FeedSource = Backbone.Model.extend({
         feedCollection: null
     },
     urlRoot: 'api/feedsources/'
-});
-
-module.exports.FeedSourceCollection = Backbone.Collection.extend({
-    model: module.exports.FeedSource,
-    url: 'api/feedsources',
-    comparator: 'name'
 });

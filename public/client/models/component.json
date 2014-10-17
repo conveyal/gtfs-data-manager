@@ -1,9 +1,0 @@
-{
-    "name": "models",
-    "dependencies": {
-	"jashkenas/backbone": "*",
-	"jashkenas/underscore": "*"
-    },
-    "main": "models.js",
-    "scripts": ["models.js", "FeedCollection.js", "FeedSource.js", "FeedVersion.js"]
-}
