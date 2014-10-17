@@ -26,6 +26,20 @@ app.addInitializer(function () {
 
     // set up the name
     $('#appName').text(Messages('app.name'));
+
+    $('#logout').text(Messages('app.logout'))
+        .click(function (e) {
+            e.preventDefault();
+            $.ajax({
+                url: 'logout',
+            }).done(function (data) {
+                if (data.status == 'logged_out') {
+                    $('#logout').addClass("hidden");
+                    $('#logged-in-user').text('');
+                    window.location.hash = '#login';
+                }
+            });
+        });
 });
 
 module.exports = app;

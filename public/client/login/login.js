@@ -21,6 +21,10 @@ module.exports = function () {
 		    password: this.$('input[name="password"]').val()})
 	        .then(function (data) {
 		    $('#logged-in-user').text(window.Messages('app.account.logged_in_as', data['username']));
+                    $('#logout').removeClass('hidden');
+
+                    // note: log out is handled in application.js
+
                     window.location.hash = '#admin';
 	        })
 	        .fail(function () {

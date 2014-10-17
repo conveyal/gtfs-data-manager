@@ -33,6 +33,7 @@ $(document).ready(function () {
         })
         .done(function (data) {
             $('#logged-in-user').text(window.Messages('app.account.logged_in_as', data['username']));
+            $('#logout').removeClass('hidden');
         })
         .fail(function () {
             // assume that we are not logged in
