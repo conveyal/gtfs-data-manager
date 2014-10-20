@@ -30,14 +30,30 @@ public class Application extends Controller {
     public static Result authenticate () throws JsonProcessingException {
         Map<String,String[]> params = request().body().asFormUrlEncoded();
         
-        if (!params.containsKey("username") || !params.containsKey("password"))
-            return unauthorized();
-        
-        // check if the user successfully authenticated
-        User u = User.getUserByUsername(params.get("username")[0]);
-        if (u != null && u.checkPassword(params.get("password")[0])) {
-            session("username", u.username);            
-            return getLoggedInUser();
+        // username+password-based auth
+        if (params.containsKey("username") && params.containsKey("password")) {
+
+            // check if the user successfully authenticated
+            User u = User.getUserByUsername(params.get("username")[0]);
+            if (u != null && u.checkPassword(params.get("password")[0])) {
+                session("username", u.username);            
+                return getLoggedInUser();
+            }
+            else {
+                return unauthorized();
+            }
+        }
+        // userid+key-based auth
+        else if (params.containsKey("userId") && params.containsKey("key")) {
+            User u = User.getUser(params.get("userId")[0]);
+            
+            if (u.checkKey(params.get("key")[0])) {
+                session("username", u.username);
+                return getLoggedInUser();
+            }
+            else {
+                return unauthorized();
+            }
         }
         else {
             return unauthorized();
@@ -82,7 +98,7 @@ public class Application extends Controller {
     }
     
     // kick off a gtfs update
-    @Security.Authenticated(Secured.class)
+    @Security.Authenticated(Admin.class)
     public static Result fetchGtfs () {
         User u = User.getUserByUsername(session("username"));
         if (!Boolean.TRUE.equals(u.admin))

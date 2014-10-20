@@ -1,0 +1,10 @@
+{
+    "name": "admin-helper",
+    "description": "Handlebars helper returning true if admin",
+    "dependencies": {
+        "components/handlebars.js": "*"
+    },
+    "local": ["application"],
+    "main": "admin-helper.js",
+    "scripts": ["admin-helper.js"]
+}

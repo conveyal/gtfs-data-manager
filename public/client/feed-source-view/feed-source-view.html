@@ -1,7 +1,22 @@
 <h1>{{ name }}</h1>
 
-{{#unless autofetch }}
-  <button role="button" class="btn btn-primary upload-feed"><span class="glyphicon glyphicon-upload sr-hidden"></span>&nbsp;&nbsp;{{ t 'app.feed_version.initiate_upload' }}</button>
-{{/unless}}
+<div class="btn-group">
+  {{#unless autofetch }}
+    <button role="button" class="btn btn-primary upload-feed"><span class="glyphicon glyphicon-upload sr-hidden"></span>&nbsp;&nbsp;{{ t 'app.feed_version.initiate_upload' }}</button>
+  {{/unless}}
+
+  {{#if (admin)}}
+    <button class="btn btn-primary" data-toggle="dropdown">{{ t 'app.feed_source.share' }}&nbsp;&nbsp;<span class="glyphicon glyphicon-share-alt"></span></button>
+    <div class="dropdown-menu">
+      <div class="container-fluid">
+        <label for="share-url" class="sr-only">{{ t 'app.feed_source.share_url' }}</label>
+        {{!-- value to be filled in by the controller --}}
+        <input type="text" size="80" id="share-url"></input>
+        
+        <p>{{ t 'app.feed_source.share_desc' }}</p>
+      </div>
+    </div>
+  {{/if}}
+</div>
 
 <div id="latest-validation"></div>

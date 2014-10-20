@@ -9,8 +9,11 @@ require('class-helper');
 require('logic-helper');
 require('translate-helper');
 require('text-helper');
+require('admin-helper');
 
 var app = new Backbone.Marionette.Application();
+
+app.user = null;
 
 app.addRegions({
     appRegion: '#content',

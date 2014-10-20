@@ -13,9 +13,9 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
 
-import controllers.Secured;
+import controllers.Admin;
 
-@Security.Authenticated(Secured.class)
+@Security.Authenticated(Admin.class)
 public class UserController extends Controller {
     private static JsonManager<User> json = new JsonManager<User>();
     

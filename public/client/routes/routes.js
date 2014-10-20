@@ -10,6 +10,7 @@ var Router = Backbone.Router.extend({
         "login/*returnTo": "login",
         "admin": "admin",
         "overview/:feedCollectionId": "overview",
+        "feed/:feedSourceId?userId=:userId&key=:key": "autologin",
         "feed/:feedSourceId": "feedsource"
     },
 
@@ -17,6 +18,7 @@ var Router = Backbone.Router.extend({
     admin: require('admin-route'),
     feedsource: require('feed-source-route'),
     overview: require('feed-collection-route'),
+    autologin: require('autologin-route')
 });
 
 // start up the app
@@ -35,6 +37,7 @@ $(document).ready(function () {
         .done(function (data) {
             $('#logged-in-user').text(window.Messages('app.account.logged_in_as', data['username']));
             $('#logout').removeClass('hidden');
+            app.user = data;
         })
         .fail(function () {
             // assume that we are not logged in

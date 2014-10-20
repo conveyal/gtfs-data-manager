@@ -17,7 +17,10 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     template: Handlebars.compile(require("./feed-source-view.html")),
     regions: {latestValidationRegion: '#latest-validation'},
 
-    events: {'click .upload-feed': 'uploadFeed' },
+    events: {
+        'click .upload-feed': 'uploadFeed',
+        'click #share-url': 'doNothing'
+    },
     initialize: function () {
         _.bindAll(this, 'uploadFeed');
     },
@@ -35,10 +38,30 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             instance.latestValidationRegion.show(new FeedVersionView({model: latest}));
         });
 
+        // expose the copypastable URL to allow users to view/edit
+        if (app.user.admin) {
+            var instance = this;
+            $.ajax({
+                url: 'api/feedsources/' + this.model.get('id') + '/getKey',
+                success: function (data) {
+                    instance.$('#share-url').val(window.location.origin + window.location.pathname + window.location.hash +
+                                                 '?userId=' + encodeURIComponent(data['userId']) + '&key=' + encodeURIComponent(data['key']));
+                }
+            });
+        }
+
         // set up nav
         app.nav.setLocation([
             {name: this.model.get('feedCollection').name, href: '#overview/' + this.model.get('feedCollection').id},
             {name: this.model.get('name'), href: '#feed/' + this.model.get('id')},
         ]);
+    },
+
+
+    // don't bubble clicks in the input field (e.g. to copy)
+    doNothing: function (e) {
+        e.preventDefault();
+        e.stopPropagation();
     }
+
 })

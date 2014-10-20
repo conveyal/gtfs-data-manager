@@ -14,6 +14,7 @@
         "class-helper",
         "logic-helper",
         "breadcrumb-nav",
-        "text-helper"
+        "text-helper",
+        "admin-helper"
     ]
 }

@@ -68,7 +68,7 @@ public class FeedVersionController extends Controller {
             return badRequest("Feed is autofetched! Cannot upload.");
         
         FeedVersion v = new FeedVersion(s);
-        v.setUser(currentUser);
+        v.setUser(s.getUser());
         
         File toSave = v.newFeed();
         FilePart uploadPart = body.getFile("feed");
@@ -90,6 +90,11 @@ public class FeedVersionController extends Controller {
             uploadStream = new FileInputStream(upload);
         } catch (FileNotFoundException e) {
             Logger.error("Unable to open input stream from upload {}", upload);
+            
+            try {
+                outStream.close();
+            } catch (IOException e1) {}
+            
             return internalServerError("Unable to read uploaded feed");
         }
         
@@ -97,11 +102,12 @@ public class FeedVersionController extends Controller {
         ReadableByteChannel rbc = Channels.newChannel(uploadStream);
         try {
             outStream.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+            outStream.close();
         } catch (IOException e) {
             Logger.error("Unable to transfer from upload to saved file.");
             return internalServerError("Unable to save uploaded file");
         }
-                
+
         // note: we don't save it until it's been validated, which happens in the job
         /*Akka.system().scheduler().scheduleOnce(
                 Duration.create(50, TimeUnit.MILLISECONDS),

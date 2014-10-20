@@ -26,6 +26,8 @@ var Login = Backbone.Marionette.LayoutView.extend({
 
                 // note: log out is handled in application.js
 
+                app.user = data;
+
                 window.location.hash = instance.returnTo != undefined ? instance.returnTo : '#admin';
 	    })
 	    .fail(function () {

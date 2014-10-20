@@ -5,11 +5,13 @@ import java.net.URL;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import controllers.Secured;
 import models.FeedCollection;
 import models.FeedSource;
 import models.User;
+import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
@@ -27,18 +29,20 @@ public class FeedSourceController extends Controller {
     public static Result getAll () {
         User currentUser = User.getUserByUsername(session("username"));
         
+        if (!Boolean.TRUE.equals(currentUser.admin)) {
+            return unauthorized();
+        }
+        
         // parse the query parameters
         String fcId = request().getQueryString("feedcollection");
         FeedCollection fc = null;
         if (fcId != null)
             fc = FeedCollection.get(fcId);
-        
-        // Only admins can get all feeds
-        if (fc == null && Boolean.TRUE.equals(currentUser.admin)) {
+ 
+        if (fc == null) {
             return ok(json.write(FeedSource.getAll()));
         }
         else {
-            // TODO: access control
             return ok(json.write(fc.getFeedSources()));
         }
     }
@@ -58,8 +62,9 @@ public class FeedSourceController extends Controller {
         FeedSource s = FeedSource.get(id);
         User currentUser = User.getUserByUsername(session("username"));
 
-        // admins can update anything; non-admins can only update the feeds they own
-        if (Boolean.TRUE.equals(currentUser.admin) || currentUser.equals(s.getUser())) {
+        // admins can update anything; non-admins cannot update anything (imagine the havoc if an agency changed their retrieval method,
+        // or set a non-public feed to public)
+        if (Boolean.TRUE.equals(currentUser.admin)) {
             JsonNode params = request().body().asJson();
             applyJsonToFeedSource(s, params);
             s.save();
@@ -79,8 +84,8 @@ public class FeedSourceController extends Controller {
         
         // TODO: access control
         if (Boolean.TRUE.equals(currentUser.admin) || currentUser.equals(c.getUser())) {
-            FeedSource s = new FeedSource();
-            s.setUser(currentUser);
+            FeedSource s = new FeedSource(params.get("name").asText());
+            // not setting user because feed sources are automatically assigned a unique user
             s.setFeedCollection(c);
             
             applyJsonToFeedSource(s, params);
@@ -88,6 +93,27 @@ public class FeedSourceController extends Controller {
             s.save();
             
             return ok(json.write(s));
+        }
+        else {
+            return unauthorized();
+        }
+    }
+    
+    /**
+     * Get the userId and key that will allow a user to edit just this feed, without being an admin.
+     * Only admins can retrieve this information.
+     */
+    public static Result getUserIdAndKey (String id) {
+        User currentUser = User.getUserByUsername(session("username"));
+        
+        if (Boolean.TRUE.equals(currentUser.admin)) {
+            FeedSource s = FeedSource.get(id);
+            User u = s.getUser();
+            
+            ObjectNode result = Json.newObject();
+            result.put("userId", u.id);
+            result.put("key", u.key);
+            return ok(result);
         }
         else {
             return unauthorized();

@@ -16,6 +16,7 @@ POST    /api/users/                     controllers.api.UserController.create()
 PUT     /api/users/:id                  controllers.api.UserController.update(id:String)
 
 GET     /api/feedsources/:id            controllers.api.FeedSourceController.get(id:String)
+GET     /api/feedsources/:id/getKey     controllers.api.FeedSourceController.getUserIdAndKey(id:String)
 GET     /api/feedsources                controllers.api.FeedSourceController.getAll()
 PUT     /api/feedsources/:id            controllers.api.FeedSourceController.update(id:String)
 POST    /api/feedsources/               controllers.api.FeedSourceController.create()

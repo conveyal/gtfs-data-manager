@@ -16,6 +16,9 @@ app.feed_source.public=Public
 app.feed_source.retrieval_method=Retrieval method
 app.feed_source.url=URL
 app.feed_source.last_updated=Last updated
+app.feed_source.share=Share
+app.feed_source.share_url=URL for sharing
+app.feed_source.share_desc=Send this URL to users to allow them to view this report and upload new versions of this feed.
 
 app.feed_source.retrieval_method.FETCHED_AUTOMATICALLY=Fetched automatically
 app.feed_source.retrieval_method.MANUALLY_UPLOADED=Manually uploaded

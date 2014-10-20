@@ -14,9 +14,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
-import controllers.Secured;
+import controllers.Admin;
 
-@Security.Authenticated(Secured.class)
+@Security.Authenticated(Admin.class)
 public class FeedCollectionController extends Controller {
     private static JsonManager<FeedCollection> json = new JsonManager<FeedCollection>();
     
