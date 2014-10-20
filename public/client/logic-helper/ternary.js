@@ -1,9 +1,11 @@
 // a ternary operator
 // use like ? condition ifTrue ifFalse
 
-module.exports = [
+var Handlebars = require('handlebars');
+
+Handlebars.registerHelper(
     '?',
     function (cond, tru, fals) {
         return cond ? tru : fals;
     }
-];
+);

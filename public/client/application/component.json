@@ -9,7 +9,10 @@
     },
     "scripts": ["application.js"],
     "local": [
-        "helpers",
+        "date-render-helper",
+        "translate-helper",
+        "class-helper",
+        "logic-helper",
         "breadcrumb-nav"
     ]
 }

@@ -4,11 +4,10 @@ var Handlebars = require('Handlebars');
 var Breadcrumb = require('breadcrumb-nav');
 
 // register Handlebars helpers
-var helpers = require('helpers');
-
-for (var i = 0; i < helpers.length; i++) {
-    Handlebars.registerHelper(helpers[i][0], helpers[i][1]);
-}
+require('date-render-helper');
+require('class-helper');
+require('logic-helper');
+require('translate-helper');
 
 var app = new Backbone.Marionette.Application();
 

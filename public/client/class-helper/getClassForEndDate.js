@@ -1,5 +1,8 @@
 // highlight in red if past, yellow if within two weeks
-module.exports = [
+
+var Handlebars = require('handlebars');
+
+Handlebars.registerHelper(
     'getClassForEndDate',
     function (date) {
         var daysToExpiration = (date - new Date().getTime()) / (60 * 60 * 24 * 1000);
@@ -12,4 +15,4 @@ module.exports = [
         }
         else return 'bg-danger';
     }
-];
+);

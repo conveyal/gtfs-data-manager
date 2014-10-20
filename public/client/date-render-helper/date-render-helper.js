@@ -1,6 +1,8 @@
 // a helper to render a date in milliseconds since epoch as something a normal
 // human can understand
 
+var Handlebars = require('handlebars');
+
 // get the month in the local language
 var getMonth = function (month) {
     return [
@@ -24,7 +26,7 @@ var getMonth = function (month) {
  * Parameters: the date in milliseconds since epoch
  * whether to include the time, or just the date (default: include time)
  */
-module.exports = [
+Handlebars.registerHelper(
     'dateRender',
     function (date, includeTime) {
         if (date == 0 || date == null)
@@ -45,6 +47,6 @@ module.exports = [
             return d.getDate() + ' ' + getMonth(d.getMonth()) + ' ' + d.getFullYear();
         }
     }
-];
+);
             
             

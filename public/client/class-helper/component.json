@@ -1,0 +1,14 @@
+{
+    "name": "class-helper",
+    "description": "Get classes for different elements of the data manager",
+    "dependencies": {
+        "components/handlebars.js": "*"
+    },
+    "main": "class-helper.js",
+    "scripts": [
+        "class-helper.js",
+        "getClassForStartDate.js",
+        "getClassForEndDate.js",
+        "highlightZero.js"
+    ]
+}

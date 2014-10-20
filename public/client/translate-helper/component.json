@@ -1,0 +1,10 @@
+{
+    "name": "translate-helper",
+    "description": "Handlebars helper for play jsMessages",
+    "dependencies": {
+        "components/handlebars.js": "*"
+    },
+    "scripts": [
+        "t.js"
+    ]
+}
