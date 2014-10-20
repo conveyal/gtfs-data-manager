@@ -18,6 +18,7 @@ import controllers.Secured;
 import models.FeedSource;
 import models.FeedVersion;
 import models.User;
+import models.FeedSource.FeedRetrievalMethod;
 import play.Logger;
 import play.libs.Akka;
 import play.mvc.Http.MultipartFormData;
@@ -63,7 +64,7 @@ public class FeedVersionController extends Controller {
         if (!Boolean.TRUE.equals(currentUser.admin) && !currentUser.equals(s.getUser()))
             return unauthorized();
         
-        if (s.autofetch)
+        if (FeedRetrievalMethod.FETCHED_AUTOMATICALLY.equals(s.retrievalMethod))
             return badRequest("Feed is autofetched! Cannot upload.");
         
         FeedVersion v = new FeedVersion(s);

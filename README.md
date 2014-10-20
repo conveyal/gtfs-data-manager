@@ -20,3 +20,21 @@ If you're running it on a Linux/OS X server which has multiple user accounts run
     TMPDIR=`mktemp -d` ./activator run
 
 See [this blog post](http://www.indicatrix.org/2014/10/20/using-geotools-with-multiple-user-accounts/) for details.
+
+## Loading feeds
+
+Feeds can be loaded directly through the admin interface, but if you have a lot of them this can be a pain. We provide two tools to load feeds in bulk. Both require that a new project be created through the admin interface.
+
+### `scripts/bulkLoadUrls.py`
+
+Loads URLs from a CSV with `name` and `url`  fields. Use it like so
+
+    bulkLoadUrls.py file.csv <server>
+
+where <server> is the URL of your GTFS data manager instance (most likely http://localhost:9000).
+
+### `scripts/bulkLoadFeeds.py`
+
+Loads a bunch of feeds. Use it like so
+  
+    bulkLoadFeeds.py feed.zip [feed2.zip feed3.zip . . .] <server>

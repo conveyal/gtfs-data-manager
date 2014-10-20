@@ -68,7 +68,7 @@ for feed in argv[1:-1]:
         name = name,
         url = None,
         isPublic = True,
-        autofetch = False,
+        retrievalMethod = 'MANUALLY_UPLOADED',
         feedCollection = coll,
     )
 

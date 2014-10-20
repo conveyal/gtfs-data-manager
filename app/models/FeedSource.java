@@ -7,21 +7,15 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
-
-import com.conveyal.gtfs.model.ValidationResult;
-import com.conveyal.gtfs.validator.json.FeedProcessor;
 import com.conveyal.gtfs.validator.json.FeedValidationResult;
 import com.conveyal.gtfs.validator.json.LoadStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-
 import play.Logger;
 import utils.DataStore;
 
@@ -60,9 +54,9 @@ public class FeedSource extends Model {
     public boolean isPublic;
     
     /**
-     * Do we fetch this feed automatically?
+     * How do we receive this feed?
      */
-    public boolean autofetch;
+    public FeedRetrievalMethod retrievalMethod;
     
     /**
      * When was this feed last fetched?
@@ -83,7 +77,7 @@ public class FeedSource extends Model {
      * Fetch the latest version of the feed.
      */
     public void fetch () {
-        if (!this.autofetch) {
+        if (this.retrievalMethod.equals(FeedRetrievalMethod.FETCHED_AUTOMATICALLY)) {
             Logger.info("not fetching feed {}, not a fetchable feed", this.toString());
             return;
         }
@@ -221,6 +215,15 @@ public class FeedSource extends Model {
 
     public static Collection<FeedSource> getAll() {
         return sourceStore.getAll();
+    }
+    
+    /**
+     * Represents ways feeds can be retrieved
+     */
+    public static enum FeedRetrievalMethod {
+        FETCHED_AUTOMATICALLY, // automatically retrieved over HTTP on some regular basis
+        MANUALLY_UPLOADED, // manually uploaded by someone, perhaps the agency, or perhaps an internal user
+        PRODUCED_IN_HOUSE // produced in-house in a GTFS Editor instance
     }
     
     /**

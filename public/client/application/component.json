@@ -13,6 +13,7 @@
         "translate-helper",
         "class-helper",
         "logic-helper",
-        "breadcrumb-nav"
+        "breadcrumb-nav",
+        "text-helper"
     ]
 }

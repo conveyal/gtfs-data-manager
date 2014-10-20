@@ -26,7 +26,7 @@ module.exports = Backbone.Marionette.CompositeView.extend({
             new FeedSource({
                 name: Messages('app.new_feed_source_name'),
                 isPublic: true,
-                autofetch: false,
+                retrievalMethod: 'MANUALLY_UPLOADED',
                 url: null,
                 feedCollection: {id: this.feedCollectionId},
                 lastUpdated: 0

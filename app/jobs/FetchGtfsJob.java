@@ -1,6 +1,7 @@
 package jobs;
 
 import models.FeedSource;
+import models.FeedSource.FeedRetrievalMethod;
 import play.Logger;
 
 /**
@@ -13,7 +14,7 @@ public class FetchGtfsJob implements Runnable {
         Logger.info("Fetching GTFS feeds");
 
         for (FeedSource source : FeedSource.getAll()) {
-            if (!source.autofetch)
+            if (!FeedRetrievalMethod.FETCHED_AUTOMATICALLY.equals(source.retrievalMethod))
                 continue;
 
             source.fetch();

@@ -1,6 +1,12 @@
 <td class="name"></td>
 <td><input class="edit-bool" type="checkbox" name="isPublic" {{ ? isPublic 'checked' '' }} /></td>
-<td><input class="edit-bool" type="checkbox" name="autofetch" {{ ? autofetch 'checked' '' }} /></td>
+<td>
+  <select class="feed-source" name="retrievalMethod">
+    <option value="FETCHED_AUTOMATICALLY" {{ ? (eq retrievalMethod 'FETCHED_AUTOMATICALLY') 'selected' '' }}>{{ t 'app.feed_source.retrieval_method.FETCHED_AUTOMATICALLY' }}</option>
+    <option value="MANUALLY_UPLOADED" {{ ? (eq retrievalMethod 'MANUALLY_UPLOADED') 'selected' '' }}>{{ t 'app.feed_source.retrieval_method.MANUALLY_UPLOADED' }}</option>
+    <option value="PRODUCED_IN_HOUSE" {{ ? (eq retrievalMethod 'PRODUCED_IN_HOUSE') 'selected' '' }}>{{ t 'app.feed_source.retrieval_method.PRODUCED_IN_HOUSE' }}</option>
+  </select>
+</td>
 <td class="url"></td>
 <td>{{ dateRender lastUpdated true }}</td>
 

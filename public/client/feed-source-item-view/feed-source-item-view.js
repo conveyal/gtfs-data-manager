@@ -14,12 +14,16 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         nameRegion: '.name',
         urlRegion: '.url'
     },
-    template: Handlebars.compile(require('./feed-source-view.html')),
+    template: Handlebars.compile(require('./feed-source-item-view.html')),
     tagName: 'tr',
 
-    events: { 'click .edit-bool': 'editBool' },
+    events: { 
+        'change .edit-bool': 'editBool',
+        'change .feed-source': 'editSource'
+    },
+
     initialize: function () {
-        _.bindAll(this, 'editBool');
+        _.bindAll(this, 'editBool', 'editSource');
     },
 
     // edit a boolean value
@@ -33,6 +37,12 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.model.save();
 
         // no need to re-render because the checkbox has already been rendered by the browser
+    },
+
+    // edit the retrieval method
+    editSource: function (e) {
+        this.model.set('retrievalMethod', $(e.target).val());
+        this.model.save();
     },
 
     onShow: function () {

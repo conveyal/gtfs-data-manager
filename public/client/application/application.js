@@ -8,6 +8,7 @@ require('date-render-helper');
 require('class-helper');
 require('logic-helper');
 require('translate-helper');
+require('text-helper');
 
 var app = new Backbone.Marionette.Application();
 

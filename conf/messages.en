@@ -13,9 +13,13 @@ app.yes=Yes
 app.no=No
 app.feed_source.name=Name
 app.feed_source.public=Public
-app.feed_source.autofetch=Fetch automatically
+app.feed_source.retrieval_method=Retrieval method
 app.feed_source.url=URL
 app.feed_source.last_updated=Last updated
+
+app.feed_source.retrieval_method.FETCHED_AUTOMATICALLY=Fetched automatically
+app.feed_source.retrieval_method.MANUALLY_UPLOADED=Manually uploaded
+app.feed_source.retrieval_method.PRODUCED_IN_HOUSE=Produced in house
 
 # date rendering
 app.date.january=January

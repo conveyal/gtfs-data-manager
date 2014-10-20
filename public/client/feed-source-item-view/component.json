@@ -10,7 +10,7 @@
     "local": [
         "editable-text-widget"
     ],
-    "main": "feed-source-view.js",
-    "scripts": ["feed-source-view.js"],
-    "templates": ["feed-source-view.html"]
+    "main": "feed-source-item-view.js",
+    "scripts": ["feed-source-item-view.js"],
+    "templates": ["feed-source-item-view.html"]
 }
