@@ -75,11 +75,6 @@ public class FeedSource extends Model {
     public Date lastUpdated;
     
     /**
-     * How often is this feed fetched (in minutes)?
-     */
-    public Integer fetchFrequency;
-    
-    /**
      * From whence is this feed fetched?
      */
     public URL url;

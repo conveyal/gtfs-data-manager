@@ -47,7 +47,6 @@ public class FeedSourceController extends Controller {
     private static void applyJsonToFeedSource (FeedSource s, JsonNode params) throws MalformedURLException {
         s.name = params.get("name").asText();
         s.autofetch = params.get("autofetch").asBoolean();
-        s.fetchFrequency = params.get("fetchFrequency").asInt();
         s.isPublic = params.get("isPublic").asBoolean();
         // the last fetched/updated cannot be updated from the web interface, only internally
         String url = params.get("url").asText();
