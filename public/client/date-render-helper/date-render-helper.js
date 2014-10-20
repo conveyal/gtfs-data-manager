@@ -6,18 +6,18 @@ var Handlebars = require('handlebars');
 // get the month in the local language
 var getMonth = function (month) {
     return [
-        Messages('app.date.january'),
-        Messages('app.date.february'),
-        Messages('app.date.march'),
-        Messages('app.date.april'),
-        Messages('app.date.may'),
-        Messages('app.date.june'),
-        Messages('app.date.july'),
-        Messages('app.date.august'),
-        Messages('app.date.september'),
-        Messages('app.date.october'),
-        Messages('app.date.november'),
-        Messages('app.date.december')
+        window.Messages('app.date.january'),
+        window.Messages('app.date.february'),
+        window.Messages('app.date.march'),
+        window.Messages('app.date.april'),
+        window.Messages('app.date.may'),
+        window.Messages('app.date.june'),
+        window.Messages('app.date.july'),
+        window.Messages('app.date.august'),
+        window.Messages('app.date.september'),
+        window.Messages('app.date.october'),
+        window.Messages('app.date.november'),
+        window.Messages('app.date.december')
     ][month];
 };
         
@@ -29,11 +29,11 @@ var getMonth = function (month) {
 Handlebars.registerHelper(
     'dateRender',
     function (date, includeTime) {
-        if (date == 0 || date == null)
+        if (date === 0 || date === null)
             return '-';
 
-        if (typeof(includeTime) == 'undefined' || includeTime == null) {
-            var includeTime = true;
+        if (typeof(includeTime) == 'undefined' || includeTime === null) {
+            includeTime = true;
         }
 
         var d = new Date(date);
