@@ -39,6 +39,15 @@ public class FeedVersion extends Model {
         
         // since we store directly on the file system, this lets users look at the DB directly
         this.id = getCleanName(source.name) + "_" + df.format(this.updated) + "_" + source.id + ".zip";
+        
+        // infer the version
+        FeedVersion prev = source.getLatest();
+        if (prev != null) {
+            this.version = prev.version + 1;
+        }
+        else {
+            this.version = 0;
+        }
     }
 
     /**
