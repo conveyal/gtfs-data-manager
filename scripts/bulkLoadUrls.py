@@ -58,7 +58,6 @@ with open(argv[1]) as f:
             isPublic = True,
             autofetch = True,
             # every day
-            fetchFrequency = 60 * 24,
             feedCollection = coll
         )
 
