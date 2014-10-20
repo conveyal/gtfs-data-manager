@@ -31,7 +31,7 @@ var FeedCollectionItemView = EditableTextWidget.extend({
 /**
  * An editable view of a FeedCollectionCollection
  */
-module.exports = Backbone.Marionette.CollectionView.extend({
+module.exports = Backbone.Marionette.CompositeView.extend({
     template: Handlebars.compile(require('./feed-collection-collection-view.html')),
     childView: FeedCollectionItemView,
     childViewContainer: 'ul',
