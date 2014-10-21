@@ -1,0 +1,9 @@
+{
+    "name": "note",
+    "dependencies": {
+	     "jashkenas/backbone": "*",
+	      "jashkenas/underscore": "*"
+    },
+    "main": "note.js",
+    "scripts": ["note.js"]
+}

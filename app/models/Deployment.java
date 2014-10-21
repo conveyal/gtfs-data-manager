@@ -44,4 +44,9 @@ public class Deployment extends Model {
     public static Deployment get (String id) {
         return deploymentStore.getById(id);
     }
+    
+    /** Save this deployment */
+    public void save () {
+        deploymentStore.save(id, this);
+    }
 }

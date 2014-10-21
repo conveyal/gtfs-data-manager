@@ -1,24 +1,51 @@
 <h1>{{ name }}</h1>
 
 <p>
-  <div class="btn-group">
-    {{#unless autofetch }}
-    <button role="button" class="btn btn-primary upload-feed"><span class="glyphicon glyphicon-upload sr-hidden"></span>&nbsp;&nbsp;{{ t 'app.feed_version.initiate_upload' }}</button>
-    {{/unless}}
-
-    {{#if (admin)}}
+  {{#if (admin)}}
     <button class="btn btn-primary" data-toggle="dropdown">{{ t 'app.feed_source.share' }}&nbsp;&nbsp;<span class="glyphicon glyphicon-share-alt"></span></button>
     <div class="dropdown-menu">
       <div class="container-fluid">
         <label for="share-url" class="sr-only">{{ t 'app.feed_source.share_url' }}</label>
         {{!-- value to be filled in by the controller --}}
         <input type="text" size="80" id="share-url"></input>
-        
+
         <p>{{ t 'app.feed_source.share_desc' }}</p>
       </div>
     </div>
-    {{/if}}
-  </div>
+  {{/if}}
 <p>
+
+<p>
+  <table class="table">
+    <tr>
+      <th>{{ t 'app.feed_source.name' }}</th>
+      <td>{{ name }}</td>
+    </tr>
+    <tr>
+      <th>{{ t 'app.feed_source.public' }}</th>
+      <td>{{ ? isPublic (t 'app.yes') (t 'app.no')}}</td>
+    </tr>
+    {{!--
+    <tr>
+      <th>{{ t 'app.feed_source.retrieval_method' }}</th>
+      <td>{{ t (('app.feed_source.retrieval_method') (retrievalMethod)}}</td>
+    </tr>
+    --}}
+    <tr>
+      <th>{{ t 'app.feed_source.url' }}</th>
+      <td>{{ url }}</td>
+    </tr>
+    <tr>
+      <th>{{ t 'app.feed_source.last_updated' }}</th>
+      <td>{{ dateRender lastUpdated true }}</td>
+    </tr>
+  </table>
+</p>
+
+<p>
+  {{#unless autofetch }}
+    <button role="button" class="btn btn-primary upload-feed"><span class="glyphicon glyphicon-upload sr-hidden"></span>&nbsp;&nbsp;{{ t 'app.feed_version.initiate_upload' }}</button>
+  {{/unless}}
+</p>
 
 <div id="validation"></div>

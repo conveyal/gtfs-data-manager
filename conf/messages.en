@@ -81,10 +81,12 @@ app.logout=Log out
 
 app.projects=Select a project
 
-app.notes.title=Comments
-app.notes.new=New comment
+app.note.title=Comments
+app.note.new=New comment
 # The label on the submit button for the new comment form
-app.notes.create=Comment
+app.note.create=Comment
+# {0}: username; {1}: date
+app.note.source=By {0} on {1}
 
 app.username=username
 app.password=password

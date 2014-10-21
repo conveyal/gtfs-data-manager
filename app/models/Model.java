@@ -1,5 +1,6 @@
 package models;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,7 +32,26 @@ public abstract class Model {
     /**
      * Notes on this object
      */
-    public List<Note> notes;
+    @JsonIgnore
+    public List<String> noteIds;
+    
+    /**
+     * Get the notes for this object    
+     */
+    // notes are handled through a separate controller
+    @JsonIgnore
+    public List<Note> getNotes() {
+        ArrayList<Note> ret = new ArrayList<Note>(noteIds != null ? noteIds.size() : 0);
+
+        if (noteIds != null) {
+            for (String id : noteIds) {
+                ret.add(Note.get(id));
+            }
+        }
+        
+        // even if there were no notes, return an empty list
+        return ret;
+    }
     
     /**
      * Get the user who owns this object.
@@ -47,4 +67,15 @@ public abstract class Model {
     public void setUser (User user) {
         userId = user.id != null ? user.id : User.getUserId(user.username);
     }
+
+    public void addNote(Note n) {
+        if (noteIds == null) {
+            noteIds = new ArrayList<String>();
+        }
+        
+        noteIds.add(n.id);
+        n.objectId = this.id;
+    }
+
+    public abstract void save();
 }

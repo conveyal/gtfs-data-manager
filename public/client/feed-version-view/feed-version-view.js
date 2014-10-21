@@ -9,6 +9,7 @@ var $ = require('jquery');
 var _ = require('underscore');
 var Handlebars = require('handlebars');
 var app = require('application');
+var NoteCollectionView = require('note-collection-view');
 
 var InvalidValuesList = Backbone.Marionette.ItemView.extend({
     // rather than having a ton of levels of nested views, since we're not editing, most of the
@@ -22,18 +23,18 @@ var InvalidValuesList = Backbone.Marionette.ItemView.extend({
         var invalidValuesLen = invalidValues.length;
         for (var i = 0; i < invalidValuesLen; i++) {
             var iv = invalidValues[i];
-            
+
             if (typeof(errors[iv.problemType]) == 'undefined') {
                 errors[iv.problemType] = [];
                 errors[iv.problemType].name = iv.problemType;
             }
-            
+
             errors[iv.problemType].push(iv);
         }
 
         // we use a bare Backbone.Model to pass the tree to the template
         this.model = new Backbone.Model({errors: errors});
-    }   
+    }
 });
 
 module.exports = Backbone.Marionette.LayoutView.extend({
@@ -43,7 +44,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         routesRegion: '#routes',
         tripsRegion: '#trips',
         stopsRegion: '#stops',
-        shapesRegion: '#shapes'
+        shapesRegion: '#shapes',
+        notesRegion: '#notes'
     },
 
     onShow: function () {
@@ -67,6 +69,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             {name: window.Messages('app.feed_version.version_number', this.model.get('version')),
              href: '#feed/' +this.model.get('feedSource').id + '/' + this.model.get('id')}
         ]);
+
+        // set up notes
+        this.notesRegion.show(new NoteCollectionView({objectId: this.model.get('id'), type: 'FEED_VERSION'}));
     }
 });
-        

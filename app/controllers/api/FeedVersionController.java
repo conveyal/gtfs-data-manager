@@ -13,11 +13,13 @@ import java.util.concurrent.TimeUnit;
 import jobs.ProcessSingleFeedJob;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import controllers.Secured;
 import models.FeedCollection;
 import models.FeedSource;
 import models.FeedVersion;
+import models.Note;
 import models.User;
 import models.FeedSource.FeedRetrievalMethod;
 import play.Logger;
@@ -32,6 +34,7 @@ import scala.concurrent.duration.Duration;
 @Security.Authenticated(Secured.class)
 public class FeedVersionController extends Controller {
     private static JsonManager<FeedVersion> json = new JsonManager<FeedVersion>();
+    private static JsonManager<Note> notes = new JsonManager<Note>();
     
     public static Result get (String id) throws JsonProcessingException {
         User currentUser = User.getUserByUsername(session("username"));
@@ -65,6 +68,7 @@ public class FeedVersionController extends Controller {
         }
     }
     
+ 
     /**
      * Upload a feed version directly. This is done behind Backbone's back, and as such uses
      * x-multipart-formdata rather than a json blob. This is done because uploading files in a JSON
