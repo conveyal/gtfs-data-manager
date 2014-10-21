@@ -40,7 +40,10 @@ app.date.december=December
 
 app.feed_version.loaded_successfully=Loaded successfully
 app.feed_version.load_status=Load status
-app.feed_version.version_number=Version
+app.feed_version.version_number=Version {0}
+app.feed_version.next_version=Next version
+app.feed_version.previous_version=Previous version
+app.feed_version.show_all_versions=Show all versions
 app.feed_version.agency_count=Agency count
 app.feed_version.error_count=Error count
 app.feed_version.route_count=Route count

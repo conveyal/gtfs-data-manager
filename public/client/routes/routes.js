@@ -10,6 +10,8 @@ var Router = Backbone.Router.extend({
         "login/*returnTo": "login",
         "admin": "admin",
         "overview/:feedCollectionId": "overview",
+        "feed/:feedSourceId/:feedVersionId?userId=:userId&key=:key": "autologin",
+        "feed/:feedSourceId/:feedVersionId": "feedsource",
         "feed/:feedSourceId?userId=:userId&key=:key": "autologin",
         "feed/:feedSourceId": "feedsource"
     },

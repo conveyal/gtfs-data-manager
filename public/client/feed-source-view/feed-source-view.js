@@ -21,7 +21,9 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         'click .upload-feed': 'uploadFeed',
         'click #share-url': 'doNothing'
     },
-    initialize: function () {
+    initialize: function (attr) {
+        this.feedVersionId = attr.feedVersionId;
+
         _.bindAll(this, 'uploadFeed');
     },
 
@@ -32,10 +34,17 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
     
     onShow: function () {
-        var latest = new FeedVersion({id: this.model.get('latestVersionId')});
+        var version;
+
+        if (this.feedVersionId != undefined && this.feedVersionId != null)
+            version = new FeedVersion({id: this.feedVersionId});
+
+        else
+            version = new FeedVersion({id: this.model.get('latestVersionId')});
+
         var instance = this;
-        latest.fetch().done(function () {
-            instance.latestValidationRegion.show(new FeedVersionView({model: latest}));
+        version.fetch().done(function () {
+            instance.latestValidationRegion.show(new FeedVersionView({model: version}));
         });
 
         // expose the copypastable URL to allow users to view/edit

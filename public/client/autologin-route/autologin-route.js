@@ -4,7 +4,22 @@
 
 var app = require('application');
 
-module.exports = function (feedSourceId, userId, key) {
+module.exports = function () {
+    var feedSourceId, feedVersionId, userId, key;
+    if (arguments.length == 4) {
+        feedSourceId = arguments[0];
+        feedVersionId = arguments[1];
+        userId = arguments[2];
+        key = arguments[3];
+    }
+    else if (arguments.length == 3) {
+        feedSourceId = arguments[0];
+        feedVersionId = null;
+        userId = arguments[1];
+        key = arguments[3];
+    }
+    else return;
+
     $.post('/authenticate',
            {
                userId: userId,
@@ -18,7 +33,8 @@ module.exports = function (feedSourceId, userId, key) {
 
             app.user = data;
             
-            window.location.hash = '#feed/' + feedSourceId;
+            window.location.hash = '#feed/' + feedSourceId +
+                (feedVersionId != null ? '/' + feedVersionId : '');
         })
         .fail(function () {
             // TODO: alert is bad, bad error message, not translatable.
