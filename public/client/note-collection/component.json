@@ -1,0 +1,10 @@
+{
+  "name": "note-collection",
+  "dependencies": {
+    "jashkenas/backbone": "*",
+    "jashkenas/underscore": "*"
+  },
+  "locals": ["note"],
+  "main": "note-collection.js",
+  "scripts": ["note-collection.js"]
+}
