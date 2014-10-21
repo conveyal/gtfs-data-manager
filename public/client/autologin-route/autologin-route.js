@@ -6,17 +6,19 @@ var app = require('application');
 
 module.exports = function () {
     var feedSourceId, feedVersionId, userId, key;
-    if (arguments.length == 4) {
+
+    // yes, this is in fact four arguments, not five, but the Bootstrap router throws an extra null on the end
+    if (arguments.length == 5) {
         feedSourceId = arguments[0];
         feedVersionId = arguments[1];
         userId = arguments[2];
         key = arguments[3];
     }
-    else if (arguments.length == 3) {
+    else if (arguments.length == 4) {
         feedSourceId = arguments[0];
         feedVersionId = null;
         userId = arguments[1];
-        key = arguments[3];
+        key = arguments[2];
     }
     else return;
 
