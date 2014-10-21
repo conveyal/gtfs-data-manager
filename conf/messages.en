@@ -81,5 +81,13 @@ app.logout=Log out
 
 app.projects=Select a project
 
+app.notes.title=Comments
+app.notes.new=New comment
+# The label on the submit button for the new comment form
+app.notes.create=Comment
+
+app.username=username
+app.password=password
+
 app.name=NYSDOT GTFS Data Manager
 app.title={0} - NYSDOT GTFS Data Manager
