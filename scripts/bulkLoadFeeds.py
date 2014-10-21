@@ -61,6 +61,10 @@ for feed in argv[1:-1]:
     reader = csv.DictReader(ZipFile(feed).open('agency.txt'))
     name = reader.next()['agency_name']
 
+    if name == 'MTA New York City Transit':
+        # they release multiple feeds
+        name = feed[:-4]
+
     print 'detected agency name %s' % name
 
     # create a feedsource
