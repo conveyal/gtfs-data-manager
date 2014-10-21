@@ -185,9 +185,9 @@ public class FeedSource extends Model {
         if (latest != null && newFeed.hash.equals(latest.hash)) {
             Logger.warn("Feed {} was fetched but has not changed; server operators should add If-Modified-Since support to avoid wasting bandwidth", this);
             newFeed.getFeed().delete();
+            newFeed.dereference();
         }
         else {
-            newFeed.setFeedSource(this);
             newFeed.userId = this.userId;
             newFeed.validate();
             newFeed.save();

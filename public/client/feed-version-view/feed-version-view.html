@@ -1,8 +1,9 @@
 {{#if (neq validationResult null)}}
   <table class="table">
     <tbody>
+      <tr><th>{{ t 'app.feed_version.version_number' }}</th><td>{{ version }}</td></tr>
       {{#with validationResult}}
-        <tr><th>Load Status</th><td>{{ loadStatus }}</td></tr>
+        <tr><th>{{ t 'app.feed_version.load_status' }}</th><td>{{ loadStatus }}</td></tr>
         {{#if (eq loadStatus 'SUCCESS') }}
         <tr><th>{{ t 'app.feed_version.agency_count' }}</th><td class="{{ highlightZero agencyCount }}">{{ agencyCount }}</td></tr>
         <tr><th>{{ t 'app.feed_version.route_count' }}</th><td class="{{ highlightZero routeCount }}">{{ routeCount }}</td></tr>

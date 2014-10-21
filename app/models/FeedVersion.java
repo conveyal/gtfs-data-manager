@@ -17,6 +17,8 @@ import utils.HashUtils;
 import com.conveyal.gtfs.validator.json.FeedProcessor;
 import com.conveyal.gtfs.validator.json.FeedValidationResult;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 /**
  * Represents a version of a feed.
@@ -32,7 +34,7 @@ public class FeedVersion extends Model {
      */
     public FeedVersion (FeedSource source) {
         this.updated = new Date();
-        this.setFeedSource(source);
+        this.feedSourceId = source.id;
         
         // ISO time
         DateFormat df = new SimpleDateFormat("yyyyMMdd'T'HHmmssX");
@@ -44,6 +46,8 @@ public class FeedVersion extends Model {
         FeedVersion prev = source.getLatest();
         if (prev != null) {
             this.version = prev.version + 1;
+            this.previousVersionId = prev.id;
+            prev.nextVersionId = this.id;
         }
         else {
             this.version = 0;
@@ -59,6 +63,22 @@ public class FeedVersion extends Model {
         return name.replace(' ', '_').replaceAll("[^A-Za-z0-9_-]", "");
     }
     
+    /**
+     * Remove this feedversion from the chain of feedversions surrounding it.
+     */
+    public void dereference () {
+        FeedVersion prev = getPreviousVersion();
+        if (prev != null)
+            prev.nextVersionId = this.nextVersionId;
+        
+        FeedVersion next = getNextVersion();
+        if (next != null)
+            next.previousVersionId = this.previousVersionId;
+        
+        // Note: versioning will have a gap, but generally this function is used only at the head of the chain
+        // so there will not be an internal gap.
+    }
+    
     /** The feed source this is associated with */
     @JsonIgnore
     public String feedSourceId;
@@ -67,8 +87,26 @@ public class FeedVersion extends Model {
         return FeedSource.get(feedSourceId);
     }
     
-    public void setFeedSource (FeedSource source) {
-        this.feedSourceId = source.id;
+    /**
+     * The ID of the previous version of this feed.
+     */
+    @JsonInclude(Include.ALWAYS)
+    public String previousVersionId;
+    
+    @JsonIgnore
+    public FeedVersion getPreviousVersion () {
+        return previousVersionId != null ? FeedVersion.get(previousVersionId) : null;
+    }
+    
+    /**
+     * The ID of the next version of this feed.
+     */
+    @JsonInclude(Include.ALWAYS)
+    public String nextVersionId;
+    
+    @JsonIgnore
+    public FeedVersion getNextVersion () {
+        return nextVersionId != null ? FeedVersion.get(nextVersionId) : null;
     }
     
     /** The hash of the feed file, for quick checking if the file has been updated */
