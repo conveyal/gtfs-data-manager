@@ -50,7 +50,7 @@ public class FeedVersion extends Model {
             prev.nextVersionId = this.id;
         }
         else {
-            this.version = 0;
+            this.version = 1;
         }
     }
 
