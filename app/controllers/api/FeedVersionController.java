@@ -127,6 +127,16 @@ public class FeedVersionController extends Controller {
             Logger.error("Unable to transfer from upload to saved file.");
             return internalServerError("Unable to save uploaded file");
         }
+        
+        v.hash();
+        
+        FeedVersion latest = s.getLatest();
+        if (latest != null && latest.hash.equals(v.hash)) {
+            // it's the same feed, don't save
+            v.dereference();
+            v.getFeed().delete();
+            return redirect("/#feed/" + s.id);
+        }
 
         // note: we don't save it until it's been validated, which happens in the job
         /*Akka.system().scheduler().scheduleOnce(

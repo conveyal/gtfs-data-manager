@@ -19,7 +19,6 @@ public class ProcessSingleFeedJob implements Runnable {
     }
     
     public void run() {
-        feedVersion.hash();
         feedVersion.validate();
         feedVersion.save();
     }
