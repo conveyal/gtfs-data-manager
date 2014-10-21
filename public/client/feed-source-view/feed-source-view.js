@@ -58,12 +58,6 @@ module.exports = Backbone.Marionette.LayoutView.extend({
                 }
             });
         }
-
-        // set up nav
-        app.nav.setLocation([
-            {name: this.model.get('feedCollection').name, href: '#overview/' + this.model.get('feedCollection').id},
-            {name: this.model.get('name'), href: '#feed/' + this.model.get('id')},
-        ]);
     },
 
 

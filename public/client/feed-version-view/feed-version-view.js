@@ -8,6 +8,7 @@ Backbone.Marionette = require('backbone.marionette');
 var $ = require('jquery');
 var _ = require('underscore');
 var Handlebars = require('handlebars');
+var app = require('application');
 
 var InvalidValuesList = Backbone.Marionette.ItemView.extend({
     // rather than having a ton of levels of nested views, since we're not editing, most of the
@@ -46,10 +47,26 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
 
     onShow: function () {
-        this.routesRegion.show(new InvalidValuesList({invalidValues: this.model.get('validationResult').routes.invalidValues}));
-        this.stopsRegion.show(new InvalidValuesList({invalidValues: this.model.get('validationResult').stops.invalidValues}))
-        this.tripsRegion.show(new InvalidValuesList({invalidValues: this.model.get('validationResult').trips.invalidValues}));
-        this.shapesRegion.show(new InvalidValuesList({invalidValues: this.model.get('validationResult').shapes.invalidValues}));
+        try {
+            this.routesRegion.show(new InvalidValuesList({invalidValues: this.model.get('validationResult').routes.invalidValues}));
+        } catch (e) {}
+        try {
+            this.stopsRegion.show(new InvalidValuesList({invalidValues: this.model.get('validationResult').stops.invalidValues}))
+        } catch (e) {}
+        try {
+            this.tripsRegion.show(new InvalidValuesList({invalidValues: this.model.get('validationResult').trips.invalidValues}));
+        } catch (e) {}
+        try {
+            this.shapesRegion.show(new InvalidValuesList({invalidValues: this.model.get('validationResult').shapes.invalidValues}));
+        } catch (e) {}
+
+        // set up nav
+        app.nav.setLocation([
+            {name: this.model.get('feedSource').feedCollection.name, href: '#overview/' + this.model.get('feedSource').feedCollection.id},
+            {name: this.model.get('feedSource').name, href: '#feed/' + this.model.get('feedSource').id},
+            {name: window.Messages('app.feed_version.version_number', this.model.get('version')),
+             href: '#feed/' +this.model.get('feedSource').id + '/' + this.model.get('id')}
+        ]);
     }
 });
         

@@ -8,6 +8,7 @@
         "components/handlebars.js": "*",
         "components/jquery": "*"
     },
+    "local": "application",
     "main": "feed-version-view.js",
     "scripts": ["feed-version-view.js"],
     "templates": ["feed-version-view.html", "invalid-values-list.html"]
