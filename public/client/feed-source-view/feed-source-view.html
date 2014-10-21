@@ -2,6 +2,7 @@
 
 <p>
   {{#if (admin)}}
+  <div class="dropdown">
     <button class="btn btn-primary" data-toggle="dropdown">{{ t 'app.feed_source.share' }}&nbsp;&nbsp;<span class="glyphicon glyphicon-share-alt"></span></button>
     <div class="dropdown-menu">
       <div class="container-fluid">
@@ -12,8 +13,9 @@
         <p>{{ t 'app.feed_source.share_desc' }}</p>
       </div>
     </div>
+  </div>
   {{/if}}
-<p>
+  <p>
 
 <p>
   <table class="table">
