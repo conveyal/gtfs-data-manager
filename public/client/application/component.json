@@ -15,6 +15,7 @@
         "logic-helper",
         "breadcrumb-nav",
         "text-helper",
-        "admin-helper"
+        "admin-helper",
+        "validation-partial"
     ]
 }

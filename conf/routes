@@ -22,6 +22,7 @@ PUT     /api/feedsources/:id            controllers.api.FeedSourceController.upd
 POST    /api/feedsources/               controllers.api.FeedSourceController.create()
 
 GET      /api/feedversions/:id          controllers.api.FeedVersionController.get(id:String)
+GET      /api/feedversions             controllers.api.FeedVersionController.getAll()
 POST     /api/feedversions/             controllers.api.FeedVersionController.create()
 
 GET     /fetchGtfs                      controllers.Application.fetchGtfs()

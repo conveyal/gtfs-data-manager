@@ -1,0 +1,10 @@
+<td>
+  <a href="#feed/{{ feedSource.id }}/{{ id }}">
+    {{ t 'app.feed_version.version_number' version }}
+  </a>
+</td>
+<td>{{ dateRender updated true }}</td>
+
+{{#with validationResult}}
+  {{> validationResult}}
+{{/with}}

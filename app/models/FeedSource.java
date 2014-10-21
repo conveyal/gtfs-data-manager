@@ -9,13 +9,16 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+
 import com.conveyal.gtfs.validator.json.FeedValidationResult;
 import com.conveyal.gtfs.validator.json.LoadStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 import play.Logger;
 import utils.DataStore;
 
@@ -255,6 +258,24 @@ public class FeedSource extends Model {
     }
     
     /**
+     * Get all of the feed versions for this source
+     * @return
+     */
+    @JsonIgnore
+    public Collection<FeedVersion> getFeedVersions() {
+        // TODO Indices
+        ArrayList<FeedVersion> ret = new ArrayList<FeedVersion>();
+        
+        for (FeedVersion v : FeedVersion.getAll()) {
+            if (this.id.equals(v.feedSourceId)) {
+                ret.add(v);
+            }
+        }
+        
+        return ret;
+    }
+    
+    /**
      * Represents ways feeds can be retrieved
      */
     public static enum FeedRetrievalMethod {
@@ -315,4 +336,4 @@ public class FeedSource extends Model {
             }
         }
     }
-     }
+}

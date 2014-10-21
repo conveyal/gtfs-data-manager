@@ -1,0 +1,16 @@
+{{#if (eq loadStatus 'SUCCESS')}}
+  <td class="{{ ? errorCount 'bg-warning' 'bg-success' }}">{{ t 'app.yes' }}</span></td>
+  <td>{{ errorCount }}</td>
+  <td class="{{ highlightZero routeCount }}">{{ routeCount }}</td>
+  <td class="{{ highlightZero tripCount }}">{{ tripCount }}</td>
+  <td class="{{ highlightZero stopTimesCount }}">{{ stopTimesCount }}</td>
+  {{#if (gt stopTimesCount 0)}}
+    <td class="{{ getClassForStartDate startDate }}">{{ dateRender startDate false }}</td>
+    <td class="{{ getClassForEndDate endDate }}">{{ dateRender endDate false }}</td>
+  {{else}}
+    <td>-</td><td>-</td>
+  {{/if}}
+{{else}}
+  <td class="bg-danger">{{ t 'app.no' }}</span></td>
+  <td colspan="6">{{ loadFailureReason }}</td>
+{{/if}}

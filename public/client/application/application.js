@@ -3,13 +3,14 @@ Backbone.Marionette = require('backbone.marionette');
 var Handlebars = require('Handlebars');
 var Breadcrumb = require('breadcrumb-nav');
 
-// register Handlebars helpers
+// register Handlebars helpers and partials
 require('date-render-helper');
 require('class-helper');
 require('logic-helper');
 require('translate-helper');
 require('text-helper');
 require('admin-helper');
+require('validation-partial');
 
 var app = new Backbone.Marionette.Application();
 

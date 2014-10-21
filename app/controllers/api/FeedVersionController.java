@@ -15,6 +15,7 @@ import jobs.ProcessSingleFeedJob;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import controllers.Secured;
+import models.FeedCollection;
 import models.FeedSource;
 import models.FeedVersion;
 import models.User;
@@ -39,6 +40,25 @@ public class FeedVersionController extends Controller {
         
         if (Boolean.TRUE.equals(currentUser.admin) || currentUser.id.equals(v.userId)) {
             return ok(json.write(v));
+        }
+        else {
+            return unauthorized();
+        }
+    }
+    
+    public static Result getAll () {
+        User currentUser = User.getUserByUsername(session("username"));
+        
+        // parse the query parameters
+        String sId = request().getQueryString("feedsource");
+        if (sId == null) {
+            return badRequest("Please specify a feedsource");
+        }
+        
+        FeedSource s = FeedSource.get(sId);
+ 
+        if (Boolean.TRUE.equals(currentUser.admin) || currentUser.equals(s.getUser())) {
+            return ok(json.write(s.getFeedVersions()));
         }
         else {
             return unauthorized();
