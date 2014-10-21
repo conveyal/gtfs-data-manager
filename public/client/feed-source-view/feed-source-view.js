@@ -9,11 +9,9 @@ var _ = require('underscore');
 var Handlebars = require('handlebars.js');
 var app = require('application');
 var FeedVersion = require('feed-version');
-var FeedVersionCollection = require('feed-version-collection');
 var FeedSource = require('feed-source');
 var FeedVersionView = require('feed-version-view');
 var FeedUploadView = require('feed-upload-view');
-var FeedVersionCollectionView = require('feed-version-collection-view');
 
 module.exports = Backbone.Marionette.LayoutView.extend({
     template: Handlebars.compile(require("./feed-source-view.html")),
@@ -21,31 +19,18 @@ module.exports = Backbone.Marionette.LayoutView.extend({
 
     events: {
         'click .upload-feed': 'uploadFeed',
-        'click #share-url': 'doNothing',
-        'click .show-all-versions': 'showAllVersions'
+        'click #share-url': 'doNothing'
     },
     initialize: function (attr) {
         this.feedVersionId = attr.feedVersionId;
 
-        _.bindAll(this, 'uploadFeed', 'showAllVersions');
+        _.bindAll(this, 'uploadFeed');
     },
 
     // show the feed upload dialog
     uploadFeed: function (e) {
         // model is so that it knows what feed source to upload to
         app.modalRegion.show(new FeedUploadView({model: this.model}));
-    },
-
-    // show all of the versions of this feed
-    showAllVersions: function () {
-        // get the data
-        var versions = new FeedVersionCollection();
-        var instance = this;
-        versions.fetch({data: {feedsource: this.model.get('id')}}).done(function () {
-            // we don't need to set up any events to return to the validation view, as that will be handled
-            // through a URL hash change and the router
-            instance.validationRegion.show(new FeedVersionCollectionView({collection: versions}));
-        });
     },
     
     onShow: function () {

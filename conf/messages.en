@@ -42,6 +42,7 @@ app.feed_version.loaded_successfully=Loaded successfully
 app.feed_version.load_status=Load status
 app.feed_version.version_number=Version {0}
 app.feed_version.version=Version
+app.feed_version.versions=Versions
 app.feed_version.date_retrieved=Date retrieved
 app.feed_version.next_version=Next version
 app.feed_version.previous_version=Previous version

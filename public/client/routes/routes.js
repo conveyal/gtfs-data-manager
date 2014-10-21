@@ -13,14 +13,16 @@ var Router = Backbone.Router.extend({
         "feed/:feedSourceId/:feedVersionId?userId=:userId&key=:key": "autologin",
         "feed/:feedSourceId/:feedVersionId": "feedsource",
         "feed/:feedSourceId?userId=:userId&key=:key": "autologin",
-        "feed/:feedSourceId": "feedsource"
+        "feed/:feedSourceId": "feedsource",
+        "versions/:feedSourceId": "versions"
     },
 
     login: require('login-route'),
     admin: require('admin-route'),
     feedsource: require('feed-source-route'),
     overview: require('feed-collection-route'),
-    autologin: require('autologin-route')
+    autologin: require('autologin-route'),
+    versions: require('feed-version-collection-route')
 });
 
 // start up the app

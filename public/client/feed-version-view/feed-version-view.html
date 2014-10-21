@@ -3,7 +3,7 @@
     <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;&nbsp;{{ t 'app.feed_version.previous_version' }}
   </a>
   <button class="btn btn-default" disabled="disabled">{{ t 'app.feed_version.version_number' version }}</button>
-  <button class="btn btn-default show-all-versions">{{ t 'app.feed_version.show_all_versions' }}</button>
+  <a class="btn btn-default" href="#versions/{{ feedSource.id }}">{{ t 'app.feed_version.show_all_versions' }}</a>
   <a href="#feed/{{ feedSource.id }}/{{ nextVersionId }}" class="btn btn-default {{ ? (eq nextVersionId null) 'disabled' '' }}">{{ t 'app.feed_version.next_version' }}&nbsp;&nbsp;<span class="glyphicon glyphicon-arrow-right"></span></a>
 </div>
 

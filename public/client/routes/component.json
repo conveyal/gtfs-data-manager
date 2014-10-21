@@ -12,6 +12,7 @@
         "admin-route",
         "feed-collection-route",
         "feed-source-route",
-        "autologin-route"
+        "autologin-route",
+        "feed-version-collection-route"
 	]
 }
