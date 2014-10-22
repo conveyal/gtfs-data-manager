@@ -6,7 +6,7 @@
     <button class="btn btn-default" disabled="disabled">{{ t 'app.feed_version.version_number' version }}</button>
     <a class="btn btn-default" href="#versions/{{ feedSource.id }}">{{ t 'app.feed_version.show_all_versions' }}</a>
 
-    {{#unless feedSource.autofetch}}
+    {{#unless (eq feedSource.retrievalMethod 'FETCHED_AUTOMATICALLY')}}
       <button role="button" class="btn btn-default upload-feed">
         <span class="glyphicon glyphicon-upload sr-hidden"></span>&nbsp;&nbsp;{{ t 'app.feed_version.initiate_upload' }}
       </button>
