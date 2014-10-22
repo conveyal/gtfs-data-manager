@@ -1,5 +1,6 @@
 package models;
 
+import java.util.Collection;
 import java.util.Date;
 
 import utils.DataStore;
@@ -37,5 +38,9 @@ public class Note extends Model {
      */
     public static enum NoteType {
         FEED_VERSION, FEED_SOURCE;
+    }
+
+    public static Collection<Note> getAll() {
+        return noteStore.getAll();
     }
 }

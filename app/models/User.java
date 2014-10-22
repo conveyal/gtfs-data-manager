@@ -169,4 +169,8 @@ public class User implements Serializable {
         }
     }
 
+    public static Collection<User> getAll() {
+        return userData.getAll();
+    }
+
 }
