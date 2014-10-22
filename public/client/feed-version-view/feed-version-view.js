@@ -10,6 +10,8 @@ var _ = require('underscore');
 var Handlebars = require('handlebars');
 var app = require('application');
 var NoteCollectionView = require('note-collection-view');
+var FeedUploadView = require('feed-upload-view');
+var FeedSource = require('feed-source')
 
 var InvalidValuesList = Backbone.Marionette.ItemView.extend({
     // rather than having a ton of levels of nested views, since we're not editing, most of the
@@ -48,12 +50,24 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         notesRegion: '.version-notes'
     },
 
+    events: {'click .upload-feed': 'uploadFeed'},
+
+    initialize: function () {
+      _.bindAll(this, 'uploadFeed');
+    },
+
+    // show the feed upload dialog
+    uploadFeed: function (e) {
+        // model is so that it knows what feed source to upload to
+        app.modalRegion.show(new FeedUploadView({model: new FeedSource(this.model.get('feedSource'))}));
+    },
+
     onShow: function () {
         try {
             this.routesRegion.show(new InvalidValuesList({invalidValues: this.model.get('validationResult').routes.invalidValues}));
         } catch (e) {}
         try {
-            this.stopsRegion.show(new InvalidValuesList({invalidValues: this.model.get('validationResult').stops.invalidValues}))
+            this.stopsRegion.show(new InvalidValuesList({invalidValues: this.model.get('validationResult').stops.invalidValues}));
         } catch (e) {}
         try {
             this.tripsRegion.show(new InvalidValuesList({invalidValues: this.model.get('validationResult').trips.invalidValues}));

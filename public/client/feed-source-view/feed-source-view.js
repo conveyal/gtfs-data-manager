@@ -9,9 +9,7 @@ var _ = require('underscore');
 var Handlebars = require('handlebars.js');
 var app = require('application');
 var FeedVersion = require('feed-version');
-var FeedSource = require('feed-source');
 var FeedVersionView = require('feed-version-view');
-var FeedUploadView = require('feed-upload-view');
 var NoteCollectionView = require('note-collection-view');
 
 module.exports = Backbone.Marionette.LayoutView.extend({
@@ -21,20 +19,9 @@ module.exports = Backbone.Marionette.LayoutView.extend({
       notesRegion: '.source-notes'
       },
 
-    events: {
-        'click .upload-feed': 'uploadFeed',
-        'click #share-url': 'doNothing'
-    },
+    events: {'click #share-url': 'doNothing'},
     initialize: function (attr) {
         this.feedVersionId = attr.feedVersionId;
-
-        _.bindAll(this, 'uploadFeed');
-    },
-
-    // show the feed upload dialog
-    uploadFeed: function (e) {
-        // model is so that it knows what feed source to upload to
-        app.modalRegion.show(new FeedUploadView({model: this.model}));
     },
 
     onShow: function () {

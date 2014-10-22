@@ -72,7 +72,7 @@ app.feed_version.choose_feed=Choose feed file
 # For actually taking the action
 app.feed_version.upload_feed=Upload feed
 # For opening the dialog with which to take the action
-app.feed_version.initiate_upload=Upload new feed version
+app.feed_version.initiate_upload=Upload new version
 
 app.location.home=Home
 app.location.login=Log in
