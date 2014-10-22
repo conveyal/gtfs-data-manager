@@ -18,7 +18,8 @@ import controllers.Admin;
 
 @Security.Authenticated(Admin.class)
 public class UserController extends Controller {
-    private static JsonManager<User> json = new JsonManager<User>(JsonViews.UserInterface.class);
+    private static JsonManager<User> json =
+            new JsonManager<User>(User.class, JsonViews.UserInterface.class);
     
     public static JsonManager<User> getJsonManager() {
         return json;

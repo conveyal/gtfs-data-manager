@@ -3,6 +3,7 @@ package controllers.api;
 import java.io.IOException;
 import java.util.Collection;
 
+import com.conveyal.gtfs.model.InvalidValue;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -20,8 +21,15 @@ public class JsonManager<T> {
     private ObjectWriter ow;
     private ObjectMapper om;
     
-    public JsonManager (Class view) {
+    /**
+     * Create a new JsonManager
+     * @param theClass The class to create a json manager for (yes, also in the diamonds).
+     * @param view The view to use
+     */
+    public JsonManager (Class<T> theClass, Class view) {
+        this.theClass = theClass;
         this.om = new ObjectMapper();
+        om.addMixInAnnotations(InvalidValue.class, InvalidValueMixIn.class);
         this.ow = om.writerWithView(view);
     }
     
@@ -53,5 +61,9 @@ public class JsonManager<T> {
     
     public T read (JsonParser p) throws JsonParseException, JsonMappingException, IOException {
         return om.readValue(p, theClass);
+    }
+
+    public T read(JsonNode asJson) {
+        return om.convertValue(asJson, theClass);
     }
 }

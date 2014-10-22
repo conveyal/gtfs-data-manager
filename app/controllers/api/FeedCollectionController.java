@@ -19,7 +19,8 @@ import controllers.Admin;
 
 @Security.Authenticated(Admin.class)
 public class FeedCollectionController extends Controller {
-    private static JsonManager<FeedCollection> json = new JsonManager<FeedCollection>(JsonViews.UserInterface.class);
+    private static JsonManager<FeedCollection> json = 
+            new JsonManager<FeedCollection>(FeedCollection.class, JsonViews.UserInterface.class);
     
     public static Result getAll () throws JsonProcessingException {
         // TODO: Only show FeedCollections this user has permission to access

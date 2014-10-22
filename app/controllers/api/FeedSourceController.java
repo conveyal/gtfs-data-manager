@@ -20,7 +20,8 @@ import play.mvc.Security;
 
 @Security.Authenticated(Secured.class)
 public class FeedSourceController extends Controller {
-    private static JsonManager<FeedSource> json = new JsonManager<FeedSource>(JsonViews.UserInterface.class);
+    private static JsonManager<FeedSource> json =
+            new JsonManager<FeedSource>(FeedSource.class, JsonViews.UserInterface.class);
     
     public static Result get (String id) throws JsonProcessingException {
         // TODO: access control

@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import utils.DataStore;
 
@@ -17,6 +19,7 @@ import utils.DataStore;
  * @author mattwigway
  *
  */
+@JsonInclude(Include.ALWAYS)
 public class FeedCollection extends Model implements Serializable {
     private static DataStore<FeedCollection> collectionStore = new DataStore<FeedCollection>("feedcollections");
     
@@ -35,7 +38,18 @@ public class FeedCollection extends Model implements Serializable {
     }
 
     public void save() {
-        collectionStore.save(this.id, this);
+        save(true);
+    }
+        
+    public void save(boolean commit) {
+        if (commit)
+            collectionStore.save(this.id, this);
+        else
+            collectionStore.saveWithoutCommit(this.id, this);
+    }
+    
+    public static void commit () {
+        collectionStore.commit();
     }
     
     /**

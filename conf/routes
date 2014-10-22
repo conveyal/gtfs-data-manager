@@ -35,6 +35,7 @@ GET     /logout                         controllers.Application.logout()
 POST    /createInitialUser              controllers.Application.createInitialUser()
 
 GET     /dump                           controllers.Dump.dump()
+POST    /load                           controllers.Dump.load()
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /                    controllers.Assets.at(path="/public", file="index.html")

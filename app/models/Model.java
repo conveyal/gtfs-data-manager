@@ -18,6 +18,8 @@ import com.fasterxml.jackson.annotation.JsonView;
 public abstract class Model {
  
     public Model () {
+        // This autogenerates an ID
+        // this is OK for dump/restore, because the ID will simply be overridden
         this.id = UUID.randomUUID().toString();
     }
         
@@ -80,6 +82,6 @@ public abstract class Model {
     }
 
     public abstract void save();
-    
-    public transient List<String> notes;
+
+    //public transient List<Note> notes;
 }

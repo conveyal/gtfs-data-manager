@@ -35,7 +35,8 @@ import scala.concurrent.duration.Duration;
 
 @Security.Authenticated(Secured.class)
 public class FeedVersionController extends Controller {
-    private static JsonManager<FeedVersion> json = new JsonManager<FeedVersion>(JsonViews.UserInterface.class);
+    private static JsonManager<FeedVersion> json =
+            new JsonManager<FeedVersion>(FeedVersion.class, JsonViews.UserInterface.class);
     
     public static Result get (String id) throws JsonProcessingException {
         User currentUser = User.getUserByUsername(session("username"));

@@ -19,7 +19,8 @@ import play.mvc.Security;
 
 @Security.Authenticated(Secured.class)
 public class NoteController extends Controller {
-    private static JsonManager<Note> json = new JsonManager<Note>(JsonViews.UserInterface.class);
+    private static JsonManager<Note> json =
+            new JsonManager<Note>(Note.class, JsonViews.UserInterface.class);
     
     public static Result getAll () throws JsonProcessingException {
         User currentUser = User.getUserByUsername(session("username"));

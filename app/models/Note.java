@@ -3,6 +3,9 @@ package models;
 import java.util.Collection;
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 import utils.DataStore;
 
 /**
@@ -10,6 +13,7 @@ import utils.DataStore;
  * @author mattwigway
  *
  */
+@JsonInclude(Include.ALWAYS)
 public class Note extends Model {
     private static DataStore<Note> noteStore = new DataStore<Note>("notes");
     
@@ -26,7 +30,14 @@ public class Note extends Model {
     public Date date;
     
     public void save () {
-        noteStore.save(id, this);
+        save(true);
+    }
+    
+    public void save (boolean commit) {
+        if (commit)
+            noteStore.save(id, this);
+        else
+            noteStore.saveWithoutCommit(id, this);
     }
     
     public static Note get (String id) {
@@ -42,5 +53,9 @@ public class Note extends Model {
 
     public static Collection<Note> getAll() {
         return noteStore.getAll();
+    }
+
+    public static void commit() {
+        noteStore.commit();
     }
 }

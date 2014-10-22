@@ -26,6 +26,7 @@ import com.fasterxml.jackson.annotation.JsonView;
  * @author mattwigway
  *
  */
+@JsonInclude(Include.ALWAYS)
 public class FeedVersion extends Model {    
     private static DataStore<FeedVersion> versionStore = new DataStore<FeedVersion>("feedversions");
     private static FeedStore feedStore = new FeedStore(Play.application().configuration().getString("application.data.gtfs")); 
@@ -55,6 +56,13 @@ public class FeedVersion extends Model {
         }
     }
 
+    /**
+     * Create an unitialized feed version. This should only be used for dump/restore.
+     */
+    public FeedVersion () {
+        // do nothing
+    }
+    
     /**
      * Clean a name to make it filesystem-friendly
      * @param name a name with any letters
@@ -92,7 +100,6 @@ public class FeedVersion extends Model {
     /**
      * The ID of the previous version of this feed.
      */
-    @JsonInclude(Include.ALWAYS)
     public String previousVersionId;
     
     @JsonIgnore
@@ -103,7 +110,6 @@ public class FeedVersion extends Model {
     /**
      * The ID of the next version of this feed.
      */
-    @JsonInclude(Include.ALWAYS)
     public String nextVersionId;
     
     @JsonIgnore
@@ -157,11 +163,22 @@ public class FeedVersion extends Model {
         this.validationResult = fp.getOutput();
     }
 
-    public void save() {
-        versionStore.save(this.id, this);
+    public void save () {
+        save(true);
+    }
+    
+    public void save(boolean commit) {
+        if (commit)
+            versionStore.save(this.id, this);
+        else
+            versionStore.saveWithoutCommit(this.id, this);
     }
 
     public void hash () {
         this.hash = HashUtils.hashFile(getFeed());
+    }
+
+    public static void commit() {
+        versionStore.commit();
     }
 }

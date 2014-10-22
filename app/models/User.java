@@ -9,12 +9,15 @@ import java.util.UUID;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import play.Logger;
 import utils.DataStore;
 import utils.HashUtils;
 
+@JsonInclude(Include.ALWAYS)
 public class User implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -70,13 +73,25 @@ public class User implements Serializable {
 	}
 	
 	/**
+	 * Create an uninitialized user, used for dump/restore.
+	 * Should not be used under other circumstances.
+	 */
+	public User () {
+	    // do nothing
+	}
+	
+	/**
 	 * (Re)generate the key used to log in.
 	 */
 	private void generateKey() {
 	    key = UUID.randomUUID().toString();
         }
+	
+	public void save() {
+	    save(true);
+	}
 
-    public void save() {
+    public void save(boolean commit) {
 		
 		// assign id at save
 		if(id == null || id.isEmpty()) {
@@ -87,7 +102,10 @@ public class User implements Serializable {
 			Logger.info("created user u " + id);
 		}
 		
-		userData.save(id, this);
+		if (commit)
+		    userData.save(id, this);
+		else
+		    userData.saveWithoutCommit(id, this);
 		
 		Logger.info("saved user u " +id);
 	}
@@ -171,6 +189,10 @@ public class User implements Serializable {
 
     public static Collection<User> getAll() {
         return userData.getAll();
+    }
+
+    public static void commit() {
+        userData.commit();
     }
 
 }
