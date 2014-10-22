@@ -45,7 +45,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         tripsRegion: '#trips',
         stopsRegion: '#stops',
         shapesRegion: '#shapes',
-        notesRegion: '#notes'
+        notesRegion: '.version-notes'
     },
 
     onShow: function () {

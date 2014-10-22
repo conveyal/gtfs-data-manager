@@ -8,7 +8,16 @@
         "marionettejs/backbone.marionette": "*",
         "components/handlebars.js": "*"
     },
-    "local": ["application", "feed-version", "feed-version-collection", "feed-version-collection-view", "feed-source", "feed-upload-view", "feed-version-view"],
+    "local": [
+      "application",
+      "feed-version",
+      "feed-version-collection",
+      "feed-version-collection-view",
+      "feed-source",
+      "feed-upload-view",
+      "feed-version-view",
+      "note-collection-view"
+      ],
     "scripts": ["feed-source-view.js"],
     "templates": ["feed-source-view.html"]
 }

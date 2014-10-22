@@ -12,10 +12,14 @@ var FeedVersion = require('feed-version');
 var FeedSource = require('feed-source');
 var FeedVersionView = require('feed-version-view');
 var FeedUploadView = require('feed-upload-view');
+var NoteCollectionView = require('note-collection-view');
 
 module.exports = Backbone.Marionette.LayoutView.extend({
     template: Handlebars.compile(require("./feed-source-view.html")),
-    regions: {validationRegion: '#validation'},
+    regions: {
+      validationRegion: '#validation',
+      notesRegion: '.source-notes'
+      },
 
     events: {
         'click .upload-feed': 'uploadFeed',
@@ -32,7 +36,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         // model is so that it knows what feed source to upload to
         app.modalRegion.show(new FeedUploadView({model: this.model}));
     },
-    
+
     onShow: function () {
         var version;
 
@@ -54,10 +58,14 @@ module.exports = Backbone.Marionette.LayoutView.extend({
                 url: 'api/feedsources/' + this.model.get('id') + '/getKey',
                 success: function (data) {
                     instance.$('#share-url').val(window.location.origin + window.location.pathname + window.location.hash +
-                                                 '?userId=' + encodeURIComponent(data['userId']) + '&key=' + encodeURIComponent(data['key']));
+                                                 '?userId=' + encodeURIComponent(data['userId']) +
+                                                 '&key=' + encodeURIComponent(data['key']));
                 }
             });
         }
+
+        // set up comments
+        this.notesRegion.show(new NoteCollectionView({objectId: this.model.get('id'), type: 'FEED_SOURCE'}));
     },
 
 

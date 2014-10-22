@@ -11,7 +11,8 @@ var NoteCollection = require('note-collection');
 var Note = require('note');
 
 var NoteItemView = Backbone.Marionette.ItemView.extend({
-  template: Handlebars.compile(require('./note-item-view.html'))
+  template: Handlebars.compile(require('./note-item-view.html')),
+  className: 'row'
 });
 
 /**
@@ -21,8 +22,7 @@ var NoteItemView = Backbone.Marionette.ItemView.extend({
 module.exports = Backbone.Marionette.CompositeView.extend({
   template: Handlebars.compile(require('./note-collection-view.html')),
   childView: NoteItemView,
-  childViewContainer: '.panel-body',
-
+  className: 'container',
   events: { 'submit form': 'newComment' },
 
   initialize: function (attr) {
@@ -60,5 +60,10 @@ module.exports = Backbone.Marionette.CompositeView.extend({
       instance.$('form').removeClass('disabled');
       window.alert('Commenting failed');
     });
+  },
+
+  attachHtml: function (collectionView, childView, index) {
+    // order not important; new things always go at the bottom
+    collectionView.$('.new-comment').before(childView.$el);
   }
 });
