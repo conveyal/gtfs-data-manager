@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import models.FeedCollection;
+import models.JsonViews;
 import models.User;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -18,13 +19,13 @@ import controllers.Admin;
 
 @Security.Authenticated(Admin.class)
 public class FeedCollectionController extends Controller {
-    private static JsonManager<FeedCollection> json = new JsonManager<FeedCollection>();
+    private static JsonManager<FeedCollection> json = new JsonManager<FeedCollection>(JsonViews.UserInterface.class);
     
-    public static Result getAll () {
+    public static Result getAll () throws JsonProcessingException {
         // TODO: Only show FeedCollections this user has permission to access
         User u = User.getUserByUsername(session("username"));
         if (u.admin)
-            return ok(json.write(FeedCollection.getAll()));
+            return ok(json.write(FeedCollection.getAll())).as("application/json");
         else
             return unauthorized();
     }
@@ -32,7 +33,7 @@ public class FeedCollectionController extends Controller {
     public static Result get (String id) throws JsonProcessingException {
         FeedCollection c = FeedCollection.get(id);
         
-        return ok(json.write(c));
+        return ok(json.write(c)).as("application/json");
     }
     
     public static Result update (String id) throws JsonProcessingException {
@@ -70,7 +71,7 @@ public class FeedCollectionController extends Controller {
         
         c.save();
         
-        return ok(json.write(c));
+        return ok(json.write(c)).as("application/json");
     }
     
     public static Result create () throws JsonParseException, JsonMappingException, IOException {
@@ -98,6 +99,6 @@ public class FeedCollectionController extends Controller {
         
         c.save();
         
-        return ok(json.write(c));
+        return ok(json.write(c)).as("application/json");
     }
 }

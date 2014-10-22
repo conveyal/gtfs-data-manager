@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import controllers.Secured;
 import models.FeedCollection;
 import models.FeedSource;
+import models.JsonViews;
 import models.User;
 import play.libs.Json;
 import play.mvc.Controller;
@@ -19,14 +20,14 @@ import play.mvc.Security;
 
 @Security.Authenticated(Secured.class)
 public class FeedSourceController extends Controller {
-    private static JsonManager<FeedSource> json = new JsonManager<FeedSource>();
+    private static JsonManager<FeedSource> json = new JsonManager<FeedSource>(JsonViews.UserInterface.class);
     
     public static Result get (String id) throws JsonProcessingException {
         // TODO: access control
         return ok(json.write(FeedSource.get(id)));
     }
     
-    public static Result getAll () {
+    public static Result getAll () throws JsonProcessingException {
         User currentUser = User.getUserByUsername(session("username"));
         
         if (!Boolean.TRUE.equals(currentUser.admin)) {
@@ -40,10 +41,10 @@ public class FeedSourceController extends Controller {
             fc = FeedCollection.get(fcId);
  
         if (fc == null) {
-            return ok(json.write(FeedSource.getAll()));
+            return ok(json.write(FeedSource.getAll())).as("application/json");
         }
         else {
-            return ok(json.write(fc.getFeedSources()));
+            return ok(json.write(fc.getFeedSources())).as("application/json");
         }
     }
     
@@ -68,7 +69,7 @@ public class FeedSourceController extends Controller {
             JsonNode params = request().body().asJson();
             applyJsonToFeedSource(s, params);
             s.save();
-            return ok(json.write(s));
+            return ok(json.write(s)).as("application/json");
         }
         
         return unauthorized();
@@ -92,7 +93,7 @@ public class FeedSourceController extends Controller {
             
             s.save();
             
-            return ok(json.write(s));
+            return ok(json.write(s)).as("application/json");
         }
         else {
             return unauthorized();

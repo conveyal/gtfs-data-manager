@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 
 import play.Logger;
 import utils.DataStore;
@@ -22,7 +23,7 @@ public class User implements Serializable {
 	
 	public String id;
 	public String username;
-	@JsonIgnore
+	@JsonView(JsonViews.DataDump.class)
 	public String passwordHash;
 	public String email;
 	
@@ -35,7 +36,7 @@ public class User implements Serializable {
 	public ArrayList<ProjectPermissions> projectPermissions;
 
 	/** A key that can be used to log in in lieu of a password */
-	@JsonIgnore
+	@JsonView(JsonViews.DataDump.class)
         public String key;
 
 	public User(String username, String password, String email) {

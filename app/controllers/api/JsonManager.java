@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 
 /**
  * Helper methods for writing REST API routines
@@ -16,7 +17,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *
  */
 public class JsonManager<T> {
-    private static ObjectMapper om = new ObjectMapper();
+    private ObjectWriter ow;
+    private ObjectMapper om;
+    
+    public JsonManager (Class view) {
+        this.om = new ObjectMapper();
+        this.ow = om.writerWithView(view);
+    }
     
     private Class<T> theClass;
     
@@ -26,17 +33,18 @@ public class JsonManager<T> {
      * @return the JSON string
      * @throws JsonProcessingException 
      */
-    public JsonNode write (T o) throws JsonProcessingException {
-        return om.valueToTree(o);
+    public String write (T o) throws JsonProcessingException {
+        return ow.writeValueAsString(o);
     }
     
     /**
      * Convert a collection of objects to their JSON representation.
      * @param c the collection
      * @return A JsonNode representing the collection
+     * @throws JsonProcessingException 
      */
-    public JsonNode write (Collection<T> c) {
-        return om.valueToTree(c);
+    public String write (Collection<T> c) throws JsonProcessingException {
+        return ow.writeValueAsString(c);
     }
     
     public T read (String s) throws JsonParseException, JsonMappingException, IOException {

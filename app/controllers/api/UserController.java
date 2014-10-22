@@ -3,8 +3,10 @@ package controllers.api;
 import java.io.IOException;
 import java.util.Map;
 
+import models.JsonViews;
 import models.User;
     
+
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -12,12 +14,11 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
-
 import controllers.Admin;
 
 @Security.Authenticated(Admin.class)
 public class UserController extends Controller {
-    private static JsonManager<User> json = new JsonManager<User>();
+    private static JsonManager<User> json = new JsonManager<User>(JsonViews.UserInterface.class);
     
     public static JsonManager<User> getJsonManager() {
         return json;
@@ -30,7 +31,7 @@ public class UserController extends Controller {
         if (!(currentUser.equals(u)))
             return unauthorized();
         else
-            return ok(json.write(u));
+            return ok(json.write(u)).as("application/json");
     }
     
     public static Result update (String id) throws JsonProcessingException {        
@@ -53,7 +54,7 @@ public class UserController extends Controller {
         
         u.save();
         
-        return ok(json.write(u));
+        return ok(json.write(u)).as("application/json");
     }
     
     public static Result create () throws JsonParseException, JsonMappingException, IOException {
@@ -71,6 +72,6 @@ public class UserController extends Controller {
         
         u.save();
         
-        return ok(json.write(u));
+        return ok(json.write(u)).as("application/json");
     }
 }

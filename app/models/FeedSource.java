@@ -18,6 +18,7 @@ import com.conveyal.gtfs.validator.json.LoadStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonView;
 
 import play.Logger;
 import utils.DataStore;
@@ -34,12 +35,13 @@ public class FeedSource extends Model {
     /**
      * The collection of which this feed is a part
      */
-    @JsonIgnore
+    @JsonView(JsonViews.DataDump.class)
     public String feedCollectionId;
     
     /**
      * Get the FeedCollection of which this feed is a part
      */
+    @JsonView(JsonViews.UserInterface.class)
     public FeedCollection getFeedCollection () {
         return FeedCollection.get(feedCollectionId);
     }
@@ -226,6 +228,7 @@ public class FeedSource extends Model {
     }
     
     @JsonInclude(Include.NON_NULL)
+    @JsonView(JsonViews.UserInterface.class)
     public String getLatestVersionId () {
         FeedVersion latest = getLatest();
         return latest != null ? latest.id : null;
@@ -238,12 +241,14 @@ public class FeedSource extends Model {
      * @return
      */
     @JsonInclude(Include.NON_NULL)
+    @JsonView(JsonViews.UserInterface.class)
     public Date getLastUpdated() {
         FeedVersion latest = getLatest();
         return latest != null ? latest.updated : null;
     }
     
     @JsonInclude(Include.NON_NULL)
+    @JsonView(JsonViews.UserInterface.class)
     public FeedValidationResultSummary getLatestValidation () {
         FeedVersion latest = getLatest();
         return latest != null ? new FeedValidationResultSummary(latest.validationResult) : null;

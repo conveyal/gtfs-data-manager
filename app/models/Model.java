@@ -7,6 +7,7 @@ import java.util.UUID;
 import javax.persistence.MappedSuperclass;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 
 /**
  * The base class for all of the models used by GTFS Data Manager.
@@ -26,19 +27,19 @@ public abstract class Model {
      * The ID of the user who owns this object.
      * For accountability, every object is owned by a user.
      */
-    @JsonIgnore
+    @JsonView(JsonViews.DataDump.class)
     public String userId;
     
     /**
      * Notes on this object
      */
-    @JsonIgnore
+    @JsonView(JsonViews.UserInterface.class)
     public List<String> noteIds;
     
     /**
      * Get the notes for this object    
      */
-    // notes are handled through a separate controller
+    // notes are handled through a separate controller and in a separate DB
     @JsonIgnore
     public List<Note> getNotes() {
         ArrayList<Note> ret = new ArrayList<Note>(noteIds != null ? noteIds.size() : 0);
@@ -57,6 +58,7 @@ public abstract class Model {
      * Get the user who owns this object.
      * @return the User object
      */
+    @JsonView(JsonViews.UserInterface.class)
     public User getUser () {
         return User.getUser(userId);
     }
@@ -79,10 +81,5 @@ public abstract class Model {
 
     public abstract void save();
     
-    // stuff from old versions of the schema
-    /**
-     * We used to store notes directly in models, except we never actually used that feature. 
-     * So we create a transient field that will not be saved in new models but allows old models to be restored.
-     */
-    public transient List<Note> notes;
+    public transient List<String> notes;
 }

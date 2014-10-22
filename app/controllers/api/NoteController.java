@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import models.FeedSource;
 import models.FeedVersion;
+import models.JsonViews;
 import models.Model;
 import models.Note;
 import models.Note.NoteType;
@@ -18,9 +19,9 @@ import play.mvc.Security;
 
 @Security.Authenticated(Secured.class)
 public class NoteController extends Controller {
-    private static JsonManager<Note> json = new JsonManager<Note>();
+    private static JsonManager<Note> json = new JsonManager<Note>(JsonViews.UserInterface.class);
     
-    public static Result getAll () {
+    public static Result getAll () throws JsonProcessingException {
         User currentUser = User.getUserByUsername(session("username"));
 
         String typeStr = request().getQueryString("type");
@@ -53,7 +54,7 @@ public class NoteController extends Controller {
      
         // check if the user has permission
         if (Boolean.TRUE.equals(currentUser.admin) || currentUser.equals(model.getUser())) {
-            return ok(json.write(model.getNotes()));
+            return ok(json.write(model.getNotes())).as("application/json");
         }
         else {
             return unauthorized();
@@ -104,7 +105,7 @@ public class NoteController extends Controller {
             n.save();
             model.save();
             
-            return ok(json.write(n));
+            return ok(json.write(n)).as("application/json");
         }
         else {
             return unauthorized();

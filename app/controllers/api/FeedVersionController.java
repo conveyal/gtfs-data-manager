@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 import jobs.ProcessSingleFeedJob;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -19,6 +20,7 @@ import controllers.Secured;
 import models.FeedCollection;
 import models.FeedSource;
 import models.FeedVersion;
+import models.JsonViews;
 import models.Note;
 import models.User;
 import models.FeedSource.FeedRetrievalMethod;
@@ -33,8 +35,7 @@ import scala.concurrent.duration.Duration;
 
 @Security.Authenticated(Secured.class)
 public class FeedVersionController extends Controller {
-    private static JsonManager<FeedVersion> json = new JsonManager<FeedVersion>();
-    private static JsonManager<Note> notes = new JsonManager<Note>();
+    private static JsonManager<FeedVersion> json = new JsonManager<FeedVersion>(JsonViews.UserInterface.class);
     
     public static Result get (String id) throws JsonProcessingException {
         User currentUser = User.getUserByUsername(session("username"));
@@ -42,14 +43,14 @@ public class FeedVersionController extends Controller {
         FeedVersion v = FeedVersion.get(id);
         
         if (Boolean.TRUE.equals(currentUser.admin) || currentUser.id.equals(v.userId)) {
-            return ok(json.write(v));
+            return ok(json.write(v)).as("application/json");
         }
         else {
             return unauthorized();
         }
     }
     
-    public static Result getAll () {
+    public static Result getAll () throws JsonProcessingException {
         User currentUser = User.getUserByUsername(session("username"));
         
         // parse the query parameters
@@ -61,7 +62,7 @@ public class FeedVersionController extends Controller {
         FeedSource s = FeedSource.get(sId);
  
         if (Boolean.TRUE.equals(currentUser.admin) || currentUser.equals(s.getUser())) {
-            return ok(json.write(s.getFeedVersions()));
+            return ok(json.write(s.getFeedVersions())).as("application/json");
         }
         else {
             return unauthorized();

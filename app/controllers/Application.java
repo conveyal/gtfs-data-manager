@@ -70,7 +70,8 @@ public class Application extends Controller {
     // used by the web app to see who is logged in
     public static Result getLoggedInUser () throws JsonProcessingException {
         if (session("username") != null) {
-            return ok(UserController.getJsonManager().write(User.getUserByUsername(session("username"))));
+            return ok(UserController.getJsonManager().write(User.getUserByUsername(session("username"))))
+                    .as("application/json");
         }
         else {
             return unauthorized();

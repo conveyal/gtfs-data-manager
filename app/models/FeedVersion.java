@@ -19,6 +19,7 @@ import com.conveyal.gtfs.validator.json.FeedValidationResult;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonView;
 
 /**
  * Represents a version of a feed.
@@ -80,9 +81,10 @@ public class FeedVersion extends Model {
     }
     
     /** The feed source this is associated with */
-    @JsonIgnore
+    @JsonView(JsonViews.DataDump.class)
     public String feedSourceId;
     
+    @JsonView(JsonViews.UserInterface.class)
     public FeedSource getFeedSource () {
         return FeedSource.get(feedSourceId);
     }
@@ -110,9 +112,10 @@ public class FeedVersion extends Model {
     }
     
     /** The hash of the feed file, for quick checking if the file has been updated */
-    @JsonIgnore
+    @JsonView(JsonViews.DataDump.class)
     public String hash;
     
+    @JsonIgnore
     public File getFeed() {
         return feedStore.getFeed(id);
     }
