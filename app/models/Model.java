@@ -78,4 +78,11 @@ public abstract class Model {
     }
 
     public abstract void save();
+    
+    // stuff from old versions of the schema
+    /**
+     * We used to store notes directly in models, except we never actually used that feature. 
+     * So we create a transient field that will not be saved in new models but allows old models to be restored.
+     */
+    public transient List<Note> notes;
 }
