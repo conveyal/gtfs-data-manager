@@ -18,11 +18,23 @@ module.exports = Backbone.Model.extend({
     urlRoot: 'api/feedversions/',
 
     change: function () {
-      this.attributes.validationResult.errorCount =
-        this.attributes.validationResult.routes.invalidValues.length +
-        this.attributes.validationResult.stops.invalidValues.length +
-        this.attributes.validationResult.shapes.invalidValues.length +
+      this.attributes.validationResult.errorCount = 0;
+      try {
+        this.attributes.validationResult.errorCount +=
+        this.attributes.validationResult.routes.invalidValues.length;
+      } catch (e) {}
+      try {
+        this.attributes.validationResult.errorCount +=
+        this.attributes.validationResult.stops.invalidValues.length;
+      } catch (e) {}
+      try {
+        this.attributes.validationResult.errorCount +=
+        this.attributes.validationResult.shapes.invalidValues.length;
+      } catch (e) {}
+      try {
+        this.attributes.validationResult.errorCount +=
         this.attributes.validationResult.trips.invalidValues.length;
+      } catch (e) {}
     },
 
     initialize: function () {
