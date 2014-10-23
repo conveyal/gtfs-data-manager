@@ -19,6 +19,7 @@ import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
+import play.mvc.With;
 
 /**
  * Handle database dump/reload.
@@ -56,7 +57,10 @@ public class Dump extends Controller {
     }
     
     // this is not authenticated, because it has to happen with a bare database (i.e. no users)
+    // however, annotated so that it can only be called when the database is empty; the annotation
+    // takes effect before the bodyparser
     // this method in particular is coded to allow up to 100MB of data to be posted
+    @With(FreshInstall.class)
     @BodyParser.Of(value=BodyParser.Json.class, maxLength = 100 * 1024 * 1024)
     public static Result load () throws JsonParseException, JsonMappingException, IOException {
         // TODO: really ought to check all tables
