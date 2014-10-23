@@ -15,7 +15,18 @@ module.exports = Backbone.Model.extend({
         updated: null,
         version: null
     },
-    urlRoot: 'api/feedversions/'
-});
+    urlRoot: 'api/feedversions/',
 
-        
+    change: function () {
+      this.attributes.validationResult.errorCount =
+        this.attributes.validationResult.routes.invalidValues.length +
+        this.attributes.validationResult.stops.invalidValues.length +
+        this.attributes.validationResult.shapes.invalidValues.length +
+        this.attributes.validationResult.trips.invalidValues.length;
+    },
+
+    initialize: function () {
+      _.bindAll(this, 'change');
+      this.on('add', this.change);
+    }
+});
