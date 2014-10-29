@@ -50,16 +50,32 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         notesRegion: '.version-notes'
     },
 
-    events: {'click .upload-feed': 'uploadFeed'},
+    events: {
+      'click .upload-feed': 'uploadFeed',
+      'click .update-feed': 'updateFeed'
+      },
 
     initialize: function () {
-      _.bindAll(this, 'uploadFeed');
+      _.bindAll(this, 'uploadFeed', 'updateFeed');
     },
 
     // show the feed upload dialog
     uploadFeed: function (e) {
         // model is so that it knows what feed source to upload to
         app.modalRegion.show(new FeedUploadView({model: new FeedSource(this.model.get('feedSource'))}));
+    },
+
+    // fetch the latest version of an autofetched/produced in house feed
+    updateFeed: function (e) {
+      var instance = this;
+      $.ajax({
+        url: 'api/feedsources/' + this.model.get('feedSource').id + '/fetch',
+        method: 'POST',
+        success: function () {
+          // TODO: should update in place, not reload
+          window.location.reload();
+        }
+      });
     },
 
     onShow: function () {

@@ -3,6 +3,8 @@ package controllers.api;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import jobs.FetchSingleFeedJob;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -116,6 +118,22 @@ public class FeedSourceController extends Controller {
             result.put("userId", u.id);
             result.put("key", u.key);
             return ok(result);
+        }
+        else {
+            return unauthorized();
+        }
+    }
+    
+    /**
+     * Refetch this feed
+     */
+    public static Result fetch (String id) {
+        User currentUser = User.getUserByUsername(session("username"));
+        
+        if (Boolean.TRUE.equals(currentUser.admin)) {
+            FeedSource s = FeedSource.get(id);
+            new FetchSingleFeedJob(s).run();
+            return ok();
         }
         else {
             return unauthorized();
