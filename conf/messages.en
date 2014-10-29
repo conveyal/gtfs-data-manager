@@ -75,6 +75,10 @@ app.feed_version.upload_feed=Upload feed
 app.feed_version.initiate_upload=Upload new version
 app.feed_version.update=Update feed
 
+app.deployment.latest_failed_validation=There is a newer version of this feed. It may have failed validation, or been manually excluded.
+app.deployment.deploy=Deploy
+app.deployment.edit-deployment=Edit deployment
+
 app.location.home=Home
 app.location.login=Log in
 app.close=Close

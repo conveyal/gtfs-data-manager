@@ -1,18 +1,19 @@
 {
-    "name": "routes",
-    "dependencies" : {
-	"jashkenas/backbone": "*",
-	"jashkenas/underscore": "*",
-	"components/jquery": "*"
-    },
-    "scripts": ["routes.js"],
-    "local": [
-        "application",
-	"login-route",
-        "admin-route",
-        "feed-collection-route",
-        "feed-source-route",
-        "autologin-route",
-        "feed-version-collection-route"
-	]
+  "name": "routes",
+  "dependencies": {
+    "jashkenas/backbone": "*",
+    "jashkenas/underscore": "*",
+    "components/jquery": "*"
+  },
+  "scripts": ["routes.js"],
+  "local": [
+    "application",
+    "login-route",
+    "deployment-route",
+    "admin-route",
+    "feed-collection-route",
+    "feed-source-route",
+    "autologin-route",
+    "feed-version-collection-route"
+  ]
 }

@@ -1,0 +1,13 @@
+{
+  "name": "deployment-route",
+  "description": "An overview of a deployment: what feeds are defined, &c.",
+  "dependencies": {
+    "jashkenas/backbone": "*",
+    "jashkenas/underscore": "*",
+    "components/jquery": "*",
+    "marionettejs/backbone.marionette": "*",
+    "components/handlebars.js": "*"
+  },
+  "local": ["application", "deployment", "deployment-view", "application"],
+  "scripts": ["deployment-route.js"]
+}

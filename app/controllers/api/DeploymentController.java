@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.NullNode;
 
 import models.Deployment;
 import models.FeedCollection;
@@ -18,7 +19,7 @@ import play.mvc.Security;
 @Security.Authenticated(Admin.class)
 public class DeploymentController extends Controller {
     private static JsonManager<Deployment> json =
-            new JsonManager<Deployment>(Deployment.class,JsonViews.UserInterface.class);
+            new JsonManager<Deployment>(Deployment.class, JsonViews.UserInterface.class);
 
     public static Result get (String id) throws JsonProcessingException {
         return ok(json.write(Deployment.get(id))).as("application/json");
@@ -40,6 +41,8 @@ public class DeploymentController extends Controller {
 
         applyJsonToDeployment(d, params);
         
+        d.save();
+        
         return ok(json.write(d)).as("application/json");
     }
     
@@ -52,6 +55,8 @@ public class DeploymentController extends Controller {
         JsonNode params = request().body().asJson();
         applyJsonToDeployment(d, params);
         
+        d.save();
+        
         return ok(json.write(d)).as("application/json");
     }
 
@@ -63,7 +68,7 @@ public class DeploymentController extends Controller {
     private static void applyJsonToDeployment(Deployment d, JsonNode params) {
         JsonNode versions = params.get("feedVersions");
 
-        if (versions != null) {
+        if (versions != null && !(versions instanceof NullNode)) {
             ArrayList<FeedVersion> versionsToInsert = new ArrayList<FeedVersion>(versions.size());
             
             for (JsonNode version : versions) {

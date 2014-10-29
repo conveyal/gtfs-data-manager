@@ -1,0 +1,21 @@
+<td><a href="#feed/{{ feedSource.id }}">{{ feedSource.name }}</a></td>
+<td>
+  <a href="#feed/{{ feedSource.id }}/{{ id }}">{{ t 'app.feed_version.version_number' version}}</a>
+
+  {{#if (neq nextVersionId null)}}
+    <!-- this isn't the latest version of the feed, so the newer version has errors or has been manually excluded -->
+    <a href="#feed/{{ feedSource.id }}/{{nextVersionId}}" title="{{t 'app.deployment.newer_version' }}">
+      <span class="glyphicon glyphicon-exclamation-sign"></span>
+      <span class="sr-only">{{t 'app.deployment.newer_version' }}</span>
+    </a>
+  {{/if}}
+</td>
+
+<td>{{ dateRender updated true }}</td>
+
+{{#with validationResult}}
+  {{> validationResult}}
+{{/with}}
+
+
+{{!-- TODO: include controls: remove, previous, next --}}
