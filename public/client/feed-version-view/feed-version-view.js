@@ -77,8 +77,13 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         method: 'POST',
         success: function (data) {
           $(e.target).find('span').removeClass('spinner');
-          var newVersion = new FeedVersion(data);
-          window.location.hash = '#feed/' + newVersion.get('feedSource').id + '/' + newVersion.id;
+          if (data === null) {
+            alert('Feed has not changed');
+          }
+          else {
+            var newVersion = new FeedVersion(data);
+            window.location.hash = '#feed/' + newVersion.get('feedSource').id + '/' + newVersion.id;
+          }
         }
       });
     },
