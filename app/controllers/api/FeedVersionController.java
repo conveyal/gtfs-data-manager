@@ -158,4 +158,8 @@ public class FeedVersionController extends Controller {
         
         return redirect("/#feed/" + s.id);
     }
+
+    public static JsonManager<FeedVersion> getJsonManager() {
+        return json;
+    }
 }

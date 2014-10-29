@@ -127,10 +127,10 @@ public class FeedSource extends Model {
     /**
      * Fetch the latest version of the feed.
      */
-    public void fetch () {
+    public FeedVersion fetch () {
         if (this.retrievalMethod.equals(FeedRetrievalMethod.FETCHED_AUTOMATICALLY)) {
             Logger.info("not fetching feed {}, not a fetchable feed", this.toString());
-            return;
+            return null;
         }
         
         // fetchable feed, continue
@@ -147,7 +147,7 @@ public class FeedSource extends Model {
             conn = (HttpURLConnection) url.openConnection();
         } catch (IOException e) {
             Logger.error("Unable to open connection to {}; not fetching feed {}", url, this);
-            return;
+            return null;
         }
         
         conn.setDefaultUseCaches(true);
@@ -160,7 +160,7 @@ public class FeedSource extends Model {
         
             if (conn.getResponseCode() == HttpURLConnection.HTTP_NOT_MODIFIED) {
                 Logger.info("Feed {} has not been modified", this);
-                return;
+                return null;
             }
 
             // TODO: redirects
@@ -175,7 +175,7 @@ public class FeedSource extends Model {
                     outStream = new FileOutputStream(out);
                 } catch (FileNotFoundException e) {
                     Logger.error("Unable to open {}", out);
-                    return;
+                    return null;
                 }
                 
                 // copy the file
@@ -185,11 +185,11 @@ public class FeedSource extends Model {
             
             else {
                 Logger.error("HTTP status {} retrieving feed {}", conn.getResponseMessage(), this);
-                return;
+                return null;
             }
         } catch (IOException e) {
             Logger.error("Unable to connect to {}; not fetching feed {}", url, this);
-            return;
+            return null;
         }
         
         // validate the fetched file
@@ -200,11 +200,13 @@ public class FeedSource extends Model {
             Logger.warn("Feed {} was fetched but has not changed; server operators should add If-Modified-Since support to avoid wasting bandwidth", this);
             newFeed.getFeed().delete();
             newFeed.dereference();
+            return null;
         }
         else {
             newFeed.userId = this.userId;
             newFeed.validate();
             newFeed.save();
+            return newFeed;
         }
     }
     

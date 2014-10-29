@@ -126,14 +126,16 @@ public class FeedSourceController extends Controller {
     
     /**
      * Refetch this feed
+     * @throws JsonProcessingException 
      */
-    public static Result fetch (String id) {
+    public static Result fetch (String id) throws JsonProcessingException {
         User currentUser = User.getUserByUsername(session("username"));
         
         if (Boolean.TRUE.equals(currentUser.admin)) {
             FeedSource s = FeedSource.get(id);
-            new FetchSingleFeedJob(s).run();
-            return ok();
+            FetchSingleFeedJob job = new FetchSingleFeedJob(s);
+            job.run();
+            return ok(FeedVersionController.getJsonManager().write(job.result)).as("application/json");
         }
         else {
             return unauthorized();

@@ -11,7 +11,8 @@ var Handlebars = require('handlebars');
 var app = require('application');
 var NoteCollectionView = require('note-collection-view');
 var FeedUploadView = require('feed-upload-view');
-var FeedSource = require('feed-source')
+var FeedSource = require('feed-source');
+var FeedVersion = require('feed-version');
 
 var InvalidValuesList = Backbone.Marionette.ItemView.extend({
     // rather than having a ton of levels of nested views, since we're not editing, most of the
@@ -67,13 +68,17 @@ module.exports = Backbone.Marionette.LayoutView.extend({
 
     // fetch the latest version of an autofetched/produced in house feed
     updateFeed: function (e) {
+      // user feedback
+      $(e.target).find('span').addClass('spinner');
+
       var instance = this;
       $.ajax({
         url: 'api/feedsources/' + this.model.get('feedSource').id + '/fetch',
         method: 'POST',
-        success: function () {
-          // TODO: should update in place, not reload
-          window.location.reload();
+        success: function (data) {
+          $(e.target).find('span').removeClass('spinner');
+          var newVersion = new FeedVersion(data);
+          window.location.hash = '#feed/' + newVersion.get('feedSource').id + '/' + newVersion.id;
         }
       });
     },
