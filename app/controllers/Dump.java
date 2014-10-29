@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import controllers.api.JsonManager;
+import models.Deployment;
 import models.FeedCollection;
 import models.FeedSource;
 import models.FeedVersion;
@@ -36,8 +37,7 @@ public class Dump extends Controller {
         public Collection<FeedVersion> feedVersions;
         public Collection<Note> notes;
         public Collection<User> users;
-        // TODO enable dump restore of deployments when the time comes
-        //public Collection<Deployment> deployments;
+        public Collection<Deployment> deployments;
     }
     
     private static JsonManager<DatabaseState> json =
@@ -51,6 +51,7 @@ public class Dump extends Controller {
         db.feedVersions = FeedVersion.getAll();
         db.notes = Note.getAll();
         db.users = User.getAll();
+        db.deployments = Deployment.getAll();
         
         return ok(json.write(db)).as("application/json");
     }
@@ -89,6 +90,11 @@ public class Dump extends Controller {
             u.save(false);
         }
         User.commit();
+        
+        for (Deployment d : db.deployments) {
+            d.save(false);
+        }
+        Deployment.commit();
         
         return ok("done");
     }

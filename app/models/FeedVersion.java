@@ -16,6 +16,7 @@ import utils.HashUtils;
 
 import com.conveyal.gtfs.validator.json.FeedProcessor;
 import com.conveyal.gtfs.validator.json.FeedValidationResult;
+import com.conveyal.gtfs.validator.json.LoadStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -180,5 +181,16 @@ public class FeedVersion extends Model {
 
     public static void commit() {
         versionStore.commit();
+    }
+
+    /**
+     * Does this feed version have any critical errors that would prevent it being loaded to OTP?
+     * @return
+     */
+    public boolean hasCriticalErrors() {
+        if (validationResult == null)
+            return true;
+        
+        return validationResult.loadStatus != LoadStatus.SUCCESS;
     }
 }

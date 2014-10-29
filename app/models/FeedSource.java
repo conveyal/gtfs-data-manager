@@ -128,7 +128,7 @@ public class FeedSource extends Model {
      * Fetch the latest version of the feed.
      */
     public FeedVersion fetch () {
-        if (this.retrievalMethod.equals(FeedRetrievalMethod.FETCHED_AUTOMATICALLY)) {
+        if (this.retrievalMethod.equals(FeedRetrievalMethod.MANUALLY_UPLOADED)) {
             Logger.info("not fetching feed {}, not a fetchable feed", this.toString());
             return null;
         }
