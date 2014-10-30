@@ -10,7 +10,8 @@
         {{ t 'app.feed_version.no_versions' }}
       {{/if}}
     </button>
-    <a class="btn btn-default" href="#versions/{{ feedSource.id }}">{{ t 'app.feed_version.show_all_versions' }}</a>
+    <a class="btn btn-default {{ ? (neq version null) '' 'disabled' }}" href="#versions/{{ feedSource.id }}">
+      {{ t 'app.feed_version.show_all_versions' }}</a>
 
     {{#if (eq feedSource.retrievalMethod 'MANUALLY_UPLOADED')}}
       <button role="button" class="btn btn-default upload-feed">
