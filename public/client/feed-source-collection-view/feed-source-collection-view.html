@@ -1,8 +1,10 @@
-<p>
-  <button type="button" class="btn btn-primary newfeedsource">
-    <span class="glyphicon glyphicon-plus"></span>&nbsp;{{ t "app.add_feed_source" }}
-  </button>
-</p>
+{{#if showNewFeedButton}}
+  <p>
+    <button type="button" class="btn btn-primary newfeedsource">
+      <span class="glyphicon glyphicon-plus"></span>&nbsp;{{ t "app.add_feed_source" }}
+    </button>
+  </p>
+{{/if}}
 
 <table class="table">
   <thead>

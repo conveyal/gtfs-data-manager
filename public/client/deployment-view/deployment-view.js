@@ -30,6 +30,6 @@ module.exports = Backbone.Marionette.CompositeView.extend({
     });
 
     var invalid = new FeedSourceCollection(this.model.get('invalidFeedSources'));
-    this.invalidFeedSourceRegion.show(new FeedSourceCollectionView({collection: invalid}));
+    this.invalidFeedSourceRegion.show(new FeedSourceCollectionView({collection: invalid, showNewFeedButton: false}));
   }
 });
