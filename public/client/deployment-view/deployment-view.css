@@ -1,0 +1,2 @@
+button.iconic { background: transparent; border: 0px }
+button[disabled].iconic { color: #ddd }

@@ -6,6 +6,7 @@ var FeedCollection = require('feed-collection');
 var FeedSourceCollection = require('feed-source-collection');
 var FeedSourceCollectionView = require('feed-source-collection-view');
 var FeedVersionCollection = require('feed-version-collection');
+var FeedVersion = require('feed-version');
 var Handlebars = require('handlebars');
 
 // FeedVersionItemView is already used on the versions page, so let's keep class names unique
@@ -28,9 +29,29 @@ var FeedVersionDeploymentView = Backbone.Marionette.ItemView.extend({
     this.collection.remove(this.model);
   },
 
-  usePreviousVersion: function () {},
+  usePreviousVersion: function (e) {
+    e.preventDefault();
+    if (this.model.get('previousVersionId') !== null) {
+      this.switchVersion(this.model.get('previousVersionId'));
+    }
+  },
 
-  useNextVersion: function () {}
+  useNextVersion: function (e) {
+    e.preventDefault();
+    if (this.model.get('nextVersionId') !== null) {
+      this.switchVersion(this.model.get('nextVersionId'));
+    }
+  },
+
+  /** Utility function to replace this feed version with a different one */
+  switchVersion: function (version) {
+    var newVersion = new FeedVersion({id: version});
+    var instance = this;
+    newVersion.fetch().done(function () {
+      instance.collection.remove(instance.model, {silent: true});
+      instance.collection.add(newVersion);
+    });
+  }
 });
 
 module.exports = Backbone.Marionette.CompositeView.extend({
@@ -40,6 +61,12 @@ module.exports = Backbone.Marionette.CompositeView.extend({
 
   initialize: function () {
     this.collection = new FeedVersionCollection(this.model.get('feedVersions'));
+    _.bindAll(this, 'collectionChange');
+  },
+
+  collectionChange: function () {
+    this.model.set('feedVersions', this.collection.toJSON());
+    this.model.save();
   },
 
   onShow: function () {
@@ -53,10 +80,8 @@ module.exports = Backbone.Marionette.CompositeView.extend({
       child.collection = instance.collection;
     });
 
-    this.collection.on('remove', function () {
-      instance.model.set('feedVersions', instance.collection.toJSON());
-      instance.model.save();
-    });
+    this.collection.on('remove', this.collectionChange);
+    this.collection.on('add', this.collectionChange);
 
     var invalid = new FeedSourceCollection(this.model.get('invalidFeedSources'));
     this.invalidFeedSourceRegion.show(new FeedSourceCollectionView({collection: invalid, showNewFeedButton: false}));

@@ -8,7 +8,9 @@
     "components/handlebars.js": "*",
     "components/jquery": "*"
   },
-  "local": ["feed-collection", "feed-version-collection", "feed-source-collection", "feed-source-collection-view"],
+  "local": ["feed-collection", "feed-version-collection", "feed-source-collection", "feed-source-collection-view",
+    "feed-version"
+  ],
   "main": "deployment-view.js",
   "scripts": ["deployment-view.js"],
   "templates": ["deployment-view.html", "feed-version-deployment-view.html"],
