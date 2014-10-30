@@ -53,7 +53,7 @@ public class FeedCollection extends Model implements Serializable {
     }
     
     /**
-     * Get all the feed sources for this feed
+     * Get all the feed sources for this feed collection
      */
     @JsonIgnore
     public Collection<FeedSource> getFeedSources () {
@@ -63,6 +63,22 @@ public class FeedCollection extends Model implements Serializable {
         for (FeedSource fs : FeedSource.getAll()) {
             if (this.id.equals(fs.feedCollectionId)) {
                 ret.add(fs);
+            }
+        }
+        
+        return ret;
+    }
+    
+    /**
+     * Get all the deployments for this feed collection
+     */
+    @JsonIgnore
+    public Collection<Deployment> getDeployments () {
+        ArrayList<Deployment> ret = new ArrayList<Deployment>();
+        
+        for (Deployment d : Deployment.getAll()) {
+            if (this.id.equals(d.feedCollectionId)) {
+                ret.add(d);
             }
         }
         

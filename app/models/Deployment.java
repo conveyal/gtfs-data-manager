@@ -1,20 +1,15 @@
 package models;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 
-import models.FeedSource.FeedRetrievalMethod;
+import utils.DataStore;
 
-import com.conveyal.gtfs.model.ValidationResult;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonView;
-
-import utils.DataStore;
 
 /**
  * A deployment of (a given version of) OTP on a given set of feeds.

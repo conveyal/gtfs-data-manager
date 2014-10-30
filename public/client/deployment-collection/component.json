@@ -1,0 +1,10 @@
+{
+  "name": "deployment-collection",
+  "dependencies": {
+    "jashkenas/backbone": "*",
+    "jashkenas/underscore": "*"
+  },
+  "local": ["deployment"],
+  "main": "deployment-collection.js",
+  "scripts": ["deployment-collection.js"]
+}

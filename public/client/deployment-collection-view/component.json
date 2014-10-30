@@ -1,0 +1,12 @@
+{
+  "name": "deployment-collection-view",
+  "dependencies": {
+    "jashkenas/backbone": "*",
+    "jashkenas/underscore": "*",
+    "marionettejs/backbone.marionette": "*",
+    "components/handlebars.js": "*",
+    "components/jquery": "*"
+  },
+  "scripts": ["deployment-collection-view.js"],
+  "templates": ["deployment-collection-view.html", "deployment-item-view.html"]
+}

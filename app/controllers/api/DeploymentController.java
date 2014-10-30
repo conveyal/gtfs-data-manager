@@ -26,7 +26,14 @@ public class DeploymentController extends Controller {
     }
 
     public static Result getAll () throws JsonProcessingException {
-        return ok(json.write(Deployment.getAll()));
+        String feedCollectionId = request().getQueryString("feedCollection");
+        if (feedCollectionId != null) {
+            FeedCollection c = FeedCollection.get(feedCollectionId);
+            return ok(json.write(c.getDeployments())).as("application/json");
+        }
+        else {
+            return ok(json.write(Deployment.getAll())).as("application/json");
+        }
     }
 
     public static Result create () throws JsonProcessingException {
