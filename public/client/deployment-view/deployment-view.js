@@ -47,7 +47,7 @@ var FeedVersionDeploymentView = Backbone.Marionette.ItemView.extend({
   switchVersion: function (version) {
     var newVersion = new FeedVersion({id: version});
     var instance = this;
-    newVersion.fetch().done(function () {
+    newVersion.fetch({data: {summarized: 'true'}}).done(function () {
       instance.collection.remove(instance.model, {silent: true});
       instance.collection.add(newVersion);
     });
@@ -69,15 +69,15 @@ module.exports = Backbone.Marionette.CompositeView.extend({
     this.model.save();
   },
 
+  buildChildView: function (child, ChildViewClass, childViewOptions) {
+    var opts = _.extend({model: child, collection: this.collection}, childViewOptions);
+    return new ChildViewClass(opts);
+  },
+
   onShow: function () {
     // show the invalid feed sources (i.e. sources with no current loadable version)
     this.invalidFeedSourceRegion = new Backbone.Marionette.Region({
       el: '.invalid-feed-sources'
-    });
-
-    var instance = this;
-    this.children.each(function (child) {
-      child.collection = instance.collection;
     });
 
     this.collection.on('remove', this.collectionChange);

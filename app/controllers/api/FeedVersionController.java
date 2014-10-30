@@ -17,6 +17,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import controllers.Secured;
+import models.Deployment.SummarizedFeedVersion;
 import models.FeedCollection;
 import models.FeedSource;
 import models.FeedVersion;
@@ -37,14 +38,25 @@ import scala.concurrent.duration.Duration;
 public class FeedVersionController extends Controller {
     private static JsonManager<FeedVersion> json =
             new JsonManager<FeedVersion>(FeedVersion.class, JsonViews.UserInterface.class);
+    private static JsonManager<SummarizedFeedVersion> jsonSummarized =
+            new JsonManager<SummarizedFeedVersion>(SummarizedFeedVersion.class, JsonViews.UserInterface.class);
     
+    /**
+     * Grab this feed version.
+     * If you pass in ?summarized=true, don't include the full tree of validation results, only the counts.
+     */
     public static Result get (String id) throws JsonProcessingException {
         User currentUser = User.getUserByUsername(session("username"));
         
         FeedVersion v = FeedVersion.get(id);
         
         if (Boolean.TRUE.equals(currentUser.admin) || currentUser.id.equals(v.userId)) {
-            return ok(json.write(v)).as("application/json");
+            if ("true".equals(request().getQueryString("summarized"))) {
+                return ok(jsonSummarized.write(new SummarizedFeedVersion(v))).as("application/json");
+            }
+            else {
+                return ok(json.write(v)).as("application/json");
+            }
         }
         else {
             return unauthorized();
