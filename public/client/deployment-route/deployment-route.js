@@ -22,7 +22,11 @@ module.exports = function(deploymentId) {
       name: d.get('feedCollection').name,
       href: '#overview/' + d.get('feedCollection').id
     }, {
-      name: window.Messages('app.deployment.edit-deployment'),
+      name: window.Messages('app.deployment.deployments'),
+      href: '#deployments/' + d.get('feedCollection').id
+    },
+    {
+      name: d.get('name'),
       href: '#deployment/' + deploymentId
     }]);
   });
