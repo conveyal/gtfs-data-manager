@@ -260,6 +260,7 @@ public class FeedSource extends Model {
      * @param id
      * @return
      */
+    // TODO: use summarized feed source here. requires serious refactoring on client side.
     @JsonInclude(Include.NON_NULL)
     @JsonView(JsonViews.UserInterface.class)
     public Date getLastUpdated() {
