@@ -18,4 +18,22 @@
 {{/with}}
 
 
-{{!-- TODO: include controls: remove, previous, next --}}
+<td>
+    <button role="button" {{#if (eq previousVersionId null)}} disabled {{/if}}
+      title="{{ t 'app.deployment.use_previous_version' }}" class="use-previous-version iconic">
+      <span class="glyphicon glyphicon-arrow-left"></span>
+      <span class="sr-only">{{ t 'app.deployment.use_previous_version' }}</span>
+    </button>
+
+    <button role="button" {{#if (eq nextVersionId null)}} disabled {{/if}}
+      title="{{ t 'app.deployment.use_next_version' }}" class="use-next-version iconic">
+      <span class="glyphicon glyphicon-arrow-right"></span>
+      <span class="sr-only">{{ t 'app.deployment.use_next_version' }}</span>
+    </button>
+
+    <button role="button"
+      title="{{ t 'app.deployment.remove_version' }}" class="remove-version iconic">
+      <span class="glyphicon glyphicon-remove"></span>
+      <span class="sr-only">{{ t 'app.deployment.remove_version' }}</span>
+    </button>
+</td>

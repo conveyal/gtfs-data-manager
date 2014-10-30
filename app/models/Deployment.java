@@ -1,9 +1,15 @@
 package models;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
+import models.FeedSource.FeedRetrievalMethod;
+
+import com.conveyal.gtfs.model.ValidationResult;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -35,12 +41,24 @@ public class Deployment extends Model {
     public Collection<String> feedVersionIds;
     
     /** All of the feed versions used in this deployment */
-    @JsonView(JsonViews.UserInterface.class)
-    public Collection<FeedVersion> getFeedVersions () {
+    @JsonIgnore
+    public Collection<FeedVersion> getFullFeedVersions () {
         ArrayList<FeedVersion> ret = new ArrayList<FeedVersion>(feedVersionIds.size());
         
         for (String id : feedVersionIds) {
             ret.add(FeedVersion.get(id));
+        }
+        
+        return ret;
+    }
+    
+    /** All of the feed versions used in this deployment, summarized so that the Internet won't break */
+    @JsonView(JsonViews.UserInterface.class)
+    public Collection<SummarizedFeedVersion> getFeedVersions () {
+        ArrayList<SummarizedFeedVersion> ret = new ArrayList<SummarizedFeedVersion>(feedVersionIds.size());
+        
+        for (String id : feedVersionIds) {
+            ret.add(new SummarizedFeedVersion(FeedVersion.get(id)));
         }
         
         return ret;
@@ -151,5 +169,28 @@ public class Deployment extends Model {
      */
     public static Collection<Deployment> getAll () {
         return deploymentStore.getAll();
+    }
+    
+    /**
+     * A summary of a FeedVersion, leaving out all of the individual validation errors.
+     */
+    public static class SummarizedFeedVersion {
+        public FeedValidationResultSummary validationResult;
+        public FeedSource feedSource;
+        public String id;
+        public Date updated;
+        public String previousVersionId;
+        public String nextVersionId;
+        public int version;
+        
+        public SummarizedFeedVersion (FeedVersion version) {
+            this.validationResult = new FeedValidationResultSummary(version.validationResult);
+            this.feedSource = version.getFeedSource();
+            this.updated = version.updated;
+            this.id = version.id;
+            this.nextVersionId = version.nextVersionId;
+            this.previousVersionId = version.previousVersionId;
+            this.version = version.version;
+        }
     }
 }

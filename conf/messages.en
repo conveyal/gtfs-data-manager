@@ -79,6 +79,9 @@ app.deployment.newer_version=There is a newer version of this feed. It may have 
 app.deployment.deploy=Deploy
 app.deployment.edit-deployment=Edit deployment
 app.deployment.invalid_feed_sources=Feed sources with no valid version
+app.deployment.use_next_version=Use next version of feed
+app.deployment.use_previous_version=Use previous version of feed
+app.deployment.remove_version=Remove feed
 
 app.location.home=Home
 app.location.login=Log in

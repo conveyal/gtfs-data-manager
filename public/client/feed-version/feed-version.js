@@ -20,7 +20,7 @@ module.exports = Backbone.Model.extend({
   change: function() {
     var vr = this.get('validationResult');
 
-    if (!_.isUndefined(vr)) {
+    if (!_.isUndefined(vr) && _.isUndefined(vr.errorCount)) {
       vr.errorCount = 0;
       try {
         vr.errorCount += vr.routes.invalidValues.length;

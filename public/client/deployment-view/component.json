@@ -11,5 +11,6 @@
   "local": ["feed-collection", "feed-version-collection", "feed-source-collection", "feed-source-collection-view"],
   "main": "deployment-view.js",
   "scripts": ["deployment-view.js"],
-  "templates": ["deployment-view.html", "feed-version-deployment-view.html"]
+  "templates": ["deployment-view.html", "feed-version-deployment-view.html"],
+  "styles": ["deployment-view.css"]
 }
