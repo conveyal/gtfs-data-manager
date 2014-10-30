@@ -191,6 +191,16 @@ public class FeedVersion extends Model {
         if (validationResult == null)
             return true;
         
-        return validationResult.loadStatus != LoadStatus.SUCCESS;
+        if (validationResult.loadStatus != LoadStatus.SUCCESS)
+            return true;
+        
+        if (validationResult.stopTimesCount == 0 || validationResult.tripCount == 0 || validationResult.agencyCount == 0)
+            return true;
+        
+        if ((new Date()).after(validationResult.endDate))
+            return true;
+        
+        else
+            return false;
     }
 }
