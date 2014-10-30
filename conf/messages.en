@@ -84,6 +84,9 @@ app.deployment.use_previous_version=Use previous version of feed
 app.deployment.remove_version=Remove feed
 app.deployment.default_name=Untitled deployment
 app.deployment.deployments=Deployments
+app.deployment.name=Name
+app.deployment.creation_date=Creation date
+app.deployment.number_of_feeds=Number of feeds
 
 app.location.home=Home
 app.location.login=Log in
