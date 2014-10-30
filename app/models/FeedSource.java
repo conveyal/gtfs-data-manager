@@ -144,6 +144,7 @@ public class FeedSource extends Model {
             conn = (HttpURLConnection) url.openConnection();
         } catch (IOException e) {
             Logger.error("Unable to open connection to {}; not fetching feed {}", url, this);
+            newFeed.dereference();
             return null;
         }
         
@@ -157,6 +158,7 @@ public class FeedSource extends Model {
         
             if (conn.getResponseCode() == HttpURLConnection.HTTP_NOT_MODIFIED) {
                 Logger.info("Feed {} has not been modified", this);
+                newFeed.dereference();
                 return null;
             }
 
@@ -172,6 +174,7 @@ public class FeedSource extends Model {
                     outStream = new FileOutputStream(out);
                 } catch (FileNotFoundException e) {
                     Logger.error("Unable to open {}", out);
+                    newFeed.dereference();
                     return null;
                 }
                 
@@ -182,10 +185,12 @@ public class FeedSource extends Model {
             
             else {
                 Logger.error("HTTP status {} retrieving feed {}", conn.getResponseMessage(), this);
+                newFeed.dereference();
                 return null;
             }
         } catch (IOException e) {
             Logger.error("Unable to connect to {}; not fetching feed {}", url, this);
+            newFeed.dereference();
             return null;
         }
         
