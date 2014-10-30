@@ -3,6 +3,7 @@ Backbone.Marionette = require('backbone.marionette');
 var $ = require('jquery');
 var _ = require('underscore');
 var FeedCollection = require('feed-collection');
+var FeedVersionCollection = require('feed-version-collection');
 var Handlebars = require('handlebars');
 
 // FeedVersionItemView is already used on the versions page, so let's keep class names unique
@@ -17,7 +18,6 @@ module.exports = Backbone.Marionette.CompositeView.extend({
   childViewContainer: 'tbody',
 
   initialize: function () {
-    // TODO: not a bare collection
-    this.collection = new Backbone.Collection(this.model.get('feedVersions'));
+    this.collection = new FeedVersionCollection(this.model.get('feedVersions'));
   }
 });
