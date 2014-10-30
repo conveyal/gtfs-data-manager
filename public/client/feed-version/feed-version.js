@@ -18,27 +18,27 @@ module.exports = Backbone.Model.extend({
     urlRoot: 'api/feedversions/',
 
     change: function () {
-      this.attributes.validationResult.errorCount = 0;
+      var vr = this.get('validationResult');
+      vr.errorCount = 0;
       try {
-        this.attributes.validationResult.errorCount +=
-        this.attributes.validationResult.routes.invalidValues.length;
+        vr.errorCount += vr.routes.invalidValues.length;
       } catch (e) {}
       try {
-        this.attributes.validationResult.errorCount +=
-        this.attributes.validationResult.stops.invalidValues.length;
+        vr.errorCount += vr.stops.invalidValues.length;
       } catch (e) {}
       try {
-        this.attributes.validationResult.errorCount +=
-        this.attributes.validationResult.shapes.invalidValues.length;
+        vr.errorCount += vr.shapes.invalidValues.length;
       } catch (e) {}
       try {
-        this.attributes.validationResult.errorCount +=
-        this.attributes.validationResult.trips.invalidValues.length;
+        vr.errorCount += vr.trips.invalidValues.length;
       } catch (e) {}
+
+      this.set('validationResult', vr);
     },
 
     initialize: function () {
       _.bindAll(this, 'change');
       this.on('add', this.change);
+      this.change();
     }
 });
