@@ -1,26 +1,3 @@
-<p>
-  <div class="btn-group">
-    <a href="#feed/{{ feedSource.id }}/{{ previousVersionId }}" class="btn btn-default {{ ? (eq previousVersionId null) 'disabled' '' }}">
-      <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;&nbsp;{{ t 'app.feed_version.previous_version' }}
-    </a>
-    <button class="btn btn-default" disabled="disabled">{{ t 'app.feed_version.version_number' version }}</button>
-    <a class="btn btn-default" href="#versions/{{ feedSource.id }}">{{ t 'app.feed_version.show_all_versions' }}</a>
-
-    {{#if (eq feedSource.retrievalMethod 'MANUALLY_UPLOADED')}}
-      <button role="button" class="btn btn-default upload-feed">
-        <span class="glyphicon glyphicon-upload sr-hidden"></span>&nbsp;&nbsp;{{ t 'app.feed_version.initiate_upload' }}
-      </button>
-    {{else}}
-      <button role="button" class="btn btn-default update-feed">
-        <span class="glyphicon glyphicon-repeat sr-hidden"></span>&nbsp;&nbsp;{{ t 'app.feed_version.update' }}
-      </button>
-    {{/if}}
-
-
-    <a href="#feed/{{ feedSource.id }}/{{ nextVersionId }}" class="btn btn-default {{ ? (eq nextVersionId null) 'disabled' '' }}">{{ t 'app.feed_version.next_version' }}&nbsp;&nbsp;<span class="glyphicon glyphicon-arrow-right"></span></a>
-  </div>
-</p>
-
 {{#if (neq validationResult null)}}
   <p>
     <table class="table">

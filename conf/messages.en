@@ -74,6 +74,7 @@ app.feed_version.upload_feed=Upload feed
 # For opening the dialog with which to take the action
 app.feed_version.initiate_upload=Upload new version
 app.feed_version.update=Update feed
+app.feed_version.no_versions=Feed never loaded
 
 app.deployment.newer_version=There is a newer version of this feed. It may have failed validation, or been manually excluded.
 app.deployment.new_deployment=New deployment

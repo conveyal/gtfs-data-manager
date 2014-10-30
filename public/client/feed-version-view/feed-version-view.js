@@ -51,43 +51,6 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         notesRegion: '.version-notes'
     },
 
-    events: {
-      'click .upload-feed': 'uploadFeed',
-      'click .update-feed': 'updateFeed'
-      },
-
-    initialize: function () {
-      _.bindAll(this, 'uploadFeed', 'updateFeed');
-    },
-
-    // show the feed upload dialog
-    uploadFeed: function (e) {
-        // model is so that it knows what feed source to upload to
-        app.modalRegion.show(new FeedUploadView({model: new FeedSource(this.model.get('feedSource'))}));
-    },
-
-    // fetch the latest version of an autofetched/produced in house feed
-    updateFeed: function (e) {
-      // user feedback
-      $(e.target).find('span').addClass('spinner');
-
-      var instance = this;
-      $.ajax({
-        url: 'api/feedsources/' + this.model.get('feedSource').id + '/fetch',
-        method: 'POST',
-        success: function (data) {
-          $(e.target).find('span').removeClass('spinner');
-          if (data === null) {
-            alert('Feed has not changed');
-          }
-          else {
-            var newVersion = new FeedVersion(data);
-            window.location.hash = '#feed/' + newVersion.get('feedSource').id + '/' + newVersion.id;
-          }
-        }
-      });
-    },
-
     onShow: function () {
         try {
             this.routesRegion.show(new InvalidValuesList({invalidValues: this.model.get('validationResult').routes.invalidValues}));
@@ -101,14 +64,6 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         try {
             this.shapesRegion.show(new InvalidValuesList({invalidValues: this.model.get('validationResult').shapes.invalidValues}));
         } catch (e) {}
-
-        // set up nav
-        app.nav.setLocation([
-            {name: this.model.get('feedSource').feedCollection.name, href: '#overview/' + this.model.get('feedSource').feedCollection.id},
-            {name: this.model.get('feedSource').name, href: '#feed/' + this.model.get('feedSource').id},
-            {name: window.Messages('app.feed_version.version_number', this.model.get('version')),
-             href: '#feed/' +this.model.get('feedSource').id + '/' + this.model.get('id')}
-        ]);
 
         // set up notes
         this.notesRegion.show(new NoteCollectionView({objectId: this.model.get('id'), type: 'FEED_VERSION'}));

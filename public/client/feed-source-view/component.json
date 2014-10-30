@@ -14,7 +14,8 @@
       "feed-version-collection",
       "feed-version-collection-view",
       "feed-version-view",
-      "note-collection-view"
+      "note-collection-view",
+      "feed-version-navigation-view"
       ],
     "scripts": ["feed-source-view.js"],
     "templates": ["feed-source-view.html"]
