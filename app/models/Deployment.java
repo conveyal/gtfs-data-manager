@@ -25,6 +25,10 @@ import utils.DataStore;
 public class Deployment extends Model {
     private static DataStore<Deployment> deploymentStore = new DataStore<Deployment>("deployments");
     
+    public String name;
+    
+    public Date dateCreated;
+    
     @JsonView(JsonViews.DataDump.class)
     public String feedCollectionId;
     
@@ -103,6 +107,8 @@ public class Deployment extends Model {
         super();
         
         this.setFeedCollection(feedCollection);
+        
+        this.dateCreated = new Date();
         
         this.feedVersionIds = new ArrayList<String>();
         this.invalidFeedSourceIds = new ArrayList<String>();

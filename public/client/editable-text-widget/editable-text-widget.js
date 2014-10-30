@@ -11,7 +11,7 @@ var Handlebars = require('handlebars');
 module.exports = Backbone.Marionette.ItemView.extend({
     template: Handlebars.compile(require('./editable-text-widget.html')),
     tagName: 'span',
-    events: { 
+    events: {
         'click .toggle-edit': 'edit'
     },
 
@@ -47,7 +47,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
             this.$('.label').text(Messages('app.edit'));
             this.$('input').focus();
         }
-        
+
         this.editing = !this.editing;
     },
 
@@ -59,7 +59,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
         if (typeof this.href == "function")
             href = this.href();
 
-        else if (typeof href == "undefined")
+        else if (_.isUndefined(this.href))
             href = '#';
 
         else
@@ -68,5 +68,3 @@ module.exports = Backbone.Marionette.ItemView.extend({
         return {text: this.model.get(this.attribute), href: href};
     }
 });
-
-    

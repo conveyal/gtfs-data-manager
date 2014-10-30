@@ -10,47 +10,62 @@ var FeedSourceCollectionView = require('feed-source-collection-view');
 var Deployment = require('deployment');
 
 var Overview = Backbone.Marionette.LayoutView.extend({
-    regions: {feedSourceRegion: '#feed-sources'},
-    template: Handlebars.compile(require('./feed-collection-route.html')),
+  regions: {
+    feedSourceRegion: '#feed-sources'
+  },
+  template: Handlebars.compile(require('./feed-collection-route.html')),
 
-    events: { 'click .deploy': 'deploy' },
+  events: {
+    'click .deploy': 'deploy'
+  },
 
-    initialize: function (attr) {
-        this.feedCollectionId = attr.feedCollectionId;
+  initialize: function(attr) {
+    this.feedCollectionId = attr.feedCollectionId;
 
-        _.bindAll(this, 'deploy');
-    },
-
+    _.bindAll(this, 'deploy');
+  },
 
   /**
    * Create a new deployment of this feedcollection
    */
-   deploy: function () {
-     var d = new Deployment({feedCollection: {id: this.feedCollectionId}});
-     d.save().done(function () {
-       window.location.hash = '#deployment/' + d.id;
-     });
-   },
+  deploy: function() {
+    var d = new Deployment({
+      feedCollection: {id: this.feedCollectionId},
+      name: window.Messages('app.deployment.default_name')
+    });
+    d.save().done(function() {
+      window.location.hash = '#deployment/' + d.id;
+    });
+  },
 
-    onShow: function () {
-        var feedSources = new FeedSourceCollection();
-        var instance = this;
-        feedSources.fetch({data: {feedcollection: this.feedCollectionId}}).done(function () {
-            instance.feedSourceRegion.show(new FeedSourceCollectionView({
-                collection: feedSources,
-                feedCollectionId: instance.feedCollectionId
-            }));
-        });
+  onShow: function() {
+    var feedSources = new FeedSourceCollection();
+    var instance = this;
+    feedSources.fetch({
+      data: {
+        feedcollection: this.feedCollectionId
+      }
+    }).done(function() {
+      instance.feedSourceRegion.show(new FeedSourceCollectionView({
+        collection: feedSources,
+        feedCollectionId: instance.feedCollectionId
+      }));
+    });
 
-        var feedCollection = new FeedCollection({id: this.feedCollectionId});
-        feedCollection.fetch().done(function () {
-            app.nav.setLocation([
-                {name: feedCollection.get('name'), href: '#overview/' + feedCollection.get('id')}
-            ]);
-        });
-    }
+    var feedCollection = new FeedCollection({
+      id: this.feedCollectionId
+    });
+    feedCollection.fetch().done(function() {
+      app.nav.setLocation([{
+        name: feedCollection.get('name'),
+        href: '#overview/' + feedCollection.get('id')
+      }]);
+    });
+  }
 });
 
-module.exports = function (feedCollectionId) {
-    app.appRegion.show(new Overview({feedCollectionId: feedCollectionId}));
+module.exports = function(feedCollectionId) {
+  app.appRegion.show(new Overview({
+    feedCollectionId: feedCollectionId
+  }));
 }

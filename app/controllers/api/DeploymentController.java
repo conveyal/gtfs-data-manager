@@ -81,5 +81,11 @@ public class DeploymentController extends Controller {
             
             d.setFeedVersions(versionsToInsert);
         }
+        
+        String name = params.get("name").asText();
+        
+        if (name != null) {
+            d.name = name;
+        }
     }
 }

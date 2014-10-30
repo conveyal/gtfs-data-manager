@@ -8,6 +8,7 @@ var FeedSourceCollectionView = require('feed-source-collection-view');
 var FeedVersionCollection = require('feed-version-collection');
 var FeedVersion = require('feed-version');
 var Handlebars = require('handlebars');
+var EditableTextWidget = require('editable-text-widget');
 
 // FeedVersionItemView is already used on the versions page, so let's keep class names unique
 var FeedVersionDeploymentView = Backbone.Marionette.ItemView.extend({
@@ -80,10 +81,17 @@ module.exports = Backbone.Marionette.CompositeView.extend({
       el: '.invalid-feed-sources'
     });
 
-    this.collection.on('remove', this.collectionChange);
-    this.collection.on('add', this.collectionChange);
-
     var invalid = new FeedSourceCollection(this.model.get('invalidFeedSources'));
     this.invalidFeedSourceRegion.show(new FeedSourceCollectionView({collection: invalid, showNewFeedButton: false}));
+
+    // show the name, in an editable fashion
+    this.nameRegion = new Backbone.Marionette.Region({
+      el: '#deployment-name'
+    });
+
+    this.nameRegion.show(new EditableTextWidget({model: this.model, attribute: 'name', href: window.location.hash}));
+
+    this.collection.on('remove', this.collectionChange);
+    this.collection.on('add', this.collectionChange);
   }
 });
