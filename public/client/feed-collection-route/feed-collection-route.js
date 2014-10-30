@@ -7,7 +7,6 @@ var app = require('application');
 var FeedSourceCollection = require('feed-source-collection');
 var FeedCollection = require('feed-collection');
 var FeedSourceCollectionView = require('feed-source-collection-view');
-var Deployment = require('deployment');
 
 var Overview = Backbone.Marionette.LayoutView.extend({
   regions: {
@@ -15,27 +14,11 @@ var Overview = Backbone.Marionette.LayoutView.extend({
   },
   template: Handlebars.compile(require('./feed-collection-route.html')),
 
-  events: {
-    'click .deploy': 'deploy'
-  },
-
   initialize: function(attr) {
     this.feedCollectionId = attr.feedCollectionId;
 
-    _.bindAll(this, 'deploy');
-  },
-
-  /**
-   * Create a new deployment of this feedcollection
-   */
-  deploy: function() {
-    var d = new Deployment({
-      feedCollection: {id: this.feedCollectionId},
-      name: window.Messages('app.deployment.default_name')
-    });
-    d.save().done(function() {
-      window.location.hash = '#deployment/' + d.id;
-    });
+    // use a bare model to pass ID to template
+    this.model = new Backbone.Model({feedCollectionId: this.feedCollectionId});
   },
 
   onShow: function() {

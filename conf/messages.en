@@ -76,7 +76,8 @@ app.feed_version.initiate_upload=Upload new version
 app.feed_version.update=Update feed
 
 app.deployment.newer_version=There is a newer version of this feed. It may have failed validation, or been manually excluded.
-app.deployment.deploy=Deploy
+app.deployment.new_deployment=New deployment
+app.deployment.manage_deployments=Manage deployments
 app.deployment.edit-deployment=Edit deployment
 app.deployment.invalid_feed_sources=Feed sources with no valid version
 app.deployment.use_next_version=Use next version of feed

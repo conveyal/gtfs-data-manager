@@ -7,6 +7,7 @@
     "components/handlebars.js": "*",
     "components/jquery": "*"
   },
+  "local": ["deployment"],
   "scripts": ["deployment-collection-view.js"],
   "templates": ["deployment-collection-view.html", "deployment-item-view.html"]
 }

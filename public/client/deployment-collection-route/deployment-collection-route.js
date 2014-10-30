@@ -6,7 +6,7 @@ var app = require('application');
 module.exports = function (feedCollectionId) {
   var d = new DeploymentCollection();
   d.fetch({data: {feedCollection: feedCollectionId}}).done(function () {
-    app.appRegion.show(new DeploymentCollectionView({collection: d}));
+    app.appRegion.show(new DeploymentCollectionView({collection: d, feedCollectionId: feedCollectionId}));
   });
 
   var fc = new FeedCollection({id: feedCollectionId});
