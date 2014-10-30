@@ -1,15 +1,15 @@
 {
-    "name": "deployment-view",
-    "description": "show a single deployment",
-    "dependencies": {
-        "jashkenas/backbone": "*",
-        "jashkenas/underscore": "*",
-        "marionettejs/backbone.marionette": "*",
-        "components/handlebars.js": "*",
-        "components/jquery": "*"
-    },
-    "local": ["feed-collection", "feed-version-collection"],
-    "main": "deployment-view.js",
-    "scripts": ["deployment-view.js"],
-    "templates": ["deployment-view.html", "feed-version-deployment-view.html"]
+  "name": "deployment-view",
+  "description": "show a single deployment",
+  "dependencies": {
+    "jashkenas/backbone": "*",
+    "jashkenas/underscore": "*",
+    "marionettejs/backbone.marionette": "*",
+    "components/handlebars.js": "*",
+    "components/jquery": "*"
+  },
+  "local": ["feed-collection", "feed-version-collection", "feed-source-collection", "feed-source-collection-view"],
+  "main": "deployment-view.js",
+  "scripts": ["deployment-view.js"],
+  "templates": ["deployment-view.html", "feed-version-deployment-view.html"]
 }

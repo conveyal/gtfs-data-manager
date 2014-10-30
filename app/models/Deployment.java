@@ -34,12 +34,6 @@ public class Deployment extends Model {
     @JsonView(JsonViews.DataDump.class)
     public Collection<String> feedVersionIds;
     
-    // future use
-    public String osmFileId;
-    
-    /** The commit of OTP being used on this deployment */
-    public String otpCommit;
-    
     /** All of the feed versions used in this deployment */
     @JsonView(JsonViews.UserInterface.class)
     public Collection<FeedVersion> getFeedVersions () {
@@ -60,6 +54,32 @@ public class Deployment extends Model {
         }
     }
     
+    // future use
+    public String osmFileId;
+    
+    /** The commit of OTP being used on this deployment */
+    public String otpCommit;
+    
+    /**
+     * Feed sources that had no valid feed versions when this deployment was created, and ergo were not added. 
+     */
+    @JsonView(JsonViews.DataDump.class)
+    public Collection<String> invalidFeedSourceIds;
+    
+    /**
+     * Get all of the feed sources which could not be added to this deployment.
+     */
+    @JsonView(JsonViews.UserInterface.class)
+    public Collection<FeedSource> getInvalidFeedSources () {
+        ArrayList<FeedSource> ret = new ArrayList<FeedSource>(invalidFeedSourceIds.size());
+        
+        for (String id : invalidFeedSourceIds) {
+            ret.add(FeedSource.get(id));
+        }
+        
+        return ret;
+    }
+    
     /** Create a new deployment plan for the given feed collection */
     public Deployment (FeedCollection feedCollection) {
         super();
@@ -67,21 +87,25 @@ public class Deployment extends Model {
         this.setFeedCollection(feedCollection);
         
         this.feedVersionIds = new ArrayList<String>();
+        this.invalidFeedSourceIds = new ArrayList<String>();
         
         FEEDSOURCE: for (FeedSource s : feedCollection.getFeedSources()) {
             // only include public feeds
             if (s.isPublic) {
                 FeedVersion latest = s.getLatest();
-                
+                                
                 // find the newest version that can be deployed
-                while (latest.hasCriticalErrors()) {
-                    latest = latest.getPreviousVersion();
-                    
-                    // silently ignore feed sources that have no valid versions
-                    // TODO: expose this to the UI
+                while (true) {                    
                     if (latest == null) {
+                        invalidFeedSourceIds.add(s.id);
                         continue FEEDSOURCE;
                     }
+                    
+                    if (!latest.hasCriticalErrors()) {
+                        break;
+                    }
+                    
+                    latest = latest.getPreviousVersion();
                 }
 
                 // this version is the latest good version

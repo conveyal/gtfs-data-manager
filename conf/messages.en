@@ -78,6 +78,7 @@ app.feed_version.update=Update feed
 app.deployment.newer_version=There is a newer version of this feed. It may have failed validation, or been manually excluded.
 app.deployment.deploy=Deploy
 app.deployment.edit-deployment=Edit deployment
+app.deployment.invalid_feed_sources=Feed sources with no valid version
 
 app.location.home=Home
 app.location.login=Log in
