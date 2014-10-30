@@ -6,19 +6,21 @@ var _ = require('underscore');
 var Backbone = require('Backbone');
 
 module.exports = Backbone.Model.extend({
-    defaults: {
-        id: null,
-        feedSource: null,
-        user: null,
-        notes: null,
-        validationResults: null,
-        updated: null,
-        version: null
-    },
-    urlRoot: 'api/feedversions/',
+  defaults: {
+    id: null,
+    feedSource: null,
+    user: null,
+    notes: null,
+    validationResults: null,
+    updated: null,
+    version: null
+  },
+  urlRoot: 'api/feedversions/',
 
-    change: function () {
-      var vr = this.get('validationResult');
+  change: function() {
+    var vr = this.get('validationResult');
+
+    if (!_.isUndefined(vr)) {
       vr.errorCount = 0;
       try {
         vr.errorCount += vr.routes.invalidValues.length;
@@ -34,11 +36,12 @@ module.exports = Backbone.Model.extend({
       } catch (e) {}
 
       this.set('validationResult', vr);
-    },
-
-    initialize: function () {
-      _.bindAll(this, 'change');
-      this.on('add', this.change);
-      this.change();
     }
+  },
+
+  initialize: function() {
+    _.bindAll(this, 'change');
+    this.on('add', this.change);
+    this.change();
+  }
 });
