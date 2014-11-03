@@ -17,9 +17,7 @@ module.exports = Backbone.Marionette.CompositeView.extend({
 
   events: { 'click .new-deployment': 'deploy'},
 
-  initialize: function (attr) {
-    this.feedCollectionId = attr.feedCollectionId;
-
+  initialize: function () {
     _.bindAll(this, 'deploy');
   },
 
@@ -27,9 +25,15 @@ module.exports = Backbone.Marionette.CompositeView.extend({
    * Create a new deployment of this feedcollection
    */
   deploy: function() {
+    var now = new Date();
+
+    var date = String(now.getFullYear());
+    date += String(now.getMonth() + 1 < 10 ? '0' + (now.getMonth() + 1) : now.getMonth() + 1);
+    date += String(now.getDate() < 10 ? '0' + now.getDate() : now.getDate());
+
     var d = new Deployment({
-      feedCollection: {id: this.feedCollectionId},
-      name: window.Messages('app.deployment.default_name')
+      feedCollection: {id: this.model.id},
+      name: this.model.get('name').toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '') + '-' + date
     });
     d.save().done(function() {
       window.location.hash = '#deployment/' + d.id;
