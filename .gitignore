@@ -18,4 +18,5 @@ dist
 lib
 public/build
 public/components
+public/data/*.zip
 .\#*

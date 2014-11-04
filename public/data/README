@@ -1,0 +1,3 @@
+This is where the manager stores bundled up deployments for OTP/Docker. This is all derivative data (zipballs of feeds); it's safe to zap when needed.
+The only exception is that, if you've created a deployment, dumped it, and then deleted/edited it, there will be no way to get it back.
+However, there is only one file here per deployment anyhow, so if you edit a deployment and dump again, the file here will be overwritten anyhow.
