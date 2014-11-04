@@ -58,8 +58,14 @@ public class FeedSourceController extends Controller {
         s.isPublic = params.get("isPublic").asBoolean();
         // the last fetched/updated cannot be updated from the web interface, only internally
         String url = params.get("url").asText();
-        if (url != null && !"null".equals(url))
-            s.url = new URL(url);
+        if (url != null && !"null".equals(url)) {
+            if ("".equals(url)) {
+                s.url = null;
+            }
+            else {
+                s.url = new URL(url);
+            }
+        }
     }
     
     public static Result update (String id) throws JsonProcessingException, MalformedURLException {
