@@ -14,7 +14,14 @@ Handlebars.registerHelper(
         if (date === 0 || date === null)
             return '-';
 
+       var m = moment(date);
+
         // TODO: time zone?
-        return moment(date).fromNow();
+        return new Handlebars.SafeString(
+          '<span title="' +
+          Handlebars.escapeExpression(m.format(window.Messages('app.date_format')))
+           + '">' +
+           Handlebars.escapeExpression(m.fromNow()) +
+           '</span>');
     }
 );
