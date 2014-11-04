@@ -109,6 +109,19 @@ public class FeedSourceController extends Controller {
         }
     }
     
+    public static Result delete (String id) {
+        User currentUser = User.getUserByUsername(session("username"));
+
+        if (Boolean.TRUE.equals(currentUser.admin)) {
+            FeedSource s = FeedSource.get(id);
+            s.delete();
+            return ok();
+        }
+        else {
+            return unauthorized();
+        }
+    }
+    
     /**
      * Get the userId and key that will allow a user to edit just this feed, without being an admin.
      * Only admins can retrieve this information.

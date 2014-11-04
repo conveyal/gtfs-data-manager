@@ -3,6 +3,8 @@ Backbone.Marionette = require('backbone.marionette');
 var $ = require('jquery');
 var _ = require('underscore');
 var Handlebars = require('handlebars');
+var app = require('application');
+var ConfirmView = require('confirm-view');
 
 var EditableTextWidget = require('editable-text-widget');
 
@@ -17,13 +19,14 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     template: Handlebars.compile(require('./feed-source-item-view.html')),
     tagName: 'tr',
 
-    events: { 
+    events: {
         'change .edit-bool': 'editBool',
-        'change .feed-source': 'editSource'
+        'change .feed-source': 'editSource',
+        'click .remove-feed': 'removeSource'
     },
 
     initialize: function () {
-        _.bindAll(this, 'editBool', 'editSource');
+        _.bindAll(this, 'editBool', 'editSource', 'removeSource');
     },
 
     // edit a boolean value
@@ -32,7 +35,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
 
         var attr = {};
         attr[$t.attr('name')] = $t.is(':checked');
-        
+
         this.model.set(attr);
         this.model.save();
 
@@ -45,10 +48,22 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.model.save();
     },
 
+    // delete a feed source
+    removeSource: function (e) {
+      var instance = this;
+      app.modalRegion.show(new ConfirmView({
+        title: window.Messages('app.confirm'),
+        body: window.Messages('app.confirm_delete', this.model.get('name')),
+        onProceed: function () {
+          instance.model.destroy();
+        }
+      }));
+    },
+
     onShow: function () {
         var nameField = new EditableTextWidget({
             model: this.model,
-            attribute: 'name', 
+            attribute: 'name',
             href: function () {
                 if (this.model.id == null) {
                     // make it a no-op until saved
@@ -61,7 +76,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         });
         this.nameRegion.show(nameField);
 
-        // start out editing name if it's new; this way we ensure it is saved before 
+        // start out editing name if it's new; this way we ensure it is saved before
         if (this.model.get('id') == null)
             nameField.edit();
 

@@ -196,4 +196,21 @@ public class FeedVersion extends Model {
         else
             return false;
     }
+
+    /**
+     * Delete this feed version.
+     */
+    public void delete() {
+        File feed = getFeed();
+        if (feed.exists())
+            feed.delete();
+        
+        this.dereference();
+        
+        for (Deployment d : Deployment.getAll()) {
+            d.feedVersionIds.remove(this.id);
+        }
+        
+        versionStore.delete(this.id);
+    }
 }

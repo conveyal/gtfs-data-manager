@@ -23,6 +23,7 @@ app.feed_source.share_desc=Send this URL to users to allow them to view this rep
 app.feed_source.retrieval_method.FETCHED_AUTOMATICALLY=Fetched automatically
 app.feed_source.retrieval_method.MANUALLY_UPLOADED=Manually uploaded
 app.feed_source.retrieval_method.PRODUCED_IN_HOUSE=Produced in house
+app.feed_source.delete=Delete feed source
 
 # date rendering
 app.date.january=January
@@ -98,6 +99,9 @@ app.logout=Log out
 
 app.projects=Select a project
 
+app.cancel=Cancel
+app.proceed=Proceed
+
 app.note.new=New comment
 # The label on the submit button for the new comment form
 app.note.create=Comment
@@ -111,6 +115,9 @@ app.password=password
 
 app.name=NYSDOT GTFS Data Manager
 app.title={0} - NYSDOT GTFS Data Manager
+
+app.confirm=Are you sure?
+app.confirm_delete=Are you sure you want to delete {0}?
 
 # Not a message per se, but something locale dependent to pass to the app
 # Note also that you can load new moment.js locales in date-render-helper.js

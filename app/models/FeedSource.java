@@ -313,4 +313,15 @@ public class FeedSource extends Model {
     public static void commit() {
         sourceStore.commit();
     }
+
+    /**
+     * Delete this feed source and everything that it contains.
+     */
+    public void delete() {
+        for (FeedVersion v : getFeedVersions()) {
+            v.delete();
+        }
+        
+        sourceStore.delete(this.id);
+    }
 }
