@@ -53,7 +53,7 @@ app.feed_version.route_count=Route count
 app.feed_version.trip_count=Trip count
 app.feed_version.stop_times_count=Stop time count
 app.feed_version.start_date=Valid from
-app.feed_version.end_date=Valid until
+app.feed_version.end_date=Expires
 app.feed_version.service_span=Service span
 # as in June 4 to June 7
 app.feed_version.to=to
