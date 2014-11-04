@@ -26,6 +26,7 @@ GET      /api/feedversions/:id          controllers.api.FeedVersionController.ge
 GET      /api/feedversions              controllers.api.FeedVersionController.getAll()
 POST     /api/feedversions/             controllers.api.FeedVersionController.create()
 
+GET      /api/deployments/:id/export    controllers.api.DeploymentController.export(id:String)
 GET      /api/deployments/:id           controllers.api.DeploymentController.get(id:String)
 GET      /api/deployments               controllers.api.DeploymentController.getAll()
 POST     /api/deployments/              controllers.api.DeploymentController.create()

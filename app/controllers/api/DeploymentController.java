@@ -1,5 +1,9 @@
 package controllers.api;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -12,9 +16,11 @@ import models.FeedVersion;
 import models.JsonViews;
 import models.User;
 import controllers.Admin;
+import play.Play;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
+import static utils.StringUtils.getCleanName;
 
 @Security.Authenticated(Admin.class)
 public class DeploymentController extends Controller {
@@ -94,5 +100,23 @@ public class DeploymentController extends Controller {
         if (name != null) {
             d.name = name;
         }
+    }
+    
+    /**
+     * Create a deployment bundle for OTP/Docker
+     * @throws IOException 
+     */
+    public static Result export (String id) throws IOException {
+        Deployment d = Deployment.get(id);
+        
+        String cleanName = getCleanName(d.name) + ".zip";
+        File output = new File(Play.application().configuration().getString("application.data.public.fs"), cleanName);
+        
+        String ret = Play.application().configuration().getString("application.data.public.url") + "/" + cleanName;
+        
+        // TODO: do this async?
+        d.dump(output);
+        
+        return redirect(ret);
     }
 }

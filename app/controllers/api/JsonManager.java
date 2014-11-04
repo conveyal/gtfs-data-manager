@@ -36,6 +36,13 @@ public class JsonManager<T> {
     private Class<T> theClass;
     
     /**
+     * Add an additional mixin for serialization with this object mapper.
+     */
+    public void addMixin(Class target, Class mixin) {
+        om.addMixInAnnotations(target, mixin);
+    }
+    
+    /**
      * Convert an object to its JSON representation
      * @param o the object to convert
      * @return the JSON string

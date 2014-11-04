@@ -1,15 +1,30 @@
 package models;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.channels.Channel;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
+import play.Play;
 import utils.DataStore;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
+
+import controllers.api.JsonManager;
+import static utils.StringUtils.getCleanName;
 
 /**
  * A deployment of (a given version of) OTP on a given set of feeds.
@@ -158,6 +173,84 @@ public class Deployment extends Model {
             deploymentStore.saveWithoutCommit(id, this);
     }
     
+    /** Dump this deployment to the given file 
+     * @throws IOException */
+    public void dump (File output) throws IOException {
+        // create the zipfile
+        ZipOutputStream out;
+        try {
+            out = new ZipOutputStream(new FileOutputStream(output));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        
+        // save the manifest at the beginning of the file, for read/seek efficiency
+        
+        ZipEntry manifestEntry = new ZipEntry("manifest.json");
+        out.putNextEntry(manifestEntry);
+        
+        // create the json
+        JsonManager<Deployment> jsonManifest = new JsonManager<Deployment>(Deployment.class, JsonViews.UserInterface.class);
+        // this mixin gives us full feed validation results, not summarized
+        jsonManifest.addMixin(Deployment.class, DeploymentFullFeedVersionMixin.class);
+        
+        byte[] manifest = jsonManifest.write(this).getBytes();
+        
+        out.write(manifest);
+        
+        out.closeEntry();
+        
+        // write each of the GTFS feeds
+        for (FeedVersion v : this.getFullFeedVersions()) {
+            File feed = v.getFeed();
+            
+            FileInputStream in;
+            
+            try {
+                in = new FileInputStream(feed);
+            } catch (FileNotFoundException e1) {
+                throw new RuntimeException(e1);
+            }
+            
+            ZipEntry e = new ZipEntry(feed.getName());
+            out.putNextEntry(e);
+            
+            // copy the zipfile 100k at a time
+            int bufSize = 100 * 1024;
+            byte[] buff = new byte[bufSize];
+            int readBytes;
+            
+            while (true) {
+                try {
+                    readBytes = in.read(buff);
+                } catch (IOException e1) {
+                    try {
+                        in.close();
+                    } catch (IOException e2) {
+                        throw new RuntimeException(e2);
+                    }
+                    throw new RuntimeException(e1);
+                }
+                
+                if (readBytes == -1)
+                    // we've copied the whole file
+                    break;
+                
+                out.write(buff, 0, readBytes);
+            }
+
+            try {
+                in.close();
+            } catch (IOException e1) {
+                throw new RuntimeException(e1);
+            }
+            
+            out.closeEntry();
+        }
+        
+        out.close();
+    }
+    
     /**
      * Commit changes to the datastore
      */
@@ -193,5 +286,21 @@ public class Deployment extends Model {
             this.previousVersionId = version.previousVersionId;
             this.version = version.version;
         }
+    }
+    
+    /**
+     * A MixIn to be applied to this deployment, for generating manifests, so that full feed versions appear rather than
+     * summarized feed versions.
+     * 
+     * Usually a mixin would be used on an external class, but since we are changing one thing about a single class, it seemed
+     * unnecessary to define a new view just for generating deployment manifests.
+     */
+    public abstract static class DeploymentFullFeedVersionMixin {
+        @JsonIgnore
+        public abstract Collection<SummarizedFeedVersion> getFeedVersions();
+        
+        @JsonProperty("feedVersions")
+        @JsonIgnore(false)
+        public abstract Collection<FeedVersion> getFullFeedVersions ();
     }
 }

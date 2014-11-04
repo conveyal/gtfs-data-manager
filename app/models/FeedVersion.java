@@ -22,6 +22,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonView;
 
+import static utils.StringUtils.getCleanName;
+
 /**
  * Represents a version of a feed.
  * @author mattwigway
@@ -62,15 +64,6 @@ public class FeedVersion extends Model {
      */
     public FeedVersion () {
         // do nothing
-    }
-    
-    /**
-     * Clean a name to make it filesystem-friendly
-     * @param name a name with any letters
-     * @return a new name with weird letters removed/transliterated.
-     */
-    public static String getCleanName (String name) {
-        return name.replace(' ', '_').replaceAll("[^A-Za-z0-9_-]", "");
     }
     
     /**
