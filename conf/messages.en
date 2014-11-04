@@ -89,6 +89,7 @@ app.deployment.deployments=Deployments
 app.deployment.name=Name
 app.deployment.creation_date=Creation date
 app.deployment.number_of_feeds=Number of feeds
+app.deployment.deploy=Deploy
 
 app.location.home=Home
 app.location.login=Log in
