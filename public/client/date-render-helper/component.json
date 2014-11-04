@@ -2,7 +2,8 @@
     "name": "date-render-helper",
     "description": "Handlebars helpers for rendering a pretty date",
     "dependencies": {
-        "components/handlebars.js": "*"
+        "components/handlebars.js": "*",
+        "moment/moment": "*"
     },
     "main": "date-render-helper.js",
     "scripts": ["date-render-helper.js"]
