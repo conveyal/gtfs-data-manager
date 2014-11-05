@@ -181,6 +181,7 @@ public class FeedSource extends Model {
                 // copy the file
                 ReadableByteChannel rbc = Channels.newChannel(conn.getInputStream());
                 outStream.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+                outStream.close();
             }
             
             else {
