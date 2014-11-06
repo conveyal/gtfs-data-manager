@@ -100,6 +100,9 @@ app.deployment.building_bundle=Building graph bundle . . .
 app.deployment.uploading=Uploading graph bundle to server {0} of {1}
 app.deployment.building_graph=Building graph for server {0} of {1}
 app.deployment.error.graph_build_failed=Graph build failed
+app.deployment.error.net=Network error
+app.deployment.error.dump=Error creating deployment bundle
+app.deployment.error.config=OTP server URL not configured properly
 
 app.location.home=Home
 app.location.login=Log in
