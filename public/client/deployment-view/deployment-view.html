@@ -3,7 +3,12 @@
   {{ t 'app.deployment.deploy' }}
 </button>
 
-<h2 id="deployment-name"></h2>
+<h2>
+  <span id="deployment-name"></span>
+  {{#if (neq deployedTo null)}}
+    <span class="badge">{{ deployedTo }}</span>
+  {{/if}}
+  </h2>
 
 <table class="table">
   <thead>

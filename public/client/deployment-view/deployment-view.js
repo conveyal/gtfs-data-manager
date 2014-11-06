@@ -87,7 +87,13 @@ module.exports = Backbone.Marionette.CompositeView.extend({
        // todo: multiple servers
        body: window.Messages('app.deployment.confirm', instance.model.get('name'), 'Production'),
        onProceed: function () {
-         $.post('api/deployments/' + instance.model.id + '/deploy');
+         $.post('api/deployments/' + instance.model.id + '/deploy').done(function () {
+           // refetch the deployment, to show where it is deployed to
+           instance.model.fetch().done(function () {
+             instance.render();
+             instance.onShow();
+           });
+         });
        }
      }));
    },

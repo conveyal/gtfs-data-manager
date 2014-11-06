@@ -110,13 +110,22 @@ public class DeploymentController extends Controller {
     }
     
     /**
-     * Create a deployment bundle for OTP/Docker
+     * Create a deployment bundle, and push it to OTP
      * @throws IOException 
      */
-    public static Result export (String id) throws IOException {
+    public static Result deploy (String id) throws IOException {
         Deployment d = Deployment.get(id);
         // for the time being hardwired to production
         List<String> target = Play.application().configuration().getStringList("application.deployment.servers.production");
+        
+        Deployment oldD = Deployment.getDeploymentForServer("Production");
+        if (oldD != null) {
+            oldD.deployedTo = null;
+            oldD.save();
+        }
+        
+        d.deployedTo = "Production";
+        d.save();
         
         DeployJob job = new DeployJob(d, target);
         

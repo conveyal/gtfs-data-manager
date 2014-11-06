@@ -91,6 +91,7 @@ app.deployment.name=Name
 app.deployment.creation_date=Creation date
 app.deployment.number_of_feeds=Number of feeds
 app.deployment.deploy=Deploy
+app.deployment.confirm=Are you sure you want to deploy {0} to {1}? This will erase all data currently on that server.
 
 app.location.home=Home
 app.location.login=Log in

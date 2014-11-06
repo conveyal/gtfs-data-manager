@@ -6,7 +6,8 @@ module.exports = Backbone.Model.extend({
       feedCollection: null,
       feedVersions: null,
       osmFileId: null,
-      otpCommit: null
+      otpCommit: null,
+      deployedTo: null
     },
     urlRoot: 'api/deployments/'
 });

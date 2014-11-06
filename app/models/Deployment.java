@@ -37,6 +37,9 @@ public class Deployment extends Model {
     
     public String name;
     
+    /** What server is this currently deployed to? */
+    public String deployedTo;
+    
     public Date dateCreated;
     
     @JsonView(JsonViews.DataDump.class)
@@ -146,6 +149,8 @@ public class Deployment extends Model {
                 this.feedVersionIds.add(latest.id);
             }
         }
+        
+        this.deployedTo = null;
     }
     
     /**
@@ -263,6 +268,18 @@ public class Deployment extends Model {
      */
     public static Collection<Deployment> getAll () {
         return deploymentStore.getAll();
+    }
+    
+    /**
+     * Get the deployment currently deployed to a particular server.
+     */
+    public static Deployment getDeploymentForServer (String server) {
+        for (Deployment d : getAll()) {
+            if (d.deployedTo != null && d.deployedTo.equals(server))
+                return d;
+        }
+        
+        return null;
     }
     
     /**

@@ -27,12 +27,26 @@ public class DeployJob implements Runnable {
     /** The URLs to deploy to */
     private List<String> targets;
     
+    /** The number of servers that have successfully been deployed to */
+    private DeployStatus status;
+    
     /** The deployment to deploy */
     private Deployment deployment;
     
     public DeployJob(Deployment deployment, List<String> targets) {
         this.deployment = deployment;
         this.targets = targets;
+        this.status = new DeployStatus();
+        status.error = false;
+        status.completed = false;
+        status.numServersCompleted = 0;
+        status.totalServers = targets.size();
+    }
+    
+    public DeployStatus getStatus () {
+        synchronized (status) {
+            return status.clone();
+        } 
     }
 
     public void run() {
@@ -43,6 +57,13 @@ public class DeployJob implements Runnable {
         } catch (IOException e) {
             Logger.error("Could not create temp file");
             e.printStackTrace();
+            
+            synchronized (status) {
+                status.error = true;
+                status.completed = true;
+                status.message = "app.deployment.error.dump";
+            }
+            
             return;
         }
         
@@ -52,6 +73,13 @@ public class DeployJob implements Runnable {
         } catch (IOException e) {
             Logger.error("Error dumping deployment");
             e.printStackTrace();
+            
+            synchronized (status) {
+                status.error = true;
+                status.completed = true;
+                status.message = "app.deployment.error.dump";
+            }
+            
             return;
         }
         
@@ -61,7 +89,13 @@ public class DeployJob implements Runnable {
             try {
                 url = new URL(rawUrl + "/routers/default");
             } catch (MalformedURLException e) {
-                Logger.error("Malformed deployment URL", rawUrl);
+                Logger.error("Malformed deployment URL {}", rawUrl);
+                
+                synchronized (status) {
+                    status.error = true;
+                    status.message = "app.deployment.error.config";
+                }
+                
                 continue;
             }
             
@@ -71,6 +105,12 @@ public class DeployJob implements Runnable {
                 conn = (HttpURLConnection) url.openConnection();
             } catch (IOException e) {
                 Logger.error("Unable to open URL of OTP server {}", url);
+                
+                synchronized (status) {
+                    status.error = true;
+                    status.message = "app.deployment.error.net";
+                }
+                
                 continue;
             }
             
@@ -85,6 +125,12 @@ public class DeployJob implements Runnable {
             } catch (IOException e) {
                 Logger.error("Could not open channel to OTP server {}", url);
                 e.printStackTrace();
+                
+                synchronized (status) {
+                    status.error = true;
+                    status.message = "app.deployment.error.net";
+                }
+                
                 continue;
             }
             
@@ -94,6 +140,12 @@ public class DeployJob implements Runnable {
                 input = new FileInputStream(temp).getChannel();
             } catch (FileNotFoundException e) {
                 Logger.error("Internal error: could not read dumped deployment!");
+                
+                synchronized (status) {
+                    status.error = true;
+                    status.message = "app.deployment.error.dump";
+                }
+                
                 continue;
             }
             
@@ -101,6 +153,12 @@ public class DeployJob implements Runnable {
                 conn.connect();
             } catch (IOException e) {
                 Logger.error("Unable to open connection to OTP server {}", url);
+                
+                synchronized (status) {
+                    status.error = true;
+                    status.message = "app.deployment.error.net";
+                }
+                
                 continue;
             }
             
@@ -110,6 +168,12 @@ public class DeployJob implements Runnable {
             } catch (IOException e) {
                 Logger.error("Unable to transfer deployment to server {}" , url);
                 e.printStackTrace();
+                
+                synchronized (status) {
+                    status.error = true;
+                    status.message = "app.deployment.error.net";
+                }
+                
                 continue;
             }
             
@@ -118,17 +182,45 @@ public class DeployJob implements Runnable {
             } catch (IOException e) {
                 Logger.error("Error finishing connection to server {}", url);
                 e.printStackTrace();
+                
+                synchronized (status) {
+                    status.error = true;
+                    status.message = "app.deployment.error.net";
+                }
+                
                 continue;
             }
             
             try {
                 input.close();
             } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                // do nothing
             }
             
             Logger.info("Done deploying to {}", url);
+            
+            synchronized (status) {
+                status.numServersCompleted++;
+            }
+        }
+        
+        synchronized (status) {
+            status.completed = true;
+        }
+    }
+    
+    /**
+     * Represents the current status of this job.
+     */
+    public static class DeployStatus implements Cloneable {
+        public String message;
+        public boolean completed;
+        public boolean error;
+        public int numServersCompleted;
+        public int totalServers;
+        
+        public DeployStatus clone () {
+            return (DeployStatus) this.clone();
         }
     }
 }
