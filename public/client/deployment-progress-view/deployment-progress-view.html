@@ -1,0 +1,21 @@
+<div class="modal fade" role="dialog" aria-labelledby="deployment-progress-title">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close cancel-action hidden" data-dismiss="modal">
+          <span aria-hidden="true">&times;</span><span class="sr-only">{{ t 'app.close' }}</span>
+        </button>
+        <h4 class="modal-title" id="deployment-progress-title">{{ t 'app.deployment.deploying' name target }}</h4>
+      </div>
+
+      <div class="modal-body">
+        <div id="progress-message"></div>
+        <div class="progress">
+          <div class="progress-bar progress-bar-striped active" role="progressbar"
+              aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
