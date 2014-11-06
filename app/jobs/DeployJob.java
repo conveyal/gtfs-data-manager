@@ -15,8 +15,13 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.WritableByteChannel;
 import java.util.List;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+import controllers.api.JsonManager;
 import play.Logger;
+import play.mvc.WebSocket;
 import models.Deployment;
+import models.JsonViews;
 
 /**
  * Deploy the given deployment to the OTP servers specified by targets.
@@ -24,6 +29,9 @@ import models.Deployment;
  *
  */
 public class DeployJob implements Runnable {
+    private static JsonManager<DeployStatus> json = 
+            new JsonManager<DeployStatus>(DeployStatus.class, JsonViews.UserInterface.class);
+    
     /** The URLs to deploy to */
     private List<String> targets;
     
@@ -33,23 +41,28 @@ public class DeployJob implements Runnable {
     /** The deployment to deploy */
     private Deployment deployment;
     
-    public DeployJob(Deployment deployment, List<String> targets) {
+    private WebSocket.Out<String> out;
+    
+    public DeployJob (Deployment deployment, List<String> targets) {
+        this(deployment, targets, null);
+    }
+    
+    public DeployJob (Deployment deployment, List<String> targets, WebSocket.Out<String> out) {
         this.deployment = deployment;
         this.targets = targets;
+        this.out = out;
         this.status = new DeployStatus();
         status.error = false;
         status.completed = false;
         status.numServersCompleted = 0;
         status.totalServers = targets.size();
-    }
-    
-    public DeployStatus getStatus () {
-        synchronized (status) {
-            return status.clone();
-        } 
+        status.built = false;
     }
 
     public void run() {
+        // kick things off
+        send();
+        
         // create a temporary file in which to save the deployment
         File temp;
         try {
@@ -58,11 +71,12 @@ public class DeployJob implements Runnable {
             Logger.error("Could not create temp file");
             e.printStackTrace();
             
-            synchronized (status) {
-                status.error = true;
-                status.completed = true;
-                status.message = "app.deployment.error.dump";
-            }
+            status.error = true;
+            status.completed = true;
+            status.message = "app.deployment.error.dump";
+            
+            send();
+            close();
             
             return;
         }
@@ -74,14 +88,18 @@ public class DeployJob implements Runnable {
             Logger.error("Error dumping deployment");
             e.printStackTrace();
             
-            synchronized (status) {
-                status.error = true;
-                status.completed = true;
-                status.message = "app.deployment.error.dump";
-            }
+            status.error = true;
+            status.completed = true;
+            status.message = "app.deployment.error.dump";
+            
+            send();
+            close();
             
             return;
         }
+        
+        status.built = true;
+        send();
         
         // load it to OTP
         for (String rawUrl : this.targets) {
@@ -91,10 +109,10 @@ public class DeployJob implements Runnable {
             } catch (MalformedURLException e) {
                 Logger.error("Malformed deployment URL {}", rawUrl);
                 
-                synchronized (status) {
                     status.error = true;
                     status.message = "app.deployment.error.config";
-                }
+                
+                send();
                 
                 continue;
             }
@@ -106,10 +124,10 @@ public class DeployJob implements Runnable {
             } catch (IOException e) {
                 Logger.error("Unable to open URL of OTP server {}", url);
                 
-                synchronized (status) {
                     status.error = true;
                     status.message = "app.deployment.error.net";
-                }
+                
+                    send();
                 
                 continue;
             }
@@ -126,10 +144,10 @@ public class DeployJob implements Runnable {
                 Logger.error("Could not open channel to OTP server {}", url);
                 e.printStackTrace();
                 
-                synchronized (status) {
                     status.error = true;
                     status.message = "app.deployment.error.net";
-                }
+                
+                    send();
                 
                 continue;
             }
@@ -141,10 +159,10 @@ public class DeployJob implements Runnable {
             } catch (FileNotFoundException e) {
                 Logger.error("Internal error: could not read dumped deployment!");
                 
-                synchronized (status) {
                     status.error = true;
                     status.message = "app.deployment.error.dump";
-                }
+                
+                    send();
                 
                 continue;
             }
@@ -154,10 +172,10 @@ public class DeployJob implements Runnable {
             } catch (IOException e) {
                 Logger.error("Unable to open connection to OTP server {}", url);
                 
-                synchronized (status) {
                     status.error = true;
                     status.message = "app.deployment.error.net";
-                }
+                
+                    send();
                 
                 continue;
             }
@@ -169,10 +187,10 @@ public class DeployJob implements Runnable {
                 Logger.error("Unable to transfer deployment to server {}" , url);
                 e.printStackTrace();
                 
-                synchronized (status) {
                     status.error = true;
                     status.message = "app.deployment.error.net";
-                }
+                
+                    send();
                 
                 continue;
             }
@@ -183,10 +201,10 @@ public class DeployJob implements Runnable {
                 Logger.error("Error finishing connection to server {}", url);
                 e.printStackTrace();
                 
-                synchronized (status) {
                     status.error = true;
                     status.message = "app.deployment.error.net";
-                }
+                
+                    send();
                 
                 continue;
             }
@@ -199,16 +217,40 @@ public class DeployJob implements Runnable {
             
             Logger.info("Done deploying to {}", url);
             
-            synchronized (status) {
                 status.numServersCompleted++;
-            }
+            
+                send();
         }
         
-        synchronized (status) {
             status.completed = true;
+        
+            send();
+            close();
+    }
+    
+    /**
+     * Send the status down the wire
+     */
+    private void send() {
+        if (out != null) {        
+        try {
+            out.write(json.write(status));
+        } catch (JsonProcessingException e) {
+            // this had better not happen
+            close();
+            throw new RuntimeException(e);
+        }
         }
     }
     
+    /**
+     * Close the websocket.
+     */
+    private void close() {
+        if (out != null)
+            out.close();
+    }
+
     /**
      * Represents the current status of this job.
      */
@@ -216,6 +258,7 @@ public class DeployJob implements Runnable {
         public String message;
         public boolean completed;
         public boolean error;
+        public boolean built;
         public int numServersCompleted;
         public int totalServers;
         
