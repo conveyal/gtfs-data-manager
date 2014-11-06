@@ -9,7 +9,7 @@
     "components/jquery": "*"
   },
   "local": ["feed-collection", "feed-version-collection", "feed-source-collection", "feed-source-collection-view",
-    "feed-version", "editable-text-widget"
+    "feed-version", "editable-text-widget", "application", "confirm-view"
   ],
   "main": "deployment-view.js",
   "scripts": ["deployment-view.js"],

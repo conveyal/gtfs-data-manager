@@ -9,6 +9,8 @@ var FeedVersionCollection = require('feed-version-collection');
 var FeedVersion = require('feed-version');
 var Handlebars = require('handlebars');
 var EditableTextWidget = require('editable-text-widget');
+var app = require('application');
+var ConfirmView = require('confirm-view');
 
 // FeedVersionItemView is already used on the versions page, so let's keep class names unique
 var FeedVersionDeploymentView = Backbone.Marionette.ItemView.extend({
@@ -60,15 +62,35 @@ module.exports = Backbone.Marionette.CompositeView.extend({
   childView: FeedVersionDeploymentView,
   childViewContainer: 'tbody',
 
+  events: { 'click .deploy': 'deploy' },
+
   initialize: function () {
     this.collection = new FeedVersionCollection(this.model.get('feedVersions'));
-    _.bindAll(this, 'collectionChange');
+    _.bindAll(this, 'collectionChange', 'deploy');
   },
 
   collectionChange: function () {
     this.model.set('feedVersions', this.collection.toJSON());
     this.model.save();
   },
+
+  /**
+   * Tell the server to push a deployment to OTP.
+   */
+   deploy: function (e) {
+     // TODO: multiple servers
+     // make sure they mean it
+     var instance = this;
+
+     app.modalRegion.show(new ConfirmView({
+       title: window.Messages('app.confirm'),
+       // todo: multiple servers
+       body: window.Messages('app.deployment.confirm', instance.model.get('name'), 'Production'),
+       onProceed: function () {
+         $.post('api/deployments/' + instance.model.id + '/deploy');
+       }
+     }));
+   },
 
   buildChildView: function (child, ChildViewClass, childViewOptions) {
     var opts = _.extend({model: child, collection: this.collection}, childViewOptions);
