@@ -26,11 +26,10 @@ import play.libs.Akka;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
-import play.mvc.WebSocket;
 import scala.concurrent.duration.Duration;
 import static utils.StringUtils.getCleanName;
 
-//@Security.Authenticated(Admin.class)
+@Security.Authenticated(Admin.class)
 public class DeploymentController extends Controller {
     private static JsonManager<Deployment> json =
             new JsonManager<Deployment>(Deployment.class, JsonViews.UserInterface.class);
@@ -114,10 +113,10 @@ public class DeploymentController extends Controller {
      * Create a deployment bundle, and push it to OTP
      * @throws IOException 
      */
-    public static WebSocket<String> deploy (String id) throws IOException {
+    public static Result deploy (String id) throws IOException {
         Deployment d = Deployment.get(id);
         // for the time being hardwired to production
-        final List<String> target = Play.application().configuration().getStringList("application.deployment.servers.production");
+        List<String> target = Play.application().configuration().getStringList("application.deployment.servers.production");
         
         Deployment oldD = Deployment.getDeploymentForServer("Production");
         if (oldD != null) {
@@ -128,14 +127,14 @@ public class DeploymentController extends Controller {
         d.deployedTo = "Production";
         d.save();
         
-        // can't/shouldn't make it final above as we change it, but now we're done
-        final Deployment finalD = d;
-                
-        return new WebSocket<String> () {
-            public void onReady (WebSocket.In<String> in, WebSocket.Out<String> out) {
-                DeployJob job = new DeployJob(finalD, target, out);
-                job.run();
-            }
-        };
+        DeployJob job = new DeployJob(d, target);
+        
+        Akka.system().scheduler().scheduleOnce(
+                Duration.create(50, TimeUnit.MILLISECONDS),
+                job,
+                Akka.system().dispatcher()
+                );
+        
+        return ok();
     }
 }

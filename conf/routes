@@ -28,9 +28,7 @@ GET      /api/feedversions/:id          controllers.api.FeedVersionController.ge
 GET      /api/feedversions              controllers.api.FeedVersionController.getAll()
 POST     /api/feedversions/             controllers.api.FeedVersionController.create()
 
-# This is a GET, which is not supposed to be action-taking, but it's actually a WebSocket, so not something you
-# can just paste into a browser
-GET      /api/deployments/:id/deploy    controllers.api.DeploymentController.deploy(id:String)
+POST     /api/deployments/:id/deploy    controllers.api.DeploymentController.deploy(id:String)
 GET      /api/deployments/:id           controllers.api.DeploymentController.get(id:String)
 GET      /api/deployments               controllers.api.DeploymentController.getAll()
 POST     /api/deployments/              controllers.api.DeploymentController.create()
