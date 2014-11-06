@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -33,7 +34,12 @@ import static utils.StringUtils.getCleanName;
 public class DeploymentController extends Controller {
     private static JsonManager<Deployment> json =
             new JsonManager<Deployment>(Deployment.class, JsonViews.UserInterface.class);
+    
+    private static JsonManager<DeployJob.DeployStatus> statusJson =
+            new JsonManager<DeployJob.DeployStatus>(DeployJob.DeployStatus.class, JsonViews.UserInterface.class);
 
+    private static HashMap<String, DeployJob> deploymentJobsByServer = new HashMap<String, DeployJob>();
+    
     public static Result get (String id) throws JsonProcessingException {
         return ok(json.write(Deployment.get(id))).as("application/json");
     }
@@ -114,9 +120,21 @@ public class DeploymentController extends Controller {
      * @throws IOException 
      */
     public static Result deploy (String id) throws IOException {
+        String target = "Production";
+        
+        // check if we can deploy
+        if (deploymentJobsByServer.containsKey(target)) {
+            DeployJob currentJob = deploymentJobsByServer.get("target");
+            if (currentJob != null && !currentJob.getStatus().completed) {
+                // send a 503 service unavailable as it is not possible to deploy to this target right now;
+                // someone else is deploying
+                return status(503);
+            }
+        }
+        
         Deployment d = Deployment.get(id);
         // for the time being hardwired to production
-        List<String> target = Play.application().configuration().getStringList("application.deployment.servers.production");
+        List<String> targetUrls = Play.application().configuration().getStringList("application.deployment.servers.production");
         
         Deployment oldD = Deployment.getDeploymentForServer("Production");
         if (oldD != null) {
@@ -127,7 +145,10 @@ public class DeploymentController extends Controller {
         d.deployedTo = "Production";
         d.save();
         
-        DeployJob job = new DeployJob(d, target);
+        DeployJob job = new DeployJob(d, targetUrls);
+        
+        deploymentJobsByServer.put("Production", job);
+        //deploymentJobsByDeployment.put(d, job);
         
         Akka.system().scheduler().scheduleOnce(
                 Duration.create(50, TimeUnit.MILLISECONDS),
@@ -136,5 +157,21 @@ public class DeploymentController extends Controller {
                 );
         
         return ok();
+    }
+    
+    /**
+     * The current status of a deployment, polled to update the progress dialog.
+     * @throws JsonProcessingException 
+     */
+    public static Result deploymentStatus (String target) throws JsonProcessingException {
+        if (!deploymentJobsByServer.containsKey(target))
+            return notFound();
+        
+        DeployJob j = deploymentJobsByServer.get(target);
+        
+        if (j == null)
+            return notFound();
+        
+        return ok(statusJson.write(j.getStatus())).as("application/json");
     }
 }

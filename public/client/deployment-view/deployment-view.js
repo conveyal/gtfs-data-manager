@@ -11,6 +11,8 @@ var Handlebars = require('handlebars');
 var EditableTextWidget = require('editable-text-widget');
 var app = require('application');
 var ConfirmView = require('confirm-view');
+var DeploymentProgressView = require('deployment-progress-view');
+var app = require('application');
 
 // FeedVersionItemView is already used on the versions page, so let's keep class names unique
 var FeedVersionDeploymentView = Backbone.Marionette.ItemView.extend({
@@ -93,6 +95,10 @@ module.exports = Backbone.Marionette.CompositeView.extend({
              instance.render();
              instance.onShow();
            });
+
+           // show the status of the deployment
+           // TODO: don't hardcode target
+           app.modalRegion.show(new DeploymentProgressView({name: instance.model.get('name'), target: "Production"}));
          });
        }
      }));

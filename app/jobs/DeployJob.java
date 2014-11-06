@@ -39,6 +39,7 @@ public class DeployJob implements Runnable {
         this.status = new DeployStatus();
         status.error = false;
         status.completed = false;
+        status.built = false;
         status.numServersCompleted = 0;
         status.totalServers = targets.size();
     }
@@ -83,8 +84,16 @@ public class DeployJob implements Runnable {
             return;
         }
         
+        synchronized (status) {
+            status.built = true;
+        }
+        
         // load it to OTP
         for (String rawUrl : this.targets) {
+            synchronized (status) {
+                status.uploading = true;
+            }
+            
             URL url;
             try {
                 url = new URL(rawUrl + "/routers/default");
@@ -129,9 +138,10 @@ public class DeployJob implements Runnable {
                 synchronized (status) {
                     status.error = true;
                     status.message = "app.deployment.error.net";
+                    status.completed = true;
                 }
                 
-                continue;
+                return;
             }
             
             // get the input file
@@ -144,9 +154,10 @@ public class DeployJob implements Runnable {
                 synchronized (status) {
                     status.error = true;
                     status.message = "app.deployment.error.dump";
+                    status.completed = true;
                 }
                 
-                continue;
+                return;
             }
             
             try {
@@ -157,9 +168,10 @@ public class DeployJob implements Runnable {
                 synchronized (status) {
                     status.error = true;
                     status.message = "app.deployment.error.net";
+                    status.completed = true;
                 }
                 
-                continue;
+                return;
             }
             
             // copy
@@ -172,9 +184,10 @@ public class DeployJob implements Runnable {
                 synchronized (status) {
                     status.error = true;
                     status.message = "app.deployment.error.net";
+                    status.completed = true;
                 }
                 
-                continue;
+                return;
             }
             
             try {
@@ -186,9 +199,10 @@ public class DeployJob implements Runnable {
                 synchronized (status) {
                     status.error = true;
                     status.message = "app.deployment.error.net";
+                    status.completed = true;
                 }
                 
-                continue;
+                return;
             }
             
             try {
@@ -197,7 +211,33 @@ public class DeployJob implements Runnable {
                 // do nothing
             }
             
-            Logger.info("Done deploying to {}", url);
+            synchronized (status) {
+                status.uploading = false;
+            }
+            
+            // wait for the server to build the graph
+            // TODO: timeouts?
+            try {
+                if (conn.getResponseCode() != HttpURLConnection.HTTP_CREATED) {
+                    Logger.error("Got response code {} from server", conn.getResponseCode());
+                    synchronized (status) {
+                        status.error = true;
+                        status.message = "app.deployment.error.graph_build_failed";
+                        status.completed = true;
+                    }
+                    
+                    // no reason to take out more servers, it's going to have the same result
+                    return;
+                }
+            } catch (IOException e) {
+                Logger.error("Could not finish request to server {}", url);
+                
+                synchronized (status) {
+                    status.completed = true;
+                    status.error = true;
+                    status.message = "app.deployment.error.net";
+                }
+            }
             
             synchronized (status) {
                 status.numServersCompleted++;
@@ -213,14 +253,37 @@ public class DeployJob implements Runnable {
      * Represents the current status of this job.
      */
     public static class DeployStatus implements Cloneable {
+        /** What error message (defined in messages.<lang>) should be displayed to the user? */
         public String message;
+        
+        /** Is this deployment completed (successfully or unsuccessfully) */
         public boolean completed;
+        
+        /** Was there an error? */
         public boolean error;
+        
+        /** Did the manager build the bundle successfully */
+        public boolean built;
+        
+        /** Is the bundle currently being uploaded to the server? */
+        public boolean uploading;
+        
+        /** To how many servers have we successfully deployed thus far? */
         public int numServersCompleted;
+        
+        /** How many servers are we attempting to deploy to? */
         public int totalServers;
         
         public DeployStatus clone () {
-            return (DeployStatus) this.clone();
+            DeployStatus ret = new DeployStatus();
+            ret.message = message;
+            ret.completed = completed;
+            ret.error = error;
+            ret.built = built;
+            ret.uploading = uploading;
+            ret.numServersCompleted = numServersCompleted;
+            ret.totalServers = totalServers;
+            return ret;
         }
     }
 }
