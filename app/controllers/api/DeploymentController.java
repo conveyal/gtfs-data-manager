@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.node.NullNode;
 
 import models.Deployment;
 import models.FeedCollection;
+import models.FeedSource;
 import models.FeedVersion;
 import models.JsonViews;
 import models.User;
@@ -30,6 +31,7 @@ import play.mvc.Result;
 import play.mvc.Security;
 import scala.concurrent.duration.Duration;
 import utils.DeploymentManager;
+import utils.StringUtils;
 import static utils.StringUtils.getCleanName;
 
 @Security.Authenticated(Admin.class)
@@ -69,6 +71,22 @@ public class DeploymentController extends Controller {
 
         applyJsonToDeployment(d, params);
         
+        d.save();
+        
+        return ok(json.write(d)).as("application/json");
+    }
+    
+    /**
+     * Create a deployment for a particular feedsource
+     * @throws JsonProcessingException 
+     */
+    public static Result createFromFeedSource (String feedSourceId) throws JsonProcessingException {
+        User currentUser = User.getUserByUsername(session("username"));
+
+        FeedSource s = FeedSource.get(feedSourceId);
+        
+        Deployment d = new Deployment(s);
+        d.setUser(currentUser);
         d.save();
         
         return ok(json.write(d)).as("application/json");

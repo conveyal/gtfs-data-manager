@@ -9,15 +9,20 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import play.Play;
 import utils.DataStore;
+import utils.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -110,6 +115,7 @@ public class Deployment extends Model {
     /**
      * Feed sources that had no valid feed versions when this deployment was created, and ergo were not added. 
      */
+    @JsonInclude(Include.ALWAYS)
     @JsonView(JsonViews.DataDump.class)
     public Collection<String> invalidFeedSourceIds;
     
@@ -117,7 +123,11 @@ public class Deployment extends Model {
      * Get all of the feed sources which could not be added to this deployment.
      */
     @JsonView(JsonViews.UserInterface.class)
+    @JsonInclude(Include.ALWAYS)
     public List<FeedSource> getInvalidFeedSources () {
+        if (invalidFeedSourceIds == null)
+            return null;
+        
         ArrayList<FeedSource> ret = new ArrayList<FeedSource>(invalidFeedSourceIds.size());
         
         for (String id : invalidFeedSourceIds) {
@@ -136,8 +146,14 @@ public class Deployment extends Model {
         this.dateCreated = new Date();
         this.feedVersionIds = new ArrayList<String>();
         
+        DateFormat df = new SimpleDateFormat("yyyyMMdd");
+        
+        this.name = StringUtils.getCleanName(feedSource.name) + "_" + df.format(dateCreated);
+        
         // always use the latest, no matter how broken it is, so we can at least see how broken it is
         this.feedVersionIds.add(feedSource.getLatestVersionId());
+        
+        this.routerId = StringUtils.getCleanName(feedSource.name) + "_" + feedSourceId;
         
         this.deployedTo = null;
     }

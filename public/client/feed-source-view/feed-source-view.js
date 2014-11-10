@@ -22,8 +22,10 @@ module.exports = Backbone.Marionette.LayoutView.extend({
   },
 
   events: {
-    'click #share-url': 'doNothing'
+    'click #share-url': 'doNothing',
+    'click .deploy': 'deploy'
   },
+
   initialize: function(attr) {
     this.feedVersionId = attr.feedVersionId;
   },
@@ -103,6 +105,16 @@ module.exports = Backbone.Marionette.LayoutView.extend({
 doNothing: function(e) {
   e.preventDefault();
   e.stopPropagation();
+},
+
+deploy: function (e) {
+  $.ajax({
+    url: 'api/deployments/fromfeedsource/' + this.model.id,
+    method: 'post',
+    success: function (data) {
+      window.location.hash = '#deployment/' + data.id;
+    }
+  });
 }
 
 })

@@ -2,7 +2,8 @@
 
 <p>
   {{#if (admin)}}
-  <div class="dropdown">
+  <div class="clearfix">
+  <div class="dropdown pull-left">
     <button class="btn btn-primary" data-toggle="dropdown">{{ t 'app.feed_source.share' }}&nbsp;&nbsp;<span class="glyphicon glyphicon-share-alt"></span></button>
     <div class="dropdown-menu">
       <div class="container-fluid">
@@ -14,8 +15,14 @@
       </div>
     </div>
   </div>
+
+  <button class="btn btn-primary deploy pull-left">
+    <span class="glyphicon glyphicon-globe"></span>
+    {{ t 'app.deployment.deploy' }}
+  </button>
   {{/if}}
   <p>
+  </div>
 
 <p>
   <table class="table">

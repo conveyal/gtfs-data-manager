@@ -35,6 +35,7 @@ GET      /api/deployments/:id           controllers.api.DeploymentController.get
 GET      /api/deployments               controllers.api.DeploymentController.getAll()
 POST     /api/deployments/              controllers.api.DeploymentController.create()
 PUT      /api/deployments/:id           controllers.api.DeploymentController.update(id:String)
+POST     /api/deployments/fromfeedsource/:id controllers.api.DeploymentController.createFromFeedSource(id:String)
 
 
 GET      /api/notes                     controllers.api.NoteController.getAll()

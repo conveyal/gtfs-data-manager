@@ -88,6 +88,9 @@ public class DeployJob implements Runnable {
             status.built = true;
         }
         
+        // figure out what router we're using
+        String router = deployment.routerId != null ? deployment.routerId : "default"; 
+        
         // load it to OTP
         for (String rawUrl : this.targets) {
             synchronized (status) {
@@ -96,7 +99,7 @@ public class DeployJob implements Runnable {
             
             URL url;
             try {
-                url = new URL(rawUrl + "/routers/default");
+                url = new URL(rawUrl + "/routers/" + router);
             } catch (MalformedURLException e) {
                 Logger.error("Malformed deployment URL {}", rawUrl);
                 
