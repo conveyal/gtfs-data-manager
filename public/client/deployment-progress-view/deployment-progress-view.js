@@ -21,7 +21,6 @@ module.exports = Backbone.Marionette.ItemView.extend({
        */
       poll: function(data) {
         if (data.completed) {
-          this.$('button.close').removeClass('hidden');
           this.$('.progress-bar').removeClass('active').removeClass('progress-bar-striped');
           // no need to keep polling
           clearInterval(this.interval);
