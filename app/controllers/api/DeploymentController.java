@@ -24,10 +24,12 @@ import models.User;
 import controllers.Admin;
 import play.Play;
 import play.libs.Akka;
+import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
 import scala.concurrent.duration.Duration;
+import utils.DeploymentManager;
 import static utils.StringUtils.getCleanName;
 
 @Security.Authenticated(Admin.class)
@@ -119,12 +121,10 @@ public class DeploymentController extends Controller {
      * Create a deployment bundle, and push it to OTP
      * @throws IOException 
      */
-    public static Result deploy (String id) throws IOException {
-        String target = "Production";
-        
+    public static Result deploy (String id, String target) throws IOException {
         // check if we can deploy
         if (deploymentJobsByServer.containsKey(target)) {
-            DeployJob currentJob = deploymentJobsByServer.get("target");
+            DeployJob currentJob = deploymentJobsByServer.get(target);
             if (currentJob != null && !currentJob.getStatus().completed) {
                 // send a 503 service unavailable as it is not possible to deploy to this target right now;
                 // someone else is deploying
@@ -133,22 +133,23 @@ public class DeploymentController extends Controller {
         }
         
         Deployment d = Deployment.get(id);
-        // for the time being hardwired to production
-        List<String> targetUrls = Play.application().configuration().getStringList("application.deployment.servers.production");
+        List<String> targetUrls = DeploymentManager.getDeploymentUrls(target);
         
-        Deployment oldD = Deployment.getDeploymentForServer("Production");
+        if (targetUrls == null)
+            return badRequest("No such server to deploy to!");
+        
+        Deployment oldD = Deployment.getDeploymentForServer(target);
         if (oldD != null) {
             oldD.deployedTo = null;
             oldD.save();
         }
         
-        d.deployedTo = "Production";
+        d.deployedTo = target;
         d.save();
         
         DeployJob job = new DeployJob(d, targetUrls);
         
-        deploymentJobsByServer.put("Production", job);
-        //deploymentJobsByDeployment.put(d, job);
+        deploymentJobsByServer.put(target, job);
         
         Akka.system().scheduler().scheduleOnce(
                 Duration.create(50, TimeUnit.MILLISECONDS),
@@ -173,5 +174,12 @@ public class DeploymentController extends Controller {
             return notFound();
         
         return ok(statusJson.write(j.getStatus())).as("application/json");
+    }
+    
+    /**
+     * The servers that it is possible to deploy to.
+     */
+    public static Result targets () {
+        return ok(Json.toJson(DeploymentManager.getDeploymentNames()));
     }
 }

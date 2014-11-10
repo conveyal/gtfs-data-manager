@@ -7,19 +7,15 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
+import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.channels.Channel;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import play.Logger;
 import play.Play;
 import utils.DataStore;
 
@@ -31,7 +27,6 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.io.ByteStreams;
 
 import controllers.api.JsonManager;
-import static utils.StringUtils.getCleanName;
 
 /**
  * A deployment of (a given version of) OTP on a given set of feeds.
@@ -103,6 +98,16 @@ public class Deployment extends Model {
     public String otpCommit;
     
     /**
+     * The routerId of this deployment
+     */
+    public String routerId;
+    
+    /**
+     * If this deployment is for a single feed source, the feed source this deployment is for.
+     */
+    public String feedSourceId;
+    
+    /**
      * Feed sources that had no valid feed versions when this deployment was created, and ergo were not added. 
      */
     @JsonView(JsonViews.DataDump.class)
@@ -122,9 +127,26 @@ public class Deployment extends Model {
         return ret;
     }
     
+    /** Create a single-agency (testing) deployment for the given feed source */
+    public Deployment (FeedSource feedSource) {
+        super();
+        
+        this.feedSourceId = feedSource.id;
+        this.setFeedCollection(feedSource.getFeedCollection());
+        this.dateCreated = new Date();
+        this.feedVersionIds = new ArrayList<String>();
+        
+        // always use the latest, no matter how broken it is, so we can at least see how broken it is
+        this.feedVersionIds.add(feedSource.getLatestVersionId());
+        
+        this.deployedTo = null;
+    }
+    
     /** Create a new deployment plan for the given feed collection */
     public Deployment (FeedCollection feedCollection) {
         super();
+        
+        this.feedSourceId = null;
         
         this.setFeedCollection(feedCollection);
         
@@ -267,33 +289,21 @@ public class Deployment extends Model {
         // figure out the bounds
         Rectangle2D bounds = getBounds();
         
-        // call vex
-        List vexCmd = Arrays.asList(
-            Play.application().configuration().getString("app.deployment.osm.vex"),
-            Play.application().configuration().getString("app.deployment.osm.db"),
-            // Y is latitude, X is longitude
-            String.format("%.6f", bounds.getMinY()),
-            String.format("%.6f", bounds.getMinX()),
-            String.format("%.6f", bounds.getMaxY()),
-            String.format("%.6f", bounds.getMaxX()),
-            // write to stdout
-            "-"
-        );
+        // call vex server
+        URL vexUrl = new URL(
+                String.format("%s/?n=%.6f&e=%.6f&s=%.6f&w=%.6f",
+                        Play.application().configuration().getString("application.deployment.osm_vex"),
+                        bounds.getMaxY(),
+                        bounds.getMaxX(),
+                        bounds.getMinY(),
+                        bounds.getMinX()
+                        ));
         
-        ProcessBuilder vex = new ProcessBuilder(vexCmd);
+        HttpURLConnection conn = (HttpURLConnection) vexUrl.openConnection();
+        conn.connect();
         
-        // show stderr on console
-        vex.redirectError(ProcessBuilder.Redirect.INHERIT);
-        
-        // capture stdout
-        vex.redirectOutput(ProcessBuilder.Redirect.PIPE);
-        
-        Logger.info("running {}", vexCmd);
-        
-        InputStream osm = vex.start().getInputStream();
-        
-        ByteStreams.copy(osm, out);
-        
+        ByteStreams.copy(conn.getInputStream(), out);
+                
         out.closeEntry();
         
         out.close();

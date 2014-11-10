@@ -66,8 +66,12 @@ module.exports = Backbone.Marionette.CompositeView.extend({
 
   events: { 'click .deploy': 'deploy' },
 
-  initialize: function () {
+  initialize: function (attr) {
     this.collection = new FeedVersionCollection(this.model.get('feedVersions'));
+
+    // possible deployment targets
+    this.targets = attr.targets;
+
     _.bindAll(this, 'collectionChange', 'deploy');
   },
 
@@ -80,16 +84,19 @@ module.exports = Backbone.Marionette.CompositeView.extend({
    * Tell the server to push a deployment to OTP.
    */
    deploy: function (e) {
-     // TODO: multiple servers
-     // make sure they mean it
+     e.preventDefault();
+
      var instance = this;
 
+     var $t = $(e.target);
+
+    // make sure they mean it
      app.modalRegion.show(new ConfirmView({
        title: window.Messages('app.confirm'),
        // todo: multiple servers
-       body: window.Messages('app.deployment.confirm', instance.model.get('name'), 'Production'),
+       body: window.Messages('app.deployment.confirm', instance.model.get('name'), $t.attr('name')),
        onProceed: function () {
-         $.post('api/deployments/' + instance.model.id + '/deploy').done(function () {
+         $.post('api/deployments/' + instance.model.id + '/deploy/' + $t.attr('name')).done(function () {
            // refetch the deployment, to show where it is deployed to
            instance.model.fetch().done(function () {
              instance.render();
@@ -98,7 +105,7 @@ module.exports = Backbone.Marionette.CompositeView.extend({
 
            // show the status of the deployment
            // TODO: don't hardcode target
-           app.modalRegion.show(new DeploymentProgressView({name: instance.model.get('name'), target: "Production"}));
+           app.modalRegion.show(new DeploymentProgressView({name: instance.model.get('name'), target: $t.attr('name')}));
          });
        }
      }));
@@ -127,5 +134,10 @@ module.exports = Backbone.Marionette.CompositeView.extend({
 
     this.collection.on('remove', this.collectionChange);
     this.collection.on('add', this.collectionChange);
+  },
+
+  // we need to pass deployment targets to the view as well
+  serializeData: function () {
+    return _.extend({targets: this.targets}, this.model.toJSON());
   }
 });

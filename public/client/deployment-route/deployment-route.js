@@ -12,9 +12,21 @@ module.exports = function(deploymentId) {
     id: deploymentId
   });
 
-  d.fetch().done(function() {
+  var targets;
+
+  var tDf = $.ajax({
+    url: 'api/deployments/targets',
+    success: function (data) {
+      targets = data;
+    }
+  });
+
+  var depDf = d.fetch();
+
+  $.when(tDf, depDf).then(function() {
     app.appRegion.show(new DeploymentView({
-      model: d
+      model: d,
+      targets: targets
     }));
 
     // nav

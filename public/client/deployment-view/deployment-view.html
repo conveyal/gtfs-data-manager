@@ -1,7 +1,16 @@
-<button role="button" class="btn btn-primary pull-right deploy">
-  <span class="glyphicon glyphicon-globe"></span>
-  {{ t 'app.deployment.deploy' }}
-</button>
+<div class="dropdown pull-right">
+  <button role="button" class="btn btn-primary" id="deploymentDropdown" data-toggle="dropdown">
+    <span class="glyphicon glyphicon-globe"></span>
+    {{ t 'app.deployment.deploy' }}
+    <span class="caret"></span>
+  </button>
+
+  <ul class="dropdown-menu" role="menu" aria-labelledby="deploymentDropdown">
+    {{#each targets}}
+      <li role="presentation"><a role="menuitem" class="deploy" href="#" tabindex="-1" name="{{ this }}">{{ this }}</a></li>
+    {{/each}}
+  </ul>
+</div>
 
 <h2>
   <span id="deployment-name"></span>
