@@ -38,11 +38,16 @@ GET      /api/deployments/status/:target controllers.api.DeploymentController.de
 GET      /api/notes                     controllers.api.NoteController.getAll()
 POST     /api/notes                     controllers.api.NoteController.create()
 
-GET     /fetchGtfs                      controllers.Application.fetchGtfs()
 GET     /messages.js                    controllers.Application.jsMessages()
 GET     /loggedInUser                   controllers.Application.getLoggedInUser()
 GET     /logout                         controllers.Application.logout()
 POST    /createInitialUser              controllers.Application.createInitialUser()
+
+# TODO: these are adminy things, and are GET requests for convenience
+# This violates the HTTP spec, as GET requests are not supposed to be action-taking
+# We should make these POSTs, and add a page to the management interface to run them
+GET     /fetchGtfs                      controllers.Application.fetchGtfs()
+GET     /revalidate                     controllers.Application.validateGtfs()
 
 GET     /dump                           controllers.Dump.dump()
 POST    /load                           controllers.Dump.load()

@@ -12,5 +12,6 @@ libraryDependencies ++= Seq(
   cache,
   javaWs,
   "org.mapdb" % "mapdb" % "1.0.6",
-  "org.julienrf" %% "play-jsmessages" % "1.6.2"
+  "org.julienrf" %% "play-jsmessages" % "1.6.2",
+  "com.google.guava" % "guava" % "18.0"
 )

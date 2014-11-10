@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import jobs.FetchGtfsJob;
+import jobs.RevalidateAllFeedVersionsJob;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -102,8 +103,6 @@ public class Application extends Controller {
     @Security.Authenticated(Admin.class)
     public static Result fetchGtfs () {
         User u = User.getUserByUsername(session("username"));
-        if (!Boolean.TRUE.equals(u.admin))
-            return unauthorized("Only admins may trigger GTFS refetch");
         
         Akka.system().scheduler().scheduleOnce(
                 Duration.create(50, TimeUnit.MILLISECONDS),
@@ -113,5 +112,17 @@ public class Application extends Controller {
         
         return ok("Running");
     }
+    
+    @Security.Authenticated(Admin.class)
+    public static Result validateGtfs () {
+        Akka.system().scheduler().scheduleOnce(
+                Duration.create(50, TimeUnit.MILLISECONDS),
+                new RevalidateAllFeedVersionsJob(),
+                Akka.system().dispatcher()
+                );
+        
+        return ok("Running");
+    }
+    
     // all of the hard stuff is in controllers.api
 }

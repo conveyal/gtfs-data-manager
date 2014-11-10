@@ -1,5 +1,6 @@
 package controllers.api;
 
+import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.util.Collection;
 
@@ -11,6 +12,9 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
 /**
  * Helper methods for writing REST API routines
@@ -30,7 +34,10 @@ public class JsonManager<T> {
         this.theClass = theClass;
         this.om = new ObjectMapper();
         om.addMixInAnnotations(InvalidValue.class, InvalidValueMixIn.class);
-        this.ow = om.writerWithView(view);
+        om.addMixInAnnotations(Rectangle2D.class, Rectangle2DMixIn.class);
+        SimpleFilterProvider filters = new SimpleFilterProvider();
+        filters.addFilter("bbox", SimpleBeanPropertyFilter.filterOutAllExcept("west", "east", "south", "north"));
+        this.ow = om.writer(filters).withView(view);
     }
     
     private Class<T> theClass;

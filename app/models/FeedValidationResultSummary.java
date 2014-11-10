@@ -1,5 +1,6 @@
 package models;
 
+import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
@@ -36,6 +37,9 @@ public class FeedValidationResultSummary implements Serializable {
     @JsonInclude(Include.ALWAYS)
     public Date endDate;
     
+    @JsonInclude(Include.ALWAYS)
+    public Rectangle2D bounds;
+    
     /**
      * Construct a summarized version of the given FeedValidationResult.
      * @param result
@@ -58,6 +62,7 @@ public class FeedValidationResultSummary implements Serializable {
             this.stopTimesCount = result.stopTimesCount;
             this.startDate = result.startDate;
             this.endDate = result.endDate;
+            this.bounds = result.bounds;
         }
     }
 }

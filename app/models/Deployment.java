@@ -1,19 +1,25 @@
 package models;
 
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.Channel;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import play.Logger;
 import play.Play;
 import utils.DataStore;
 
@@ -22,6 +28,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.google.common.io.ByteStreams;
 
 import controllers.api.JsonManager;
 import static utils.StringUtils.getCleanName;
@@ -59,7 +66,7 @@ public class Deployment extends Model {
     
     /** All of the feed versions used in this deployment */
     @JsonIgnore
-    public Collection<FeedVersion> getFullFeedVersions () {
+    public List<FeedVersion> getFullFeedVersions () {
         ArrayList<FeedVersion> ret = new ArrayList<FeedVersion>(feedVersionIds.size());
         
         for (String id : feedVersionIds) {
@@ -71,7 +78,7 @@ public class Deployment extends Model {
     
     /** All of the feed versions used in this deployment, summarized so that the Internet won't break */
     @JsonView(JsonViews.UserInterface.class)
-    public Collection<SummarizedFeedVersion> getFeedVersions () {
+    public List<SummarizedFeedVersion> getFeedVersions () {
         ArrayList<SummarizedFeedVersion> ret = new ArrayList<SummarizedFeedVersion>(feedVersionIds.size());
         
         for (String id : feedVersionIds) {
@@ -105,7 +112,7 @@ public class Deployment extends Model {
      * Get all of the feed sources which could not be added to this deployment.
      */
     @JsonView(JsonViews.UserInterface.class)
-    public Collection<FeedSource> getInvalidFeedSources () {
+    public List<FeedSource> getInvalidFeedSources () {
         ArrayList<FeedSource> ret = new ArrayList<FeedSource>(invalidFeedSourceIds.size());
         
         for (String id : invalidFeedSourceIds) {
@@ -253,9 +260,84 @@ public class Deployment extends Model {
             out.closeEntry();
         }
         
+        // extract OSM and insert it into the deployment bundle
+        ZipEntry e = new ZipEntry("osm.pbf");
+        out.putNextEntry(e);
+        
+        // figure out the bounds
+        Rectangle2D bounds = getBounds();
+        
+        // call vex
+        List vexCmd = Arrays.asList(
+            Play.application().configuration().getString("app.deployment.osm.vex"),
+            Play.application().configuration().getString("app.deployment.osm.db"),
+            // Y is latitude, X is longitude
+            String.format("%.6f", bounds.getMinY()),
+            String.format("%.6f", bounds.getMinX()),
+            String.format("%.6f", bounds.getMaxY()),
+            String.format("%.6f", bounds.getMaxX()),
+            // write to stdout
+            "-"
+        );
+        
+        ProcessBuilder vex = new ProcessBuilder(vexCmd);
+        
+        // show stderr on console
+        vex.redirectError(ProcessBuilder.Redirect.INHERIT);
+        
+        // capture stdout
+        vex.redirectOutput(ProcessBuilder.Redirect.PIPE);
+        
+        Logger.info("running {}", vexCmd);
+        
+        InputStream osm = vex.start().getInputStream();
+        
+        ByteStreams.copy(osm, out);
+        
+        out.closeEntry();
+        
         out.close();
     }
     
+    // Get the union of the bounds of all the feeds in this deployment
+    private Rectangle2D getBounds() {
+        List<SummarizedFeedVersion> versions = getFeedVersions();
+        
+        if (versions.size() == 0)
+            return null;
+        
+        Rectangle2D bounds = (Rectangle2D) versions.get(0).validationResult.bounds.clone();
+        
+        // i = 1 because we've already included bounds 0
+        // todo: NPE
+        for (int i = 1; i < versions.size(); i++) {
+            bounds.add(versions.get(i).validationResult.bounds);
+        }
+        
+        // expand the bounds by (about) 10 km in every direction
+        double degreesPerKmLat = 360D / 40008;
+        double degreesPerKmLon = 
+                // the diameter of the chord of the earth at this latitude
+                360 /
+                (2 * Math.PI * 6371 * Math.cos(Math.toRadians(bounds.getCenterY())));
+        
+        // south-west
+        bounds.add(new Point2D.Double(
+                // lon
+                bounds.getMinX() - 10 * degreesPerKmLon,
+                bounds.getMinY() - 10 * degreesPerKmLat
+                ));
+        
+        // north-east
+        bounds.add(new Point2D.Double(
+                // lon
+                bounds.getMaxX() + 10 * degreesPerKmLon,
+                bounds.getMaxY() + 10 * degreesPerKmLat
+                ));
+        
+        return bounds;        
+    }
+
     /**
      * Commit changes to the datastore
      */
