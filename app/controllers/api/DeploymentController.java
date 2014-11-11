@@ -26,6 +26,7 @@ import controllers.Admin;
 import play.Play;
 import play.libs.Akka;
 import play.libs.Json;
+import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
@@ -92,6 +93,7 @@ public class DeploymentController extends Controller {
         return ok(json.write(d)).as("application/json");
     }
     
+    @BodyParser.Of(value=BodyParser.Json.class, maxLength=1024*1024)
     public static Result update (String id) throws JsonProcessingException {
         Deployment d = Deployment.get(id);
         
