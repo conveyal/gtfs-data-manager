@@ -17,7 +17,11 @@ module.exports = Backbone.View.extend({
      */
     setLocation: function (location) {
         // home is implied
-        location = [{name: Messages('app.location.home'), href: '#'}] + location;
+        var mod = [{name: Messages('app.location.home'), href: '#'}];
+
+        _.each(location, function (val) {
+          mod.push(val);
+        });        
 
         this.$el.empty().append(this.template({location: location}));
 
