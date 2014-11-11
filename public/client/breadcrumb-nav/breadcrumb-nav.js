@@ -21,10 +21,10 @@ module.exports = Backbone.View.extend({
 
         _.each(location, function (val) {
           mod.push(val);
-        });        
+        });
 
-        this.$el.empty().append(this.template({location: location}));
+        this.$el.empty().append(this.template({location: mod}));
 
-        $('head > title').text(Messages('app.title', location[location.length - 1].name));
+        $('head > title').text(Messages('app.title', mod[mod.length - 1].name));
     }
 });
