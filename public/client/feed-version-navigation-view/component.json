@@ -6,7 +6,7 @@
         "marionettejs/backbone.marionette": "*",
         "components/handlebars.js": "*",
         "jashkenas/underscore": "*",
-        "components/jquery": "*"
+        "components/jquery": "1.11.1"
     },
     "local": ["feed-version", "feed-source", "feed-upload-view"],
     "main": "feed-version-navigation-view.js",

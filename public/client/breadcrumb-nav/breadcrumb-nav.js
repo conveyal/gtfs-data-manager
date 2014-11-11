@@ -11,17 +11,16 @@ module.exports = Backbone.View.extend({
     template: Handlebars.compile(require('./breadcrumb-nav.html')),
     tagName: 'ol',
     className: 'breadcrumb',
-    
+
     /**
      * call this with a list (representing hierarchy) of hashes with href and name
      */
     setLocation: function (location) {
         // home is implied
-        location.splice(0, 0, {name: Messages('app.location.home'), href: '#'});
+        location = [{name: Messages('app.location.home'), href: '#'}] + location;
 
         this.$el.empty().append(this.template({location: location}));
 
         $('head > title').text(Messages('app.title', location[location.length - 1].name));
     }
-}); 
-            
+});

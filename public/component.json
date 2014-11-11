@@ -3,8 +3,8 @@
     "paths": ["client"],
     "local": ["routes"],
     "dependencies": {
-        "components/bootstrap": "3.3.0",
-        "components/bootstrap-default": "3.3.0",
-        "components/jquery": "*"
+        "components/bootstrap": "3.2.0",
+        "components/bootstrap-default": "3.2.0",
+        "components/jquery": "1.11.1"
     }
 }

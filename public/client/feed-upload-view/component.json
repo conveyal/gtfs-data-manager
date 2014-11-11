@@ -5,7 +5,7 @@
         "jashkenas/underscore": "*",
         "marionettejs/backbone.marionette": "*",
         "components/handlebars.js": "*",
-        "components/jquery": "*"
+        "components/jquery": "1.11.1"
     },
     "main": "feed-upload-view.js",
     "scripts": ["feed-upload-view.js"],

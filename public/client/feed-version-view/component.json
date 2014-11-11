@@ -6,7 +6,7 @@
         "jashkenas/underscore": "*",
         "marionettejs/backbone.marionette": "*",
         "components/handlebars.js": "*",
-        "components/jquery": "*"
+        "components/jquery": "1.11.1"
     },
     "local": ["application", "note-collection-view", "feed-upload-view", "feed-source"],
     "main": "feed-version-view.js",

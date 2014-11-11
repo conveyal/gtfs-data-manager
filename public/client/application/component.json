@@ -3,7 +3,7 @@
     "dependencies": {
         "jashkenas/backbone": "*",
         "jashkenas/underscore": "*",
-        "components/jquery": "*",
+        "components/jquery": "1.11.1",
         "marionettejs/backbone.marionette": "*",
         "components/handlebars.js": "*"
     },

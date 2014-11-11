@@ -5,7 +5,7 @@
         "jashkenas/underscore": "*",
         "marionettejs/backbone.marionette": "*",
         "components/handlebars.js": "*",
-        "components/jquery": "*"
+        "components/jquery": "1.11.1"
     },
     "local": ["editable-text-widget", "confirm-view", "application"],
     "main": "feed-source-item-view.js",
