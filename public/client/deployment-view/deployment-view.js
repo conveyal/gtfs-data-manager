@@ -53,8 +53,10 @@ var FeedVersionDeploymentView = Backbone.Marionette.ItemView.extend({
     var newVersion = new FeedVersion({id: version});
     var instance = this;
     newVersion.fetch({data: {summarized: 'true'}}).done(function () {
-      instance.collection.remove(instance.model, {silent: true});
+      // TODO: this generates two round trips to the server, which is not necessary
+      // and is slow, but safe
       instance.collection.add(newVersion);
+      instance.collection.remove(instance.model);
     });
   }
 });
@@ -133,7 +135,9 @@ module.exports = Backbone.Marionette.CompositeView.extend({
     this.nameRegion.show(new EditableTextWidget({model: this.model, attribute: 'name', href: window.location.hash}));
 
     this.collection.on('remove', this.collectionChange);
-    this.collection.on('add', this.collectionChange);
+    // We don't save on add, because, for now, adds only happen before removes, which do trigger saves
+    // TODO fix
+    //this.collection.on('add', this.collectionChange);
   },
 
   // we need to pass deployment targets to the view as well
