@@ -28,8 +28,9 @@ module.exports = Backbone.Marionette.LayoutView.extend({
   updateFeed: function(e) {
     // user feedback
     var $t = $(e.target);
-    $t.find('span').addClass('spinner');
+    $t.find('span.glyphicon').addClass('spinner');
     $t.attr('disabled', true);
+    $t.find('span.button-label').text(window.Messages('app.feed_version.updating'));
 
     var instance = this;
     $.ajax({
@@ -38,6 +39,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
       success: function(data) {
         $t.find('span').removeClass('spinner');
         $t.attr('disabled', false);
+        $t.find('span.button-label').text(window.Messages('app.feed_version.update'));
 
         if (data === null) {
           alert('Feed has not changed');
