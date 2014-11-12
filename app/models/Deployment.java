@@ -326,7 +326,7 @@ public class Deployment extends Model {
     }
     
     // Get the union of the bounds of all the feeds in this deployment
-    private Rectangle2D getBounds() {
+    public Rectangle2D getBounds() {
         List<SummarizedFeedVersion> versions = getFeedVersions();
         
         if (versions.size() == 0)

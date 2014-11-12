@@ -104,6 +104,7 @@ app.deployment.error.graph_build_failed=Graph build failed
 app.deployment.error.net=Network error
 app.deployment.error.dump=Error creating deployment bundle
 app.deployment.error.config=OTP server URL not configured properly
+app.deployment.try_it=Try it.
 
 app.location.home=Home
 app.location.login=Log in

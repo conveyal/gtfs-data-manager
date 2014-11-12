@@ -55,6 +55,6 @@ GET     /revalidate                     controllers.Application.validateGtfs()
 GET     /dump                           controllers.Dump.dump()
 POST    /load                           controllers.Dump.load()
 
-# Map static resources from the /public folder to the /assets URL path
+# Map static resources from the /public folder to the / URL path
 GET     /                    controllers.Assets.at(path="/public", file="index.html")
 GET     /*file               controllers.Assets.at(path="/public", file)

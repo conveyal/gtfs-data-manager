@@ -107,7 +107,7 @@ module.exports = Backbone.Marionette.CompositeView.extend({
 
            // show the status of the deployment
            // TODO: don't hardcode target
-           app.modalRegion.show(new DeploymentProgressView({name: instance.model.get('name'), target: $t.attr('name')}));
+           app.modalRegion.show(new DeploymentProgressView({deployment: instance.model, target: $t.attr('name')}));
          });
        }
      }));
