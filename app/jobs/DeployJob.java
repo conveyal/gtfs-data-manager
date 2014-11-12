@@ -128,6 +128,8 @@ public class DeployJob implements Runnable {
             
             conn.addRequestProperty("Content-Type", "application/zip");
             conn.setDoOutput(true);
+            // graph build can take a long time but not more than an hour, I should think
+            conn.setConnectTimeout(60 * 60 * 1000);
             conn.setFixedLengthStreamingMode(temp.length());
             
             // this makes it a post request so that we can upload our file

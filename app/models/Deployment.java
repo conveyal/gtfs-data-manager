@@ -381,10 +381,13 @@ public class Deployment extends Model {
     /**
      * Get the deployment currently deployed to a particular server.
      */
-    public static Deployment getDeploymentForServer (String server) {
+    public static Deployment getDeploymentForServerAndRouterId (String server, String routerId) {
         for (Deployment d : getAll()) {
-            if (d.deployedTo != null && d.deployedTo.equals(server))
-                return d;
+            if (d.deployedTo != null && d.deployedTo.equals(server)) {
+                if ((routerId != null && routerId.equals(d.routerId)) || d.routerId == routerId) {
+                    return d;
+                }
+            }
         }
         
         return null;

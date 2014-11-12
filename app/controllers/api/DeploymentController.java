@@ -158,7 +158,7 @@ public class DeploymentController extends Controller {
         if (targetUrls == null)
             return badRequest("No such server to deploy to!");
         
-        Deployment oldD = Deployment.getDeploymentForServer(target);
+        Deployment oldD = Deployment.getDeploymentForServerAndRouterId(target, d.routerId);
         if (oldD != null) {
             oldD.deployedTo = null;
             oldD.save();
