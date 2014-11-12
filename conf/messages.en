@@ -105,6 +105,7 @@ app.deployment.error.net=Network error
 app.deployment.error.dump=Error creating deployment bundle
 app.deployment.error.config=OTP server URL not configured properly
 app.deployment.try_it=Try it.
+app.deployment.already_deploying=There is currently a deployment being pushed to this server. Please wait until that deployment finishes before attempting another.
 
 app.location.home=Home
 app.location.login=Log in

@@ -24,24 +24,24 @@ var FeedVersionDeploymentView = Backbone.Marionette.ItemView.extend({
     'click .use-next-version': 'useNextVersion'
   },
 
-  initialize: function () {
+  initialize: function() {
     _.bindAll(this, 'removeVersion', 'usePreviousVersion', 'useNextVersion');
   },
 
-  removeVersion: function (e) {
+  removeVersion: function(e) {
     e.preventDefault();
 
     this.collection.remove(this.model);
   },
 
-  usePreviousVersion: function (e) {
+  usePreviousVersion: function(e) {
     e.preventDefault();
     if (this.model.get('previousVersionId') !== null) {
       this.switchVersion(this.model.get('previousVersionId'));
     }
   },
 
-  useNextVersion: function (e) {
+  useNextVersion: function(e) {
     e.preventDefault();
     if (this.model.get('nextVersionId') !== null) {
       this.switchVersion(this.model.get('nextVersionId'));
@@ -49,10 +49,16 @@ var FeedVersionDeploymentView = Backbone.Marionette.ItemView.extend({
   },
 
   /** Utility function to replace this feed version with a different one */
-  switchVersion: function (version) {
-    var newVersion = new FeedVersion({id: version});
+  switchVersion: function(version) {
+    var newVersion = new FeedVersion({
+      id: version
+    });
     var instance = this;
-    newVersion.fetch({data: {summarized: 'true'}}).done(function () {
+    newVersion.fetch({
+      data: {
+        summarized: 'true'
+      }
+    }).done(function() {
       // TODO: this generates two round trips to the server, which is not necessary
       // and is slow, but safe
       instance.collection.add(newVersion);
@@ -66,9 +72,11 @@ module.exports = Backbone.Marionette.CompositeView.extend({
   childView: FeedVersionDeploymentView,
   childViewContainer: 'tbody',
 
-  events: { 'click .deploy': 'deploy' },
+  events: {
+    'click .deploy': 'deploy'
+  },
 
-  initialize: function (attr) {
+  initialize: function(attr) {
     this.collection = new FeedVersionCollection(this.model.get('feedVersions'));
 
     // possible deployment targets
@@ -77,7 +85,7 @@ module.exports = Backbone.Marionette.CompositeView.extend({
     _.bindAll(this, 'collectionChange', 'deploy');
   },
 
-  collectionChange: function () {
+  collectionChange: function() {
     this.model.set('feedVersions', this.collection.toJSON());
     this.model.save();
   },
@@ -85,54 +93,76 @@ module.exports = Backbone.Marionette.CompositeView.extend({
   /**
    * Tell the server to push a deployment to OTP.
    */
-   deploy: function (e) {
-     e.preventDefault();
+  deploy: function(e) {
+    e.preventDefault();
 
-     var instance = this;
+    var instance = this;
 
-     var $t = $(e.target);
+    var $t = $(e.target);
 
     // make sure they mean it
-     app.modalRegion.show(new ConfirmView({
-       title: window.Messages('app.confirm'),
-       // todo: multiple servers
-       body: window.Messages('app.deployment.confirm', instance.model.get('name'), $t.attr('name')),
-       onProceed: function () {
-         $.post('api/deployments/' + instance.model.id + '/deploy/' + $t.attr('name')).done(function () {
-           // refetch the deployment, to show where it is deployed to
-           instance.model.fetch().done(function () {
-             instance.render();
-             instance.onShow();
-           });
+    app.modalRegion.show(new ConfirmView({
+      title: window.Messages('app.confirm'),
+      // todo: multiple servers
+      body: window.Messages('app.deployment.confirm', instance.model.get('name'), $t.attr('name')),
+      onProceed: function() {
+        $.ajax({
+          url: 'api/deployments/' + instance.model.id + '/deploy/' + $t.attr('name'),
+          method: 'POST',
+          success: function() {
+            // refetch the deployment, to show where it is deployed to
+            instance.model.fetch().done(function() {
+              instance.render();
+              instance.onShow();
+            });
 
-           // show the status of the deployment
-           // TODO: don't hardcode target
-           app.modalRegion.show(new DeploymentProgressView({deployment: instance.model, target: $t.attr('name')}));
-         });
-       }
-     }));
-   },
+            // show the status of the deployment
+            // TODO: don't hardcode target
+            app.modalRegion.show(new DeploymentProgressView({
+              deployment: instance.model,
+              target: $t.attr('name')
+            }));
+          },
+          statusCode: {
+            503: function() {
+              window.alert(window.Messages('app.deployment.already_deploying'))
+            }
+          }
+        });
+      }
+    }))
+  },
 
-  buildChildView: function (child, ChildViewClass, childViewOptions) {
-    var opts = _.extend({model: child, collection: this.collection}, childViewOptions);
+  buildChildView: function(child, ChildViewClass, childViewOptions) {
+    var opts = _.extend({
+      model: child,
+      collection: this.collection
+    }, childViewOptions);
     return new ChildViewClass(opts);
   },
 
-  onShow: function () {
+  onShow: function() {
     // show the invalid feed sources (i.e. sources with no current loadable version)
     this.invalidFeedSourceRegion = new Backbone.Marionette.Region({
       el: '.invalid-feed-sources'
     });
 
     var invalid = new FeedSourceCollection(this.model.get('invalidFeedSources'));
-    this.invalidFeedSourceRegion.show(new FeedSourceCollectionView({collection: invalid, showNewFeedButton: false}));
+    this.invalidFeedSourceRegion.show(new FeedSourceCollectionView({
+      collection: invalid,
+      showNewFeedButton: false
+    }));
 
     // show the name, in an editable fashion
     this.nameRegion = new Backbone.Marionette.Region({
       el: '#deployment-name'
     });
 
-    this.nameRegion.show(new EditableTextWidget({model: this.model, attribute: 'name', href: window.location.hash}));
+    this.nameRegion.show(new EditableTextWidget({
+      model: this.model,
+      attribute: 'name',
+      href: window.location.hash
+    }));
 
     this.collection.on('remove', this.collectionChange);
     // We don't save on add, because, for now, adds only happen before removes, which do trigger saves
@@ -141,7 +171,9 @@ module.exports = Backbone.Marionette.CompositeView.extend({
   },
 
   // we need to pass deployment targets to the view as well
-  serializeData: function () {
-    return _.extend({targets: this.targets}, this.model.toJSON());
+  serializeData: function() {
+    return _.extend({
+      targets: this.targets
+    }, this.model.toJSON());
   }
 });
