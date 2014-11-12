@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+  <title>otp.js</title>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <!-- include the core otpjs build files -->
+    <link rel="stylesheet" href="build/build.css" />
+
+    <!-- include the client-specific code, styles, and configuration -->
+    <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+
+    <link rel="stylesheet" href="client.css" />
+
+    <!--[if lt IE 9]>
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+
+<select id="locationSelector" style="float: right">
+  <option value="#start/42.65428817975673/-73.7563705444336/13">Albany Metro</option>
+  <option value="#start/42.88690758675958/-78.87737274169922/13">Buffalo, NY</option>
+  <option value="#start/40.77092185281977/-73.98699760437012/12">New York Metro</option>
+  <option value="#start/43.21606073334134/-75.45787811279297/14">Rome, NY</option>
+  <option value="#start/43.046687188090296/-76.14641189575194/14">Syracuse, NY</option>
+  <option value="#start/43.15360247702301/-77.6022720336914/13">Rochester, NY</option>
+</select>
+
+<h3><img src="logo.png" style="height: 50px;"/> NYSDOT OTP Demo</h3>
+
+
+<iframe id="clientFrame" width="100%" height="900" style="border: 0px; width: 100%; height: 900px" src="index.html"></iframe>
+
+<script type="text/javascript">
+
+$( document ).ready(function() {
+  $('#locationSelector').on('change', function() {
+    $('#clientFrame').attr('src', "index.html" + $('#locationSelector').val());
+  });
+});
+
+</script>
+
+
+</body>
+
+</html>
