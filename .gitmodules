@@ -1,3 +1,0 @@
-[submodule "public/otp.js"]
-	path = public/otp.js
-	url = git@github.com:conveyal/otp.js
