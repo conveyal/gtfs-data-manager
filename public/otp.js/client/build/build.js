@@ -32499,10 +32499,10 @@ var narrativeAdjustTemplate = Handlebars.compile([\n\
 '));\n\
 \n\
 var OtpPlanResponseNarrativeView = Backbone.View.extend({\n\
- \n\
+\n\
     initialize : function(options) {\n\
         this.options = options || {};\n\
-    }, \n\
+    },\n\
 \n\
     render : function() {\n\
 \n\
@@ -32515,7 +32515,7 @@ var OtpPlanResponseNarrativeView = Backbone.View.extend({\n\
             if(this.options.autoResize) {\n\
                 var itineraries = this.$el.find('.itineraries');\n\
                 itineraries.height($(window).height() - ($('#request').height() + $('#messageWell').height() + 80));\n\
-                $(window).resize(function() { \n\
+                $(window).resize(function() {\n\
                     itineraries.height($(window).height() - ($('#request').height() + $('#messageWell').height() + 80));\n\
                 });\n\
             }\n\
@@ -32561,7 +32561,7 @@ var itinNarrativeTemplate = Handlebars.compile([\n\
 '));\n\
 \n\
 var OtpItineraryNarrativeView = Backbone.View.extend({\n\
- \n\
+\n\
     events: {\n\
         \"click .otp-itinHeader\" : \"headerClicked\",\n\
         \"mouseenter .otp-itinHeader\" : \"headerMouseenter\",\n\
@@ -32580,8 +32580,8 @@ var OtpItineraryNarrativeView = Backbone.View.extend({\n\
     render : function() {\n\
         var legs = this.model.get(\"legs\");\n\
         var timeOffset = this.options.planView.model.getTimeOffset();\n\
-        var duration = this.options.planView.options.showFullDuration ? \n\
-            this.model.getFullDuration(this.options.planView.model.get('request'), timeOffset) : \n\
+        var duration = this.options.planView.options.showFullDuration ?\n\
+            this.model.getFullDuration(this.options.planView.model.get('request'), timeOffset) :\n\
             this.model.get(\"duration\");\n\
 \n\
         var context = _.clone(this.model.attributes);\n\
@@ -32590,7 +32590,7 @@ var OtpItineraryNarrativeView = Backbone.View.extend({\n\
         context.duration = duration;\n\
         context.timeOffset = timeOffset;\n\
         this.$el.html(itinNarrativeTemplate(context));\n\
-        \n\
+\n\
         _.each(legs.models, this.processLeg, this);\n\
 \n\
         this.$el.find(\".otp-itinBody\").hide();\n\
@@ -32616,7 +32616,7 @@ var OtpItineraryNarrativeView = Backbone.View.extend({\n\
     headerClicked : function(e) {\n\
         if(!this.isActive()) {\n\
             this.model.trigger(\"activate\");\n\
-        } \n\
+        }\n\
     },\n\
 \n\
     headerMouseenter : function(e) {\n\
@@ -32649,7 +32649,7 @@ Handlebars.registerHelper('formatTime', function(time, offset, options) {\n\
 \n\
 Handlebars.registerHelper('formatDuration', function(duration) {\n\
     if(duration)\n\
-        return utils.msToHrMin(duration); \n\
+        return utils.secToHrMin(duration); \n\
     else\n\
         return '';\n\
 });\n\
@@ -32663,7 +32663,7 @@ var accessLegTemplate = Handlebars.compile([\n\
             '<span style=\"float:right;\">{{formatDuration duration}}</span><b><div class=\"otp-legMode-icon otp-legMode-icon-{{ mode }}\"></div></b> to {{to.name}}',\n\
         '</div>',\n\
         '<div class=\"otp-legBody\">',\n\
-        '</div>',    \n\
+        '</div>',\n\
     '</div>'\n\
 ].join('\\n\
 '));\n\
@@ -32682,7 +32682,7 @@ var transitLegTemplate = Handlebars.compile([\n\
             '<div class=\"otp-transitLeg-buffer\"></div>',\n\
             '<div class=\"otp-transitLeg-leftCol\">{{formatTime endTime timeOffset}}</div>',\n\
             '<div class=\"otp-transitLeg-endpointDesc otp-to\"><b>Arrive</b>: {{to.name}}</div>',\n\
-        '</div>',    \n\
+        '</div>',\n\
     '</div>'\n\
 ].join('\\n\
 '));\n\
@@ -32698,19 +32698,19 @@ var genericLegTemplate = Handlebars.compile([\n\
 \n\
 \n\
 var OtpLegNarrativeView = Backbone.View.extend({\n\
- \n\
+\n\
     events: {\n\
         \"click .otp-legHeader\" : \"headerClicked\",\n\
         \"mouseenter .otp-legHeader\" : \"headerMouseenter\",\n\
-        \"mouseleave .otp-legHeader\" : \"headerMouseleave\",        \n\
+        \"mouseleave .otp-legHeader\" : \"headerMouseleave\",\n\
         \"click .otp-from\" : \"fromClicked\",\n\
         \"click .otp-to\" : \"toClicked\",\n\
     },\n\
 \n\
     initialize : function(options) {\n\
         this.options = options || {};\n\
-    }, \n\
-    \n\
+    },\n\
+\n\
     render : function() {\n\
         if(this.model.isWalk() || this.model.isBicycle() || this.model.isCar()) {\n\
             //var context = _.clone(this.model.attributes);\n\
@@ -32721,10 +32721,10 @@ var OtpLegNarrativeView = Backbone.View.extend({\n\
         else if(this.model.isTransit()) {\n\
             var context = _.clone(this.model.attributes);\n\
             context.timeOffset = this.options.itinView.options.planView.model.getTimeOffset();\n\
-            this.$el.html(transitLegTemplate(context));        \n\
+            this.$el.html(transitLegTemplate(context));\n\
         }\n\
         else {\n\
-            this.$el.html(genericLegTemplate(this.model.attributes));        \n\
+            this.$el.html(genericLegTemplate(this.model.attributes));\n\
         }\n\
 \n\
         if(!this.model.isTransit()) this.$el.find('.otp-legBody').hide();\n\
@@ -32794,7 +32794,7 @@ var stepTemplate = Handlebars.compile([\n\
 \t\t            '{{#if stayOn}}',\n\
 \t            \t\t'<b>{{relativeDirection}}</b> to continue on <b>{{streetName}}</b>',\n\
 \t            \t'{{else}}',\n\
-\t            \t\t'<b>{{relativeDirection}}</b> on to <b>{{streetName}}</b>',\t            \t\t\n\
+\t            \t\t'<b>{{relativeDirection}}</b> on to <b>{{streetName}}</b>',\n\
 \t\t            '{{/if}}',\n\
 \t            '{{/if}}',\n\
             '{{/if}}',\n\
@@ -32805,24 +32805,24 @@ var stepTemplate = Handlebars.compile([\n\
 '));\n\
 \n\
 var OtpStepNarrativeView = Backbone.View.extend({\n\
- \n\
+\n\
     events: {\n\
         \"click .otp-legStep-row\" : \"rowClicked\",\n\
         \"mouseenter .otp-legStep-row\" : \"rowMouseenter\",\n\
-        \"mouseleave .otp-legStep-row\" : \"rowMouseleave\",   \n\
+        \"mouseleave .otp-legStep-row\" : \"rowMouseleave\",\n\
     },\n\
-    \n\
+\n\
     initialize : function(options) {\n\
         this.options = options || {};\n\
-    }, \n\
-    \n\
+    },\n\
+\n\
     render : function() {\n\
     \tvar context = _.clone(this.model.attributes);\n\
     \tvar relDir = this.model.get('relativeDirection');\n\
 \n\
         // set a flag if this is the first step of the leg\n\
         context.isFirst = (this.options.index === 0);\n\
-    \t\n\
+\n\
         // handle the special case of roundabout / traffic circle steps\n\
     \tif(relDir === \"CIRCLE_COUNTERCLOCKWISE\" || relDir === \"CIRCLE_CLOCKWISE\") {\n\
 \t    \tcontext.isRoundabout = true;\n\
@@ -33810,7 +33810,7 @@ module.exports.filterParams = filterParams;\n\
 \n\
 \n\
 var decodePolyline = function(polyline) {\n\
-        \n\
+\n\
     var currentPosition = 0;\n\
 \n\
     var currentLat = 0;\n\
@@ -33821,18 +33821,18 @@ var decodePolyline = function(polyline) {\n\
     var polylineLatLngs = new Array();\n\
 \n\
     while (currentPosition < dataLength) {\n\
-      \n\
+\n\
         var shift = 0;\n\
         var result = 0;\n\
-          \n\
+\n\
         var byte;\n\
-          \n\
+\n\
         do {\n\
             byte = polyline.charCodeAt(currentPosition++) - 63;\n\
             result |= (byte & 0x1f) << shift;\n\
             shift += 5;\n\
         } while (byte >= 0x20);\n\
-        \n\
+\n\
         var deltaLat = ((result & 1) ? ~(result >> 1) : (result >> 1));\n\
         currentLat += deltaLat;\n\
 \n\
@@ -33844,13 +33844,13 @@ var decodePolyline = function(polyline) {\n\
             result |= (byte & 0x1f) << shift;\n\
             shift += 5;\n\
         } while (byte >= 0x20);\n\
-              \n\
+\n\
         var deltLng = ((result & 1) ? ~(result >> 1) : (result >> 1));\n\
-         \n\
+\n\
         currentLng += deltLng;\n\
 \n\
         polylineLatLngs.push(new L.LatLng(currentLat * 0.00001, currentLng * 0.00001));\n\
-    } \n\
+    }\n\
 \n\
     return polylineLatLngs;\n\
 };\n\
@@ -33868,10 +33868,22 @@ var formatTime = function(time, format, offsetHrs) {\n\
 module.exports.formatTime = formatTime;\n\
 \n\
 \n\
+var secToHrMin = function(sec) {\n\
+    var hrs = Math.floor(sec / 3600);\n\
+    var mins = Math.floor(sec / 60) % 60;\n\
+\n\
+    // TODO: localization\n\
+    var str = (hrs > 0 ? (hrs +\" hr, \") : \"\") + mins + \" min\";\n\
+\n\
+    return str;\n\
+};\n\
+\n\
+module.exports.secToHrMin = secToHrMin;\n\
+\n\
 var msToHrMin = function(ms) {\n\
     var hrs = Math.floor(ms / 3600000);\n\
     var mins = Math.floor(ms / 60000) % 60;\n\
-    \n\
+\n\
     // TODO: localization\n\
     var str = (hrs > 0 ? (hrs +\" hr, \") : \"\") + mins + \" min\";\n\
 \n\
@@ -33905,12 +33917,10 @@ var distanceStringMetric = function(m) {\n\
 };\n\
 \n\
 var distanceString = function(m, metric) {\n\
-    return (metric === true) ? distanceStringMetric(m) : distanceStringImperial(m); \n\
+    return (metric === true) ? distanceStringMetric(m) : distanceStringImperial(m);\n\
 };\n\
 \n\
 module.exports.distanceString = distanceString;\n\
-\n\
-\n\
 //@ sourceURL=otpjs/lib/utils.js"
 ));
 
