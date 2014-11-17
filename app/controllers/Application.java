@@ -61,6 +61,23 @@ public class Application extends Controller {
         }
     }
     
+    /**
+     * Edit a particular feed by delegating to the editor.
+     * @param id
+     * @return
+     */
+    public static Result edit (Long id) {
+        String url = Play.application().configuration().getString("application.editor.public_url");
+        
+        if (!url.endsWith("/"))
+            url = url + "/";
+        
+        // TODO: key handling
+        url = url + "search/?agencyId=" + id.toString();
+        
+        return redirect(url);
+    }
+    
     public static Result logout () {
         session().clear();
         ObjectNode result = Json.newObject();

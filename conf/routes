@@ -46,6 +46,7 @@ GET     /messages.js                    controllers.Application.jsMessages()
 GET     /loggedInUser                   controllers.Application.getLoggedInUser()
 GET     /logout                         controllers.Application.logout()
 POST    /createInitialUser              controllers.Application.createInitialUser()
+GET     /edit/:id                       controllers.Application.edit(id:Long)
 
 # TODO: these are adminy things, and are GET requests for convenience
 # This violates the HTTP spec, as GET requests are not supposed to be action-taking

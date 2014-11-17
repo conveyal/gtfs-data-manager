@@ -24,6 +24,7 @@ app.feed_source.retrieval_method.FETCHED_AUTOMATICALLY=Fetched automatically
 app.feed_source.retrieval_method.MANUALLY_UPLOADED=Manually uploaded
 app.feed_source.retrieval_method.PRODUCED_IN_HOUSE=Produced in house
 app.feed_source.delete=Delete feed source
+app.feed_source.edit=Edit feed source
 
 # date rendering
 app.date.january=January

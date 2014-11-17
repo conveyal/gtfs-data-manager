@@ -10,6 +10,7 @@
         "ternary.js",
         "eq.js",
         "neq.js",
-        "gt.js"
+        "gt.js",
+        "and.js"
     ]
 }

@@ -1,28 +1,36 @@
 <h1>{{ name }}</h1>
 
 <p>
-  {{#if (admin)}}
-  <div class="clearfix">
-  <div class="dropdown pull-left">
-    <button class="btn btn-primary" data-toggle="dropdown">{{ t 'app.feed_source.share' }}&nbsp;&nbsp;<span class="glyphicon glyphicon-share-alt"></span></button>
-    <div class="dropdown-menu">
-      <div class="container-fluid">
-        <label for="share-url" class="sr-only">{{ t 'app.feed_source.share_url' }}</label>
-        {{!-- value to be filled in by the controller --}}
-        <input type="text" size="80" id="share-url"></input>
+  <div class="clearfix btn-group">
+    {{#if (admin)}}
+      <div class="dropdown pull-left">
+        <button class="btn btn-primary" data-toggle="dropdown">{{ t 'app.feed_source.share' }}&nbsp;&nbsp;<span class="glyphicon glyphicon-share-alt"></span></button>
+        <div class="dropdown-menu">
+          <div class="container-fluid">
+            <label for="share-url" class="sr-only">{{ t 'app.feed_source.share_url' }}</label>
+            {{!-- value to be filled in by the controller --}}
+            <input type="text" size="80" id="share-url"></input>
 
-        <p>{{ t 'app.feed_source.share_desc' }}</p>
-      </div>
+            <p>{{ t 'app.feed_source.share_desc' }}</p>
+          </div>
+        </div>
     </div>
-  </div>
+    {{/if}}
 
-  <button class="btn btn-primary deploy pull-left">
-    <span class="glyphicon glyphicon-globe"></span>
-    {{ t 'app.deployment.deploy' }}
-  </button>
-  {{/if}}
-  <p>
+    <button class="btn btn-primary deploy pull-left">
+      <span class="glyphicon glyphicon-globe"></span>
+      {{ t 'app.deployment.deploy' }}
+    </button>
+
+    {{#if (and (eq retrievalMethod 'PRODUCED_IN_HOUSE') (neq editorId null) (neq editorId ''))}}
+      {{!-- /edit/id just redirects to GTFS Editor --}}
+      <a class="btn btn-primary edit-feed pull-left" target="_blank" href="edit/{{ editorId }}">
+        <span class="glyphicon glyphicon-pencil"></span>
+        {{ t 'app.feed_source.edit'}}
+      </a>
+    {{/if}}
   </div>
+</p>
 
 <p>
   <table class="table">
