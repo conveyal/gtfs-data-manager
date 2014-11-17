@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
@@ -35,6 +36,9 @@ public class JsonManager<T> {
         this.om = new ObjectMapper();
         om.addMixInAnnotations(InvalidValue.class, InvalidValueMixIn.class);
         om.addMixInAnnotations(Rectangle2D.class, Rectangle2DMixIn.class);
+        SimpleModule deser = new SimpleModule();
+        deser.addDeserializer(Rectangle2D.class, new Rectangle2DDeserializer());
+        om.registerModule(deser);
         SimpleFilterProvider filters = new SimpleFilterProvider();
         filters.addFilter("bbox", SimpleBeanPropertyFilter.filterOutAllExcept("west", "east", "south", "north"));
         this.ow = om.writer(filters).withView(view);
