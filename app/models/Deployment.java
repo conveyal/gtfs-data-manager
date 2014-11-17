@@ -327,13 +327,14 @@ public class Deployment extends Model {
 
     // Get the union of the bounds of all the feeds in this deployment
     @JsonView(JsonViews.UserInterface.class)
-    public BoundingBox getBounds() {
+    public Rectangle2D getBounds() {
         List<SummarizedFeedVersion> versions = getFeedVersions();
 
         if (versions.size() == 0)
             return null;
 
-        BoundingBox bounds = new BoundingBox(versions.get(0).validationResult.bounds);
+        Rectangle2D bounds = new Rectangle2D.Double();
+        bounds.setRect(versions.get(0).validationResult.bounds);
 
         // i = 1 because we've already included bounds 0
         // todo: NPE
