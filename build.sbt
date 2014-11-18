@@ -4,7 +4,7 @@ import NativePackagerKeys._
 
 name := """gtfs-data-manager"""
 
-packageArchetype.java_server
+#packageArchetype.java_server
 
 version := "0.1.1"
 
