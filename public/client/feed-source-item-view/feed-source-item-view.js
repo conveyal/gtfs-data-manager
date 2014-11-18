@@ -5,6 +5,7 @@ var _ = require('underscore');
 var Handlebars = require('handlebars');
 var app = require('application');
 var ConfirmView = require('confirm-view');
+var EditorAgencyView = require('editor-agency-view');
 
 var EditableTextWidget = require('editable-text-widget');
 
@@ -65,7 +66,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             model: this.model,
             attribute: 'name',
             href: function () {
-                if (this.model.id == null) {
+                if (this.model.id === null) {
                     // make it a no-op until saved
                     return '#overview/' + this.model.get('feedCollection').id;
                 }
@@ -77,13 +78,24 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.nameRegion.show(nameField);
 
         // start out editing name if it's new; this way we ensure it is saved before
-        if (this.model.get('id') == null)
+        if (this.model.get('id') === null)
             nameField.edit();
 
+        this.handleUrlRegion();
+        this.model.on('change:retrievalMethod', this.handleUrlRegion);
+    },
+
+    // figure out what belongs in the URL region: a URL editor, a GTFS Editor selector, or nothing
+    handleUrlRegion: function () {
+      var retrievalMethod = this.model.get('retrievalMethod');
+      if (retrievalMethod == 'FETCHED_AUTOMATICALLY') {
         this.urlRegion.show(new EditableTextWidget({
             model: this.model,
             attribute: 'url',
-            href: function () { return this.model.get('url') }
+            href: function () { return this.model.get('url'); }
         }));
+      } else if (retrievalMethod == 'PRODUCED_IN_HOUSE') {
+        this.urlRegion.show(new EditorAgencyView({model: this.model}));
+      }
     }
 });

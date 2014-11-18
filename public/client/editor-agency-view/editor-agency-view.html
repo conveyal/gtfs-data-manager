@@ -1,0 +1,7 @@
+<label class="sr-only" for="source-{{ id }}">{{ t 'app.feedsource.select_editor_source' }}</label>
+<select id="source-{{ id }}"{{#if (eq agencies.length 0)}} disabled {{/if}}
+  title="{{ t 'app.feedsource.select_editor_source' }}">
+  {{#each agencies}}
+    <option value="{{ id }}">{{ name }}</option>
+  {{/each}}
+</select>

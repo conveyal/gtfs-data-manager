@@ -79,7 +79,7 @@ public class FeedSource extends Model {
     /**
      * What is the GTFS Editor ID of this feed?
      */
-    public String editorId;
+    public Long editorId;
     
     /**
      * Create a new feed. This also creates a user to own this feed.

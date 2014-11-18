@@ -7,7 +7,7 @@
         "components/handlebars.js": "*",
         "components/jquery": "1.11.1"
     },
-    "local": ["editable-text-widget", "confirm-view", "application"],
+    "local": ["editable-text-widget", "confirm-view", "application", "editor-agency-view"],
     "main": "feed-source-item-view.js",
     "scripts": ["feed-source-item-view.js"],
     "templates": ["feed-source-item-view.html"],
