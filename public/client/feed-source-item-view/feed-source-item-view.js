@@ -27,7 +27,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
 
     initialize: function () {
-        _.bindAll(this, 'editBool', 'editSource', 'removeSource');
+        _.bindAll(this, 'editBool', 'editSource', 'removeSource', 'handleUrlRegion');
     },
 
     // edit a boolean value
@@ -96,6 +96,8 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         }));
       } else if (retrievalMethod == 'PRODUCED_IN_HOUSE') {
         this.urlRegion.show(new EditorAgencyView({model: this.model}));
+      } else {
+        this.urlRegion.empty();
       }
     }
 });
