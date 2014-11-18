@@ -1,29 +1,18 @@
 package controllers.api;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import jobs.DeployJob;
-import jobs.FetchGtfsJob;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.NullNode;
-
 import models.Deployment;
 import models.FeedCollection;
 import models.FeedSource;
 import models.FeedVersion;
 import models.JsonViews;
 import models.User;
-import controllers.Admin;
-import play.Play;
 import play.libs.Akka;
 import play.libs.Json;
 import play.mvc.BodyParser;
@@ -32,10 +21,14 @@ import play.mvc.Result;
 import play.mvc.Security;
 import scala.concurrent.duration.Duration;
 import utils.DeploymentManager;
-import utils.StringUtils;
-import static utils.StringUtils.getCleanName;
 
-@Security.Authenticated(Admin.class)
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.NullNode;
+
+import controllers.Secured;
+
+@Security.Authenticated(Secured.class)
 public class DeploymentController extends Controller {
     private static JsonManager<Deployment> json =
             new JsonManager<Deployment>(Deployment.class, JsonViews.UserInterface.class);
