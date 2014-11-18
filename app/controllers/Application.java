@@ -17,6 +17,10 @@ import controllers.api.UserController;
 import models.User;
 import play.*;
 import play.libs.Akka;
+import play.libs.F.Function;
+import play.libs.F.Promise;
+import play.libs.ws.WS;
+import play.libs.ws.WSResponse;
 import play.libs.Json;
 import play.mvc.*;
 import scala.concurrent.duration.Duration;
@@ -66,16 +70,31 @@ public class Application extends Controller {
      * @param id
      * @return
      */
-    public static Result edit (Long id) {
+    public static Promise<Result> edit (final Long id) {
+        // get a token for this agency only
+        
         String url = Play.application().configuration().getString("application.editor.public_url");
         
         if (!url.endsWith("/"))
             url = url + "/";
         
-        // TODO: key handling
-        url = url + "search/?agencyId=" + id.toString();
+        final String baseUrl = url;
         
-        return redirect(url);
+        url += "get_token?agency=" + id.toString();
+        url += "&client_id=" +  Play.application().configuration().getString("application.oauth.client_id");
+        url += "&client_secret=" +  Play.application().configuration().getString("application.oauth.client_secret");
+        
+        return WS.url(url).get().map(new Function<WSResponse, Result> () {
+            public Result apply (WSResponse wsr) {
+                if (wsr.getStatus() != 200) {
+                    Logger.error("Could not get OAuth token to edit agency {}", id);
+                    return internalServerError();
+                }
+                else {
+                    return redirect(baseUrl + "search/?oauth_token=" + wsr.getBody() + "&agencyId=" + id);
+                }
+            }
+        });
     }
     
     public static Result logout () {
