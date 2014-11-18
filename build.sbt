@@ -1,6 +1,30 @@
+import com.typesafe.sbt.SbtNativePackager._
+import com.typesafe.sbt.packager.archetypes.ServerLoader
+import NativePackagerKeys._
+
 name := """gtfs-data-manager"""
 
-version := "1.0-SNAPSHOT"
+packageArchetype.java_server
+
+version := "0.1.1"
+
+serverLoading in Rpm := ServerLoader.SystemV
+
+serverLoading in Debian := ServerLoader.SystemV
+
+maintainer in Linux := "Matthew Wigginton Conway <mconway@conveyal.com>"
+
+packageSummary in Linux := "GTFS Data Manager"
+
+packageDescription := "GTFS Data Manager"
+
+rpmRelease := "1"
+
+rpmVendor := "conveyal.com"
+
+rpmUrl := Some("http://github.com/conveyal/gtfs-data-manager")
+
+rpmLicense := Some("MIT")
 
 lazy val root = (project in file(".")).enablePlugins(PlayJava)
 
