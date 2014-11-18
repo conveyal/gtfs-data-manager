@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -18,6 +19,9 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import play.Logger;
+import play.Play;
+import play.libs.ws.WS;
+import play.libs.ws.WSResponse;
 import utils.DataStore;
 
 
@@ -143,6 +147,56 @@ public class FeedSource extends Model {
         // fetching it, we will not miss a new feed.
         FeedVersion newFeed = new FeedVersion(this);
         
+        // build the URL from which to fetch
+        URL url;
+        String oauthToken = null;
+        if (this.retrievalMethod.equals(FeedRetrievalMethod.FETCHED_AUTOMATICALLY))
+            url = this.url;
+        else if (this.retrievalMethod.equals(FeedRetrievalMethod.PRODUCED_IN_HOUSE)) {
+            if (this.editorId == null) {
+                Logger.error("Feed {} has no editor id; cannot fetch", this); 
+                return null;
+            }
+            
+            // get an OAuth token, etc.
+            String baseUrl = Play.application().configuration().getString("application.editor.internal_url");
+            
+            if (!baseUrl.endsWith("/"))
+                baseUrl += "/";
+            
+            String tokenUrl = baseUrl + "get_token?client_id=" + Play.application().configuration().getString("application.oauth.client_id");
+            tokenUrl += "&client_secret=" + Play.application().configuration().getString("application.oauth.client_secret");
+            
+            WSResponse resp;
+            try {
+                resp = WS.url(tokenUrl).get().get(30 * 1000L);
+            } catch (Exception e) {
+                Logger.error("Could not get OAuth token, skipping feed {}", this);
+                return null;
+            }
+            
+            if (resp.getStatus() != 200) {
+                Logger.error("Could not get OAuth token (status {}), skipping feed {}", resp.getStatus(), this);
+                return null;
+            }
+            
+            oauthToken = resp.getBody();
+            
+            // build the URL
+            try {
+                url = new URL(baseUrl + "export/creategtfs?agencySelect=" + this.editorId.toString());
+            } catch (MalformedURLException e) {
+                Logger.error("Invalid URL for editor, check your config.");
+                return null;
+            }
+        }
+        else {
+            Logger.error("Unknown retrieval method" + this.retrievalMethod);
+            return null;
+        }
+        
+        Logger.info(url.toString());
+        
         // make the request, using the proper HTTP caching headers to prevent refetch, if applicable
         HttpURLConnection conn;
         try {
@@ -154,6 +208,9 @@ public class FeedSource extends Model {
         }
         
         conn.setDefaultUseCaches(true);
+        
+        if (oauthToken != null)
+            conn.addRequestProperty("Authorization", "Bearer " + oauthToken);
         
         if (latest != null)
             conn.setIfModifiedSince(latest.updated.getTime());
