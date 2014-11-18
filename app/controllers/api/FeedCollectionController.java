@@ -6,6 +6,11 @@ import java.util.Map;
 import models.FeedCollection;
 import models.JsonViews;
 import models.User;
+import play.Play;
+import play.libs.F.Function;
+import play.libs.F.Promise;
+import play.libs.ws.WS;
+import play.libs.ws.WSResponse;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
@@ -101,5 +106,45 @@ public class FeedCollectionController extends Controller {
         c.save();
         
         return ok(json.write(c)).as("application/json");
+    }
+    
+    public static Promise<Result> getEditorAgencies () {
+        // first, get a token
+        String url = Play.application().configuration().getString("application.editor.internal_url");
+        
+        if (!url.endsWith("/"))
+            url += "/";
+        
+        final String baseUrl = url;
+        
+        String tokenUrl = baseUrl + "get_token";
+        tokenUrl += "?client_id=" + Play.application().configuration().getString("application.oauth.client_id");
+        tokenUrl += "&client_secret=" + Play.application().configuration().getString("application.oauth.client_secret");
+        
+        final Promise<String> tokenPromise = WS.url(tokenUrl).get().map(new Function<WSResponse, String> () {
+            public String apply(WSResponse wsr) throws Throwable {
+                if (wsr.getStatus() != 200)
+                    return null;
+                
+                else
+                    return wsr.getBody();
+            }
+        });
+        
+        final Promise<WSResponse> agencyPromise = tokenPromise.flatMap(new Function<String, Promise<WSResponse>> () {
+            public Promise<WSResponse> apply(String token) throws Throwable {
+                String agencyUrl = baseUrl + "api/agency?oauth_token=" + token;
+                return WS.url(agencyUrl).get();
+            }
+        });
+        
+        return agencyPromise.map(new Function<WSResponse, Result> () {
+            public Result apply (WSResponse wsr) {
+                if (wsr.getStatus() != 200)
+                    return internalServerError();
+                else
+                    return ok(wsr.getBody()).as("application/json");
+            }
+        });
     }
 }

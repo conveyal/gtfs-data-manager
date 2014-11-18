@@ -6,6 +6,7 @@
 POST    /authenticate                   controllers.Application.authenticate()
 
 # API CRUD stuff
+GET     /api/feedcollections/geteditoragencies controllers.api.FeedCollectionController.getEditorAgencies()
 GET      /api/feedcollections/:id       controllers.api.FeedCollectionController.get(id:String)
 GET      /api/feedcollections           controllers.api.FeedCollectionController.getAll()
 PUT      /api/feedcollections/:id       controllers.api.FeedCollectionController.update(id:String)
