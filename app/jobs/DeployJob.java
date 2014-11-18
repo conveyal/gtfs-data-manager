@@ -27,15 +27,19 @@ public class DeployJob implements Runnable {
     /** The URLs to deploy to */
     private List<String> targets;
     
+    /** The base URL to otp.js on these targets */
+    private String publicUrl;
+    
     /** The number of servers that have successfully been deployed to */
     private DeployStatus status;
     
     /** The deployment to deploy */
     private Deployment deployment;
     
-    public DeployJob(Deployment deployment, List<String> targets) {
+    public DeployJob(Deployment deployment, List<String> targets, String publicUrl) {
         this.deployment = deployment;
         this.targets = targets;
+        this.publicUrl = publicUrl;
         this.status = new DeployStatus();
         status.error = false;
         status.completed = false;
@@ -251,6 +255,7 @@ public class DeployJob implements Runnable {
         
         synchronized (status) {
             status.completed = true;
+            status.baseUrl = this.publicUrl;
         }
     }
     
@@ -279,6 +284,9 @@ public class DeployJob implements Runnable {
         /** How many servers are we attempting to deploy to? */
         public int totalServers;
         
+        /** Where can the user see the result? */
+        public String baseUrl;
+        
         public DeployStatus clone () {
             DeployStatus ret = new DeployStatus();
             ret.message = message;
@@ -288,6 +296,7 @@ public class DeployJob implements Runnable {
             ret.uploading = uploading;
             ret.numServersCompleted = numServersCompleted;
             ret.totalServers = totalServers;
+            ret.baseUrl = baseUrl;
             return ret;
         }
     }

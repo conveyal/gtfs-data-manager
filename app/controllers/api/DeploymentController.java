@@ -167,7 +167,7 @@ public class DeploymentController extends Controller {
         d.deployedTo = target;
         d.save();
         
-        DeployJob job = new DeployJob(d, targetUrls);
+        DeployJob job = new DeployJob(d, targetUrls, DeploymentManager.getPublicUrl(target));
         
         deploymentJobsByServer.put(target, job);
         

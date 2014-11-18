@@ -17,6 +17,15 @@ public class DeploymentManager {
     
     /** Get the servers for a particular deployment */
     public static List<String> getDeploymentUrls (String name) {
-        return ((Map<String, List<String>>) Play.application().configuration().getObject("application.deployment.servers")).get(name);
+        Map<String, Map<String, Object>> servers = 
+                (Map<String, Map<String, Object>>) Play.application().configuration().getObject("application.deployment.servers");
+        return (List<String>) servers.get(name).get("internal");
+    }
+
+    /** Get the public otp.js server for a particular deployment */
+    public static String getPublicUrl(String name) {
+        Map<String, Map<String, Object>> servers = 
+                (Map<String, Map<String, Object>>) Play.application().configuration().getObject("application.deployment.servers");
+        return (String) servers.get(name).get("public");
     }
 }

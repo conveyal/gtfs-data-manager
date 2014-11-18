@@ -34,9 +34,12 @@ module.exports = Backbone.Marionette.ItemView.extend({
             this.$('.progress-bar').addClass('progress-bar-success');
 
             // set up the link to view it
-            var href = 'otp.js/client/index.html#start/';
+            var href = data.baseUrl;
 
-            // calculate the centroid latitude
+            if (href.slice(-1) != '/')
+              href += '/';
+
+            // calculate the centroid latitude and longitude
             var bounds = this.deployment.get('bounds');
             var lat = (bounds.north + bounds.south) / 2;
             var lon = (bounds.east + bounds.west) / 2;
@@ -74,7 +77,8 @@ module.exports = Backbone.Marionette.ItemView.extend({
             }
 
             var routerId = this.deployment.get('routerId');
-            href += lat + '/' + lon + '/' + z + '/' + (!_.isUndefined(routerId) && routerId !== null ? routerId : 'default');
+            href += '#start/' + lat + '/' + lon + '/' + z + '/' +
+              (!_.isUndefined(routerId) && routerId !== null ? routerId : 'default');
 
             this.$('#result-link').attr('href', href)
               .removeClass('hidden');
