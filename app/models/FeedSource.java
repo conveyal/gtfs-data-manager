@@ -269,8 +269,15 @@ public class FeedSource extends Model {
         }
         else {
             newFeed.userId = this.userId;
-            newFeed.validate();
+            newFeed.validate();            
             newFeed.save();
+            
+            FeedVersion prev = newFeed.getPreviousVersion();
+            if (prev != null) {
+                prev.nextVersionId = newFeed.id;
+                prev.save();
+            }                        
+            
             return newFeed;
         }
     }
