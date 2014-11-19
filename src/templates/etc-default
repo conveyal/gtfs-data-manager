@@ -1,1 +1,4 @@
 -Dpidfile.path=/var/run/${{app_name}}/play.pid
+# See https://github.com/sbt/sbt-native-packager/issues/361
+# Note: this will break on non-Unix systems
+-Dconfig.file=/etc/${{app.name}}/application.conf
