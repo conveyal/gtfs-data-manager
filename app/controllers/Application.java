@@ -73,12 +73,17 @@ public class Application extends Controller {
     public static Promise<Result> edit (final Long id) {
         // get a token for this agency only
         
-        String url = Play.application().configuration().getString("application.editor.public_url");
+        String url = Play.application().configuration().getString("application.editor.internal_url");
         
         if (!url.endsWith("/"))
             url = url + "/";
         
-        final String baseUrl = url;
+        String publicUrl = Play.application().configuration().getString("application.editor.public_url");
+        
+        if (!publicUrl.endsWith("/"))
+            publicUrl += "/";
+        
+        final String baseUrl = publicUrl;
         
         url += "get_token?agency=" + id.toString();
         url += "&client_id=" +  Play.application().configuration().getString("application.oauth.client_id");
