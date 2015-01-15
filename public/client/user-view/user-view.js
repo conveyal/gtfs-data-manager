@@ -42,6 +42,16 @@ module.exports = Backbone.Marionette.ItemView.extend({
   },
 
   updateModel: function() {
+    // only set the username on a new user
+    if (!this.model.id) {
+      var username = this.$('#username').val();
+      if (username)
+        this.model.set('username', username);
+      else
+        // TODO: alert what went wrong
+        return false;
+    }
+
     this.model.set('email', this.$('#email').val());
 
     var pass = this.$('#password').val();
@@ -56,14 +66,25 @@ module.exports = Backbone.Marionette.ItemView.extend({
         active: this.$('#active').is(':checked')
       });
     }
+
+    return true;
   },
 
   saveChanges: function () {
     if (!this.validatePassword())
       return false;
 
-    this.updateModel();
-    this.model.save();
+    if (!this.updateModel())
+      return false;
+
+    var id = this.model.id;
+
+    // if it's a new user, send them back to the user list
+    this.model.save().done(function () {
+      if (id) {
+        window.location.hash = '#users';
+      }
+    })
 
     this.$('.password').val('');
 

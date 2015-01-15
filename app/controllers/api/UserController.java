@@ -75,17 +75,17 @@ public class UserController extends Controller {
     }
     
     public static Result create () throws JsonParseException, JsonMappingException, IOException {
-        Map<String,String[]> params = request().body().asFormUrlEncoded();
+        JsonNode params = request().body().asJson();
         
         User currentUser = User.getUserByUsername(session("username"));
         
         if (!(Boolean.TRUE.equals(currentUser.admin)))
             return unauthorized();
         
-        User u = new User(params.get("username")[0], params.get("password")[0], params.get("email")[0]);
+        User u = new User(params.get("username").asText(), params.get("password").asText(), params.get("email").asText());
         
-        if (params.containsKey("admin"))
-            u.admin = "true".equals(params.get("admin")[0]);
+        if (params.has("admin"))
+            u.admin = "true".equals(params.get("admin").asText());
         
         u.save();
         

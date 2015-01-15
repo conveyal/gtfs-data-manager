@@ -18,7 +18,8 @@ var Router = Backbone.Router.extend({
     "deployment/:deploymentId": "deployment",
     "deployments/:feedCollectionId": "deployments",
     "user/:userid": "user",
-    "users": "users"
+    "users": "users",
+    "users/new": "newUser"
   },
 
   login: require('login-route'),
@@ -30,7 +31,8 @@ var Router = Backbone.Router.extend({
   deployment: require('deployment-route'),
   deployments: require('deployment-collection-route'),
   users: require('user-collection-route'),
-  user: require('user-route')
+  user: require('user-route'),
+  newUser: require('new-user-route')
 });
 
 // start up the app

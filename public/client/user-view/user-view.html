@@ -1,8 +1,15 @@
 <form>
-  <h1>{{ t 'app.user.edit' username }}</h1>
+  {{#if id}}
+    <h1>{{ t 'app.user.edit' username }}</h1>
+  {{else}}
+    <div class="form-group">
+      <label for="username">{{ t 'app.user.username' }}</label>
+      <input type="text" id="username" class="form-control" value="{{ username }}" />
+    </div>
+  {{/if}}
 
   <div class="form-group">
-    <label for="username">{{ t 'app.user.email' }}</label>
+    <label for="email">{{ t 'app.user.email' }}</label>
     <input type="text" id="email" class="form-control" value="{{ email }}" />
   </div>
 

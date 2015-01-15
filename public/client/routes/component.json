@@ -17,6 +17,7 @@
     "feed-version-collection-route",
     "deployment-collection-route",
     "user-collection-route",
-    "user-route"
+    "user-route",
+    "new-user-route"
   ]
 }
