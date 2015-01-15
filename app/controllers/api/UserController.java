@@ -25,6 +25,12 @@ public class UserController extends Controller {
         return json;
     }
     
+    /** Get all of the users 
+     * @throws JsonProcessingException */
+    public static Result getAll () throws JsonProcessingException {
+        return ok(json.write(User.getAll()));
+    }
+    
     public static Result get (String id) throws JsonProcessingException {
         User currentUser = User.getUserByUsername(session("username"));
         User u = User.getUser(id);

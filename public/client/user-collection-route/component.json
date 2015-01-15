@@ -1,0 +1,7 @@
+{
+  "name": "user-collection-route",
+  "description": "The route for showing all users.",
+  "locals": ["application", "user-collection", "user-collection-view"],
+  "main": "user-collection-route.js",
+  "scripts": ["user-collection-route.js"]
+}

@@ -16,7 +16,8 @@ var Router = Backbone.Router.extend({
     "feed/:feedSourceId": "feedsource",
     "versions/:feedSourceId": "versions",
     "deployment/:deploymentId": "deployment",
-    "deployments/:feedCollectionId": "deployments"
+    "deployments/:feedCollectionId": "deployments",
+    "users": "users"
   },
 
   login: require('login-route'),
@@ -26,7 +27,8 @@ var Router = Backbone.Router.extend({
   autologin: require('autologin-route'),
   versions: require('feed-version-collection-route'),
   deployment: require('deployment-route'),
-  deployments: require('deployment-collection-route')
+  deployments: require('deployment-collection-route'),
+  users: require('user-collection-route')
 });
 
 // start up the app

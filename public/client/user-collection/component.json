@@ -1,0 +1,10 @@
+{
+  "name": "user-collection",
+  "dependencies": {
+    "jashkenas/backbone": "*",
+    "jashkenas/underscore": "*"
+  },
+  "locals": ["user"],
+  "main": "user-collection.js",
+  "scripts": ["user-collection.js"]
+}

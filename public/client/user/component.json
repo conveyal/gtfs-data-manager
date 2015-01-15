@@ -1,0 +1,9 @@
+{
+  "name": "user",
+  "dependencies": {
+    "jashkenas/backbone": "*",
+    "jashkenas/underscore": "*"
+  },
+  "main": "user.js",
+  "scripts": ["user.js"]
+}
