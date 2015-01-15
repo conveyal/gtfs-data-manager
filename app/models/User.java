@@ -26,7 +26,7 @@ public class User implements Serializable {
 
     public String id;
     public String username;
-    
+
     @JsonView(JsonViews.DataDump.class)
     public String passwordHash;
     public String email;
@@ -57,20 +57,12 @@ public class User implements Serializable {
         }
         else {
             this.key = null;
-            try {
-
-                byte[] bytesOfMessage = password.getBytes("UTF-8");	
-
-                this.passwordHash = DigestUtils.shaHex(bytesOfMessage);
-
-            }
-            catch(Exception e) {
-
+            
+            if (!this.setPassword(password)) {
                 this.active = false;
                 this.passwordHash = null;
             }
         }
-
     }
 
     /**
@@ -79,6 +71,22 @@ public class User implements Serializable {
      */
     public User () {
         // do nothing
+    }
+    
+    /**
+     * Set the password for this user.
+     */
+    public boolean setPassword (String password) {
+        if (this.key != null || password == null || "".equals(password))
+            return false;
+        
+        try {
+            byte[] bytesOfMessage = password.getBytes("UTF-8");
+            this.passwordHash = DigestUtils.shaHex(bytesOfMessage);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /**

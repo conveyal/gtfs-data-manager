@@ -1,0 +1,13 @@
+{
+  "name": "user-view",
+  "dependencies" : {
+    "jashkenas/backbone": "*",
+    "marionettejs/backbone.marionette": "*",
+    "components/handlebars.js": "*"
+  },
+  "description": "A view used to edit a single user",
+  "main": "user-view.js",
+  "locals": ["application"],
+  "scripts": ["user-view.js"],
+  "templates": ["user-view.html"]
+}

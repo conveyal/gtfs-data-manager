@@ -16,6 +16,7 @@
     "autologin-route",
     "feed-version-collection-route",
     "deployment-collection-route",
-    "user-collection-route"
+    "user-collection-route",
+    "user-route"
   ]
 }

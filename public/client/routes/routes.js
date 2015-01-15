@@ -17,6 +17,7 @@ var Router = Backbone.Router.extend({
     "versions/:feedSourceId": "versions",
     "deployment/:deploymentId": "deployment",
     "deployments/:feedCollectionId": "deployments",
+    "user/:userid": "user",
     "users": "users"
   },
 
@@ -28,7 +29,8 @@ var Router = Backbone.Router.extend({
   versions: require('feed-version-collection-route'),
   deployment: require('deployment-route'),
   deployments: require('deployment-collection-route'),
-  users: require('user-collection-route')
+  users: require('user-collection-route'),
+  user: require('user-route')
 });
 
 // start up the app

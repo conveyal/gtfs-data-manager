@@ -1,0 +1,35 @@
+<form>
+  <h1>{{ t 'app.user.edit' username }}</h1>
+
+  <div class="form-group">
+    <label for="username">{{ t 'app.user.email' }}</label>
+    <input type="text" id="email" class="form-control" value="{{ email }}" />
+  </div>
+
+  <div class="form-group">
+    <label for="password">{{ t 'app.user.password' }}</label>
+    <input type="password" class="password form-control" id="password" />
+  </div>
+
+  <div class="form-group">
+    <label for="retype-password">{{ t 'app.user.retype-password' }}</label>
+    <input type="password" class="password form-control" id="retype-password" />
+    <span id="dont-match" class="text-danger hidden">{{ t 'app.user.passwords-dont-match'}}</span>
+  </div>
+
+  {{#if currentUser.admin }}
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" id="admin" {{ ? admin 'checked' '' }} /> {{ t 'app.user.admin' }}
+      </label>
+    </div>
+
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" id="active" {{ ? active 'checked' '' }} /> {{ t 'app.user.active' }}
+      </label>
+    </div>
+  {{/if}}
+
+  <input type="submit" class="btn btn-primary" value="{{ t 'app.user.save-changes' }}" />
+</form>
