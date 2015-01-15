@@ -9,5 +9,8 @@ module.exports = function () {
     }));
 
     app.appRegion.show(new UserCollectionView({collection: d}));
+    app.nav.setLocation([
+        {name: window.Messages('app.users'), href: '#users'}
+      ]);
   });
 };

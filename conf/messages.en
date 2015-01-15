@@ -144,3 +144,4 @@ app.user.username=Username
 app.user.email=Email
 app.user.admin=Administrator
 app.user.active=Active
+app.users=Users
