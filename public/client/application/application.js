@@ -40,10 +40,15 @@ app.addInitializer(function () {
                 if (data.status == 'logged_out') {
                     $('#logout').addClass("hidden");
                     $('#logged-in-user').text('');
+                    $('#manageUsers').addClass('hidden');
+                    $('#myAccount').addClass('hidden');
                     window.location.hash = '#login';
                 }
             });
         });
+
+    $('#manageUsers').text(window.Messages("app.user.manage-users"));
+    $('#myAccount').text(window.Messages("app.user.my-account"));
 });
 
 module.exports = app;

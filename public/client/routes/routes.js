@@ -49,8 +49,14 @@ $(document).ready(function() {
       Backbone.history.start();
     })
     .done(function(data) {
-      $('#logged-in-user').text(window.Messages('app.account.logged_in_as', data['username']));
+      $('#logged-in-user').text(window.Messages('app.account.logged_in_as', data.username));
       $('#logout').removeClass('hidden');
+
+      $('#myAccount').removeClass('hidden').attr('href', '#user/' + data.id);
+
+      if (data.admin)
+        $('#manageUsers').removeClass('hidden');
+        
       app.user = data;
     })
     .fail(function() {

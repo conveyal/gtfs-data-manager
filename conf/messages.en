@@ -150,4 +150,6 @@ app.user.save-changes=Save changes
 app.user.passwords-dont-match=Passwords don't match
 app.user.edit=Editing user {0}
 app.user.new=New user
+app.user.manage-users=Manage users
+app.user.my-account=My account
 app.users=Users
