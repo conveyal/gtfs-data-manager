@@ -2,6 +2,7 @@ var DeploymentCollection = require('deployment-collection');
 var DeploymentCollectionView = require('deployment-collection-view');
 var FeedCollection = require('feed-collection');
 var app = require('application');
+var _ = require('underscore');
 var $ = require('jquery');
 
 module.exports = function (feedCollectionId) {
@@ -12,6 +13,13 @@ module.exports = function (feedCollectionId) {
   var fcDf = fc.fetch();
 
   $.when(dDf, fcDf).done(function () {
+    d = d.filter(function (deployment) {
+      var fsId = deployment.get('feedSourceId');
+      return fsId === null || _.isUndefined(fsId);
+    });
+
+    d = new DeploymentCollection(d);
+
     app.appRegion.show(new DeploymentCollectionView({collection: d, model: fc}));
 
     // nav
