@@ -11,6 +11,7 @@ import models.JsonViews;
 import models.Model;
 import models.Note;
 import models.Note.NoteType;
+import models.User.ProjectPermissions;
 import models.User;
 import controllers.Secured;
 import play.mvc.Controller;
@@ -52,9 +53,29 @@ public class NoteController extends Controller {
             // this shouldn't ever happen, but Java requires that every case be covered somehow so model can't be used uninitialized
             return badRequest("Unsupported type for notes");
         }
+        
+        FeedSource s;
+        
+        if (model instanceof FeedSource) {
+            s = (FeedSource) model;
+        }
+        else {
+            s = ((FeedVersion) model).getFeedSource();
+        }
      
+        boolean hasPermission = false;
+        
+        if (currentUser.projectPermissions != null) {
+            for (ProjectPermissions p : currentUser.projectPermissions) {
+                if (s.id.equals(p.project_id) && p.write) {
+                    hasPermission = true;
+                    break;                            
+                }
+            }
+        }
+        
         // check if the user has permission
-        if (Boolean.TRUE.equals(currentUser.admin) || currentUser.equals(model.getUser())) {
+        if (currentUser.admin || currentUser.equals(s.getUser()) || hasPermission) {
             return ok(json.write(model.getNotes())).as("application/json");
         }
         else {
@@ -94,9 +115,29 @@ public class NoteController extends Controller {
             // this shouldn't ever happen, but Java requires that every case be covered somehow so model can't be used uninitialized
             return badRequest("Unsupported type for notes");
         }
+        
+        FeedSource s;
+        
+        if (model instanceof FeedSource) {
+            s = (FeedSource) model;
+        }
+        else {
+            s = ((FeedVersion) model).getFeedSource();
+        }
      
+        boolean hasPermission = false;
+        
+        if (currentUser.projectPermissions != null) {
+            for (ProjectPermissions p : currentUser.projectPermissions) {
+                if (s.id.equals(p.project_id) && p.write) {
+                    hasPermission = true;
+                    break;                            
+                }
+            }
+        }
+        
         // check if the user has permission
-        if (Boolean.TRUE.equals(currentUser.admin) || currentUser.equals(model.getUser())) {
+        if (currentUser.admin || currentUser.equals(s.getUser()) || hasPermission) {
             Note n = new Note();
             n.note = params.get("note").asText();
             // folks can't make comments as other folks
