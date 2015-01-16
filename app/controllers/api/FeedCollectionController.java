@@ -20,20 +20,19 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
-import controllers.Admin;
+import controllers.Secured;
 
-@Security.Authenticated(Admin.class)
+@Security.Authenticated(Secured.class)
 public class FeedCollectionController extends Controller {
     private static JsonManager<FeedCollection> json = 
             new JsonManager<FeedCollection>(FeedCollection.class, JsonViews.UserInterface.class);
     
     public static Result getAll () throws JsonProcessingException {
-        // TODO: Only show FeedCollections this user has permission to access
-        User u = User.getUserByUsername(session("username"));
-        if (u.admin)
-            return ok(json.write(FeedCollection.getAll())).as("application/json");
-        else
-            return unauthorized();
+        // it's fine to show all feed collections here. they're just folders, the user knows
+        // nothing about what is in them.
+        // TODO: When we get to a point where we're managing lots of them, for multiple clients on the same server
+        // we'll want to change this.
+        return ok(json.write(FeedCollection.getAll())).as("application/json");
     }
     
     public static Result get (String id) throws JsonProcessingException {
@@ -47,23 +46,18 @@ public class FeedCollectionController extends Controller {
         
         User currentUser = User.getUserByUsername(session("username"));
         
-        if (!Boolean.TRUE.equals(currentUser.admin))
+        if (!currentUser.admin)
             return unauthorized();
         
         JsonNode params = request().body().asJson();
                 
-        // Only allow admins or feed collection owners to rename FeedCollections
-        // TODO: feed collection admins
-        
-        if (Boolean.TRUE.equals(currentUser.admin) || currentUser.equals(c.getUser())) {
-            JsonNode name = params.get("name");
-            if (name != null) {
-                c.name = name.asText();
-            }
+        JsonNode name = params.get("name");
+        if (name != null) {
+            c.name = name.asText();
         }
         
         // only allow admins to change feed collection owners
-        if (Boolean.TRUE.equals(currentUser.admin)) {
+        if (currentUser.admin) {
             JsonNode uname = params.get("user");
         
             // TODO: test
@@ -83,7 +77,7 @@ public class FeedCollectionController extends Controller {
     public static Result create () throws JsonParseException, JsonMappingException, IOException {
         User currentUser = User.getUserByUsername(session("username"));
         
-        if (!Boolean.TRUE.equals(currentUser.admin))
+        if (!currentUser.admin)
             return unauthorized();
         
         JsonNode params = request().body().asJson();

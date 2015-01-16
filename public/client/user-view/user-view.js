@@ -40,36 +40,38 @@ module.exports = Backbone.Marionette.ItemView.extend({
   onShow: function () {
     var instance = this;
 
-    // initialize the select box
-    var feedSources = new FeedSourceCollection();
+    // initialize the select box, if the user is an admin
+    if (app.user.admin) {
+      var feedSources = new FeedSourceCollection();
 
-    var userFeedSources = _.pluck(this.model.get('projectPermissions'), 'project_id');
+      var userFeedSources = _.pluck(this.model.get('projectPermissions'), 'project_id');
 
-    feedSources.fetch().done(function () {
-      feedSources.each(function (feedSource) {
-        var og = instance.$('optgroup#' + feedSource.get('feedCollection').id);
+      feedSources.fetch().done(function() {
+        feedSources.each(function(feedSource) {
+          var og = instance.$('optgroup#' + feedSource.get('feedCollection').id);
 
-        if (og.length === 0) {
-          og = $('<optgroup>')
-            .attr('id', feedSource.get('feedCollection').id)
-            .attr('label', feedSource.get('feedCollection').name);
+          if (og.length === 0) {
+            og = $('<optgroup>')
+              .attr('id', feedSource.get('feedCollection').id)
+              .attr('label', feedSource.get('feedCollection').name);
             og.appendTo(instance.$('#feedsources'));
-        }
+          }
 
-        var opt = $('<option>')
-          .attr('value', feedSource.id)
-          .text(feedSource.get('name'));
+          var opt = $('<option>')
+            .attr('value', feedSource.id)
+            .text(feedSource.get('name'));
 
-        if (userFeedSources.indexOf(feedSource.id) !== -1) {
-          opt.attr('selected', true);
-        }
+          if (userFeedSources.indexOf(feedSource.id) !== -1) {
+            opt.attr('selected', true);
+          }
 
-        opt.appendTo(og);
+          opt.appendTo(og);
 
+        });
+
+        instance.$('#feedsources').select2();
       });
-
-      instance.$('#feedsources').select2();
-    });
+    }
   },
 
   serializeData: function() {
@@ -95,15 +97,6 @@ module.exports = Backbone.Marionette.ItemView.extend({
 
     var projectPermissions = [];
 
-    _.each(this.$('#feedsources').val(), function (fsid) {
-      projectPermissions.push({
-        project_id: fsid,
-        read: true,
-        write: true,
-        admin: false // not used
-      });
-    });
-
     this.model.set('projectPermissions', projectPermissions);
 
     var pass = this.$('#password').val();
@@ -113,6 +106,15 @@ module.exports = Backbone.Marionette.ItemView.extend({
     }
 
     if (app.user.admin) {
+      _.each(this.$('#feedsources').val(), function (fsid) {
+        projectPermissions.push({
+          project_id: fsid,
+          read: true,
+          write: true,
+          admin: false // not used
+        });
+      });
+
       this.model.set({
         admin: this.$('#admin').is(':checked'),
         active: this.$('#active').is(':checked')

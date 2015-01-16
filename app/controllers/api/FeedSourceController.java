@@ -2,6 +2,11 @@ package controllers.api;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import jobs.FetchSingleFeedJob;
 
@@ -14,6 +19,7 @@ import models.FeedCollection;
 import models.FeedSource;
 import models.JsonViews;
 import models.User;
+import models.User.ProjectPermissions;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -33,22 +39,45 @@ public class FeedSourceController extends Controller {
     public static Result getAll () throws JsonProcessingException {
         User currentUser = User.getUserByUsername(session("username"));
         
-        if (!Boolean.TRUE.equals(currentUser.admin)) {
-            return unauthorized();
-        }
-        
         // parse the query parameters
         String fcId = request().getQueryString("feedcollection");
         FeedCollection fc = null;
         if (fcId != null)
             fc = FeedCollection.get(fcId);
  
+        Collection<FeedSource> feedSources;
         if (fc == null) {
-            return ok(json.write(FeedSource.getAll())).as("application/json");
+            feedSources = FeedSource.getAll();
         }
         else {
-            return ok(json.write(fc.getFeedSources())).as("application/json");
+            feedSources = fc.getFeedSources();
         }
+        
+        if (!currentUser.admin) {
+            if (currentUser.projectPermissions == null)
+                return unauthorized();
+            
+            Set<String> canRead = new HashSet<String>(currentUser.projectPermissions.size());
+            
+            for (ProjectPermissions p : currentUser.projectPermissions) {
+                if (p.read != null && p.read) {
+                    canRead.add(p.project_id);
+                }
+            }
+            
+            // filter the list, only show the ones this user has permission to access
+            List<FeedSource> filtered = new ArrayList<FeedSource>();
+            
+            for (FeedSource fs : feedSources) {
+                if (canRead.contains(fs.id)) {
+                    filtered.add(fs);
+                }
+            }
+            
+            feedSources = filtered;
+        }
+        
+        return ok(json.write(feedSources)).as("application/json");
     }
     
     // common code between create and update
@@ -79,7 +108,7 @@ public class FeedSourceController extends Controller {
 
         // admins can update anything; non-admins cannot update anything (imagine the havoc if an agency changed their retrieval method,
         // or set a non-public feed to public)
-        if (Boolean.TRUE.equals(currentUser.admin)) {
+        if (currentUser.admin) {
             JsonNode params = request().body().asJson();
             applyJsonToFeedSource(s, params);
             s.save();
@@ -98,7 +127,7 @@ public class FeedSourceController extends Controller {
         FeedCollection c = FeedCollection.get(params.get("feedCollection").get("id").asText());
         
         // TODO: access control
-        if (Boolean.TRUE.equals(currentUser.admin) || currentUser.equals(c.getUser())) {
+        if (currentUser.admin) {
             FeedSource s = new FeedSource(params.get("name").asText());
             // not setting user because feed sources are automatically assigned a unique user
             s.setFeedCollection(c);
@@ -117,7 +146,7 @@ public class FeedSourceController extends Controller {
     public static Result delete (String id) {
         User currentUser = User.getUserByUsername(session("username"));
 
-        if (Boolean.TRUE.equals(currentUser.admin)) {
+        if (currentUser.admin) {
             FeedSource s = FeedSource.get(id);
             s.delete();
             return ok();
@@ -134,7 +163,7 @@ public class FeedSourceController extends Controller {
     public static Result getUserIdAndKey (String id) {
         User currentUser = User.getUserByUsername(session("username"));
         
-        if (Boolean.TRUE.equals(currentUser.admin)) {
+        if (currentUser.admin) {
             FeedSource s = FeedSource.get(id);
             User u = s.getUser();
             
@@ -154,15 +183,30 @@ public class FeedSourceController extends Controller {
      */
     public static Result fetch (String id) throws JsonProcessingException {
         User currentUser = User.getUserByUsername(session("username"));
+        FeedSource s = FeedSource.get(id);
         
-        if (Boolean.TRUE.equals(currentUser.admin)) {
-            FeedSource s = FeedSource.get(id);
-            FetchSingleFeedJob job = new FetchSingleFeedJob(s);
-            job.run();
-            return ok(FeedVersionController.getJsonManager().write(job.result)).as("application/json");
+        // does the user have permission to do this through project permissions?
+        boolean hasPermission = false;
+        
+        if (currentUser.projectPermissions != null) {
+            for (ProjectPermissions p : currentUser.projectPermissions) {
+                if (s.id.equals(p.project_id) && p.write) {
+                    hasPermission = true;
+                    break;                            
+                }
+            }
         }
-        else {
+        
+        // three ways to have permission to do this:
+        // 1) be an admin
+        // 2) be the autogenerated user associated with this feed
+        // 3) have access to this feed through project permissions
+        // if all fail, the user cannot do this.
+        if (!currentUser.admin && !currentUser.equals(s.getUser()) && !hasPermission)
             return unauthorized();
-        }
+        
+        FetchSingleFeedJob job = new FetchSingleFeedJob(s);
+        job.run();
+        return ok(FeedVersionController.getJsonManager().write(job.result)).as("application/json");
     }
 }
