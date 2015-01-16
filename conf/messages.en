@@ -153,4 +153,6 @@ app.user.new=New user
 app.user.manage-users=Manage users
 app.user.my-account=My account
 app.user.feed-sources=Feed sources
+app.user.current-password=Current password for user {0}
+app.user.update-failed=The update failed, please check your inputs and try again.
 app.users=Users

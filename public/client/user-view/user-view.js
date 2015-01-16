@@ -14,9 +14,17 @@ module.exports = Backbone.Marionette.ItemView.extend({
     'keyup .password': 'validatePassword',
     'submit form': 'saveChanges'
   },
+
   validatePassword: function() {
     var pass = this.$('#password').val();
     var pass2 = this.$('#retype-password').val();
+
+    // require the current user to enter their password to change a password, but not to create a password
+    // for a new user
+    if (pass.length === pass2.length && pass.length === 0 || !this.model.id)
+      this.$('#current-password-group').addClass('hidden');
+    else
+      this.$('#current-password-group').removeClass('hidden');
 
     if (pass != pass2) {
       this.$('#retype-password').parent().addClass('has-error')
@@ -103,6 +111,9 @@ module.exports = Backbone.Marionette.ItemView.extend({
 
     if (pass !== '') {
       this.model.set('password', pass);
+      // we pass along the current user password as well if we are doing an update. the user must authenticate to change passwords.
+      if (this.model.id)
+        this.model.set('currentUserPassword', this.$('#current-password').val());
     }
 
     if (app.user.admin) {
@@ -125,6 +136,10 @@ module.exports = Backbone.Marionette.ItemView.extend({
   },
 
   saveChanges: function () {
+    var instance = this;
+
+    this.$('#error').addClass('hidden');
+
     if (!this.validatePassword())
       return false;
 
@@ -139,6 +154,9 @@ module.exports = Backbone.Marionette.ItemView.extend({
         window.location.hash = '#users';
       }
     })
+    .fail(function () {
+      instance.$('#error').removeClass('hidden');
+    });
 
     // use the class, clear both fields
     this.$('.password').val('');

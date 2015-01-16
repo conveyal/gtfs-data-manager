@@ -1,3 +1,5 @@
+<div class="hidden alert alert-danger" role="alert" id="error">{{ t 'app.user.update-failed' }}</div>
+
 <form>
   {{#if id}}
     <h1>{{ t 'app.user.edit' username }}</h1>
@@ -22,6 +24,11 @@
     <label for="retype-password">{{ t 'app.user.retype-password' }}</label>
     <input type="password" class="password form-control" id="retype-password" />
     <span id="dont-match" class="text-danger hidden">{{ t 'app.user.passwords-dont-match'}}</span>
+  </div>
+
+  <div class="form-group hidden" id="current-password-group">
+    <label for="current-password">{{ t 'app.user.current-password' currentUser.username }}</label>
+    <input type="password" class="password form-control" id="current-password" />
   </div>
 
   {{#if currentUser.admin }}

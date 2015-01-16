@@ -103,9 +103,14 @@ public class UserController extends Controller {
         if (!(currentUser.equals(u) || Boolean.TRUE.equals(currentUser.admin)))
             return unauthorized();
         
-        if (params.has("password"))
+        if (params.has("password")) {
+            // force the user to re-enter their password
+            if (!params.has("currentUserPassword") || !currentUser.checkPassword(params.get("currentUserPassword").asText()))
+                return unauthorized();
+            
             // validation is handled in the model
             u.setPassword(params.get("password").asText());
+        }
         
         if (params.has("email"))
             u.email = params.get("email").asText();
