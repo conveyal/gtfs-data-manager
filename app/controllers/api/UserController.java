@@ -118,8 +118,6 @@ public class UserController extends Controller {
         if (Boolean.TRUE.equals(currentUser.admin)) {
             applyJsonToUser(u, params);
         }
-        if (params.has("admin"))
-            u.admin = params.get("admin").asBoolean();
         
         u.save();
         
