@@ -43,11 +43,6 @@ $(document).ready(function() {
   $.ajax({
       url: '/loggedInUser'
     })
-    .always(function() {
-      app.start();
-      router = new Router();
-      Backbone.history.start();
-    })
     .done(function(data) {
       $('#logged-in-user').text(window.Messages('app.account.logged_in_as', data.username));
       $('#logout').removeClass('hidden');
@@ -56,7 +51,7 @@ $(document).ready(function() {
 
       if (data.admin)
         $('#manageUsers').removeClass('hidden');
-        
+
       app.user = data;
     })
     .fail(function() {
@@ -64,5 +59,10 @@ $(document).ready(function() {
       // don't let us go to #login/login/login/login/login/overview
       if (window.location.hash.indexOf('login') != 1)
         document.location.hash = '#login/' + window.location.hash.slice(1);
+    })
+    .always(function() {
+      app.start();
+      router = new Router();
+      Backbone.history.start();
     });
 });
