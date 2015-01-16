@@ -152,4 +152,5 @@ app.user.edit=Editing user {0}
 app.user.new=New user
 app.user.manage-users=Manage users
 app.user.my-account=My account
+app.user.feed-sources=Feed sources
 app.users=Users

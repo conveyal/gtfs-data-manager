@@ -3,6 +3,10 @@ Backbone.Marionette = require('backbone.marionette');
 var Handlebars = require('handlebars.js');
 var app = require('application');
 var _ = require('underscore');
+var $ = require('jquery');
+jQuery = $;
+require('select2');
+var FeedSourceCollection = require('feed-source-collection');
 
 module.exports = Backbone.Marionette.ItemView.extend({
   template: Handlebars.compile(require('./user-view.html')),
@@ -33,6 +37,41 @@ module.exports = Backbone.Marionette.ItemView.extend({
     _.bindAll(this, 'validatePassword', 'saveChanges');
   },
 
+  onShow: function () {
+    var instance = this;
+
+    // initialize the select box
+    var feedSources = new FeedSourceCollection();
+
+    var userFeedSources = _.pluck(this.model.get('projectPermissions'), 'project_id');
+
+    feedSources.fetch().done(function () {
+      feedSources.each(function (feedSource) {
+        var og = instance.$('optgroup#' + feedSource.get('feedCollection').id);
+
+        if (og.length === 0) {
+          og = $('<optgroup>')
+            .attr('id', feedSource.get('feedCollection').id)
+            .attr('label', feedSource.get('feedCollection').name);
+            og.appendTo(instance.$('#feedsources'));
+        }
+
+        var opt = $('<option>')
+          .attr('value', feedSource.id)
+          .text(feedSource.get('name'));
+
+        if (userFeedSources.indexOf(feedSource.id) !== -1) {
+          opt.attr('selected', true);
+        }
+
+        opt.appendTo(og);
+
+      });
+
+      instance.$('#feedsources').select2();
+    });
+  },
+
   serializeData: function() {
     // include the current user so that the view can figure out what is fair game for editing
     var ret = {
@@ -53,6 +92,19 @@ module.exports = Backbone.Marionette.ItemView.extend({
     }
 
     this.model.set('email', this.$('#email').val());
+
+    var projectPermissions = [];
+
+    _.each(this.$('#feedsources').val(), function (fsid) {
+      projectPermissions.push({
+        project_id: fsid,
+        read: true,
+        write: true,
+        admin: false // not used
+      });
+    });
+
+    this.model.set('projectPermissions', projectPermissions);
 
     var pass = this.$('#password').val();
 
@@ -81,11 +133,12 @@ module.exports = Backbone.Marionette.ItemView.extend({
 
     // if it's a new user, send them back to the user list
     this.model.save().done(function () {
-      if (id) {
+      if (!id) {
         window.location.hash = '#users';
       }
     })
 
+    // use the class, clear both fields
     this.$('.password').val('');
 
     // always return false so that the form is not submitted
