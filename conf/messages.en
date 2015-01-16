@@ -123,7 +123,7 @@ app.note.new=New comment
 # The label on the submit button for the new comment form
 app.note.create=Comment
 # {0}: username; {1}: date
-app.note.source=by {0} on {1}
+app.note.source=by {0}
 app.note.source_notes=Comments on this feed
 app.note.version_notes=Comments on this version of this feed
 
