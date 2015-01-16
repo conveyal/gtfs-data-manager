@@ -35,7 +35,7 @@ public abstract class Model {
     /**
      * Notes on this object
      */
-    @JsonView(JsonViews.UserInterface.class)
+    @JsonView(JsonViews.DataDump.class)
     public List<String> noteIds;
     
     /**
