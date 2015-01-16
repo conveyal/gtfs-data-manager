@@ -103,6 +103,8 @@ public class FeedCollectionController extends Controller {
     }
     
     public static Promise<Result> getEditorAgencies () {
+        // note: this is accessible to anyone; for now this is fine but in the future we will want to handle this better
+        
         // first, get a token
         String url = Play.application().configuration().getString("application.editor.internal_url");
         

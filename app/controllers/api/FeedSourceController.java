@@ -126,7 +126,6 @@ public class FeedSourceController extends Controller {
         
         FeedCollection c = FeedCollection.get(params.get("feedCollection").get("id").asText());
         
-        // TODO: access control
         if (currentUser.admin) {
             FeedSource s = new FeedSource(params.get("name").asText());
             // not setting user because feed sources are automatically assigned a unique user
