@@ -25,7 +25,7 @@ app.addRegions({
 // initialize breadcrumb navigation
 app.nav = new Breadcrumb();
 
-app.addInitializer(function () {
+app.on('before:start', function () {
     app.navRegion.show(app.nav);
 
     // set up the name

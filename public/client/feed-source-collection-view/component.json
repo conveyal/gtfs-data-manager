@@ -9,7 +9,8 @@
     },
     "local": [
         "feed-source",
-        "feed-source-item-view"
+        "feed-source-item-view",
+        "application"
     ],
     "main": "feed-source-collection-view.js",
     "scripts": ["feed-source-collection-view.js"],
