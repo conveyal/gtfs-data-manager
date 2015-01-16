@@ -17,8 +17,11 @@ var Overview = Backbone.Marionette.LayoutView.extend({
   initialize: function(attr) {
     this.feedCollectionId = attr.feedCollectionId;
 
+    // if the user is defined but is not an admin, show the button
+    var showDeploymentButton = !(app.user && !app.user.admin);
+
     // use a bare model to pass ID to template
-    this.model = new Backbone.Model({feedCollectionId: this.feedCollectionId});
+    this.model = new Backbone.Model({feedCollectionId: this.feedCollectionId, showDeploymentButton: showDeploymentButton});
   },
 
   onShow: function() {

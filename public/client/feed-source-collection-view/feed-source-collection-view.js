@@ -4,6 +4,7 @@ var $ = require('jquery');
 var _ = require('underscore');
 var FeedSource = require('feed-source');
 var Handlebars = require('handlebars');
+var app = require('application');
 
 var FeedSourceItemView = require('feed-source-item-view');
 
@@ -24,6 +25,10 @@ module.exports = Backbone.Marionette.CompositeView.extend({
 
     // default is to show new feed button
     var showNewFeedButton = _.isUndefined(attr.showNewFeedButton) ? true : attr.showNewFeedButton;
+
+    if (app.user && !app.user.admin) {
+      showNewFeedButton = false;
+    }
 
     // use a bare model to pass random bits to the template
     this.model = new Backbone.Model({showNewFeedButton: showNewFeedButton});
