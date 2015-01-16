@@ -34,10 +34,10 @@ application.langs="en"
 # Database configuration
 # ~~~~~
 
-application.data.mapdb=/home/matthewc/conveyal/manager-scratch/mapdb
+application.data.mapdb=data/mapdb
 
 # this must be a dedicated directory
-application.data.gtfs=/home/matthewc/conveyal/manager-scratch/gtfs
+application.data.gtfs=data/gtfs
 
 # Where do we deploy to?
 # Each server (set) has internal URL(s), which are to all of the instances, and a public URL
@@ -47,7 +47,9 @@ application.data.gtfs=/home/matthewc/conveyal/manager-scratch/gtfs
 application.deployment.servers = {
   Production: {
     internal: ["http://localhost:8080/otp"],
-    public: "http://localhost:8291"
+    public: "http://localhost:8291",
+    # setting admin: true means only administrators will be able to deploy to this target
+    admin: true
   },
   # you can run scripts/receiveFile.js to save deployment bundles to /tmp/deployment.zip for inspection.
   Dump: {
