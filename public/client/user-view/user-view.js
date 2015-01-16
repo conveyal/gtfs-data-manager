@@ -158,6 +158,10 @@ module.exports = Backbone.Marionette.ItemView.extend({
       instance.$('#error').removeClass('hidden');
     });
 
+    // no need to keep these floating around on the client
+    this.model.set('password', null);
+    this.model.set('currentUserPassword', null);
+
     // use the class, clear both fields
     this.$('.password').val('');
 
