@@ -178,6 +178,9 @@ public class DeploymentController extends Controller {
         if (!currentUser.admin && !currentUser.equals(d.getUser()))
             return unauthorized();
         
+        if (!currentUser.admin && DeploymentManager.isDeploymentAdmin(target))
+            return unauthorized();
+        
         // check if we can deploy
         if (deploymentJobsByServer.containsKey(target)) {
             DeployJob currentJob = deploymentJobsByServer.get(target);
@@ -237,6 +240,7 @@ public class DeploymentController extends Controller {
      * The servers that it is possible to deploy to.
      */
     public static Result targets () {
-        return ok(Json.toJson(DeploymentManager.getDeploymentNames()));
+        User currentUser = User.getUserByUsername(session("username"));
+        return ok(Json.toJson(DeploymentManager.getDeploymentNames(currentUser.admin)));
     }
 }
