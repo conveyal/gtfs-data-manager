@@ -121,6 +121,7 @@ public class NoteController extends Controller {
             // folks can't make comments as other folks
             n.userId = currentUser.id;
             n.date = new Date();
+            n.type = type;
             model.addNote(n);
             n.save();
             model.save();
