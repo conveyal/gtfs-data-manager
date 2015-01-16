@@ -190,6 +190,42 @@ public class User implements Serializable {
         public Boolean admin;
 
     }
+    
+    /**
+     * Check if this user has write access to the specified project.
+     */
+    public boolean hasWriteAccess (String project) {
+        boolean hasPermission = false;
+        
+        if (this.projectPermissions != null) {
+            for (ProjectPermissions p : this.projectPermissions) {
+                if (project.equals(p.project_id) && p.write) {
+                    hasPermission = true;
+                    break;                            
+                }
+            }
+        }
+        
+        return hasPermission;
+    }
+    
+    /**
+     * Check if this user has read access to the specified project.
+     */
+    public boolean hasReadAccess (String project) {
+        boolean hasPermission = false;
+        
+        if (this.projectPermissions != null) {
+            for (ProjectPermissions p : this.projectPermissions) {
+                if (project.equals(p.project_id) && p.read) {
+                    hasPermission = true;
+                    break;                            
+                }
+            }
+        }
+        
+        return hasPermission;
+    }
 
     /**
      * Check if:

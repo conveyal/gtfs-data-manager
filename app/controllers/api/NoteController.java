@@ -63,19 +63,8 @@ public class NoteController extends Controller {
             s = ((FeedVersion) model).getFeedSource();
         }
      
-        boolean hasPermission = false;
-        
-        if (currentUser.projectPermissions != null) {
-            for (ProjectPermissions p : currentUser.projectPermissions) {
-                if (s.id.equals(p.project_id) && p.write) {
-                    hasPermission = true;
-                    break;                            
-                }
-            }
-        }
-        
         // check if the user has permission
-        if (currentUser.admin || currentUser.equals(s.getUser()) || hasPermission) {
+        if (currentUser.admin || currentUser.equals(s.getUser()) || currentUser.hasReadAccess(s.id)) {
             return ok(json.write(model.getNotes())).as("application/json");
         }
         else {
@@ -124,20 +113,9 @@ public class NoteController extends Controller {
         else {
             s = ((FeedVersion) model).getFeedSource();
         }
-     
-        boolean hasPermission = false;
-        
-        if (currentUser.projectPermissions != null) {
-            for (ProjectPermissions p : currentUser.projectPermissions) {
-                if (s.id.equals(p.project_id) && p.write) {
-                    hasPermission = true;
-                    break;                            
-                }
-            }
-        }
         
         // check if the user has permission
-        if (currentUser.admin || currentUser.equals(s.getUser()) || hasPermission) {
+        if (currentUser.admin || currentUser.equals(s.getUser()) || currentUser.hasWriteAccess(s.id)) {
             Note n = new Note();
             n.note = params.get("note").asText();
             // folks can't make comments as other folks
