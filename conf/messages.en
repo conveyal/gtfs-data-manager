@@ -13,6 +13,7 @@ app.yes=Yes
 app.no=No
 app.feed_source.name=Name
 app.feed_source.public=Public
+app.feed_source.deployable=Deployable
 app.feed_source.retrieval_method=Retrieval method
 app.feed_source.url=URL/GTFS Editor Agency
 app.feed_source.last_updated=Last updated

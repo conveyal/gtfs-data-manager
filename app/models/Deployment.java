@@ -172,8 +172,8 @@ public class Deployment extends Model {
         this.invalidFeedSourceIds = new ArrayList<String>();
 
         FEEDSOURCE: for (FeedSource s : feedCollection.getFeedSources()) {
-            // only include public feeds
-            if (s.isPublic) {
+            // only include deployable feeds
+            if (s.deployable) {
                 FeedVersion latest = s.getLatest();
 
                 // find the newest version that can be deployed

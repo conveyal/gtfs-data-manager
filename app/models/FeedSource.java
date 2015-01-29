@@ -55,10 +55,13 @@ public class FeedSource extends Model implements Comparable<FeedSource> {
     /** The name of this feed source, e.g. MTA New York City Subway */
     public String name;
     
-    /** Is this feed public, i.e. should it be placed in deployments and listed on the
+    /** Is this feed public, i.e. should it be listed on the
      * public feeds page for download?
      */
     public boolean isPublic;
+    
+    /** Is this feed deployable? */
+    public boolean deployable;
     
     /**
      * How do we receive this feed?
