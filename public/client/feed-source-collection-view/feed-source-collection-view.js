@@ -17,21 +17,30 @@ module.exports = Backbone.Marionette.CompositeView.extend({
   template: Handlebars.compile(require('./feed-source-collection-view.html')),
 
   events: {
-    'click .newfeedsource': 'add'
+    'click .newfeedsource': 'add',
+    'click .deploy-public': 'deployPublic'
   },
   initialize: function(attr) {
     this.feedCollectionId = attr.feedCollectionId;
-    _.bindAll(this, 'add');
+    _.bindAll(this, 'add', 'deployPublic');
 
     // default is to show new feed button
     var showNewFeedButton = _.isUndefined(attr.showNewFeedButton) ? true : attr.showNewFeedButton;
 
-    if (app.user && !app.user.admin) {
+    var showDeployPublicButton;
+
+    if (app.user && app.user.admin) {
+      showDeployPublicButton = true;
+    } else {
       showNewFeedButton = false;
+      showDeployPublicButton = false;
     }
 
     // use a bare model to pass random bits to the template
-    this.model = new Backbone.Model({showNewFeedButton: showNewFeedButton});
+    this.model = new Backbone.Model({
+      showNewFeedButton: showNewFeedButton,
+      showDeployPublicButton: showDeployPublicButton
+    });
   },
 
   add: function() {
@@ -47,5 +56,36 @@ module.exports = Backbone.Marionette.CompositeView.extend({
         lastUpdated: 0
       })
     );
-  }
+  },
+
+  /**
+   * deploy the public feeds to a directory, where they are presumably consumed
+   * by a front-end web server.
+   */
+   deployPublic: function () {
+     var instance = this;
+
+     // user feedback
+     this.$('.deploy-public span.glyphicon')
+      // set up spinner
+      .removeClass('glyphicon-upload').addClass('glyphicon-refresh').addClass('spinner')
+      .parent()
+      .prop('disabled', true);
+
+    this.$('.deploy-public span.button-label')
+      .text(window.Messages('app.deploy-public.updating'));
+
+    $.post('deployPublic', {feedCollectionId: this.feedCollectionId})
+      .done(function () {
+        instance.$('.deploy-public span.glyphicon')
+        // set up spinner
+          .addClass('glyphicon-upload').removeClass('glyphicon-refresh').removeClass('spinner')
+          .parent()
+          .prop('disabled', false);
+
+        instance.$('.deploy-public span.button-label')
+        .text(window.Messages('app.deploy-public'));
+      });
+   }
+
 });

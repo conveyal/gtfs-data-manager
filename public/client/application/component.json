@@ -17,5 +17,6 @@
         "text-helper",
         "admin-helper",
         "validation-partial"
-    ]
+    ],
+    "styles": ["application.css"]
 }

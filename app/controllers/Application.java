@@ -169,8 +169,13 @@ public class Application extends Controller {
     
     /** Copy all the public feeds to the public feeds directory */
     @Security.Authenticated(Admin.class)
-    public static Result deployPublic (String feedCollectionId) {
-        FeedCollection fc = FeedCollection.get(feedCollectionId);
+    public static Result deployPublic () {
+        String[] feedCollectionId = request().body().asFormUrlEncoded().get("feedCollectionId");
+        
+        if (feedCollectionId == null || feedCollectionId.length != 1)
+            return  badRequest("Please specify exactly one feed collection");
+        
+        FeedCollection fc = FeedCollection.get(feedCollectionId[0]);
         
         if (fc == null)
             return notFound("no such feed collection!");

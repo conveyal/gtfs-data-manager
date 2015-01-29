@@ -49,7 +49,7 @@ GET     /logout                         controllers.Application.logout()
 POST    /createInitialUser              controllers.Application.createInitialUser()
 GET     /edit/:id                       controllers.Application.edit(id:Long)
 
-GET     /deployPublic                   controllers.Application.deployPublic(feedCollectionId: String)
+POST    /deployPublic                   controllers.Application.deployPublic()
 
 # TODO: these are adminy things, and are GET requests for convenience
 # This violates the HTTP spec, as GET requests are not supposed to be action-taking

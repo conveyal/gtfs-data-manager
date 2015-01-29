@@ -1,10 +1,17 @@
-{{#if showNewFeedButton}}
-  <p>
+<p>
+  {{#if showNewFeedButton}}
     <button type="button" class="btn btn-primary newfeedsource">
       <span class="glyphicon glyphicon-plus"></span>&nbsp;{{ t "app.add_feed_source" }}
     </button>
-  </p>
-{{/if}}
+  {{/if}}
+
+  {{#if showDeployPublicButton}}
+    <button type="button" class="btn btn-primary deploy-public">
+      <span class="glyphicon glyphicon-upload"></span>&nbsp;
+      <span class="button-label">{{ t "app.deploy-public" }}</span>
+    </button>
+  {{/if}}
+</p>
 
 <table class="table">
   <thead>
