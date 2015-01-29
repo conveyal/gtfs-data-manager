@@ -16,10 +16,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import controllers.api.UserController;
 import models.FeedCollection;
+import models.FeedSource;
 import models.User;
+import models.FeedSource.FeedRetrievalMethod;
 import play.*;
 import play.libs.Akka;
 import play.libs.F.Function;
+import play.libs.F.Function0;
 import play.libs.F.Promise;
 import play.libs.ws.WS;
 import play.libs.ws.WSResponse;
@@ -72,8 +75,32 @@ public class Application extends Controller {
      * @param id
      * @return
      */
-    public static Promise<Result> edit (final Long id) {
+    @Security.Authenticated(Secured.class)
+    public static Promise<Result> edit (String feedSourceId) {
+        User currentUser = User.getUserByUsername(session("username"));
+        FeedSource fs = FeedSource.get(feedSourceId);
+        
+        if (fs == null || fs.retrievalMethod != FeedRetrievalMethod.PRODUCED_IN_HOUSE) {
+            return Promise.promise(new Function0<Result> () {
+                @Override
+                public Result apply() throws Throwable {
+                    return badRequest("Invalid agency");
+                }
+            });
+        }        
+        
         // get a token for this agency only
+        if (currentUser == null || 
+                !(currentUser.hasWriteAccess(fs.id) || currentUser.id.equals(fs.userId) || Boolean.TRUE.equals(currentUser.admin))) {
+            return Promise.promise(new Function0<Result> () {
+                @Override
+                public Result apply() throws Throwable {
+                    return unauthorized("You are not authorized to edit this feed");
+                }
+            });
+        }
+        
+        final Long id = fs.editorId;
         
         String url = Play.application().configuration().getString("application.editor.internal_url");
         

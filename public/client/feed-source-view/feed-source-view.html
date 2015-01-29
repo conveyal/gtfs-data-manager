@@ -24,7 +24,7 @@
 
     {{#if (and (eq retrievalMethod 'PRODUCED_IN_HOUSE') (neq editorId null) (neq editorId ''))}}
       {{!-- /edit/id just redirects to GTFS Editor --}}
-      <a class="btn btn-primary edit-feed pull-left" target="_blank" href="edit/{{ editorId }}">
+      <a class="btn btn-primary edit-feed pull-left" target="_blank" href="edit/{{ id }}">
         <span class="glyphicon glyphicon-pencil"></span>
         {{ t 'app.feed_source.edit'}}
       </a>
