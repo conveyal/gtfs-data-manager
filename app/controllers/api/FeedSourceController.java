@@ -90,6 +90,7 @@ public class FeedSourceController extends Controller {
         }
         
         s.isPublic = params.get("isPublic").asBoolean();
+        s.deployable = params.get("deployable").asBoolean();
         // the last fetched/updated cannot be updated from the web interface, only internally
         String url = params.get("url").asText();
         if (url != null && !"null".equals(url)) {

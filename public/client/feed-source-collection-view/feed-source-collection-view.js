@@ -26,12 +26,9 @@ module.exports = Backbone.Marionette.CompositeView.extend({
 
     // default is to show new feed button
     var showNewFeedButton = _.isUndefined(attr.showNewFeedButton) ? true : attr.showNewFeedButton;
+    var showDeployPublicButton = showNewFeedButton;
 
-    var showDeployPublicButton;
-
-    if (app.user && app.user.admin) {
-      showDeployPublicButton = true;
-    } else {
+    if (app.user && !app.user.admin || !app.user) {
       showNewFeedButton = false;
       showDeployPublicButton = false;
     }
@@ -47,7 +44,6 @@ module.exports = Backbone.Marionette.CompositeView.extend({
     this.collection.add(
       new FeedSource({
         name: Messages('app.new_feed_source_name'),
-        isPublic: true,
         retrievalMethod: 'MANUALLY_UPLOADED',
         url: null,
         feedCollection: {
