@@ -31,7 +31,7 @@ import utils.DataStore;
  *
  */
 @JsonInclude(Include.ALWAYS)
-public class FeedSource extends Model {
+public class FeedSource extends Model implements Comparable<FeedSource> {
     private static DataStore<FeedSource> sourceStore = new DataStore<FeedSource>("feedsources");
     
     /**
@@ -280,6 +280,10 @@ public class FeedSource extends Model {
             
             return newFeed;
         }
+    }
+    
+    public int compareTo(FeedSource o) {
+        return this.name.compareTo(o.name);
     }
     
     public String toString () {

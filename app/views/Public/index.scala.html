@@ -1,0 +1,22 @@
+@(versions: List[FeedVersion], feedVersionFileNames: Map[String, String])
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>@Messages("public.title")</title>
+
+    <style type="text/css">
+      body { font-family: "Helvetica Neue", helvetica, sans }
+    </style>
+  </head>
+  <body>
+    <h1>@Messages("public.title")</h1>
+
+    @Messages("public.description")
+
+    <ul>
+      @for(v <- versions) {
+        <li><a href="@feedVersionFileNames.get(v.id)">@v.getFeedSource().name</a>
+      }
+    </ul>
+  </body>
+</html>

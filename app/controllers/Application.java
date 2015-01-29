@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import jobs.FetchGtfsJob;
+import jobs.MakePublicJob;
 import jobs.RevalidateAllFeedVersionsJob;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -14,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import controllers.api.UserController;
+import models.FeedCollection;
 import models.User;
 import play.*;
 import play.libs.Akka;
@@ -163,6 +165,19 @@ public class Application extends Controller {
                 );
         
         return ok("Running");
+    }
+    
+    /** Copy all the public feeds to the public feeds directory */
+    @Security.Authenticated(Admin.class)
+    public static Result deployPublic (String feedCollectionId) {
+        FeedCollection fc = FeedCollection.get(feedCollectionId);
+        
+        if (fc == null)
+            return notFound("no such feed collection!");
+        
+        // run as sync job; if it gets too slow change to async
+        new MakePublicJob(fc).run();
+        return ok("Done");
     }
     
     // all of the hard stuff is in controllers.api

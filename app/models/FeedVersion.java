@@ -60,7 +60,7 @@ public class FeedVersion extends Model {
     }
 
     /**
-     * Create an unitialized feed version. This should only be used for dump/restore.
+     * Create an uninitialized feed version. This should only be used for dump/restore.
      */
     public FeedVersion () {
         // do nothing

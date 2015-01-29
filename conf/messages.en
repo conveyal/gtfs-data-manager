@@ -156,3 +156,7 @@ app.user.feed-sources=Feed sources
 app.user.current-password=Current password for user {0}
 app.user.update-failed=The update failed, please check your inputs and try again.
 app.users=Users
+
+# Title for the public feed download page
+public.title=Public Feeds
+public.description=The following feeds, in GTFS format, are available for download and use.
