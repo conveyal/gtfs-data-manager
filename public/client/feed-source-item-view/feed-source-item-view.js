@@ -78,7 +78,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         this.nameRegion.show(nameField);
 
         // start out editing name if it's new; this way we ensure it is saved before
-        if (this.model.get('id') === null)
+        if (_.isUndefined(this.model.id) || _.isNull(this.model.id))
             nameField.edit();
 
         this.handleUrlRegion();
