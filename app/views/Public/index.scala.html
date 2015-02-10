@@ -16,9 +16,10 @@
     <ul>
       @for(v <- versions) {
       	@if(v.getFeedSource().retrievalMethod == models.FeedSource.FeedRetrievalMethod.FETCHED_AUTOMATICALLY) {
-      		<li><a href="@v.getFeedSource().url">@v.getFeedSource().name</a>
+      		<li><a href="@v.getFeedSource().url">@v.getFeedSource().name</a></li>
       	} else { 
-        	<li><a href="@feedVersionFileNames.get(v.id)">@v.getFeedSource().name</a>
+      		@* date is only shown on feeds we are hosting *@
+        	<li><a href="@feedVersionFileNames.get(v.id)">@v.getFeedSource().name</a> (@Messages("public.last-updated", v.updated.format("dd MMM YYYY")))</li>
         }
       }
     </ul>
