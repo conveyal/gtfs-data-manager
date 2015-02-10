@@ -91,6 +91,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
       if (retrievalMethod == 'FETCHED_AUTOMATICALLY') {
         this.urlRegion.show(new EditableTextWidget({
             model: this.model,
+            maxWidth: 35,
             attribute: 'url',
             href: function () { return this.model.get('url'); }
         }));

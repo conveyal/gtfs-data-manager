@@ -16,8 +16,9 @@ module.exports = Backbone.Marionette.ItemView.extend({
     },
 
     initialize: function (attr) {
-        this.attribute = attr['attribute'] || this.attribute;
-        this.href = attr['href'] || this.href;
+        this.attribute = attr.attribute || this.attribute;
+        this.maxWidth = attr.maxWidth;
+        this.href = attr.href || this.href;
 
         _.bindAll(this, 'edit');
         // keep track of whether the field is currently being edited or not
@@ -65,6 +66,14 @@ module.exports = Backbone.Marionette.ItemView.extend({
         else
             href = this.href;
 
-        return {text: this.model.get(this.attribute), href: href};
+        var text = this.model.get(this.attribute);
+
+        if (!_.isUndefined(this.maxWidth) && !_.isNull(this.maxWidth) && text.length >= this.maxWidth) {
+          text = text.slice(0, this.maxWidth - 1);
+          text += '…';
+        }
+
+
+        return {text: this.model.get(this.attribute), displayText: text, href: href};
     }
 });
