@@ -15,7 +15,11 @@
 
     <ul>
       @for(v <- versions) {
-        <li><a href="@feedVersionFileNames.get(v.id)">@v.getFeedSource().name</a>
+      	@if(v.getFeedSource().retrievalMethod == models.FeedSource.FeedRetrievalMethod.FETCHED_AUTOMATICALLY) {
+      		<li><a href="@v.getFeedSource().url">@v.getFeedSource().name</a>
+      	} else { 
+        	<li><a href="@feedVersionFileNames.get(v.id)">@v.getFeedSource().name</a>
+        }
       }
     </ul>
   </body>

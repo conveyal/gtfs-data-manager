@@ -25,6 +25,7 @@ import com.google.common.io.Files;
 
 import models.FeedCollection;
 import models.FeedSource;
+import models.FeedSource.FeedRetrievalMethod;
 import models.FeedVersion;
 
 /**
@@ -67,11 +68,14 @@ public class MakePublicJob implements Runnable {
             // get the latest version that passed validation, more or less
             FeedVersion fv = fs.getLatest();
             
-            while (fv != null && fv.hasCriticalErrors())
+            if (fv == null)
+                continue;
+            
+            // we don't worry about feed expiration; old data is better than no data.
+            while (fv.previousVersionId != null && fv.hasCriticalErrorsExceptingDate())
                 fv = fv.getPreviousVersion();
             
-            if (fv != null)
-                versions.add(fv);
+            versions.add(fv);
         }
         
         // empty out the public directory
@@ -92,6 +96,10 @@ public class MakePublicJob implements Runnable {
         
         for (Iterator<FeedVersion> it = versions.iterator(); it.hasNext();) {
             FeedVersion v = it.next();
+            
+            // we don't need to copy feeds that are fetched automatically as we link directly to the source
+            if (v.getFeedSource().retrievalMethod == FeedRetrievalMethod.FETCHED_AUTOMATICALLY)
+                continue;
             
             // get a name for the feed version
             String name = StringUtils.getCleanName(v.getFeedSource().name);

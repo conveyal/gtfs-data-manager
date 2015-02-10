@@ -181,6 +181,17 @@ public class FeedVersion extends Model {
      * @return
      */
     public boolean hasCriticalErrors() {
+        if ((new Date()).after(validationResult.endDate) || hasCriticalErrorsExceptingDate())
+            return true;
+        
+        else
+            return false;
+    }
+    
+    /**
+     * Does this feed have any critical errors other than possibly being expired?
+     */
+    public boolean hasCriticalErrorsExceptingDate () {
         if (validationResult == null)
             return true;
         
@@ -190,12 +201,9 @@ public class FeedVersion extends Model {
         if (validationResult.stopTimesCount == 0 || validationResult.tripCount == 0 || validationResult.agencyCount == 0)
             return true;
         
-        if ((new Date()).after(validationResult.endDate))
-            return true;
-        
-        else
-            return false;
+        return false;
     }
+    
 
     /**
      * Delete this feed version.
