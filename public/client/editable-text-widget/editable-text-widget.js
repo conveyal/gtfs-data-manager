@@ -68,7 +68,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
 
         var text = this.model.get(this.attribute);
 
-        if (!_.isUndefined(this.maxWidth) && !_.isNull(this.maxWidth) && text.length >= this.maxWidth) {
+        if (!_.isUndefined(this.maxWidth) && !_.isNull(this.maxWidth) && !_.isNull(text) && text.length >= this.maxWidth) {
           text = text.slice(0, this.maxWidth - 1);
           text += '…';
         }
