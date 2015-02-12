@@ -36,52 +36,54 @@ module.exports = Backbone.Marionette.ItemView.extend({
             // set up the link to view it
             var href = data.baseUrl;
 
-            if (href.slice(-1) != '/')
-              href += '/';
+            if(href) {
+              if (href.slice(-1) != '/')
+                href += '/';
 
-            // calculate the centroid latitude and longitude
-            var bounds = this.deployment.get('bounds');
-            var lat = (bounds.north + bounds.south) / 2;
-            var lon = (bounds.east + bounds.west) / 2;
+              // calculate the centroid latitude and longitude
+              var bounds = this.deployment.get('bounds');
+              var lat = (bounds.north + bounds.south) / 2;
+              var lon = (bounds.east + bounds.west) / 2;
 
-            // figure out the zoom. assume that otp.js will open in a window of the same size (e.g. a new tab)
-            var width = $(window).width();
-            var height = $(window).height();
+              // figure out the zoom. assume that otp.js will open in a window of the same size (e.g. a new tab)
+              var width = $(window).width();
+              var height = $(window).height();
 
-            // what fraction of the world is this from north to south?
-            // note that we are storing the denominator only, to avoid roundoff errors
-            var boundsHeightMerc = 180 / (bounds.north - bounds.south);
+              // what fraction of the world is this from north to south?
+              // note that we are storing the denominator only, to avoid roundoff errors
+              var boundsHeightMerc = 180 / (bounds.north - bounds.south);
 
-            // longitude is generally more complicated, because the length depends on the latitude
-            // however, because we're using a Mercator projection, the map doesn't understand this either,
-            // and maps 360 degrees of longitude to an invariant width
-            // This is why Greenland appears larger than Africa, but it does make the math easy.
-            var boundsWidthMerc = 360 / (bounds.east - bounds.west);
+              // longitude is generally more complicated, because the length depends on the latitude
+              // however, because we're using a Mercator projection, the map doesn't understand this either,
+              // and maps 360 degrees of longitude to an invariant width
+              // This is why Greenland appears larger than Africa, but it does make the math easy.
+              var boundsWidthMerc = 360 / (bounds.east - bounds.west);
 
-            // figure out the zoom level
-            // level 0 is the entireer world in a single 256x256 tile, next level
-            // is entire world in 256 * 2^1, then 256 * 2^2, and so on
-            var z = 23;
+              // figure out the zoom level
+              // level 0 is the entireer world in a single 256x256 tile, next level
+              // is entire world in 256 * 2^1, then 256 * 2^2, and so on
+              var z = 23;
 
-            while (true) {
-              var worldSize = 256 * Math.pow(2, z);
-              // again, store the denominator/reciprocal
-              var windowWidthMerc = worldSize / width;
-              var windowHeightMerc = worldSize / height;
+              while (true) {
+                var worldSize = 256 * Math.pow(2, z);
+                // again, store the denominator/reciprocal
+                var windowWidthMerc = worldSize / width;
+                var windowHeightMerc = worldSize / height;
 
-              // if it fits. We use < not > because we have stored the reciprocals.
-              if (windowWidthMerc < boundsWidthMerc && windowHeightMerc < boundsHeightMerc || z === 0)
-                break;
+                // if it fits. We use < not > because we have stored the reciprocals.
+                if (windowWidthMerc < boundsWidthMerc && windowHeightMerc < boundsHeightMerc || z === 0)
+                  break;
 
-              z--;
+                z--;
+              }
+
+              var routerId = this.deployment.get('routerId');
+              href += '#start/' + lat + '/' + lon + '/' + z + '/' +
+                (!_.isUndefined(routerId) && routerId !== null ? routerId : 'default');
+
+              this.$('#result-link').attr('href', href)
+                .removeClass('hidden');
             }
-
-            var routerId = this.deployment.get('routerId');
-            href += '#start/' + lat + '/' + lon + '/' + z + '/' +
-              (!_.isUndefined(routerId) && routerId !== null ? routerId : 'default');
-
-            this.$('#result-link').attr('href', href)
-              .removeClass('hidden');
           } else {
             // uh-oh
             this.setMessage(data.message || 'app.deployment.error');
@@ -95,8 +97,12 @@ module.exports = Backbone.Marionette.ItemView.extend({
             this.setMessage('app.deployment.building_bundle');
           }
           else {
-            // are we uploading or waiting for the server to build a graph?
-            if (data.uploading)
+            // are we uploading to S3, OTP, or waiting for the server to build a graph?
+            if(data.uploadingS3) {
+              this.setMessage('app.deployment.uploading_s3');
+              this.setBarPosition(data.percentUploaded);
+            }
+            else if (data.uploading)
               this.setMessage('app.deployment.uploading', data.numServersCompleted + 1, data.totalServers);
             else
               this.setMessage('app.deployment.building_graph', data.numServersCompleted + 1, data.totalServers);

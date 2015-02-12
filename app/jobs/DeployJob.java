@@ -1,22 +1,27 @@
 package jobs;
 
+import com.amazonaws.AmazonClientException;
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
+import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.event.ProgressEvent;
+import com.amazonaws.event.ProgressListener;
+import com.amazonaws.services.s3.transfer.TransferManager;
+import com.amazonaws.services.s3.transfer.Upload;
+import models.Deployment;
+import play.Logger;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
-import java.nio.channels.Channel;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.WritableByteChannel;
 import java.util.List;
-
-import play.Logger;
-import models.Deployment;
 
 /**
  * Deploy the given deployment to the OTP servers specified by targets.
@@ -29,23 +34,31 @@ public class DeployJob implements Runnable {
     
     /** The base URL to otp.js on these targets */
     private String publicUrl;
-    
+
+    /** An optional AWS S3 bucket to copy the bundle to */
+    private String s3Bucket;
+
+    /** An AWS credentials file to use when uploading to S3 */
+    private String s3CredentialsFilename;
+
     /** The number of servers that have successfully been deployed to */
     private DeployStatus status;
     
     /** The deployment to deploy */
     private Deployment deployment;
     
-    public DeployJob(Deployment deployment, List<String> targets, String publicUrl) {
+    public DeployJob(Deployment deployment, List<String> targets, String publicUrl, String s3Bucket, String s3CredentialsFilename) {
         this.deployment = deployment;
         this.targets = targets;
         this.publicUrl = publicUrl;
+        this.s3Bucket = s3Bucket;
+        this.s3CredentialsFilename = s3CredentialsFilename;
         this.status = new DeployStatus();
         status.error = false;
         status.completed = false;
         status.built = false;
         status.numServersCompleted = 0;
-        status.totalServers = targets.size();
+        status.totalServers = targets == null ? 0 : targets.size();
     }
     
     public DeployStatus getStatus () {
@@ -91,7 +104,64 @@ public class DeployJob implements Runnable {
         synchronized (status) {
             status.built = true;
         }
-        
+
+        // upload to S3, if applicable
+        if(this.s3Bucket != null) {
+            synchronized (status) {
+                status.uploadingS3 = true;
+            }
+
+            try {
+                AWSCredentials creds;
+                if (this.s3CredentialsFilename != null) {
+                    creds = new ProfileCredentialsProvider(this.s3CredentialsFilename, "default").getCredentials();
+                }
+                else {
+                    // default credentials providers, e.g. IAM role
+                    creds = new DefaultAWSCredentialsProviderChain().getCredentials();
+                }
+
+                TransferManager tx = new TransferManager(creds);
+                final Upload upload = tx.upload(this.s3Bucket, deployment.name + ".zip", temp);
+
+                upload.addProgressListener(new ProgressListener() {
+                    public void progressChanged(ProgressEvent progressEvent) {
+                        synchronized (status) {
+                            status.percentUploaded = upload.getProgress().getPercentTransferred();
+                        }
+                    }
+                });
+
+                upload.waitForCompletion();
+                tx.shutdownNow();
+
+            } catch (AmazonClientException|InterruptedException e) {
+                Logger.error("Error uploading deployment bundle to S3");
+                e.printStackTrace();
+
+                synchronized (status) {
+                    status.error = true;
+                    status.completed = true;
+                    status.message = "app.deployment.error.dump";
+                }
+
+                return;
+            }
+
+            synchronized (status) {
+                status.uploadingS3 = false;
+            }
+        }
+
+        // if no OTP targets (i.e. we're only deploying to S3), we're done
+        if(this.targets == null) {
+            synchronized (status) {
+                status.completed = true;
+            }
+
+            return;
+        }
+
         // figure out what router we're using
         String router = deployment.routerId != null ? deployment.routerId : "default"; 
         
@@ -274,10 +344,16 @@ public class DeployJob implements Runnable {
         
         /** Did the manager build the bundle successfully */
         public boolean built;
-        
+
         /** Is the bundle currently being uploaded to the server? */
         public boolean uploading;
-        
+
+        /** Is the bundle currently being uploaded to an S3 bucket? */
+        public boolean uploadingS3;
+
+        /** How much of the bundle has been uploaded? */
+        public double percentUploaded;
+
         /** To how many servers have we successfully deployed thus far? */
         public int numServersCompleted;
         
@@ -294,6 +370,8 @@ public class DeployJob implements Runnable {
             ret.error = error;
             ret.built = built;
             ret.uploading = uploading;
+            ret.uploadingS3 = uploadingS3;
+            ret.percentUploaded = percentUploaded;
             ret.numServersCompleted = numServersCompleted;
             ret.totalServers = totalServers;
             ret.baseUrl = baseUrl;

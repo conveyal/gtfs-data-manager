@@ -54,6 +54,14 @@ application.deployment.servers = {
     public: "http://localhost:8291",
     # setting admin: true means only administrators will be able to deploy to this target
     admin: true
+
+    # Uncomment and complete the following to also upload the bundle to a S3 bucket. Specifying a local
+    # credentials file via 's3credentials' is optional; if unspecified the AWS SDK will look for credentials
+    # using the default chain (environment variables, etc.). If the following is set and 'internal' is not,
+    # then the deployment will only write the bundle to S3.
+
+    # s3bucket: "your-bucket"
+    # s3credentials: "/path/to/your/credentials"
   },
   # you can run scripts/receiveFile.js to save deployment bundles to /tmp/deployment.zip for inspection.
   Dump: {

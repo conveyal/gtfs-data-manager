@@ -53,7 +53,18 @@ public class DeploymentManager {
     }
 
     /** Get the public otp.js server for a particular deployment */
-    public static String getPublicUrl(String name) {;
+    public static String getPublicUrl(String name) {
         return (String) getServers().get(name).get("public");
     }
+
+    /** Get the s3 bucket for a particular deployment */
+    public static String getS3Bucket(String name) {
+        return (String) getServers().get(name).get("s3bucket");
+    }
+
+    /** Get the s3 credentials filename for a particular deployment */
+    public static String getS3Credentials(String name) {
+        return (String) getServers().get(name).get("s3credentials");
+    }
+
 }

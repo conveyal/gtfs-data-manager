@@ -181,9 +181,6 @@ public class DeploymentController extends Controller {
         
         List<String> targetUrls = DeploymentManager.getDeploymentUrls(target);
         
-        if (targetUrls == null)
-            return badRequest("No such server to deploy to!");
-        
         Deployment oldD = Deployment.getDeploymentForServerAndRouterId(target, d.routerId);
         if (oldD != null) {
             oldD.deployedTo = null;
@@ -193,7 +190,7 @@ public class DeploymentController extends Controller {
         d.deployedTo = target;
         d.save();
         
-        DeployJob job = new DeployJob(d, targetUrls, DeploymentManager.getPublicUrl(target));
+        DeployJob job = new DeployJob(d, targetUrls, DeploymentManager.getPublicUrl(target), DeploymentManager.getS3Bucket(target), DeploymentManager.getS3Credentials(target));
         
         deploymentJobsByServer.put(target, job);
         
@@ -220,7 +217,7 @@ public class DeploymentController extends Controller {
         
         if (j == null)
             return notFound();
-        
+
         return ok(statusJson.write(j.getStatus())).as("application/json");
     }
     

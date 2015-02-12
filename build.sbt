@@ -35,5 +35,6 @@ libraryDependencies ++= Seq(
   javaWs,
   "org.mapdb" % "mapdb" % "1.0.6",
   "org.julienrf" %% "play-jsmessages" % "1.6.2",
-  "com.google.guava" % "guava" % "18.0"
+  "com.google.guava" % "guava" % "18.0",
+  "com.amazonaws" % "aws-java-sdk-s3" % "1.9.0"
 )

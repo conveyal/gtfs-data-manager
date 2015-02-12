@@ -102,6 +102,7 @@ app.deployment.deploying=Deploying {0} to {1} . . .
 app.deployment.error=An unknown error occurred.
 app.deployment.building_bundle=Building graph bundle . . .
 app.deployment.uploading=Uploading graph bundle to server {0} of {1}
+app.deployment.uploading_s3=Uploading graph bundle to S3
 app.deployment.building_graph=Building graph for server {0} of {1}
 app.deployment.error.graph_build_failed=Graph build failed
 app.deployment.error.net=Network error
