@@ -349,18 +349,24 @@ public class Deployment extends Model {
                 360 /
                 (2 * Math.PI * 6371 * Math.cos(Math.toRadians(bounds.getCenterY())));
 
+
+        double bufferKm = 10;
+        if(Play.application().configuration().keys().contains("application.deployment.osm_buffer_km")) {
+            bufferKm = Play.application().configuration().getDouble("application.deployment.osm_buffer_km");
+        }
+
         // south-west
         bounds.add(new Point2D.Double(
                 // lon
-                bounds.getMinX() - 10 * degreesPerKmLon,
-                bounds.getMinY() - 10 * degreesPerKmLat
+                bounds.getMinX() - bufferKm * degreesPerKmLon,
+                bounds.getMinY() - bufferKm * degreesPerKmLat
                 ));
 
         // north-east
         bounds.add(new Point2D.Double(
                 // lon
-                bounds.getMaxX() + 10 * degreesPerKmLon,
-                bounds.getMaxY() + 10 * degreesPerKmLat
+                bounds.getMaxX() + bufferKm * degreesPerKmLon,
+                bounds.getMaxY() + bufferKm * degreesPerKmLat
                 ));
 
         return bounds;

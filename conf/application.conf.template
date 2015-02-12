@@ -73,6 +73,9 @@ application.deployment.servers = {
 # The vex (https://github.com/conveyal/vanilla-extract) server used to grab OSM data
 application.deployment.osm_vex="http://localhost:8282"
 
+# A buffer in km to apply to the GTFS bounds when extracting OSM. Defaults to 10 if not specified.
+# application.deployment.osm_buffer_km=10
+
 # The public URL of the GTFS Editor; this is where users will be redirected to when they click 'edit' on a feed source
 application.editor.public_url="http://localhost:9000/"
 # The internal URL of the GTFS Editor, used when Manager communicates directly with editor
