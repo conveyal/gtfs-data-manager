@@ -144,7 +144,7 @@ app.confirm_delete=Are you sure you want to delete {0}?
 
 # Not a message per se, but something locale dependent to pass to the app
 # Note also that you can load new moment.js locales in date-render-helper.js
-app.date_format=dddd, MMMM Do YYYY, h:mm:ss a
+app.date_format=Do MMM YYYY
 
 app.user.username=Username
 app.user.email=Email
