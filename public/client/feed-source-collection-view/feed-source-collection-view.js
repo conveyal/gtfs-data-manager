@@ -18,11 +18,12 @@ module.exports = Backbone.Marionette.CompositeView.extend({
 
   events: {
     'click .newfeedsource': 'add',
-    'click .deploy-public': 'deployPublic'
+    'click .deploy-public': 'deployPublic',
+    'click .sort-by': 'sortBy'
   },
   initialize: function(attr) {
     this.feedCollectionId = attr.feedCollectionId;
-    _.bindAll(this, 'add', 'deployPublic');
+    _.bindAll(this, 'add', 'deployPublic', 'sortBy');
 
     // default is to show new feed button
     var showNewFeedButton = _.isUndefined(attr.showNewFeedButton) ? true : attr.showNewFeedButton;
@@ -82,6 +83,10 @@ module.exports = Backbone.Marionette.CompositeView.extend({
         instance.$('.deploy-public span.button-label')
         .text(window.Messages('app.deploy-public'));
       });
-   }
+   },
 
+   /** sort by a particular column. new feeds are still at the top */
+   sortBy: function (e) {
+     this.collection.sortBy($(e.target).attr('data-attr'));
+   }
 });
