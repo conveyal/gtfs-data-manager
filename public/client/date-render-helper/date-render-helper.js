@@ -18,10 +18,9 @@ Handlebars.registerHelper(
 
         // TODO: time zone?
         return new Handlebars.SafeString(
-          '<span title="' +
-          Handlebars.escapeExpression(m.format(window.Messages('app.date_format')))
-           + '">' +
-           Handlebars.escapeExpression(m.fromNow()) +
+          '<span>' +
+           Handlebars.escapeExpression(m.fromNow()) + '<br/>' +
+           Handlebars.escapeExpression(m.format(window.Messages('app.date_format'))) +
            '</span>');
     }
 );
