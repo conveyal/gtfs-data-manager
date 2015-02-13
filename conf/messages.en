@@ -59,6 +59,7 @@ app.feed_version.stop_times_count=Stop time count
 app.feed_version.start_date=Valid from
 app.feed_version.end_date=Expires
 app.feed_version.service_span=Service span
+app.feed_version.route=Route
 # as in June 4 to June 7
 app.feed_version.to=to
 app.feed_version.reason=Reason
