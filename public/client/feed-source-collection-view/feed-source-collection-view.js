@@ -21,6 +21,20 @@ module.exports = Backbone.Marionette.CompositeView.extend({
     'click .deploy-public': 'deployPublic',
     'click .sort-by': 'sortBy'
   },
+
+  onRender: function () {
+    // set up sort indicators
+    this.$('.sort-marker').remove();
+
+    this.$('a[data-attr="' + this.collection.sortAttribute + '"]').parent();
+
+    var span =   $('<span>')
+    .addClass('glyphicon')
+    .addClass('sort-marker')
+    .addClass(this.collection.sortBackwards ? 'glyphicon-sort-by-alphabet-alt' : 'glyphicon-sort-by-alphabet')
+    .appendTo(this.$('a[data-attr="' + this.collection.sortAttribute + '"]').parent());
+  },
+
   initialize: function(attr) {
     this.feedCollectionId = attr.feedCollectionId;
     _.bindAll(this, 'add', 'deployPublic', 'sortBy');
@@ -93,6 +107,7 @@ module.exports = Backbone.Marionette.CompositeView.extend({
      // sort backwards on second click
      this.collection.sortBackwards = this.collection.sortAttribute == attr && !this.collection.sortBackwards;
      this.collection.sortAttribute = attr;
+
      this.collection.sort();
    }
 });
