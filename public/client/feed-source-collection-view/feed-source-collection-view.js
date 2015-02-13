@@ -87,6 +87,12 @@ module.exports = Backbone.Marionette.CompositeView.extend({
 
    /** sort by a particular column. new feeds are still at the top */
    sortBy: function (e) {
-     this.collection.sortBy($(e.target).attr('data-attr'));
+     e.preventDefault();
+     var attr = $(e.target).attr('data-attr');
+
+     // sort backwards on second click
+     this.collection.sortBackwards = this.collection.sortAttribute == attr && !this.collection.sortBackwards;
+     this.collection.sortAttribute = attr;
+     this.collection.sort();
    }
 });

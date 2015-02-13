@@ -16,18 +16,19 @@
 <table class="table">
   <thead>
     <th><a href="#" class="sort-by" data-attr="name">{{ t 'app.feed_source.name' }}</a></th>
-    <th><a href="#" class="sort-by" data-attr="name">{{ t 'app.feed_source.public' }}</a></th>
-    <th><a href="#" class="sort-by" data-attr="name">{{ t 'app.feed_source.deployable' }}</a></th>
-    <th><a href="#" class="sort-by" data-attr="name">{{ t 'app.feed_source.retrieval_method' }}</a></th>
-    <th><a href="#" class="sort-by" data-attr="name">{{ t 'app.feed_source.url' }}</a></th>
-    <th><a href="#" class="sort-by" data-attr="name">{{ t 'app.feed_source.last_updated' }}</a></th>
-    <th><a href="#" class="sort-by" data-attr="name">{{ t 'app.feed_version.loaded_successfully' }}</a></th>
-    <th><a href="#" class="sort-by" data-attr="name">{{ t 'app.feed_version.error_count' }}</a></th>
-    <th><a href="#" class="sort-by" data-attr="name">{{ t 'app.feed_version.route_count' }}</a></th>
-    <th><a href="#" class="sort-by" data-attr="name">{{ t 'app.feed_version.trip_count' }}</a></th>
-    <th><a href="#" class="sort-by" data-attr="name">{{ t 'app.feed_version.stop_times_count' }}</a></th>
-    <th><a href="#" class="sort-by" data-attr="name">{{ t 'app.feed_version.start_date' }}</a></th>
-    <th><a href="#" class="sort-by" data-attr="name">{{ t 'app.feed_version.end_date' }}</a></th>
+    <th><a href="#" class="sort-by" data-attr="isPublic">{{ t 'app.feed_source.public' }}</a></th>
+    <th><a href="#" class="sort-by" data-attr="deployable">{{ t 'app.feed_source.deployable' }}</a></th>
+    <th><a href="#" class="sort-by" data-attr="retrievalMethod">{{ t 'app.feed_source.retrieval_method' }}</a></th>
+    <!-- can't sort by URL because this column actually contains both URLs and GTFS Editor agencies, so sorting does not make sense -->
+    <th>{{ t 'app.feed_source.url' }}</th>
+    <th><a href="#" class="sort-by" data-attr="lastUpdated">{{ t 'app.feed_source.last_updated' }}</a></th>
+    <th><a href="#" class="sort-by" data-attr="latestValidation.loadStatus">{{ t 'app.feed_version.loaded_successfully' }}</a></th>
+    <th><a href="#" class="sort-by" data-attr="latestValidation.errorCount">{{ t 'app.feed_version.error_count' }}</a></th>
+    <th><a href="#" class="sort-by" data-attr="latestValidation.routeCount">{{ t 'app.feed_version.route_count' }}</a></th>
+    <th><a href="#" class="sort-by" data-attr="latestValidation.tripCount">{{ t 'app.feed_version.trip_count' }}</a></th>
+    <th><a href="#" class="sort-by" data-attr="latestValidation.stopTimesCount">{{ t 'app.feed_version.stop_times_count' }}</a></th>
+    <th><a href="#" class="sort-by" data-attr="latestValidation.startDate">{{ t 'app.feed_version.start_date' }}</a></th>
+    <th><a href="#" class="sort-by" data-attr="latestValidation.endDate">{{ t 'app.feed_version.end_date' }}</a></th>
     <th>{{!-- delete control --}}</th>
   </thead>
   <tbody></tbody>
