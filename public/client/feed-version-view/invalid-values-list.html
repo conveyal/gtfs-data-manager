@@ -14,6 +14,7 @@
           <th>{{ t 'app.feed_version.affected_entity' }}</th>
           <th>{{ t 'app.feed_version.affected_field' }}</th>
           <th>{{ t 'app.feed_version.description' }}</th>
+          {{#if ../showRoute}}<th>{{ t 'app.feed_version.route' }}</th>{{/if}}
         </thead>
         <tbody>
           {{!-- this is a list, with some extra properties (e.g. name) --}}
@@ -23,6 +24,7 @@
               <td>{{ affectedEntity }}</td>
               <td>{{ affectedField }}</td>
               <td>{{ problemDescription }}</td>
+              {{#if ../../showRoute}}<td>{{ route_name }}</td>{{/if}}
             </tr>
           {{/each}}
         </tbody>

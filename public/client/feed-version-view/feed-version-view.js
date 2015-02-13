@@ -21,6 +21,9 @@ var InvalidValuesList = Backbone.Marionette.ItemView.extend({
 
     initialize: function (attr) {
         // group them by error type
+
+        var showRoute = attr.showRoute || false;
+
         var invalidValues = attr.invalidValues;
         var errors = {};
         var invalidValuesLen = invalidValues.length;
@@ -32,11 +35,28 @@ var InvalidValuesList = Backbone.Marionette.ItemView.extend({
                 errors[iv.problemType].name = iv.problemType;
             }
 
+            if (showRoute) {
+              if (iv.route === null || iv.route === undefined)
+                iv.route_name = null;
+
+              else if (iv.route.shortName !== null && iv.route.longName !== null)
+                iv.route_name = iv.route.shortName + ' ' + iv.route.longName;
+
+              else if (iv.route.shortName !== null)
+                iv.route_name = iv.route.shortName;
+
+              else if (iv.route.longName !== null)
+                iv.route_name = iv.route.longName;
+
+              else
+                iv.route_name = null;
+            }
+
             errors[iv.problemType].push(iv);
         }
 
         // we use a bare Backbone.Model to pass the tree to the template
-        this.model = new Backbone.Model({errors: errors});
+        this.model = new Backbone.Model({showRoute: showRoute, errors: errors});
     }
 });
 
@@ -59,7 +79,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
             this.stopsRegion.show(new InvalidValuesList({invalidValues: this.model.get('validationResult').stops.invalidValues}));
         } catch (e) {}
         try {
-            this.tripsRegion.show(new InvalidValuesList({invalidValues: this.model.get('validationResult').trips.invalidValues}));
+            this.tripsRegion.show(new InvalidValuesList({invalidValues: this.model.get('validationResult').trips.invalidValues, showRoute: true}));
         } catch (e) {}
         try {
             this.shapesRegion.show(new InvalidValuesList({invalidValues: this.model.get('validationResult').shapes.invalidValues}));
