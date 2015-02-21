@@ -141,7 +141,7 @@ public class DeployJob implements Runnable {
                 tx.shutdownNow();
 
                 // copy to [name]-latest.zip
-                String copyKey = deployment.getFeedCollection().name + "-latest.zip";
+                String copyKey = deployment.getFeedCollection().name.toLowerCase() + "-latest.zip";
                 AmazonS3 s3client = new AmazonS3Client(creds);
                 CopyObjectRequest copyObjRequest = new CopyObjectRequest(
                     this.s3Bucket, key, this.s3Bucket, copyKey);
