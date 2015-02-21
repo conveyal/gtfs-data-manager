@@ -6,6 +6,9 @@ import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.event.ProgressEvent;
 import com.amazonaws.event.ProgressListener;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.CopyObjectRequest;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.Upload;
 import models.Deployment;
@@ -111,6 +114,7 @@ public class DeployJob implements Runnable {
                 status.uploadingS3 = true;
             }
 
+
             try {
                 AWSCredentials creds;
                 if (this.s3CredentialsFilename != null) {
@@ -122,7 +126,8 @@ public class DeployJob implements Runnable {
                 }
 
                 TransferManager tx = new TransferManager(creds);
-                final Upload upload = tx.upload(this.s3Bucket, deployment.name + ".zip", temp);
+                String key = deployment.name + ".zip";
+                final Upload upload = tx.upload(this.s3Bucket, key, temp);
 
                 upload.addProgressListener(new ProgressListener() {
                     public void progressChanged(ProgressEvent progressEvent) {
@@ -134,6 +139,13 @@ public class DeployJob implements Runnable {
 
                 upload.waitForCompletion();
                 tx.shutdownNow();
+
+                // copy to [name]-latest.zip
+                String copyKey = deployment.getFeedCollection().name + "-latest.zip";
+                AmazonS3 s3client = new AmazonS3Client(creds);
+                CopyObjectRequest copyObjRequest = new CopyObjectRequest(
+                    this.s3Bucket, key, this.s3Bucket, copyKey);
+                s3client.copyObject(copyObjRequest);
 
             } catch (AmazonClientException|InterruptedException e) {
                 Logger.error("Error uploading deployment bundle to S3");
