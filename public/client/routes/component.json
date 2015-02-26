@@ -18,6 +18,7 @@
     "deployment-collection-route",
     "user-collection-route",
     "user-route",
-    "new-user-route"
+    "new-user-route",
+    "osm-config-route"
   ]
 }

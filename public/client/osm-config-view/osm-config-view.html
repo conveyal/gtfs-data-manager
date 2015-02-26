@@ -1,0 +1,43 @@
+
+
+<h1>{{ t 'app.osm_config.configure' }}</h1>
+
+<div class="form-group">
+
+  <div class="radio">
+    <label><input id="use-gtfs" type="radio" name="useCustom" value="false">Use GTFS-Derived Extract Bounds</label>
+  </div>
+
+  <div class="radio">
+    <label><input id="use-custom" type="radio" name="useCustom" value="true">Use Custom Extract Bounds</label>
+  </div>
+
+  <div id="custom-inputs">
+    <div class="row">
+      <div class="col-md-3">
+        <label for="osmWest">{{ t 'app.osm_config.west' }}</label>
+        <input type="text" id="osmWest" class="form-control" value="{{ osmWest }}" />
+      </div>
+
+      <div class="col-md-3">
+        <label for="osmSouth">{{ t 'app.osm_config.south' }}</label>
+        <input type="text" id="osmSouth" class="form-control" value="{{ osmSouth }}" />
+      </div>
+
+      <div class="col-md-3">
+        <label for="osmEast">{{ t 'app.osm_config.east' }}</label>
+        <input type="text" id="osmEast" class="form-control" value="{{ osmEast }}" />
+      </div>
+
+      <div class="col-md-3">
+        <label for="osmNorth">{{ t 'app.osm_config.north' }}</label>
+        <input type="text" id="osmNorth" class="form-control" value="{{ osmNorth }}" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="form-group">
+  <input id="save-button" class="btn btn-primary" value="{{ t 'app.osm_config.save' }}" />
+</div>
+

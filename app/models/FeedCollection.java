@@ -25,6 +25,10 @@ public class FeedCollection extends Model implements Serializable {
     
     /** The name of this feed collection, e.g. NYSDOT. */
     public String name;
+
+    public Boolean useCustomOsmBounds;
+
+    public Double osmNorth, osmSouth, osmEast, osmWest;
     
     /**
      * Get all of the FeedCollections that are defined

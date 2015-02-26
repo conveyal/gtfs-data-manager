@@ -55,7 +55,32 @@ public class FeedCollectionController extends Controller {
         if (name != null) {
             c.name = name.asText();
         }
-        
+
+        JsonNode useCustomOsmBounds = params.get("useCustomOsmBounds");
+        if (useCustomOsmBounds != null) {
+            c.useCustomOsmBounds = useCustomOsmBounds.asBoolean();
+        }
+
+        JsonNode osmWest = params.get("osmWest");
+        if (osmWest != null) {
+            c.osmWest = osmWest.asDouble();
+        }
+
+        JsonNode osmSouth = params.get("osmSouth");
+        if (osmSouth != null) {
+            c.osmSouth = osmSouth.asDouble();
+        }
+
+        JsonNode osmEast = params.get("osmEast");
+        if (osmEast != null) {
+            c.osmEast = osmEast.asDouble();
+        }
+
+        JsonNode osmNorth = params.get("osmNorth");
+        if (osmNorth != null) {
+            c.osmNorth = osmNorth.asDouble();
+        }
+
         // only allow admins to change feed collection owners
         if (currentUser.admin) {
             JsonNode uname = params.get("user");

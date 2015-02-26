@@ -328,6 +328,14 @@ public class Deployment extends Model {
     // Get the union of the bounds of all the feeds in this deployment
     @JsonView(JsonViews.UserInterface.class)
     public Rectangle2D getBounds() {
+
+        FeedCollection feedColl = this.getFeedCollection();
+        if(feedColl.useCustomOsmBounds) {
+            Rectangle2D bounds = new Rectangle2D.Double(feedColl.osmWest, feedColl.osmSouth,
+                    feedColl.osmEast - feedColl.osmWest, feedColl.osmNorth - feedColl.osmSouth);
+            return bounds;
+        }
+
         List<SummarizedFeedVersion> versions = getFeedVersions();
 
         if (versions.size() == 0)

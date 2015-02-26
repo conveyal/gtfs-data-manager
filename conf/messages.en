@@ -116,6 +116,14 @@ app.deployment.already_deploying=There is currently a deployment being pushed to
 app.deploy-public=Update feeds available for public download
 app.deploy-public.updating=Uploading feeds
 
+# OSM extract range configuration
+app.osm_config.configure=Configure OSM Extract
+app.osm_config.north=North Latitude Bound
+app.osm_config.south=South Latitude Bound
+app.osm_config.east=East Longitude Bound
+app.osm_config.west=West Longitude Bound
+app.osm_config.save=Save Changes
+
 app.location.home=Home
 app.location.login=Log in
 app.close=Close

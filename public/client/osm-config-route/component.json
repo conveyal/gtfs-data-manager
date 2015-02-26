@@ -1,0 +1,6 @@
+{
+  "name": "osm-config-route",
+  "local": ["feed-collection", "feed-source-collection", "osm-config-view", "application"],
+  "main": "osm-config-route.js",
+  "scripts": ["osm-config-route.js"]
+}

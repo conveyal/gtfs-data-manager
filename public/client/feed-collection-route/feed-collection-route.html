@@ -1,9 +1,14 @@
-{{#showDeploymentButton}}
 <p>
+  {{#showDeploymentButton}}
   <a href="#deployments/{{ feedCollectionId }}" class="btn btn-primary">
     <span class="glyphicon glyphicon-globe"></span>&nbsp;&nbsp;{{ t "app.deployment.manage_deployments" }}
   </a>
+  {{/showDeploymentButton}}
+
+  <a href="#osmconfig/{{ feedCollectionId }}" class="btn btn-primary">
+    <span class="glyphicon glyphicon-scissors"></span>&nbsp;&nbsp;{{ t "app.osm_config.configure" }}
+  </a>
 </p>
-{{/showDeploymentButton}}
+
 
 <div id="feed-sources"></div>
