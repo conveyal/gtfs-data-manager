@@ -26,7 +26,9 @@ module.exports = Backbone.Marionette.ItemView.extend({
 
       var north, south, east, west;
       this.options.feedSources.each(function(feedSource) {
-        var bounds = feedSource.get('latestValidation').bounds;
+        var latestVal = feedSource.get('latestValidation');
+        if(!latestVal || !latestVal.bounds) return;
+        var bounds = latestVal.bounds;
         west = west ? Math.min(west, bounds.west) : bounds.west;
         south = south ? Math.min(south, bounds.south) : bounds.south;
         east = east ? Math.max(east, bounds.east) : bounds.east;
