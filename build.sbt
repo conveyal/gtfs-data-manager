@@ -38,3 +38,5 @@ libraryDependencies ++= Seq(
   "com.google.guava" % "guava" % "18.0",
   "com.amazonaws" % "aws-java-sdk-s3" % "1.9.0"
 )
+
+resolvers += "Conveyal Maven Repository" at "file:///home/matthewc/.ivy2/cache"

@@ -100,6 +100,10 @@ public class DeploymentController extends Controller {
         if (!currentUser.admin && !currentUser.equals(s.getUser()) && !currentUser.hasWriteAccess(s.id))
             return unauthorized();
         
+        // never loaded
+        if (s.getLatestVersionId() == null)
+            return badRequest();  
+        
         Deployment d = new Deployment(s);
         d.setUser(currentUser);
         d.save();
