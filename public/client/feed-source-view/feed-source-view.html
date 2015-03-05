@@ -1,67 +1,62 @@
-<h1>{{ name }}</h1>
-
-<p>
-  <div class="clearfix btn-group">
+<h2>{{ name }}
+  <div class="btn-group">
     {{#if (admin)}}
-      <div class="dropdown pull-left">
-        <button class="btn btn-primary" data-toggle="dropdown">{{ t 'app.feed_source.share' }}&nbsp;&nbsp;<span class="glyphicon glyphicon-share-alt"></span></button>
+      <div class="btn-group">
+        <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown">{{ t 'app.feed_source.share' }} <span class="glyphicon glyphicon-share-alt"></span></button>
         <div class="dropdown-menu">
           <div class="container-fluid">
             <label for="share-url" class="sr-only">{{ t 'app.feed_source.share_url' }}</label>
             {{!-- value to be filled in by the controller --}}
-            <input type="text" size="80" id="share-url"></input>
+            <input type="text" size="80" id="share-url" disabled></input>
 
             <p>{{ t 'app.feed_source.share_desc' }}</p>
           </div>
         </div>
-    </div>
+      </div>
     {{/if}}
 
-    <button class="btn btn-primary deploy pull-left" {{#unless latestVersionId}}disabled{{/unless}}>
+    <button class="btn btn-primary deploy" {{#unless latestVersionId}}disabled{{/unless}}>
       <span class="glyphicon glyphicon-globe"></span>
       {{ t 'app.deployment.deploy' }}
     </button>
 
     {{#if (and (eq retrievalMethod 'PRODUCED_IN_HOUSE') (neq editorId null) (neq editorId ''))}}
       {{!-- /edit/id just redirects to GTFS Editor --}}
-      <a class="btn btn-primary edit-feed pull-left" target="_blank" href="edit/{{ id }}">
+      <a class="btn btn-primary edit-feed" target="_blank" href="edit/{{ id }}">
         <span class="glyphicon glyphicon-pencil"></span>
         {{ t 'app.feed_source.edit'}}
       </a>
     {{/if}}
   </div>
-</p>
+</h2>
 
-<p>
-  <table class="table table-striped table-hover table-condensed">
-    <tr>
-      <th>{{ t 'app.feed_source.name' }}</th>
-      <td>{{ name }}</td>
-    </tr>
-    <tr>
-      <th>{{ t 'app.feed_source.public' }}</th>
-      <td>{{ ? isPublic (t 'app.yes') (t 'app.no')}}</td>
-    </tr>
-    {{!--
-    <tr>
-      <th>{{ t 'app.feed_source.retrieval_method' }}</th>
-      <td>{{ t (('app.feed_source.retrieval_method') (retrievalMethod)}}</td>
-    </tr>
-    --}}
-    <tr>
-      <th>{{ t 'app.feed_source.url' }}</th>
-      <td>{{ url }}</td>
-    </tr>
-    <tr>
-      <th>{{ t 'app.feed_source.last_updated' }}</th>
-      <td>{{ dateRender lastUpdated true }}</td>
-    </tr>
-  </table>
-</p>
+<table class="table table-striped">
+  <tr>
+    <th>{{ t 'app.feed_source.name' }}</th>
+    <td>{{ name }}</td>
+  </tr>
+  <tr>
+    <th>{{ t 'app.feed_source.public' }}</th>
+    <td>{{ ? isPublic (t 'app.yes') (t 'app.no')}}</td>
+  </tr>
+  {{!--
+  <tr>
+    <th>{{ t 'app.feed_source.retrieval_method' }}</th>
+    <td>{{ t (('app.feed_source.retrieval_method') (retrievalMethod)}}</td>
+  </tr>
+  --}}
+  <tr>
+    <th>{{ t 'app.feed_source.url' }}</th>
+    <td>{{ url }}</td>
+  </tr>
+  <tr>
+    <th>{{ t 'app.feed_source.last_updated' }}</th>
+    <td>{{ dateRender lastUpdated true }}</td>
+  </tr>
+</table>
 
 <h4>{{ t 'app.note.source_notes' }}</h4>
-<p class="source-notes">
-</p>
+<p class="source-notes"></p>
 
 <div id="version-navigation"></div>
 
