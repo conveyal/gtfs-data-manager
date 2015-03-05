@@ -1,14 +1,15 @@
-<div class="panel-group">
-  {{#each errors}}
+<h4>{{title}}</h4>
+{{#each errors}}
+  <div class="panel panel-default">
     <div class="panel-heading">
       <h4 class="panel-title">
-        <a href="#" role="button" data-toggle="collapse" data-target="#errors-{{ name }}" onclick="return false;">
-          {{ name }} ({{ length }} {{ t 'app.feed_version.warnings' }}) {{!-- priority this --}}&nbsp;&nbsp;<span class="caret"></span>
+        <a href="#" role="button" data-parent="#invalid-value-panels" data-toggle="collapse" data-target="#errors-{{ ../type }}-{{ name }}" onclick="return false;">
+          {{ name }} ({{ length }} {{ t 'app.feed_version.warnings' }}) {{!-- priority this --}} <span class="caret"></span>
         </a>
       </h4>
     </div>
-    <div class="panel collapse" id="errors-{{ name }}">
-      <table class="table table-striped table-hover table-condensed">
+    <div class="panel-collapse collapse" id="errors-{{ ../type }}-{{ name }}">
+      <table class="table table-striped">
         <thead>
           <th>{{ t 'app.feed_version.problem_type' }}</th>
           <th>{{ t 'app.feed_version.affected_entity' }}</th>
@@ -30,5 +31,5 @@
         </tbody>
       </table>
     </div>
-  {{/each}}
-</div>
+  </div>
+{{/each}}

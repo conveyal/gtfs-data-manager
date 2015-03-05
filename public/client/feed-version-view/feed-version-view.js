@@ -56,7 +56,12 @@ var InvalidValuesList = Backbone.Marionette.ItemView.extend({
         }
 
         // we use a bare Backbone.Model to pass the tree to the template
-        this.model = new Backbone.Model({showRoute: showRoute, errors: errors});
+        this.model = new Backbone.Model({
+          showRoute: showRoute,
+          title: Messages('app.feed_version.' + attr.type + '_warnings'),
+          type: attr.type,
+          errors: errors
+        });
     }
 });
 
@@ -72,20 +77,49 @@ module.exports = Backbone.Marionette.LayoutView.extend({
     },
 
     onShow: function () {
-        try {
-            this.routesRegion.show(new InvalidValuesList({invalidValues: this.model.get('validationResult').routes.invalidValues}));
-        } catch (e) {}
-        try {
-            this.stopsRegion.show(new InvalidValuesList({invalidValues: this.model.get('validationResult').stops.invalidValues}));
-        } catch (e) {}
-        try {
-            this.tripsRegion.show(new InvalidValuesList({invalidValues: this.model.get('validationResult').trips.invalidValues, showRoute: true}));
-        } catch (e) {}
-        try {
-            this.shapesRegion.show(new InvalidValuesList({invalidValues: this.model.get('validationResult').shapes.invalidValues}));
-        } catch (e) {}
+      var result = this.model.get('validationResult');
+      try {
+        var invalidRoutes = result.routes.invalidValues;
+        if (invalidRoutes && invalidRoutes.length > 0) {
+          this.routesRegion.show(new InvalidValuesList({
+            invalidValues: invalidRoutes,
+            type: 'route'
+          }));
+        }
+      } catch (e) {}
 
-        // set up notes
-        this.notesRegion.show(new NoteCollectionView({objectId: this.model.get('id'), type: 'FEED_VERSION'}));
+      try {
+        var invalidStops = result.stops.invalidValues;
+        if (invalidStops && invalidStops.length > 0) {
+          this.stopsRegion.show(new InvalidValuesList({
+            invalidValues: invalidStops,
+            type: 'stop'
+          }));
+        }
+      } catch (e) {}
+
+      try {
+        var invalidTrips = result.trips.invalidValues;
+        if (invalidTrips && invalidTrips.length > 0) {
+          this.tripsRegion.show(new InvalidValuesList({
+            invalidValues: invalidTrips,
+            type: 'trip',
+            showRoute: true
+          }));
+        }
+      } catch (e) {}
+
+      try {
+        var invalidShapes = result.shapes.invalidValues;
+        if (invalidShapes && invalidShapes.length > 0) {
+          this.shapesRegion.show(new InvalidValuesList({
+            invalidValues: invalidShapes,
+            type: 'shape'
+          }));
+        }
+      } catch (e) {}
+
+      // set up notes
+      this.notesRegion.show(new NoteCollectionView({objectId: this.model.get('id'), type: 'FEED_VERSION'}));
     }
 });

@@ -1,4 +1,4 @@
-<p>
+<h2>{{ t 'app.feed_version.version_number' version }}
   <div class="btn-group">
     <a href="#feed/{{ feedSource.id }}/{{ previousVersionId }}" class="btn btn-default {{ ? (eq previousVersionId null) 'disabled' '' }}">
       <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;&nbsp;{{ t 'app.feed_version.previous_version' }}
@@ -25,4 +25,4 @@
 
     <a href="#feed/{{ feedSource.id }}/{{ nextVersionId }}" class="btn btn-default {{ ? (eq nextVersionId null) 'disabled' '' }}">{{ t 'app.feed_version.next_version' }}&nbsp;&nbsp;<span class="glyphicon glyphicon-arrow-right"></span></a>
   </div>
-</p>
+</h2>
