@@ -11,6 +11,7 @@ var Handlebars = require('handlebars');
 module.exports = Backbone.Marionette.ItemView.extend({
     template: Handlebars.compile(require('./editable-text-widget.html')),
     tagName: 'span',
+    className: 'EditableText',
     events: {
         'click .toggle-edit': 'edit'
     },
@@ -33,7 +34,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
 
         if (this.editing) {
             // save
-            var attr = [];
+            var attr = {};
             attr[this.attribute] = this.$('input').val();
             this.model.set(attr);
 

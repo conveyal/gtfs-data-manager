@@ -1,1 +1,5 @@
+.EditableText {
+  white-space: nowrap;
+}
+
 button.toggle-edit { background: transparent; border: 0px }
