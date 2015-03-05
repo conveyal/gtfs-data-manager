@@ -11,8 +11,7 @@ var NoteCollection = require('note-collection');
 var Note = require('note');
 
 var NoteItemView = Backbone.Marionette.ItemView.extend({
-  template: Handlebars.compile(require('./note-item-view.html')),
-  className: 'row'
+  template: Handlebars.compile(require('./note-item-view.html'))
 });
 
 /**
@@ -22,7 +21,7 @@ var NoteItemView = Backbone.Marionette.ItemView.extend({
 module.exports = Backbone.Marionette.CompositeView.extend({
   template: Handlebars.compile(require('./note-collection-view.html')),
   childView: NoteItemView,
-  className: 'container',
+  className: 'row',
   events: { 'submit form': 'newComment' },
 
   initialize: function (attr) {
