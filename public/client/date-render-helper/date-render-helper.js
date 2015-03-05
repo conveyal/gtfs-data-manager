@@ -19,7 +19,7 @@ Handlebars.registerHelper(
         // TODO: time zone?
         return new Handlebars.SafeString(
           '<span>' +
-           Handlebars.escapeExpression(m.format(window.Messages('app.date_format'))) + '<br/>(' +
+           Handlebars.escapeExpression(m.format(window.Messages('app.date_format'))) + ' (' +
            Handlebars.escapeExpression(m.fromNow()) +
            ')</span>');
     }
