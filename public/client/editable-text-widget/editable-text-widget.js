@@ -73,7 +73,13 @@ module.exports = Backbone.Marionette.ItemView.extend({
           text += '…';
         }
 
+        var value = this.model.isNew() ? '' : this.model.get(this.attribute);
 
-        return {text: this.model.get(this.attribute), displayText: text, href: href};
+        return {
+          displayText: text,
+          value: value,
+          placeholder: text,
+          href: href
+        };
     }
 });
