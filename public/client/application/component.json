@@ -1,9 +1,10 @@
 {
     "name": "application",
     "dependencies": {
+        "es-shims/es5-shim": "*",
+        "es-shims/es6-shim": "*",
         "jashkenas/backbone": "*",
         "jashkenas/underscore": "*",
-        "components/jquery": "1.11.1",
         "marionettejs/backbone.marionette": "*",
         "components/handlebars.js": "*"
     },

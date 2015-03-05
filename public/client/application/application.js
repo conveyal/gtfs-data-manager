@@ -3,6 +3,10 @@ Backbone.Marionette = require('backbone.marionette');
 var Handlebars = require('Handlebars');
 var Breadcrumb = require('breadcrumb-nav');
 
+// Load Shims
+var es5 = require('es5-shim');
+var es6 = require('es6-shim');
+
 // register Handlebars helpers and partials
 require('date-render-helper');
 require('class-helper');
