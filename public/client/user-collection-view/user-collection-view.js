@@ -21,6 +21,5 @@
  module.exports = Backbone.Marionette.CompositeView.extend({
    template: Handlebars.compile(require('./user-collection-view.html')),
    childView: UserItemView,
-   className: 'container',
    childViewContainer: 'tbody'
  });

@@ -1,6 +1,6 @@
 {{#if (neq validationResult null)}}
   <p>
-    <table class="table">
+    <table class="table table-striped table-hover table-condensed">
       <tbody>
         {{#with validationResult}}
           <tr><th>{{ t 'app.feed_version.load_status' }}</th><td>{{ loadStatus }}</td></tr>
