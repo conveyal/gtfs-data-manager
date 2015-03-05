@@ -14,7 +14,8 @@ var EditableTextWidget = require('editable-text-widget');
 var FeedCollectionItemView = EditableTextWidget.extend({
     tagName: 'li',
     attribute: 'name',
-    href: function () { 
+    className: 'list-group-item',
+    href: function () {
         return '#overview/' + this.model.get('id');
     },
 
@@ -43,7 +44,7 @@ module.exports = Backbone.Marionette.CompositeView.extend({
     initialize: function () {
         _.bindAll(this, 'add');
     },
-    
+
     /** Add an item to the collection */
     add: function () {
         // note that this is not persisted to the server here; it won't be, until they change the name
