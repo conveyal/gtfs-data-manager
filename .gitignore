@@ -20,3 +20,5 @@ public/components
 public/data/*.zip
 .\#*
 conf/application.conf
+data
+
