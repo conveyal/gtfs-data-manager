@@ -6,8 +6,8 @@ var BB = require('bb');
 var Handlebars = require('handlebars');
 
 module.exports = BB.Marionette.ItemView.extend({
-    template: Handlebars.compile(require('./feed-upload-view.html')),
-    onShow: function () {
-        this.$('.modal').modal();
-    }
+  template: Handlebars.compile(require('./feed-upload-view.html')),
+  onShow: function() {
+    this.$('.modal').modal();
+  }
 });

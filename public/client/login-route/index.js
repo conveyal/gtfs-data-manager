@@ -1,1 +1,1 @@
-var template = 
+var template =

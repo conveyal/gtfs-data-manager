@@ -13,9 +13,11 @@ module.exports = BB.Marionette.CompositeView.extend({
   childView: DeploymentItemView,
   childViewContainer: 'tbody',
 
-  events: { 'click .new-deployment': 'deploy'},
+  events: {
+    'click .new-deployment': 'deploy'
+  },
 
-  initialize: function () {
+  initialize: function() {
     _.bindAll(this, 'deploy');
   },
 
@@ -30,7 +32,9 @@ module.exports = BB.Marionette.CompositeView.extend({
     date += String(now.getDate() < 10 ? '0' + now.getDate() : now.getDate());
 
     var d = new Deployment({
-      feedCollection: {id: this.model.id},
+      feedCollection: {
+        id: this.model.id
+      },
       name: this.model.get('name').toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '') + '-' + date
     });
     d.save().done(function() {

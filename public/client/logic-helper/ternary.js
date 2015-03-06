@@ -4,8 +4,8 @@
 var Handlebars = require('handlebars');
 
 Handlebars.registerHelper(
-    '?',
-    function (cond, tru, fals) {
-        return cond ? tru : fals;
-    }
+  '?',
+  function(cond, tru, fals) {
+    return cond ? tru : fals;
+  }
 );

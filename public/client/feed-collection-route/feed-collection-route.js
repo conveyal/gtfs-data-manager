@@ -19,7 +19,10 @@ var Overview = BB.Marionette.LayoutView.extend({
     var showDeploymentButton = !(app.user && !app.user.admin);
 
     // use a bare model to pass ID to template
-    this.model = new BB.Model({feedCollectionId: this.feedCollectionId, showDeploymentButton: showDeploymentButton});
+    this.model = new BB.Model({
+      feedCollectionId: this.feedCollectionId,
+      showDeploymentButton: showDeploymentButton
+    });
   },
 
   onShow: function() {

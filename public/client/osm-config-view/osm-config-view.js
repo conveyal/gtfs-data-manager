@@ -13,17 +13,16 @@ module.exports = BB.Marionette.ItemView.extend({
   },
 
   onShow: function() {
-    if(this.model.get('useCustomOsmBounds')) {
+    if (this.model.get('useCustomOsmBounds')) {
       $('#use-custom').prop('checked', true);
-    }
-    else {
+    } else {
       $('#use-gtfs').prop('checked', true);
       $('#custom-inputs').hide();
 
       var north, south, east, west;
       this.options.feedSources.each(function(feedSource) {
         var latestVal = feedSource.get('latestValidation');
-        if(!latestVal || !latestVal.bounds) return;
+        if (!latestVal || !latestVal.bounds) return;
         var bounds = latestVal.bounds;
         west = west ? Math.min(west, bounds.west) : bounds.west;
         south = south ? Math.min(south, bounds.south) : bounds.south;
@@ -50,30 +49,29 @@ module.exports = BB.Marionette.ItemView.extend({
   saveChanges: function() {
     var useCustom = ($('input:radio[name=useCustom]:checked').val() === 'true');
 
-    if(!useCustom) {
+    if (!useCustom) {
       this.model.set('useCustomOsmBounds', false);
-    }
-    else {
+    } else {
       var west = this.$('#osmWest').val();
-      if(!isNumber(west)) {
+      if (!isNumber(west)) {
         window.alert("West bound is not valid");
         return;
       }
 
       var south = this.$('#osmSouth').val();
-      if(!isNumber(south)) {
+      if (!isNumber(south)) {
         window.alert("South bound is not valid");
         return;
       }
 
       var east = this.$('#osmEast').val();
-      if(!isNumber(east)) {
+      if (!isNumber(east)) {
         window.alert("East bound is not valid");
         return;
       }
 
       var north = this.$('#osmNorth').val();
-      if(!isNumber(north)) {
+      if (!isNumber(north)) {
         window.alert("North bound is not valid");
         return;
       }
@@ -87,12 +85,12 @@ module.exports = BB.Marionette.ItemView.extend({
 
     var self = this;
 
-    this.model.save().done(function () {
-      window.location.hash = '#overview/' + self.model.get('id');
-    })
-    .fail(function () {
-      window.alert('Error saving OSM settings');
-    });
+    this.model.save().done(function() {
+        window.location.hash = '#overview/' + self.model.get('id');
+      })
+      .fail(function() {
+        window.alert('Error saving OSM settings');
+      });
   }
 
 });

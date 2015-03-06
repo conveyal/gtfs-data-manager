@@ -19,38 +19,38 @@ var app = new BB.Marionette.Application();
 app.user = null;
 
 app.addRegions({
-    appRegion: '#content',
-    navRegion: '#nav',
-    modalRegion: '#modal'
+  appRegion: '#content',
+  navRegion: '#nav',
+  modalRegion: '#modal'
 });
 
 // initialize breadcrumb navigation
 app.nav = new Breadcrumb();
 
-app.on('before:start', function () {
-    app.navRegion.show(app.nav);
+app.on('before:start', function() {
+  app.navRegion.show(app.nav);
 
-    // set up the name
-    $('#appName').text(Messages('app.name'));
+  // set up the name
+  $('#appName').text(Messages('app.name'));
 
-    $('#logout').text(Messages('app.logout'))
-        .click(function (e) {
-            e.preventDefault();
-            $.ajax({
-                url: 'logout',
-            }).done(function (data) {
-                if (data.status == 'logged_out') {
-                    $('#logout').addClass("hidden");
-                    $('#logged-in-user').text('');
-                    $('#manageUsers').addClass('hidden');
-                    $('#myAccount').addClass('hidden');
-                    window.location.hash = '#login';
-                }
-            });
-        });
+  $('#logout').text(Messages('app.logout'))
+    .click(function(e) {
+      e.preventDefault();
+      $.ajax({
+        url: 'logout',
+      }).done(function(data) {
+        if (data.status == 'logged_out') {
+          $('#logout').addClass("hidden");
+          $('#logged-in-user').text('');
+          $('#manageUsers').addClass('hidden');
+          $('#myAccount').addClass('hidden');
+          window.location.hash = '#login';
+        }
+      });
+    });
 
-    $('#manageUsers').text(window.Messages("app.user.manage-users"));
-    $('#myAccount').text(window.Messages("app.user.my-account"));
+  $('#manageUsers').text(window.Messages("app.user.manage-users"));
+  $('#myAccount').text(window.Messages("app.user.my-account"));
 });
 
 module.exports = app;

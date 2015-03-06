@@ -20,14 +20,21 @@ module.exports = BB.Marionette.CompositeView.extend({
   template: Handlebars.compile(require('./note-collection-view.html')),
   childView: NoteItemView,
   className: 'row',
-  events: { 'submit form': 'newComment' },
+  events: {
+    'submit form': 'newComment'
+  },
 
-  initialize: function (attr) {
+  initialize: function(attr) {
     this.objectId = attr.objectId;
     this.type = attr.type;
 
     this.collection = new NoteCollection();
-    this.collection.fetch({data: {objectId: this.objectId, type: this.type}});
+    this.collection.fetch({
+      data: {
+        objectId: this.objectId,
+        type: this.type
+      }
+    });
 
     _.bindAll(this, 'newComment');
   },
@@ -35,7 +42,7 @@ module.exports = BB.Marionette.CompositeView.extend({
   /**
    * Grab the contents of the text field and create a new comment
    */
-  newComment: function (e) {
+  newComment: function(e) {
     // don't submit the form
     e.preventDefault();
 
@@ -48,18 +55,18 @@ module.exports = BB.Marionette.CompositeView.extend({
     this.$('form').addClass('disabled');
 
     var instance = this;
-    n.save().done(function () {
-      instance.collection.add(n);
-      instance.$('form').removeClass('disabled');
-      instance.$('textarea').val('');
-    })
-    .fail(function () {
-      instance.$('form').removeClass('disabled');
-      window.alert('Commenting failed');
-    });
+    n.save().done(function() {
+        instance.collection.add(n);
+        instance.$('form').removeClass('disabled');
+        instance.$('textarea').val('');
+      })
+      .fail(function() {
+        instance.$('form').removeClass('disabled');
+        window.alert('Commenting failed');
+      });
   },
 
-  attachHtml: function (collectionView, childView, index) {
+  attachHtml: function(collectionView, childView, index) {
     // order not important; new things always go at the bottom
     collectionView.$('.new-comment').before(childView.$el);
   }

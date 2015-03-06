@@ -12,7 +12,7 @@ module.exports = function(deploymentId) {
 
   var tDf = $.ajax({
     url: 'api/deployments/targets',
-    success: function (data) {
+    success: function(data) {
       targets = data;
     }
   });
@@ -32,8 +32,7 @@ module.exports = function(deploymentId) {
     }, {
       name: window.Messages('app.deployment.deployments'),
       href: '#deployments/' + d.get('feedCollection').id
-    },
-    {
+    }, {
       name: d.get('name'),
       href: '#deployment/' + deploymentId
     }]);

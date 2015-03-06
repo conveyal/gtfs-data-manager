@@ -57,7 +57,8 @@ $(document).ready(function() {
     .fail(function() {
       // assume that we are not logged in
       // don't let us go to #login/login/login/login/login/overview
-      if (window.location.hash.indexOf('login') != 1 && !/\#feed\/[0-9a-z\-]+\?userId=.+&key=.+/.exec(window.location.hash))
+      if (window.location.hash.indexOf('login') != 1 && !/\#feed\/[0-9a-z\-]+\?userId=.+&key=.+/.exec(window.location
+          .hash))
         document.location.hash = '#login/' + window.location.hash.slice(1);
     })
     .always(function() {

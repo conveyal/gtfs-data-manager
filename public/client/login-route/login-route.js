@@ -4,51 +4,56 @@ var Handlebars = require('handlebars.js');
 var app = require('application');
 
 var Login = BB.Marionette.LayoutView.extend({
-    template: Handlebars.compile(require('./login-route.html')),
-    events: {'click .login': 'doLogin'},
+  template: Handlebars.compile(require('./login-route.html')),
+  events: {
+    'click .login': 'doLogin'
+  },
 
-    initialize: function (attr) {
-        this.returnTo = attr.returnTo
-	// bind it so context is layout not a DOM object
-	_.bindAll(this, 'doLogin');
-    },
+  initialize: function(attr) {
+    this.returnTo = attr.returnTo
+      // bind it so context is layout not a DOM object
+    _.bindAll(this, 'doLogin');
+  },
 
-    doLogin: function () {
-        var instance = this;
-	$.post('/authenticate',
-	       {username: this.$('input[name="username"]').val(),
-		password: this.$('input[name="password"]').val()})
-	    .then(function (data) {
-		$('#logged-in-user').text(window.Messages('app.account.logged_in_as', data.username));
-                $('#logout').removeClass('hidden');
-                $('#myAccount').removeClass('hidden').attr('href', '#user/' + data.id);
+  doLogin: function() {
+    var instance = this;
+    $.post('/authenticate', {
+        username: this.$('input[name="username"]').val(),
+        password: this.$('input[name="password"]').val()
+      })
+      .then(function(data) {
+        $('#logged-in-user').text(window.Messages('app.account.logged_in_as', data.username));
+        $('#logout').removeClass('hidden');
+        $('#myAccount').removeClass('hidden').attr('href', '#user/' + data.id);
 
-                if (data.admin)
-                  $('#manageUsers').removeClass('hidden');
+        if (data.admin)
+          $('#manageUsers').removeClass('hidden');
 
-                // note: log out is handled in application.js
+        // note: log out is handled in application.js
 
-                app.user = data;
+        app.user = data;
 
-                window.location.hash = instance.returnTo ? instance.returnTo : '#admin';
-	    })
-	    .fail(function () {
-		    window.alert('Log in failed');
-	    });
+        window.location.hash = instance.returnTo ? instance.returnTo : '#admin';
+      })
+      .fail(function() {
+        window.alert('Log in failed');
+      });
 
-	return false;
-    },
+    return false;
+  },
 
-    onShow: function () {
-        // init nav
-        app.nav.setLocation([
-            {name: Messages('app.location.login'), href: '#login'}
-        ]);
-    }
+  onShow: function() {
+    // init nav
+    app.nav.setLocation([{
+      name: Messages('app.location.login'),
+      href: '#login'
+    }]);
+  }
 });
 
-
-module.exports = function (returnTo) {
-    // show your work
-    app.appRegion.show(new Login({returnTo: returnTo}));
+module.exports = function(returnTo) {
+  // show your work
+  app.appRegion.show(new Login({
+    returnTo: returnTo
+  }));
 }

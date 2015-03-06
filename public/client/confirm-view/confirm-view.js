@@ -13,17 +13,17 @@ module.exports = BB.Marionette.ItemView.extend({
     'click .proceed-action': 'onProceed'
   },
 
-  initialize: function (attr) {
+  initialize: function(attr) {
     this.model = new BB.Model({
       title: attr.title,
       body: attr.body
     });
 
-    this.onCancel = !_.isUndefined(attr.onCancel) ? attr.onCancel : function () {};
-    this.onProceed = !_.isUndefined(attr.onProceed) ? attr.onProceed : function () {};
+    this.onCancel = !_.isUndefined(attr.onCancel) ? attr.onCancel : function() {};
+    this.onProceed = !_.isUndefined(attr.onProceed) ? attr.onProceed : function() {};
   },
 
-  onShow: function () {
+  onShow: function() {
     this.$el.find('.modal').modal();
   }
 });

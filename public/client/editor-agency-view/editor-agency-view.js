@@ -9,7 +9,7 @@ module.exports = BB.Marionette.ItemView.extend({
     'change select': 'changeAgency'
   },
 
-  initialize: function () {
+  initialize: function() {
     this.agencies = [];
     var instance = this;
 
@@ -20,7 +20,7 @@ module.exports = BB.Marionette.ItemView.extend({
     }
 
     // even if it is already done, this will still get called
-    module.exports.agencies.done(function (data) {
+    module.exports.agencies.done(function(data) {
       instance.agencies = data;
       // this may trigger rendering more than once; oh well.
       instance.render();
@@ -29,19 +29,21 @@ module.exports = BB.Marionette.ItemView.extend({
     _.bindAll(this, 'changeAgency');
   },
 
-  onRender: function () {
+  onRender: function() {
     // select the appropriate agency
     this.$('option[value="' + this.model.get('editorId') + '"]').prop('selected', true);
   },
 
-  changeAgency: function () {
+  changeAgency: function() {
     var newAgency = this.$('select').val();
     this.model.set('editorId', newAgency);
     this.model.save();
   },
 
-  serializeData: function () {
-    return _.extend({agencies: this.agencies}, this.model.toJSON());
+  serializeData: function() {
+    return _.extend({
+      agencies: this.agencies
+    }, this.model.toJSON());
   }
 });
 
