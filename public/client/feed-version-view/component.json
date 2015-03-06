@@ -2,13 +2,10 @@
     "name": "feed-version-view",
     "description": "show a single feed version",
     "dependencies": {
-        "jashkenas/backbone": "*",
         "jashkenas/underscore": "*",
-        "marionettejs/backbone.marionette": "*",
-        "components/handlebars.js": "*",
-        "components/jquery": "1.11.1"
+        "components/handlebars.js": "*"
     },
-    "local": ["application", "note-collection-view", "feed-upload-view", "feed-source"],
+    "local": ["application", "bb", "note-collection-view", "feed-upload-view", "feed-source"],
     "main": "feed-version-view.js",
     "scripts": ["feed-version-view.js"],
     "templates": ["feed-version-view.html", "invalid-values-list.html"]

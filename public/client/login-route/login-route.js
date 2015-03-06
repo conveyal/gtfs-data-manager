@@ -1,11 +1,9 @@
-var Backbone = require('backbone');
-Backbone.Marionette = require('backbone.marionette');
-var $ = require('jquery');
+var BB = require('bb');
 var _ = require('underscore');
 var Handlebars = require('handlebars.js');
 var app = require('application');
 
-var Login = Backbone.Marionette.LayoutView.extend({
+var Login = BB.Marionette.LayoutView.extend({
     template: Handlebars.compile(require('./login-route.html')),
     events: {'click .login': 'doLogin'},
 
@@ -26,16 +24,16 @@ var Login = Backbone.Marionette.LayoutView.extend({
                 $('#myAccount').removeClass('hidden').attr('href', '#user/' + data.id);
 
                 if (data.admin)
-                  $('#manageUsers').removeClass('hidden');                
+                  $('#manageUsers').removeClass('hidden');
 
                 // note: log out is handled in application.js
 
                 app.user = data;
 
-                window.location.hash = instance.returnTo != undefined ? instance.returnTo : '#admin';
+                window.location.hash = instance.returnTo ? instance.returnTo : '#admin';
 	    })
 	    .fail(function () {
-		alert('Log in failed');
+		    window.alert('Log in failed');
 	    });
 
 	return false;

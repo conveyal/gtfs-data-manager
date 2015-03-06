@@ -2,8 +2,6 @@ var FeedCollection = require('feed-collection');
 var FeedSourceCollection = require('feed-source-collection');
 var OsmConfigView = require('osm-config-view');
 var app = require('application');
-var _ = require('underscore');
-var $ = require('jquery');
 
 module.exports = function (feedCollectionId) {
 

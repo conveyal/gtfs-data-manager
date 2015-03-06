@@ -1,13 +1,11 @@
 // Breadcrumb nav for the site
 
-var Backbone = require('backbone');
-Backbone.Marionette = require('backbone.marionette');
-var $ = require('jquery');
+var BB = require('bb');
 var _ = require('underscore');
 var Handlebars = require('handlebars');
 
 // this is just a backbone view; we don't need the machinery of models here
-module.exports = Backbone.View.extend({
+module.exports = BB.View.extend({
     template: Handlebars.compile(require('./breadcrumb-nav.html')),
     tagName: 'ol',
     className: 'breadcrumb',

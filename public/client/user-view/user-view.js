@@ -1,14 +1,11 @@
-var Backbone = require('Backbone');
-Backbone.Marionette = require('backbone.marionette');
+var BB = require('bb');
 var Handlebars = require('handlebars.js');
 var app = require('application');
 var _ = require('underscore');
-var $ = require('jquery');
-jQuery = $;
 require('select2');
 var FeedSourceCollection = require('feed-source-collection');
 
-module.exports = Backbone.Marionette.ItemView.extend({
+module.exports = BB.Marionette.ItemView.extend({
   template: Handlebars.compile(require('./user-view.html')),
   events: {
     'keyup .password': 'validatePassword',

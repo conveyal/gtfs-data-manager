@@ -1,6 +1,4 @@
-var Backbone = require('backbone');
-Backbone.Marionette = require('backbone.marionette');
-var $ = require('jquery');
+var BB = require('bb');
 var _ = require('underscore');
 var FeedCollection = require('feed-collection');
 
@@ -23,7 +21,7 @@ var FeedCollectionItemView = EditableTextWidget.extend({
         if (typeof(EditableTextWidget.prototype.onShow) == 'function')
             EditableTextWidget.prototype.onShow.call(this);
 
-        if (this.model.get('id') == null)
+        if (!this.model.get('id'))
             // new feed
             this.edit();
     }
@@ -32,7 +30,7 @@ var FeedCollectionItemView = EditableTextWidget.extend({
 /**
  * An editable view of a FeedCollectionCollection
  */
-module.exports = Backbone.Marionette.CompositeView.extend({
+module.exports = BB.Marionette.CompositeView.extend({
     template: Handlebars.compile(require('./feed-collection-collection-view.html')),
     childView: FeedCollectionItemView,
     childViewContainer: 'ul',

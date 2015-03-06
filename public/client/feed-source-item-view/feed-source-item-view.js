@@ -1,6 +1,4 @@
-var Backbone = require('backbone');
-Backbone.Marionette = require('backbone.marionette');
-var $ = require('jquery');
+var BB = require('bb');
 var _ = require('underscore');
 var Handlebars = require('handlebars');
 var app = require('application');
@@ -12,7 +10,7 @@ var EditableTextWidget = require('editable-text-widget');
 /**
  * An item view of a single FeedSource
  */
-module.exports = Backbone.Marionette.LayoutView.extend({
+module.exports = BB.Marionette.LayoutView.extend({
     regions: {
         nameRegion: '.name',
         urlRegion: '.url'

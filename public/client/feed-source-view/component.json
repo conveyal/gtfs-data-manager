@@ -2,14 +2,12 @@
     "name": "feed-source-view",
     "description": "What is the status of a feed source: latest validation results, etc.",
     "dependencies": {
-        "jashkenas/backbone": "*",
         "jashkenas/underscore": "*",
-        "components/jquery": "1.11.1",
-        "marionettejs/backbone.marionette": "*",
         "components/handlebars.js": "*"
     },
     "local": [
       "application",
+      "bb",
       "feed-version",
       "feed-version-collection",
       "feed-version-collection-view",

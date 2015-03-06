@@ -1,16 +1,14 @@
-var Backbone = require('backbone');
-Backbone.Marionette = require('backbone.marionette');
-var $ = require('jquery');
-var _ = require('underscore');
-var Handlebars = require('handlebars');
+var BB = require('bb');
 var Deployment = require('deployment');
+var Handlebars = require('handlebars');
+var _ = require('underscore');
 
-var DeploymentItemView = Backbone.Marionette.ItemView.extend({
+var DeploymentItemView = BB.Marionette.ItemView.extend({
   tagName: 'tr',
   template: Handlebars.compile(require('./deployment-item-view.html'))
 });
 
-module.exports = Backbone.Marionette.CompositeView.extend({
+module.exports = BB.Marionette.CompositeView.extend({
   template: Handlebars.compile(require('./deployment-collection-view.html')),
   childView: DeploymentItemView,
   childViewContainer: 'tbody',

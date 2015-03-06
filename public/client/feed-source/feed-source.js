@@ -1,7 +1,6 @@
-var _ = require('underscore');
-var Backbone = require('Backbone');
+var BB = require('bb');
 
-module.exports = Backbone.Model.extend({
+module.exports = BB.Model.extend({
     defaults: {
         name: null,
         isPublic: false,

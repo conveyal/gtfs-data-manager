@@ -1,13 +1,9 @@
 {
   "name": "routes",
-  "dependencies": {
-    "jashkenas/backbone": "*",
-    "jashkenas/underscore": "*",
-    "components/jquery": "1.11.1"
-  },
   "scripts": ["routes.js"],
   "local": [
     "application",
+    "bb",
     "login-route",
     "deployment-route",
     "admin-route",

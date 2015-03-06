@@ -1,11 +1,9 @@
-var Backbone = require('backbone');
-Backbone.Marionette = require('backbone.marionette');
-var Handlebars = require('Handlebars');
+var BB = require('bb');
+var Bootstrap = require('bootstrap');
 var Breadcrumb = require('breadcrumb-nav');
-
-// Load Shims
 var es5 = require('es5-shim');
 var es6 = require('es6-shim');
+var Handlebars = require('Handlebars');
 
 // register Handlebars helpers and partials
 require('date-render-helper');
@@ -16,7 +14,7 @@ require('text-helper');
 require('admin-helper');
 require('validation-partial');
 
-var app = new Backbone.Marionette.Application();
+var app = new BB.Marionette.Application();
 
 app.user = null;
 

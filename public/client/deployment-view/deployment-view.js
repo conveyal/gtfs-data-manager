@@ -1,6 +1,4 @@
-var Backbone = require('backbone');
-Backbone.Marionette = require('backbone.marionette');
-var $ = require('jquery');
+var BB = require('bb');
 var _ = require('underscore');
 var FeedCollection = require('feed-collection');
 var FeedSourceCollection = require('feed-source-collection');
@@ -15,7 +13,7 @@ var DeploymentProgressView = require('deployment-progress-view');
 var app = require('application');
 
 // FeedVersionItemView is already used on the versions page, so let's keep class names unique
-var FeedVersionDeploymentView = Backbone.Marionette.ItemView.extend({
+var FeedVersionDeploymentView = BB.Marionette.ItemView.extend({
   template: Handlebars.compile(require('./feed-version-deployment-view.html')),
   tagName: 'tr',
   events: {
@@ -67,7 +65,7 @@ var FeedVersionDeploymentView = Backbone.Marionette.ItemView.extend({
   }
 });
 
-module.exports = Backbone.Marionette.CompositeView.extend({
+module.exports = BB.Marionette.CompositeView.extend({
   template: Handlebars.compile(require('./deployment-view.html')),
   childView: FeedVersionDeploymentView,
   childViewContainer: 'tbody',
@@ -143,7 +141,7 @@ module.exports = Backbone.Marionette.CompositeView.extend({
 
   onShow: function() {
     // show the invalid feed sources (i.e. sources with no current loadable version)
-    this.invalidFeedSourceRegion = new Backbone.Marionette.Region({
+    this.invalidFeedSourceRegion = new BB.Marionette.Region({
       el: '.invalid-feed-sources'
     });
 
@@ -154,7 +152,7 @@ module.exports = Backbone.Marionette.CompositeView.extend({
     }));
 
     // show the name, in an editable fashion
-    this.nameRegion = new Backbone.Marionette.Region({
+    this.nameRegion = new BB.Marionette.Region({
       el: '#deployment-name'
     });
 

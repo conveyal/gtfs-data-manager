@@ -2,12 +2,12 @@
     "name":"breadcrumb-nav",
     "description": "the breadcrumb nav component. also manages page title",
     "dependencies" : {
-        "jashkenas/backbone": "*",
         "jashkenas/underscore": "*",
-        "marionettejs/backbone.marionette": "*",
-        "components/handlebars.js": "*",
-        "components/jquery": "1.11.1"
+        "components/handlebars.js": "*"
     },
+    "local": [
+      "bb"
+    ],
     "main": "breadcrumb-nav.js",
     "scripts": ["breadcrumb-nav.js"],
     "templates": ["breadcrumb-nav.html"]

@@ -1,20 +1,17 @@
 // A list of FeedVersions for a particular FeedSource
 
-var Backbone = require('backbone');
-Backbone.Marionette = require('backbone.marionette');
-var $ = require('jquery');
-var _ = require('underscore');
+var BB = require('bb');
 var Handlebars = require('handlebars');
 var app = require('application');
 
 var FeedSource = require('feed-source');
 
-var FeedVersionItemView = Backbone.Marionette.ItemView.extend({
+var FeedVersionItemView = BB.Marionette.ItemView.extend({
     template: Handlebars.compile(require('./feed-version-item-view.html')),
-    tagName: 'tr'                                 
+    tagName: 'tr'
 });
 
-module.exports = Backbone.Marionette.CompositeView.extend({
+module.exports = BB.Marionette.CompositeView.extend({
     childView: FeedVersionItemView,
     childViewContainer: 'tbody',
     template: Handlebars.compile(require('./feed-version-collection-view.html')),

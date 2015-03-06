@@ -1,13 +1,9 @@
-var Backbone = require('Backbone');
-Backbone.Marionette = require('backbone.marionette');
+var BB = require('bb');
 var Handlebars = require('handlebars.js');
 var app = require('application');
-var _ = require('underscore');
-var $ = require('jquery');
-jQuery = $;
 var FeedCollection = require('feed-collection');
 
-module.exports = Backbone.Marionette.ItemView.extend({
+module.exports = BB.Marionette.ItemView.extend({
   template: Handlebars.compile(require('./osm-config-view.html')),
 
   events: {
@@ -60,25 +56,25 @@ module.exports = Backbone.Marionette.ItemView.extend({
     else {
       var west = this.$('#osmWest').val();
       if(!isNumber(west)) {
-        alert("West bound is not valid");
+        window.alert("West bound is not valid");
         return;
       }
 
       var south = this.$('#osmSouth').val();
       if(!isNumber(south)) {
-        alert("South bound is not valid");
+        window.alert("South bound is not valid");
         return;
       }
 
       var east = this.$('#osmEast').val();
       if(!isNumber(east)) {
-        alert("East bound is not valid");
+        window.alert("East bound is not valid");
         return;
       }
 
       var north = this.$('#osmNorth').val();
       if(!isNumber(north)) {
-        alert("North bound is not valid");
+        window.alert("North bound is not valid");
         return;
       }
 
@@ -95,7 +91,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
       window.location.hash = '#overview/' + self.model.get('id');
     })
     .fail(function () {
-      alert('Error saving OSM settings');
+      window.alert('Error saving OSM settings');
     });
   }
 

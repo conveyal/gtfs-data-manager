@@ -1,6 +1,4 @@
-var Backbone = require('backbone');
-Backbone.Marionette = require('backbone.marionette');
-var $ = require('jquery');
+var BB = require('bb');
 var _ = require('underscore');
 var FeedSource = require('feed-source');
 var Handlebars = require('handlebars');
@@ -11,7 +9,7 @@ var FeedSourceItemView = require('feed-source-item-view');
 /**
  * An editable table of FeedSources
  */
-module.exports = Backbone.Marionette.CompositeView.extend({
+module.exports = BB.Marionette.CompositeView.extend({
   childView: FeedSourceItemView,
   childViewContainer: 'tbody',
   template: Handlebars.compile(require('./feed-source-collection-view.html')),
@@ -49,7 +47,7 @@ module.exports = Backbone.Marionette.CompositeView.extend({
     }
 
     // use a bare model to pass random bits to the template
-    this.model = new Backbone.Model({
+    this.model = new BB.Model({
       showNewFeedButton: showNewFeedButton,
       showDeployPublicButton: showDeployPublicButton
     });

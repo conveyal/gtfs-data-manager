@@ -1,9 +1,7 @@
-var _ = require('underscore');
-var Backbone = require('backbone');
-var $ = Backbone.$ = require('jquery');
 var app = require('application');
+var BB = require('bb');
 
-var Router = Backbone.Router.extend({
+var Router = BB.Router.extend({
   routes: {
     "": "admin",
     "login": "login",
@@ -65,6 +63,6 @@ $(document).ready(function() {
     .always(function() {
       app.start();
       router = new Router();
-      Backbone.history.start();
+      BB.history.start();
     });
 });

@@ -1,9 +1,8 @@
 {
   "name": "deployment",
-  "dependencies": {
-    "jashkenas/backbone": "*",
-    "jashkenas/underscore": "*"
-  },
+  "local": [
+    "bb"
+  ],
   "main": "deployment.js",
   "scripts": ["deployment.js"]
 }

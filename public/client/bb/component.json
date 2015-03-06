@@ -1,8 +1,8 @@
 {
   "name": "bb",
   "dependencies": {
-    "components/backbone": "*",
     "components/jquery": "1.11.2",
+    "jashkenas/backbone": "*",
     "marionettejs/backbone.marionette": "*"
   },
   "scripts": [

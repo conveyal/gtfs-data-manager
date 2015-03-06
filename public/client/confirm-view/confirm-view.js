@@ -1,13 +1,11 @@
-var Backbone = require('backbone');
-Backbone.Marionette = require('backbone.marionette');
-Backbone.$ = require('jquery');
+var BB = require('bb');
 var _ = require('underscore');
 var Handlebars = require('handlebars');
 
 /**
  * usage: new ConfirmView({title: text, body: text, [onProceed: function,] [onCancel: function,]})
  */
-module.exports = Backbone.Marionette.ItemView.extend({
+module.exports = BB.Marionette.ItemView.extend({
   template: Handlebars.compile(require('./confirm-view.html')),
 
   events: {
@@ -16,7 +14,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
   },
 
   initialize: function (attr) {
-    this.model = new Backbone.Model({
+    this.model = new BB.Model({
       title: attr.title,
       body: attr.body
     });

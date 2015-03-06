@@ -1,11 +1,8 @@
-var _ = require('underscore');
-var Backbone = require('backbone');
-Backbone.Marionette = require('backbone.marionette');
-var $ = require('jquery');
-var _ = require('underscore');
+var BB = require('bb');
 var Handlebars = require('handlebars');
+var _ = require('underscore');
 
-module.exports = Backbone.Marionette.ItemView.extend({
+module.exports = BB.Marionette.ItemView.extend({
   template: Handlebars.compile(require('./editor-agency-view.html')),
 
   events: {

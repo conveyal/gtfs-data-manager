@@ -1,9 +1,6 @@
 {
   "name": "user",
-  "dependencies": {
-    "jashkenas/backbone": "*",
-    "jashkenas/underscore": "*"
-  },
+  "local": ["bb"],
   "main": "user.js",
   "scripts": ["user.js"]
 }

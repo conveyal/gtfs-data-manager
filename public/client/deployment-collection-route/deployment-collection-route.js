@@ -1,9 +1,8 @@
+var app = require('application');
 var DeploymentCollection = require('deployment-collection');
 var DeploymentCollectionView = require('deployment-collection-view');
 var FeedCollection = require('feed-collection');
-var app = require('application');
 var _ = require('underscore');
-var $ = require('jquery');
 
 module.exports = function (feedCollectionId) {
   var d = new DeploymentCollection();

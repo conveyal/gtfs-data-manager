@@ -1,11 +1,7 @@
-var Backbone = require('backbone');
-Backbone.Marionette = require('backbone.marionette');
-var $ = require('jquery');
-var _ = require('underscore');
-var Handlebars = require('handlebars.js');
 var app = require('application');
 var Deployment = require('deployment');
 var DeploymentView = require('deployment-view');
+var Handlebars = require('handlebars.js');
 
 module.exports = function(deploymentId) {
   var d = new Deployment({

@@ -3,9 +3,7 @@
  * This primarily consists of validation results
  */
 
-var Backbone = require('backbone');
-Backbone.Marionette = require('backbone.marionette');
-var $ = require('jquery');
+var BB = require('bb');
 var _ = require('underscore');
 var Handlebars = require('handlebars');
 var app = require('application');
@@ -14,7 +12,7 @@ var FeedUploadView = require('feed-upload-view');
 var FeedSource = require('feed-source');
 var FeedVersion = require('feed-version');
 
-var InvalidValuesList = Backbone.Marionette.ItemView.extend({
+var InvalidValuesList = BB.Marionette.ItemView.extend({
     // rather than having a ton of levels of nested views, since we're not editing, most of the
     // recursion occurs in the template
     template: Handlebars.compile(require('./invalid-values-list.html')),
@@ -56,7 +54,7 @@ var InvalidValuesList = Backbone.Marionette.ItemView.extend({
         }
 
         // we use a bare Backbone.Model to pass the tree to the template
-        this.model = new Backbone.Model({
+        this.model = new BB.Model({
           showRoute: showRoute,
           title: Messages('app.feed_version.' + attr.type + '_warnings'),
           type: attr.type,
@@ -65,7 +63,7 @@ var InvalidValuesList = Backbone.Marionette.ItemView.extend({
     }
 });
 
-module.exports = Backbone.Marionette.LayoutView.extend({
+module.exports = BB.Marionette.LayoutView.extend({
     template: Handlebars.compile(require('./feed-version-view.html')),
 
     regions: {

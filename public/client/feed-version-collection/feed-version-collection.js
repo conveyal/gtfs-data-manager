@@ -1,8 +1,7 @@
-var _ = require('underscore');
-var Backbone = require('Backbone');
+var BB = require('bb');
 var FeedVersion = require('feed-version');
 
-module.exports = Backbone.Collection.extend({
+module.exports = BB.Collection.extend({
     model: FeedVersion,
     url: 'api/feedversions',
     // sort by name, then reverse-sort by version

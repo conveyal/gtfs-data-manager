@@ -1,8 +1,8 @@
-var _ = require('underscore');
-var Backbone = require('Backbone');
+var BB = require('bb');
 var FeedSource = require('feed-source');
+var _ = require('underscore');
 
-module.exports = Backbone.Collection.extend({
+module.exports = BB.Collection.extend({
   model: FeedSource,
   url: 'api/feedsources',
 

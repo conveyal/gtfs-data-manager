@@ -1,11 +1,7 @@
 {
     "name": "feed-version-collection",
-    "dependencies": {
-	"jashkenas/backbone": "*",
-	"jashkenas/underscore": "*"
-    },
-    "locals": ["feed-version"],
+    "local": ["bb", "feed-version"],
     "main": "feed-version-collection.js",
     "scripts": ["feed-version-collection.js"]
 }
- 
+

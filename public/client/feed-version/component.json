@@ -1,9 +1,9 @@
 {
     "name": "feed-version",
     "dependencies": {
-	"jashkenas/backbone": "*",
-	"jashkenas/underscore": "*"
+	     "jashkenas/underscore": "*"
     },
+    "local": ["bb"],
     "main": "feed-version.js",
     "scripts": ["feed-version.js"]
 }

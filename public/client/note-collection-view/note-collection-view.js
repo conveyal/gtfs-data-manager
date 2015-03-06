@@ -2,15 +2,13 @@
  * Show a bunch of notes, comment-style
  */
 
-var Backbone = require('backbone');
-Backbone.Marionette = require('backbone.marionette');
-var $ = require('jquery');
+var BB = require('bb');
 var _ = require('underscore');
 var Handlebars = require('handlebars');
 var NoteCollection = require('note-collection');
 var Note = require('note');
 
-var NoteItemView = Backbone.Marionette.ItemView.extend({
+var NoteItemView = BB.Marionette.ItemView.extend({
   template: Handlebars.compile(require('./note-item-view.html'))
 });
 
@@ -18,7 +16,7 @@ var NoteItemView = Backbone.Marionette.ItemView.extend({
  * Instantiate a new NoteCollectionView like so:
  * new NoteCollectionView({objectId: 'u-u-i-d', type: 'FEED_SOURCE'})
  */
-module.exports = Backbone.Marionette.CompositeView.extend({
+module.exports = BB.Marionette.CompositeView.extend({
   template: Handlebars.compile(require('./note-collection-view.html')),
   childView: NoteItemView,
   className: 'row',

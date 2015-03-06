@@ -2,9 +2,7 @@
  * Show some information about a feed source
  */
 
-var Backbone = require('backbone');
-Backbone.Marionette = require('backbone.marionette');
-var $ = require('jquery');
+var BB = require('bb');
 var _ = require('underscore');
 var Handlebars = require('handlebars.js');
 var app = require('application');
@@ -13,7 +11,7 @@ var FeedVersionView = require('feed-version-view');
 var NoteCollectionView = require('note-collection-view');
 var FeedVersionNavigationView = require('feed-version-navigation-view');
 
-module.exports = Backbone.Marionette.LayoutView.extend({
+module.exports = BB.Marionette.LayoutView.extend({
   template: Handlebars.compile(require("./feed-source-view.html")),
   regions: {
     validationRegion: '#validation',
@@ -31,9 +29,9 @@ module.exports = Backbone.Marionette.LayoutView.extend({
   },
 
   onShow: function() {
-    var version;
+    var instance, version;
 
-    if (this.feedVersionId != undefined && this.feedVersionId != null)
+    if (this.feedVersionId)
       version = new FeedVersion({
         id: this.feedVersionId
       });
@@ -53,7 +51,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
 
   if (version.get('id') !== null) {
 
-    var instance = this;
+    instance = this;
     version.fetch().done(function() {
       instance.validationRegion.show(new FeedVersionView({
         model: version
@@ -83,13 +81,13 @@ module.exports = Backbone.Marionette.LayoutView.extend({
 
   // expose the copypastable URL to allow users to view/edit
   if (app.user.admin) {
-    var instance = this;
+    instance = this;
     $.ajax({
       url: 'api/feedsources/' + this.model.get('id') + '/getKey',
       success: function(data) {
         instance.$('#share-url').val(window.location.origin + window.location.pathname + window.location.hash +
-          '?userId=' + encodeURIComponent(data['userId']) +
-          '&key=' + encodeURIComponent(data['key']));
+          '?userId=' + encodeURIComponent(data.userId) +
+          '&key=' + encodeURIComponent(data.key));
       }
     });
   }

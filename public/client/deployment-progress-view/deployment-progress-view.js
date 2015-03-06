@@ -1,14 +1,12 @@
-var Backbone = require('backbone');
-Backbone.Marionette = require('backbone.marionette');
+var BB = require('bb');
 var _ = require('underscore');
 var Handlebars = require('handlebars');
-var $ = require('jquery');
 
-module.exports = Backbone.Marionette.ItemView.extend({
+module.exports = BB.Marionette.ItemView.extend({
       template: Handlebars.compile(require('./deployment-progress-view.html')),
 
       initialize: function(attr) {
-        this.model = new Backbone.Model({
+        this.model = new BB.Model({
           name: attr.deployment.get('name'),
           target: attr.target
         });

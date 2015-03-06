@@ -1,13 +1,9 @@
 {
     "name":"feed-version-collection-view",
     "dependencies" : {
-        "jashkenas/backbone": "*",
-        "jashkenas/underscore": "*",
-        "marionettejs/backbone.marionette": "*",
-        "components/handlebars.js": "*",
-        "components/jquery": "1.11.1"
+        "components/handlebars.js": "*"
     },
-    "local": ["feed-version", "application"],
+    "local": ["bb", "feed-version", "application"],
     "main": "feed-version-collection-view.js",
     "scripts": ["feed-version-collection-view.js"],
     "templates": ["feed-version-collection-view.html", "feed-version-item-view.html"]

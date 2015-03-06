@@ -2,7 +2,7 @@
     "name": "validation-partial",
     "description": "Summary of validation results",
     "dependencies": {
-        "components/handlebars.js": "*"
+      "components/handlebars.js": "*"
     },
     "main": "validation-partial.js",
     "scripts": ["validation-partial.js"],

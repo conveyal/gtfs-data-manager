@@ -2,12 +2,12 @@
   "name": "deployment-progress-view",
   "description": "show the progress of a deployment",
   "dependencies": {
-    "jashkenas/backbone": "*",
     "jashkenas/underscore": "*",
-    "marionettejs/backbone.marionette": "*",
-    "components/handlebars.js": "*",
-    "components/jquery": "1.11.1"
+    "components/handlebars.js": "*"
   },
+  "local": [
+    "bb"
+  ],
   "main": "deployment-progress-view.js",
   "scripts": ["deployment-progress-view.js"],
   "templates": ["deployment-progress-view.html"]

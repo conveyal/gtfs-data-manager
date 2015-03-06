@@ -1,8 +1,7 @@
-var _ = require('underscore');
-var Backbone = require('Backbone');
+var BB = require('bb');
 var User = require('user');
 
-module.exports = Backbone.Collection.extend({
+module.exports = BB.Collection.extend({
   model: User,
   url: 'api/users'
 });
