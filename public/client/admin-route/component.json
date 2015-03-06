@@ -1,14 +1,10 @@
 {
-    "name": "admin-route",
-    "description": "Route to show all of the defined feed collections",
-    "dependencies": {
-	"jashkenas/backbone": "*",
-	"jashkenas/underscore": "*",
-	"components/jquery": "1.11.1",
-	"marionettejs/backbone.marionette": "*",
-	"components/handlebars.js": "*"
-    },
-    "local": ["application", "feed-collection-collection", "feed-collection-collection-view"],
-    "scripts": ["admin-route.js"],
-    "templates": ["admin-route.html"]
+  "name": "admin-route",
+  "description": "Route to show all of the defined feed collections",
+  "dependencies": {
+    "components/handlebars.js": "*"
+  },
+  "local": ["application", "bb", "feed-collection-collection", "feed-collection-collection-view"],
+  "scripts": ["admin-route.js"],
+  "templates": ["admin-route.html"]
 }

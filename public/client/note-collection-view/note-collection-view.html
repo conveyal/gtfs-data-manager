@@ -1,15 +1,9 @@
-<div class="row new-comment panel">
-  <div class="panel-body">
-    <form action="#" class="form-horizontal">
-      <div class="form-group">
-        <label for="new-note" class="sr-only">{{ t 'app.note.new' }}</label>
-        <div class="col-sm-5">
-          <textarea class="form-control" placeholder="{{ t 'app.note.new' }}" />
-        </div>
-        <div class="col-sm-2">
-          <input type="submit" class="btn btn-primary" value="{{ t 'app.note.create' }}" />
-        </div>
-      </div>
-    </form>
-  </div>
+<div class="new-comment">
+  <form action="#" class="col-sm-6">
+    <div class="form-group">
+      <label for="new-note" class="sr-only">{{ t 'app.note.new' }}</label>
+      <textarea class="form-control" placeholder="{{ t 'app.note.new' }}"></textarea>
+    </div>
+    <input type="submit" class="btn btn-block btn-primary" value="{{ t 'app.note.create' }}">
+  </form>
 </div>

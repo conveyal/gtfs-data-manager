@@ -1,14 +1,13 @@
 {
   "name": "user-view",
-  "dependencies" : {
-    "jashkenas/backbone": "*",
-    "marionettejs/backbone.marionette": "*",
+  "dependencies": {
+    "jashkenas/underscore": "*",
     "components/handlebars.js": "*",
     "kpwebb/select2": "*"
   },
   "description": "A view used to edit a single user",
   "main": "user-view.js",
-  "locals": ["application"],
+  "local": ["application", "bb", "feed-source-collection"],
   "scripts": ["user-view.js"],
   "templates": ["user-view.html"]
 }

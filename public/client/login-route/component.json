@@ -1,15 +1,13 @@
 {
-    "name": "login-route",
-    "dependencies": {
-	"jashkenas/backbone": "*",
-	"jashkenas/underscore": "*",
-	"components/jquery": "1.11.1",
-	"marionettejs/backbone.marionette": "*",
-	"components/handlebars.js": "*"
-    },
-    "local" : [
-        "application"
-    ],
-    "scripts": ["login-route.js"],
-    "templates": ["login-route.html"]
+  "name": "login-route",
+  "dependencies": {
+    "jashkenas/underscore": "*",
+    "components/handlebars.js": "*"
+  },
+  "local": [
+    "application",
+    "bb"
+  ],
+  "scripts": ["login-route.js"],
+  "templates": ["login-route.html"]
 }

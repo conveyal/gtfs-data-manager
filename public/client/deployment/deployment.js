@@ -1,13 +1,12 @@
-var _ = require('underscore');
-var Backbone = require('Backbone');
+var BB = require('bb');
 
-module.exports = Backbone.Model.extend({
-    defaults: {
-      feedCollection: null,
-      feedVersions: null,
-      osmFileId: null,
-      otpCommit: null,
-      deployedTo: null
-    },
-    urlRoot: 'api/deployments/'
+module.exports = BB.Model.extend({
+  defaults: {
+    feedCollection: null,
+    feedVersions: null,
+    osmFileId: null,
+    otpCommit: null,
+    deployedTo: null
+  },
+  urlRoot: 'api/deployments/'
 });

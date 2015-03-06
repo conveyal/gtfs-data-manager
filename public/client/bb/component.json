@@ -1,0 +1,11 @@
+{
+  "name": "bb",
+  "dependencies": {
+    "components/jquery": "1.11.2",
+    "jashkenas/backbone": "*",
+    "marionettejs/backbone.marionette": "*"
+  },
+  "scripts": [
+    "index.js"
+  ]
+}

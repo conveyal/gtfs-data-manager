@@ -1,14 +1,11 @@
 {
-    "name":"note-collection-view",
-    "dependencies" : {
-        "jashkenas/backbone": "*",
-        "jashkenas/underscore": "*",
-        "marionettejs/backbone.marionette": "*",
-        "components/handlebars.js": "*",
-        "components/jquery": "1.11.1"
-    },
-    "local": ["note", "note-collection"],
-    "main": "note-collection-view.js",
-    "scripts": ["note-collection-view.js"],
-    "templates": ["note-collection-view.html", "note-item-view.html"]
+  "name": "note-collection-view",
+  "dependencies": {
+    "jashkenas/underscore": "*",
+    "components/handlebars.js": "*"
+  },
+  "local": ["bb", "note", "note-collection"],
+  "main": "note-collection-view.js",
+  "scripts": ["note-collection-view.js"],
+  "templates": ["note-collection-view.html", "note-item-view.html"]
 }

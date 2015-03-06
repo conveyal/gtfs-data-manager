@@ -1,22 +1,22 @@
 {
-    "name": "application",
-    "dependencies": {
-        "jashkenas/backbone": "*",
-        "jashkenas/underscore": "*",
-        "components/jquery": "1.11.1",
-        "marionettejs/backbone.marionette": "*",
-        "components/handlebars.js": "*"
-    },
-    "scripts": ["application.js"],
-    "local": [
-        "date-render-helper",
-        "translate-helper",
-        "class-helper",
-        "logic-helper",
-        "breadcrumb-nav",
-        "text-helper",
-        "admin-helper",
-        "validation-partial"
-    ],
-    "styles": ["application.css"]
+  "name": "application",
+  "dependencies": {
+    "components/bootstrap": "3.3.2",
+    "components/handlebars.js": "*",
+    "es-shims/es5-shim": "*",
+    "es-shims/es6-shim": "*"
+  },
+  "scripts": ["application.js"],
+  "local": [
+    "bb",
+    "date-render-helper",
+    "translate-helper",
+    "class-helper",
+    "logic-helper",
+    "breadcrumb-nav",
+    "text-helper",
+    "admin-helper",
+    "validation-partial"
+  ],
+  "styles": ["application.css"]
 }

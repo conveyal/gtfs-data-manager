@@ -1,9 +1,6 @@
 {
-    "name": "feed-source",
-    "dependencies": {
-	"jashkenas/backbone": "*",
-	"jashkenas/underscore": "*"
-    },
-    "main": "feed-source.js",
-    "scripts": ["feed-source.js"]
+  "name": "feed-source",
+  "local": ["bb"],
+  "main": "feed-source.js",
+  "scripts": ["feed-source.js"]
 }

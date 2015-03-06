@@ -1,9 +1,9 @@
 {
-    "name": "text-helper",
-    "description": "Handlebars helpers for text manipulation",
-    "dependencies": {
-        "components/handlebars.js": "*"
-    },
-    "main": "text-helper.js",
-    "scripts": ["text-helper.js", "join.js"]
+  "name": "text-helper",
+  "description": "Handlebars helpers for text manipulation",
+  "dependencies": {
+    "components/handlebars.js": "*"
+  },
+  "main": "text-helper.js",
+  "scripts": ["text-helper.js", "join.js"]
 }

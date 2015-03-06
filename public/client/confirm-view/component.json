@@ -2,11 +2,12 @@
   "name": "confirm-view",
   "description": "Ask the user if they want to proceed",
   "dependencies": {
-    "jashkenas/backbone": "*",
     "jashkenas/underscore": "*",
-    "marionettejs/backbone.marionette": "*",
     "components/handlebars.js": "*"
   },
+  "local": [
+    "bb"
+  ],
   "scripts": ["confirm-view.js"],
   "templates": ["confirm-view.html"]
 }

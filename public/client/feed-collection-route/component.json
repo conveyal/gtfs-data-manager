@@ -1,14 +1,11 @@
 {
-    "name": "feed-collection-route",
-    "description": "An overview of a feed collection: what feeds are defined, &c.",
-    "dependencies": {
-        "jashkenas/backbone": "*",
-        "jashkenas/underscore": "*",
-        "components/jquery": "1.11.1",
-        "marionettejs/backbone.marionette": "*",
-        "components/handlebars.js": "*"
-    },
-    "local": ["application", "feed-collection", "feed-source-collection", "feed-source-collection-view"],
-    "scripts": ["feed-collection-route.js"],
-    "templates": ["feed-collection-route.html"]
+  "name": "feed-collection-route",
+  "description": "An overview of a feed collection: what feeds are defined, &c.",
+  "dependencies": {
+    "jashkenas/underscore": "*",
+    "components/handlebars.js": "*"
+  },
+  "local": ["application", "bb", "feed-collection", "feed-source-collection", "feed-source-collection-view"],
+  "scripts": ["feed-collection-route.js"],
+  "templates": ["feed-collection-route.html"]
 }

@@ -1,10 +1,6 @@
 {
-    "name": "gtfs-data-manager",
-    "paths": ["client"],
-    "local": ["routes"],
-    "dependencies": {
-        "components/bootstrap": "3.2.0",
-        "components/bootstrap-default": "3.2.0",
-        "components/jquery": "1.11.1"
-    }
+  "name": "gtfs-data-manager",
+  "paths": ["client"],
+  "local": ["routes"],
+  "development": {}
 }

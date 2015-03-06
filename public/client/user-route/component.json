@@ -1,7 +1,7 @@
 {
   "name": "user-route",
   "descripton": "the route for editing a single user",
-  "locals": ["user", "application", "user-view"],
+  "local": ["user", "application", "user-view"],
   "main": "user-route.js",
   "scripts": ["user-route.js"]
 }

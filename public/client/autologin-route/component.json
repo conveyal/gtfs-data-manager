@@ -1,7 +1,7 @@
 {
-    "name": "autologin-route",
-    "description": "Automatically log a user in with a key and userId",
-    "local": ["application"],
-    "main": "autologin-route.js",
-    "scripts": ["autologin-route.js"]
+  "name": "autologin-route",
+  "description": "Automatically log a user in with a key and userId",
+  "local": ["application"],
+  "main": "autologin-route.js",
+  "scripts": ["autologin-route.js"]
 }

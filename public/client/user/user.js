@@ -1,6 +1,6 @@
-var Backbone = require('Backbone');
+var BB = require('bb');
 
-module.exports = Backbone.Model.extend({
+module.exports = BB.Model.extend({
   defaults: {
     id: null,
     username: null,

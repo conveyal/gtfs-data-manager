@@ -1,6 +1,4 @@
-var Backbone = require('backbone');
-Backbone.Marionette = require('backbone.marionette');
-var $ = require('jquery');
+var BB = require('bb');
 var _ = require('underscore');
 var FeedSource = require('feed-source');
 var Handlebars = require('handlebars');
@@ -11,7 +9,7 @@ var FeedSourceItemView = require('feed-source-item-view');
 /**
  * An editable table of FeedSources
  */
-module.exports = Backbone.Marionette.CompositeView.extend({
+module.exports = BB.Marionette.CompositeView.extend({
   childView: FeedSourceItemView,
   childViewContainer: 'tbody',
   template: Handlebars.compile(require('./feed-source-collection-view.html')),
@@ -22,17 +20,17 @@ module.exports = Backbone.Marionette.CompositeView.extend({
     'click .sort-by': 'sortBy'
   },
 
-  onRender: function () {
+  onRender: function() {
     // set up sort indicators
     this.$('.sort-marker').remove();
 
     this.$('a[data-attr="' + this.collection.sortAttribute + '"]').parent();
 
-    var span =   $('<span>')
-    .addClass('glyphicon')
-    .addClass('sort-marker')
-    .addClass(this.collection.sortBackwards ? 'glyphicon-sort-by-alphabet-alt' : 'glyphicon-sort-by-alphabet')
-    .appendTo(this.$('a[data-attr="' + this.collection.sortAttribute + '"]').parent());
+    var span = $('<span>')
+      .addClass('glyphicon')
+      .addClass('sort-marker')
+      .addClass(this.collection.sortBackwards ? 'glyphicon-sort-by-alphabet-alt' : 'glyphicon-sort-by-alphabet')
+      .appendTo(this.$('a[data-attr="' + this.collection.sortAttribute + '"]').parent());
   },
 
   initialize: function(attr) {
@@ -49,7 +47,7 @@ module.exports = Backbone.Marionette.CompositeView.extend({
     }
 
     // use a bare model to pass random bits to the template
-    this.model = new Backbone.Model({
+    this.model = new BB.Model({
       showNewFeedButton: showNewFeedButton,
       showDeployPublicButton: showDeployPublicButton
     });
@@ -73,11 +71,11 @@ module.exports = Backbone.Marionette.CompositeView.extend({
    * deploy the public feeds to a directory, where they are presumably consumed
    * by a front-end web server.
    */
-   deployPublic: function () {
-     var instance = this;
+  deployPublic: function() {
+    var instance = this;
 
-     // user feedback
-     this.$('.deploy-public span.glyphicon')
+    // user feedback
+    this.$('.deploy-public span.glyphicon')
       // set up spinner
       .removeClass('glyphicon-upload').addClass('glyphicon-refresh').addClass('spinner')
       .parent()
@@ -86,28 +84,30 @@ module.exports = Backbone.Marionette.CompositeView.extend({
     this.$('.deploy-public span.button-label')
       .text(window.Messages('app.deploy-public.updating'));
 
-    $.post('deployPublic', {feedCollectionId: this.feedCollectionId})
-      .done(function () {
+    $.post('deployPublic', {
+        feedCollectionId: this.feedCollectionId
+      })
+      .done(function() {
         instance.$('.deploy-public span.glyphicon')
-        // set up spinner
+          // set up spinner
           .addClass('glyphicon-upload').removeClass('glyphicon-refresh').removeClass('spinner')
           .parent()
           .prop('disabled', false);
 
         instance.$('.deploy-public span.button-label')
-        .text(window.Messages('app.deploy-public'));
+          .text(window.Messages('app.deploy-public'));
       });
-   },
+  },
 
-   /** sort by a particular column. new feeds are still at the top */
-   sortBy: function (e) {
-     e.preventDefault();
-     var attr = $(e.target).attr('data-attr');
+  /** sort by a particular column. new feeds are still at the top */
+  sortBy: function(e) {
+    e.preventDefault();
+    var attr = $(e.target).attr('data-attr');
 
-     // sort backwards on second click
-     this.collection.sortBackwards = this.collection.sortAttribute == attr && !this.collection.sortBackwards;
-     this.collection.sortAttribute = attr;
+    // sort backwards on second click
+    this.collection.sortBackwards = this.collection.sortAttribute == attr && !this.collection.sortBackwards;
+    this.collection.sortAttribute = attr;
 
-     this.collection.sort();
-   }
+    this.collection.sort();
+  }
 });

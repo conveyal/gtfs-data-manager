@@ -1,23 +1,23 @@
-var Backbone = require('backbone');
-Backbone.Marionette = require('backbone.marionette');
-var $ = require('jquery');
-var _ = require('underscore');
-var Handlebars = require('handlebars');
+var BB = require('bb');
 var Deployment = require('deployment');
+var Handlebars = require('handlebars');
+var _ = require('underscore');
 
-var DeploymentItemView = Backbone.Marionette.ItemView.extend({
+var DeploymentItemView = BB.Marionette.ItemView.extend({
   tagName: 'tr',
   template: Handlebars.compile(require('./deployment-item-view.html'))
 });
 
-module.exports = Backbone.Marionette.CompositeView.extend({
+module.exports = BB.Marionette.CompositeView.extend({
   template: Handlebars.compile(require('./deployment-collection-view.html')),
   childView: DeploymentItemView,
   childViewContainer: 'tbody',
 
-  events: { 'click .new-deployment': 'deploy'},
+  events: {
+    'click .new-deployment': 'deploy'
+  },
 
-  initialize: function () {
+  initialize: function() {
     _.bindAll(this, 'deploy');
   },
 
@@ -32,7 +32,9 @@ module.exports = Backbone.Marionette.CompositeView.extend({
     date += String(now.getDate() < 10 ? '0' + now.getDate() : now.getDate());
 
     var d = new Deployment({
-      feedCollection: {id: this.model.id},
+      feedCollection: {
+        id: this.model.id
+      },
       name: this.model.get('name').toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '') + '-' + date
     });
     d.save().done(function() {

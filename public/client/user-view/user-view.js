@@ -1,14 +1,11 @@
-var Backbone = require('Backbone');
-Backbone.Marionette = require('backbone.marionette');
+var BB = require('bb');
 var Handlebars = require('handlebars.js');
 var app = require('application');
 var _ = require('underscore');
-var $ = require('jquery');
-jQuery = $;
 require('select2');
 var FeedSourceCollection = require('feed-source-collection');
 
-module.exports = Backbone.Marionette.ItemView.extend({
+module.exports = BB.Marionette.ItemView.extend({
   template: Handlebars.compile(require('./user-view.html')),
   events: {
     'keyup .password': 'validatePassword',
@@ -45,7 +42,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
     _.bindAll(this, 'validatePassword', 'saveChanges');
   },
 
-  onShow: function () {
+  onShow: function() {
     var instance = this;
 
     // initialize the select box, if the user is an admin
@@ -97,7 +94,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
       if (username)
         this.model.set('username', username);
       else
-        // TODO: alert what went wrong
+      // TODO: alert what went wrong
         return false;
     }
 
@@ -117,7 +114,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
     }
 
     if (app.user.admin) {
-      _.each(this.$('#feedsources').val(), function (fsid) {
+      _.each(this.$('#feedsources').val(), function(fsid) {
         projectPermissions.push({
           project_id: fsid,
           read: true,
@@ -135,7 +132,7 @@ module.exports = Backbone.Marionette.ItemView.extend({
     return true;
   },
 
-  saveChanges: function () {
+  saveChanges: function() {
     var instance = this;
 
     this.$('#error').addClass('hidden');
@@ -149,14 +146,14 @@ module.exports = Backbone.Marionette.ItemView.extend({
     var id = this.model.id;
 
     // if it's a new user, send them back to the user list
-    this.model.save().done(function () {
-      if (!id) {
-        window.location.hash = '#users';
-      }
-    })
-    .fail(function () {
-      instance.$('#error').removeClass('hidden');
-    });
+    this.model.save().done(function() {
+        if (!id) {
+          window.location.hash = '#users';
+        }
+      })
+      .fail(function() {
+        instance.$('#error').removeClass('hidden');
+      });
 
     // no need to keep these floating around on the client
     this.model.set('password', null);

@@ -2,10 +2,10 @@
  * A model representing a feed version
  */
 
+var BB = require('bb');
 var _ = require('underscore');
-var Backbone = require('Backbone');
 
-module.exports = Backbone.Model.extend({
+module.exports = BB.Model.extend({
   defaults: {
     id: null,
     feedSource: null,

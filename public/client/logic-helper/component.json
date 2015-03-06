@@ -1,16 +1,17 @@
 {
-    "name": "logic-helper",
-    "description": "Add logic to handlebars",
-    "dependencies": {
-        "components/handlebars.js": "*"
-    },
-    "main": "logic-helper.js",
-    "scripts": [
-        "logic-helper.js",
-        "ternary.js",
-        "eq.js",
-        "neq.js",
-        "gt.js",
-        "and.js"
-    ]
+  "name": "logic-helper",
+  "description": "Add logic to handlebars",
+  "dependencies": {
+    "jashkenas/underscore": "*",
+    "components/handlebars.js": "*"
+  },
+  "main": "logic-helper.js",
+  "scripts": [
+    "logic-helper.js",
+    "ternary.js",
+    "eq.js",
+    "neq.js",
+    "gt.js",
+    "and.js"
+  ]
 }

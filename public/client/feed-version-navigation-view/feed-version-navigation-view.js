@@ -1,14 +1,12 @@
-var Backbone = require('backbone');
-Backbone.Marionette = require('backbone.marionette');
+var BB = require('bb');
 var Handlebars = require('handlebars.js');
 var _ = require('underscore');
 var FeedVersion = require('feed-version');
 var FeedUploadView = require('feed-upload-view');
 var FeedSource = require('feed-source');
 var app = require('application');
-var $ = require('jquery');
 
-module.exports = Backbone.Marionette.LayoutView.extend({
+module.exports = BB.Marionette.LayoutView.extend({
   template: Handlebars.compile(require('./feed-version-navigation-view.html')),
 
   events: {
@@ -42,7 +40,7 @@ module.exports = Backbone.Marionette.LayoutView.extend({
         $t.find('span.button-label').text(window.Messages('app.feed_version.update'));
 
         if (data === null) {
-          alert('Feed has not changed');
+          window.alert('Feed has not changed');
         } else {
           var newVersion = new FeedVersion(data);
           window.location.hash = '#feed/' + newVersion.get('feedSource').id + '/' + newVersion.id;

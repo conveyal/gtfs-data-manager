@@ -1,15 +1,12 @@
 {
-    "name":"feed-source-item-view",
-    "dependencies" : {
-        "jashkenas/backbone": "*",
-        "jashkenas/underscore": "*",
-        "marionettejs/backbone.marionette": "*",
-        "components/handlebars.js": "*",
-        "components/jquery": "1.11.1"
-    },
-    "local": ["editable-text-widget", "confirm-view", "application", "editor-agency-view"],
-    "main": "feed-source-item-view.js",
-    "scripts": ["feed-source-item-view.js"],
-    "templates": ["feed-source-item-view.html"],
-    "styles": ["feed-source-item-view.css"]
+  "name": "feed-source-item-view",
+  "dependencies": {
+    "jashkenas/underscore": "*",
+    "components/handlebars.js": "*"
+  },
+  "local": ["bb", "editable-text-widget", "confirm-view", "application", "editor-agency-view"],
+  "main": "feed-source-item-view.js",
+  "scripts": ["feed-source-item-view.js"],
+  "templates": ["feed-source-item-view.html"],
+  "styles": ["feed-source-item-view.css"]
 }

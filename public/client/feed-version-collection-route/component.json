@@ -1,7 +1,7 @@
 {
-    "name": "feed-version-collection-route",
-    "description": "The route for showing all feed versions for a feed source.",
-    "locals": ["application", "feed-version-collection", "feed-version-collection-view"],
-    "main": "feed-version-collection-route.js",
-    "scripts": ["feed-version-collection-route.js"]
+  "name": "feed-version-collection-route",
+  "description": "The route for showing all feed versions for a feed source.",
+  "local": ["application", "feed-version-collection", "feed-version-collection-view"],
+  "main": "feed-version-collection-route.js",
+  "scripts": ["feed-version-collection-route.js"]
 }

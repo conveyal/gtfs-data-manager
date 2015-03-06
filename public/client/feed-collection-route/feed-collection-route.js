@@ -1,14 +1,12 @@
-var Backbone = require('backbone');
-Backbone.Marionette = require('backbone.marionette');
-var $ = require('jquery');
-var _ = require('underscore');
-var Handlebars = require('handlebars.js');
 var app = require('application');
+var BB = require('bb');
 var FeedSourceCollection = require('feed-source-collection');
 var FeedCollection = require('feed-collection');
 var FeedSourceCollectionView = require('feed-source-collection-view');
+var Handlebars = require('handlebars.js');
+var _ = require('underscore');
 
-var Overview = Backbone.Marionette.LayoutView.extend({
+var Overview = BB.Marionette.LayoutView.extend({
   regions: {
     feedSourceRegion: '#feed-sources'
   },
@@ -21,7 +19,10 @@ var Overview = Backbone.Marionette.LayoutView.extend({
     var showDeploymentButton = !(app.user && !app.user.admin);
 
     // use a bare model to pass ID to template
-    this.model = new Backbone.Model({feedCollectionId: this.feedCollectionId, showDeploymentButton: showDeploymentButton});
+    this.model = new BB.Model({
+      feedCollectionId: this.feedCollectionId,
+      showDeploymentButton: showDeploymentButton
+    });
   },
 
   onShow: function() {

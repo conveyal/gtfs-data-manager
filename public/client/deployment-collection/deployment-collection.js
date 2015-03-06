@@ -1,10 +1,11 @@
-var _ = require('underscore');
-var Backbone = require('Backbone');
+var BB = require('bb');
 var Deployment = require('deployment');
 
-module.exports = Backbone.Collection.extend({
-    model: Deployment,
-    url: 'api/deployments',
-    // reverse-sort by date created
-    comparator: function (d) { return -d.get('dateCreated'); }
+module.exports = BB.Collection.extend({
+  model: Deployment,
+  url: 'api/deployments',
+  // reverse-sort by date created
+  comparator: function(d) {
+    return -d.get('dateCreated');
+  }
 });

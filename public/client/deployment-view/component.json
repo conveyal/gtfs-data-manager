@@ -2,13 +2,10 @@
   "name": "deployment-view",
   "description": "show a single deployment",
   "dependencies": {
-    "jashkenas/backbone": "*",
     "jashkenas/underscore": "*",
-    "marionettejs/backbone.marionette": "*",
-    "components/handlebars.js": "*",
-    "components/jquery": "1.11.1"
+    "components/handlebars.js": "*"
   },
-  "local": ["feed-collection", "feed-version-collection", "feed-source-collection", "feed-source-collection-view",
+  "local": ["bb", "feed-collection", "feed-version-collection", "feed-source-collection", "feed-source-collection-view",
     "feed-version", "editable-text-widget", "application", "confirm-view", "deployment-progress-view"
   ],
   "main": "deployment-view.js",

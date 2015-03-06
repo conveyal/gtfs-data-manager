@@ -1,7 +1,7 @@
 {
   "name": "new-user-route",
   "description": "create a new user",
-  "locals": ["user", "application", "user-view"],
+  "local": ["user", "application", "user-view"],
   "main": "new-user-route.js",
   "scripts": ["new-user-route.js"]
 }

@@ -1,7 +1,7 @@
 {
-    "name": "feed-source-route",
-    "description": "The route for showing a feed source.",
-    "locals": ["application", "feed-source", "feed-source-view"],
-    "main": "feed-source-route.js",
-    "scripts": ["feed-source-route.js"]
+  "name": "feed-source-route",
+  "description": "The route for showing a feed source.",
+  "local": ["application", "feed-source", "feed-source-view"],
+  "main": "feed-source-route.js",
+  "scripts": ["feed-source-route.js"]
 }

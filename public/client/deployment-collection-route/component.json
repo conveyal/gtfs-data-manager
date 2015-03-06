@@ -1,5 +1,8 @@
 {
   "name": "deployment-collection-route",
+  "dependencies": {
+    "jashkenas/underscore": "*"
+  },
   "local": ["feed-collection", "deployment-collection", "deployment-collection-view", "application"],
   "main": "deployment-collection-route.js",
   "scripts": ["deployment-collection-route.js"]
