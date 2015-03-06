@@ -17,24 +17,26 @@
   {{#if (neq deployedTo null)}}
     <span class="badge">{{ deployedTo }}</span>
   {{/if}}
-  </h2>
+</h2>
 
-<table class="table table-striped table-hover table-condensed">
-  <thead>
-    <th>{{ t 'app.feed_source.name' }}</th>
-    <th>{{ t 'app.feed_version.version' }}</th>
-    <th>{{ t 'app.feed_version.date_retrieved' }}</th>
-    <th>{{ t 'app.feed_version.loaded_successfully' }}</th>
-    <th>{{ t 'app.feed_version.error_count' }}</th>
-    <th>{{ t 'app.feed_version.route_count' }}</th>
-    <th>{{ t 'app.feed_version.trip_count' }}</th>
-    <th>{{ t 'app.feed_version.stop_times_count' }}</th>
-    <th>{{ t 'app.feed_version.start_date' }}</th>
-    <th>{{ t 'app.feed_version.end_date' }}</th>
-    <th><!-- nothing, controls column --></th>
-  </thead>
-  <tbody></tbody>
-</table>
+<div class="table-responsive">
+  <table class="table table-striped table-hover table-condensed">
+    <thead>
+      <th>{{ t 'app.feed_source.name' }}</th>
+      <th>{{ t 'app.feed_version.version' }}</th>
+      <th>{{ t 'app.feed_version.date_retrieved' }}</th>
+      <th>{{ t 'app.feed_version.loaded_successfully' }}</th>
+      <th>{{ t 'app.feed_version.error_count' }}</th>
+      <th>{{ t 'app.feed_version.route_count' }}</th>
+      <th>{{ t 'app.feed_version.trip_count' }}</th>
+      <th>{{ t 'app.feed_version.stop_times_count' }}</th>
+      <th>{{ t 'app.feed_version.start_date' }}</th>
+      <th>{{ t 'app.feed_version.end_date' }}</th>
+      <th><!-- nothing, controls column --></th>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
 
 <h2>{{ t 'app.deployment.invalid_feed_sources' }}</h2>
 

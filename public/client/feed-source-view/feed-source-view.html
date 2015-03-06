@@ -30,30 +30,32 @@
   </div>
 </h2>
 
-<table class="table table-striped">
-  <tr>
-    <th>{{ t 'app.feed_source.name' }}</th>
-    <td>{{ name }}</td>
-  </tr>
-  <tr>
-    <th>{{ t 'app.feed_source.public' }}</th>
-    <td>{{ ? isPublic (t 'app.yes') (t 'app.no')}}</td>
-  </tr>
-  {{!--
-  <tr>
-    <th>{{ t 'app.feed_source.retrieval_method' }}</th>
-    <td>{{ t (('app.feed_source.retrieval_method') (retrievalMethod)}}</td>
-  </tr>
-  --}}
-  <tr>
-    <th>{{ t 'app.feed_source.url' }}</th>
-    <td>{{ url }}</td>
-  </tr>
-  <tr>
-    <th>{{ t 'app.feed_source.last_updated' }}</th>
-    <td>{{ dateRender lastUpdated true }}</td>
-  </tr>
-</table>
+<div class="table-responsive">
+  <table class="table table-striped">
+    <tr>
+      <th>{{ t 'app.feed_source.name' }}</th>
+      <td>{{ name }}</td>
+    </tr>
+    <tr>
+      <th>{{ t 'app.feed_source.public' }}</th>
+      <td>{{ ? isPublic (t 'app.yes') (t 'app.no')}}</td>
+    </tr>
+    {{!--
+    <tr>
+      <th>{{ t 'app.feed_source.retrieval_method' }}</th>
+      <td>{{ t (('app.feed_source.retrieval_method') (retrievalMethod)}}</td>
+    </tr>
+    --}}
+    <tr>
+      <th>{{ t 'app.feed_source.url' }}</th>
+      <td>{{ url }}</td>
+    </tr>
+    <tr>
+      <th>{{ t 'app.feed_source.last_updated' }}</th>
+      <td>{{ dateRender lastUpdated true }}</td>
+    </tr>
+  </table>
+</div>
 
 <h4>{{ t 'app.note.source_notes' }}</h4>
 <p class="source-notes"></p>
