@@ -24,7 +24,7 @@ module.exports = BB.View.extend({
       mod.push(val);
     });
 
-    if (mod.length < 2 || mod[1].href === '#login')
+    if (mod.length === 2 && mod[1].href === '#login')
       this.$el.addClass('hidden');
     else
       this.$el.removeClass('hidden');
