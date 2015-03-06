@@ -1,6 +1,6 @@
 {
-  "name":"user-collection-view",
-  "dependencies" : {
+  "name": "user-collection-view",
+  "dependencies": {
     "components/handlebars.js": "*"
   },
   "local": ["bb", "user", "user-collection"],

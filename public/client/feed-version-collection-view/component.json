@@ -1,10 +1,10 @@
 {
-    "name":"feed-version-collection-view",
-    "dependencies" : {
-        "components/handlebars.js": "*"
-    },
-    "local": ["bb", "feed-source", "feed-version", "application"],
-    "main": "feed-version-collection-view.js",
-    "scripts": ["feed-version-collection-view.js"],
-    "templates": ["feed-version-collection-view.html", "feed-version-item-view.html"]
+  "name": "feed-version-collection-view",
+  "dependencies": {
+    "components/handlebars.js": "*"
+  },
+  "local": ["bb", "feed-source", "feed-version", "application"],
+  "main": "feed-version-collection-view.js",
+  "scripts": ["feed-version-collection-view.js"],
+  "templates": ["feed-version-collection-view.html", "feed-version-item-view.html"]
 }

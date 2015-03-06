@@ -1,6 +1,6 @@
 {
   "name": "user-view",
-  "dependencies" : {
+  "dependencies": {
     "jashkenas/underscore": "*",
     "components/handlebars.js": "*",
     "kpwebb/select2": "*"

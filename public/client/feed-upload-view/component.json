@@ -1,11 +1,11 @@
 {
-    "name":"feed-upload-view",
-    "dependencies": {
-      "jashkenas/underscore": "*",
-      "components/handlebars.js": "*"
-    },
-    "local": ["bb"],
-    "main": "feed-upload-view.js",
-    "scripts": ["feed-upload-view.js"],
-    "templates": ["feed-upload-view.html"]
+  "name": "feed-upload-view",
+  "dependencies": {
+    "jashkenas/underscore": "*",
+    "components/handlebars.js": "*"
+  },
+  "local": ["bb"],
+  "main": "feed-upload-view.js",
+  "scripts": ["feed-upload-view.js"],
+  "templates": ["feed-upload-view.html"]
 }

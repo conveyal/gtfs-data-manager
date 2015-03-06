@@ -1,20 +1,20 @@
 {
-    "name": "feed-source-view",
-    "description": "What is the status of a feed source: latest validation results, etc.",
-    "dependencies": {
-        "jashkenas/underscore": "*",
-        "components/handlebars.js": "*"
-    },
-    "local": [
-      "application",
-      "bb",
-      "feed-version",
-      "feed-version-collection",
-      "feed-version-collection-view",
-      "feed-version-view",
-      "note-collection-view",
-      "feed-version-navigation-view"
-      ],
-    "scripts": ["feed-source-view.js"],
-    "templates": ["feed-source-view.html"]
+  "name": "feed-source-view",
+  "description": "What is the status of a feed source: latest validation results, etc.",
+  "dependencies": {
+    "jashkenas/underscore": "*",
+    "components/handlebars.js": "*"
+  },
+  "local": [
+    "application",
+    "bb",
+    "feed-version",
+    "feed-version-collection",
+    "feed-version-collection-view",
+    "feed-version-view",
+    "note-collection-view",
+    "feed-version-navigation-view"
+  ],
+  "scripts": ["feed-source-view.js"],
+  "templates": ["feed-source-view.html"]
 }

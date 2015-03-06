@@ -1,6 +1,6 @@
 {
-  "name":"editor-agency-view",
-  "dependencies" : {
+  "name": "editor-agency-view",
+  "dependencies": {
     "jashkenas/underscore": "*",
     "components/handlebars.js": "*"
   },
@@ -10,4 +10,4 @@
   "main": "editor-agency-view.js",
   "scripts": ["editor-agency-view.js"],
   "templates": ["editor-agency-view.html"]
-  }
+}

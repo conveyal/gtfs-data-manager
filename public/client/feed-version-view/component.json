@@ -1,12 +1,12 @@
 {
-    "name": "feed-version-view",
-    "description": "show a single feed version",
-    "dependencies": {
-        "jashkenas/underscore": "*",
-        "components/handlebars.js": "*"
-    },
-    "local": ["application", "bb", "feed-version", "note-collection-view", "feed-upload-view", "feed-source"],
-    "main": "feed-version-view.js",
-    "scripts": ["feed-version-view.js"],
-    "templates": ["feed-version-view.html", "invalid-values-list.html"]
+  "name": "feed-version-view",
+  "description": "show a single feed version",
+  "dependencies": {
+    "jashkenas/underscore": "*",
+    "components/handlebars.js": "*"
+  },
+  "local": ["application", "bb", "feed-version", "note-collection-view", "feed-upload-view", "feed-source"],
+  "main": "feed-version-view.js",
+  "scripts": ["feed-version-view.js"],
+  "templates": ["feed-version-view.html", "invalid-values-list.html"]
 }

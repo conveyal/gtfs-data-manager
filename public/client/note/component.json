@@ -1,6 +1,6 @@
 {
-    "name": "note",
-    "local": ["bb"],
-    "main": "note.js",
-    "scripts": ["note.js"]
+  "name": "note",
+  "local": ["bb"],
+  "main": "note.js",
+  "scripts": ["note.js"]
 }

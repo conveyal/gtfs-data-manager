@@ -1,12 +1,12 @@
 {
-    "name": "feed-collection-collection-view",
-    "description": "show all of the feed collections",
-    "dependencies": {
-        "jashkenas/underscore": "*",
-        "components/handlebars.js": "*"
-    },
-    "local": ["bb", "editable-text-widget", "feed-collection"],
-    "main": "feed-collection-collection-view.js",
-    "scripts": ["feed-collection-collection-view.js"],
-    "templates": ["feed-collection-collection-view.html"]
+  "name": "feed-collection-collection-view",
+  "description": "show all of the feed collections",
+  "dependencies": {
+    "jashkenas/underscore": "*",
+    "components/handlebars.js": "*"
+  },
+  "local": ["bb", "editable-text-widget", "feed-collection"],
+  "main": "feed-collection-collection-view.js",
+  "scripts": ["feed-collection-collection-view.js"],
+  "templates": ["feed-collection-collection-view.html"]
 }
