@@ -3,7 +3,7 @@
   "dependencies" : {
     "components/handlebars.js": "*"
   },
-  "locals": ["bb", "user", "user-collection"],
+  "local": ["bb", "user", "user-collection"],
   "main": "user-collection-view.js",
   "scripts": ["user-collection-view.js"],
   "templates": ["user-collection-view.html", "user-item-view.html"]

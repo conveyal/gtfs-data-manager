@@ -1,6 +1,7 @@
 {
     "name":"feed-upload-view",
     "dependencies": {
+      "jashkenas/underscore": "*",
       "components/handlebars.js": "*"
     },
     "local": ["bb"],

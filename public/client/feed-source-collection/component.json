@@ -3,7 +3,7 @@
   "dependencies": {
     "jashkenas/underscore": "*"
   },
-  "locals": ["bb", "feed-source"],
+  "local": ["bb", "feed-source"],
   "main": "feed-source-collection.js",
   "scripts": ["feed-source-collection.js"]
 }

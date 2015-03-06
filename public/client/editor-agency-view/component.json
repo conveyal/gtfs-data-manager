@@ -4,6 +4,9 @@
     "jashkenas/underscore": "*",
     "components/handlebars.js": "*"
   },
+  "local": [
+    "bb"
+  ],
   "main": "editor-agency-view.js",
   "scripts": ["editor-agency-view.js"],
   "templates": ["editor-agency-view.html"]

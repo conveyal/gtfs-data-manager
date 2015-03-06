@@ -5,7 +5,7 @@
         "jashkenas/underscore": "*",
         "components/handlebars.js": "*"
     },
-    "locals": ["editable-text-widget", "feed-collection"],
+    "local": ["bb", "editable-text-widget", "feed-collection"],
     "main": "feed-collection-collection-view.js",
     "scripts": ["feed-collection-collection-view.js"],
     "templates": ["feed-collection-collection-view.html"]

@@ -1,6 +1,6 @@
 {
   "name": "note-collection",
-  "locals": ["bb", "note"],
+  "local": ["bb", "note"],
   "main": "note-collection.js",
   "scripts": ["note-collection.js"]
 }

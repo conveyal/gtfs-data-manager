@@ -1,6 +1,6 @@
 {
     "name": "feed-collection-collection",
-    "locals": ["bb","feed-collection"],
+    "local": ["bb","feed-collection"],
     "main": "feed-collection-collection.js",
     "scripts": ["feed-collection-collection.js"]
 }

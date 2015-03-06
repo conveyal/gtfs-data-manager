@@ -3,7 +3,7 @@
   "dependencies": {
     "components/handlebars.js": "*"
   },
-  "local": ["bb", "feed-collection"],
+  "local": ["application", "bb", "feed-collection"],
   "scripts": ["osm-config-view.js"],
   "templates": ["osm-config-view.html"]
 }

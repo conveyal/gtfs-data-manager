@@ -1,6 +1,6 @@
 {
   "name": "user-collection",
-  "locals": ["bb", "user"],
+  "local": ["bb", "user"],
   "main": "user-collection.js",
   "scripts": ["user-collection.js"]
 }
