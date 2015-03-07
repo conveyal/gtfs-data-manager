@@ -8,7 +8,6 @@ module.exports = ItemView.extend({
   events: {
     'click .add-updater': 'addUpdater',
     'click .remove-updater': 'removeUpdater',
-    'click .save': 'save',
     'submit': 'save'
   },
 
