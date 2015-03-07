@@ -84,7 +84,7 @@ app.feed_version.no_versions=Feed never loaded
 
 app.deployment.newer_version=There is a newer version of this feed. It may have failed validation, or been manually excluded.
 app.deployment.new_deployment=New deployment
-app.deployment.manage_deployments=Manage deployments
+app.deployment.manage_deployments=Deployments
 app.deployment.deployments=Deployments
 app.deployment.invalid_feed_sources=Feed sources with no valid version
 app.deployment.use_next_version=Use next version of feed
@@ -113,7 +113,7 @@ app.deployment.try_it=Try it.
 app.deployment.already_deploying=There is currently a deployment being pushed to this server. Please wait until that deployment finishes before attempting another.
 
 # deploy the public feed download page
-app.deploy-public=Update feeds available for public download
+app.deploy-public=Update Feeds
 app.deploy-public.updating=Uploading feeds
 
 # OSM extract range configuration
