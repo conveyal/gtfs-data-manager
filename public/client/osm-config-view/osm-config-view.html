@@ -1,6 +1,6 @@
 
 
-<h1>{{ t 'app.osm_config.configure' }}</h1>
+<legend>{{ t 'app.osm_config.configure' }}</legend>
 
 <div class="form-group">
 
@@ -14,22 +14,22 @@
 
   <div id="custom-inputs">
     <div class="row">
-      <div class="col-md-3">
+      <div class="col-sm-3">
         <label for="osmWest">{{ t 'app.osm_config.west' }}</label>
         <input type="text" id="osmWest" class="form-control" value="{{ osmWest }}" />
       </div>
 
-      <div class="col-md-3">
+      <div class="col-sm-3">
         <label for="osmSouth">{{ t 'app.osm_config.south' }}</label>
         <input type="text" id="osmSouth" class="form-control" value="{{ osmSouth }}" />
       </div>
 
-      <div class="col-md-3">
+      <div class="col-sm-3">
         <label for="osmEast">{{ t 'app.osm_config.east' }}</label>
         <input type="text" id="osmEast" class="form-control" value="{{ osmEast }}" />
       </div>
 
-      <div class="col-md-3">
+      <div class="col-sm-3">
         <label for="osmNorth">{{ t 'app.osm_config.north' }}</label>
         <input type="text" id="osmNorth" class="form-control" value="{{ osmNorth }}" />
       </div>
@@ -38,6 +38,6 @@
 </div>
 
 <div class="form-group">
-  <input id="save-button" class="btn btn-primary" value="{{ t 'app.osm_config.save' }}" />
+  <input id="save-button" class="btn btn-block btn-primary" value="{{ t 'app.osm_config.save' }}" />
 </div>
 
