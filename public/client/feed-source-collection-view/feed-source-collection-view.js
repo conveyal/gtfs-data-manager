@@ -40,6 +40,7 @@ module.exports = BB.Marionette.CompositeView.extend({
     // default is to show new feed button
     var showNewFeedButton = _.isUndefined(attr.showNewFeedButton) ? true : attr.showNewFeedButton;
     var showDeployPublicButton = showNewFeedButton;
+    var showDeploymentButton = !(app.user && !app.user.admin);
 
     if (app.user && !app.user.admin || !app.user) {
       showNewFeedButton = false;
@@ -48,7 +49,9 @@ module.exports = BB.Marionette.CompositeView.extend({
 
     // use a bare model to pass random bits to the template
     this.model = new BB.Model({
+      feedCollectionId: this.feedCollectionId,
       showNewFeedButton: showNewFeedButton,
+      showDeploymentButton: showDeploymentButton,
       showDeployPublicButton: showDeployPublicButton
     });
   },

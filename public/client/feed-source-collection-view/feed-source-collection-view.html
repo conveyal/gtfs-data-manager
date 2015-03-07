@@ -10,6 +10,16 @@
       <span class="glyphicon glyphicon-upload"></span> <span class="button-label">{{ t "app.deploy-public" }}</span>
     </button>
   {{/if}}
+
+  {{#showDeploymentButton}}
+  <a href="#deployments/{{ feedCollectionId }}" class="btn btn-primary">
+    <span class="glyphicon glyphicon-globe"></span>&nbsp;&nbsp;{{ t "app.deployment.manage_deployments" }}
+  </a>
+  {{/showDeploymentButton}}
+
+  <a href="#osmconfig/{{ feedCollectionId }}" class="btn btn-primary">
+    <span class="glyphicon glyphicon-scissors"></span>&nbsp;&nbsp;{{ t "app.osm_config.configure" }}
+  </a>
 </p>
 
 <div class="table-responsive">
