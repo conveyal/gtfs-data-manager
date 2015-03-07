@@ -58,7 +58,9 @@ module.exports = ItemView.extend({
 
   save: function(e) {
     e.preventDefault();
-    this.model.set('otpConfig', this.serializeForm());
+    this.model.save({
+      otpConfig: this.serializeForm()
+    });
   }
 });
 
