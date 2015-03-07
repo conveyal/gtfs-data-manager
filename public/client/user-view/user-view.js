@@ -1,12 +1,11 @@
-var BB = require('bb');
-var Handlebars = require('handlebars.js');
 var app = require('application');
+var ItemView = require('item-view');
 var _ = require('underscore');
 require('select2');
 var FeedSourceCollection = require('feed-source-collection');
 
-module.exports = BB.Marionette.ItemView.extend({
-  template: Handlebars.compile(require('./user-view.html')),
+module.exports = ItemView.extend({
+  template: require('./user-view.html'),
   events: {
     'keyup .password': 'validatePassword',
     'submit form': 'saveChanges'

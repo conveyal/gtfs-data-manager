@@ -2,12 +2,11 @@
 // each of these gets its own reference to the model, which is fine
 // Backbone will handle all the concurrent updates
 
-var BB = require('bb');
+var ItemView = require('item-view');
 var _ = require('underscore');
-var Handlebars = require('handlebars');
 
-module.exports = BB.Marionette.ItemView.extend({
-  template: Handlebars.compile(require('./editable-text-widget.html')),
+module.exports = ItemView.extend({
+  template: require('./editable-text-widget.html'),
   tagName: 'span',
   className: 'EditableText',
   events: {

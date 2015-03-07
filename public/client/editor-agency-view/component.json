@@ -1,11 +1,10 @@
 {
   "name": "editor-agency-view",
   "dependencies": {
-    "jashkenas/underscore": "*",
-    "components/handlebars.js": "*"
+    "jashkenas/underscore": "*"
   },
   "local": [
-    "bb"
+    "item-view"
   ],
   "main": "editor-agency-view.js",
   "scripts": ["editor-agency-view.js"],

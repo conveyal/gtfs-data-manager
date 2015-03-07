@@ -1,13 +1,13 @@
 // A list of FeedVersions for a particular FeedSource
 
-var BB = require('bb');
-var Handlebars = require('handlebars');
 var app = require('application');
-
+var BB = require('bb');
 var FeedSource = require('feed-source');
+var Handlebars = require('handlebars');
+var ItemView = require('item-view');
 
-var FeedVersionItemView = BB.Marionette.ItemView.extend({
-  template: Handlebars.compile(require('./feed-version-item-view.html')),
+var FeedVersionItemView = ItemView.extend({
+  template: require('./feed-version-item-view.html'),
   tagName: 'tr'
 });
 

@@ -2,11 +2,11 @@
   "name": "deployment-progress-view",
   "description": "show the progress of a deployment",
   "dependencies": {
-    "jashkenas/underscore": "*",
-    "components/handlebars.js": "*"
+    "jashkenas/underscore": "*"
   },
   "local": [
-    "bb"
+    "bb",
+    "item-view"
   ],
   "main": "deployment-progress-view.js",
   "scripts": ["deployment-progress-view.js"],

@@ -4,7 +4,7 @@
     "jashkenas/underscore": "*",
     "components/handlebars.js": "*"
   },
-  "local": ["bb", "deployment"],
+  "local": ["bb", "deployment", "item-view"],
   "scripts": ["deployment-collection-view.js"],
   "templates": ["deployment-collection-view.html", "deployment-item-view.html"]
 }

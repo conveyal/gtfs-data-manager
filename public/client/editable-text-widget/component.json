@@ -2,11 +2,10 @@
   "name": "editable-text-widget",
   "description": "An editable text widget for a model",
   "dependencies": {
-    "jashkenas/underscore": "*",
-    "components/handlebars.js": "*"
+    "jashkenas/underscore": "*"
   },
   "local": [
-    "bb"
+    "item-view"
   ],
   "main": "editable-text-widget.js",
   "scripts": ["editable-text-widget.js"],

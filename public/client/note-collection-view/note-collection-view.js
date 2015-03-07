@@ -5,11 +5,12 @@
 var BB = require('bb');
 var _ = require('underscore');
 var Handlebars = require('handlebars');
+var ItemView = require('item-view');
 var NoteCollection = require('note-collection');
 var Note = require('note');
 
-var NoteItemView = BB.Marionette.ItemView.extend({
-  template: Handlebars.compile(require('./note-item-view.html'))
+var NoteItemView = ItemView.extend({
+  template: require('./note-item-view.html')
 });
 
 /**

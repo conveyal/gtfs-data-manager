@@ -1,9 +1,9 @@
 var BB = require('bb');
+var ItemView = require('item-view');
 var _ = require('underscore');
-var Handlebars = require('handlebars');
 
-module.exports = BB.Marionette.ItemView.extend({
-  template: Handlebars.compile(require('./deployment-progress-view.html')),
+module.exports = ItemView.extend({
+  template: require('./deployment-progress-view.html'),
 
   initialize: function(attr) {
     this.model = new BB.Model({

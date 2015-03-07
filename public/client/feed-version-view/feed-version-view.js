@@ -11,11 +11,12 @@ var NoteCollectionView = require('note-collection-view');
 var FeedUploadView = require('feed-upload-view');
 var FeedSource = require('feed-source');
 var FeedVersion = require('feed-version');
+var ItemView = require('item-view');
 
-var InvalidValuesList = BB.Marionette.ItemView.extend({
+var InvalidValuesList = ItemView.extend({
   // rather than having a ton of levels of nested views, since we're not editing, most of the
   // recursion occurs in the template
-  template: Handlebars.compile(require('./invalid-values-list.html')),
+  template: require('./invalid-values-list.html'),
 
   initialize: function(attr) {
     // group them by error type

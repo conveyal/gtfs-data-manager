@@ -1,9 +1,8 @@
-var BB = require('bb');
-var Handlebars = require('handlebars');
+var ItemView = require('item-view');
 var _ = require('underscore');
 
-module.exports = BB.Marionette.ItemView.extend({
-  template: Handlebars.compile(require('./editor-agency-view.html')),
+module.exports = ItemView.extend({
+  template: require('./editor-agency-view.html'),
 
   events: {
     'change select': 'changeAgency'

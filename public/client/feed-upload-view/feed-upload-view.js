@@ -2,11 +2,10 @@
  * Upload a feed to the manager manually.
  */
 
-var BB = require('bb');
-var Handlebars = require('handlebars');
+var ItemView = require('item-view');
 
-module.exports = BB.Marionette.ItemView.extend({
-  template: Handlebars.compile(require('./feed-upload-view.html')),
+module.exports = ItemView.extend({
+  template: require('./feed-upload-view.html'),
   onShow: function() {
     this.$('.modal').modal();
   }

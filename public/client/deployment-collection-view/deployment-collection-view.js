@@ -1,11 +1,12 @@
 var BB = require('bb');
 var Deployment = require('deployment');
 var Handlebars = require('handlebars');
+var ItemView = require('item-view');
 var _ = require('underscore');
 
-var DeploymentItemView = BB.Marionette.ItemView.extend({
+var DeploymentItemView = ItemView.extend({
   tagName: 'tr',
-  template: Handlebars.compile(require('./deployment-item-view.html'))
+  template: require('./deployment-item-view.html')
 });
 
 module.exports = BB.Marionette.CompositeView.extend({

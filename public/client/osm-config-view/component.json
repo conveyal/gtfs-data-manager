@@ -1,9 +1,6 @@
 {
   "name": "osm-config-view",
-  "dependencies": {
-    "components/handlebars.js": "*"
-  },
-  "local": ["application", "bb", "feed-collection"],
+  "local": ["application", "feed-collection", "item-view"],
   "scripts": ["osm-config-view.js"],
   "templates": ["osm-config-view.html"]
 }

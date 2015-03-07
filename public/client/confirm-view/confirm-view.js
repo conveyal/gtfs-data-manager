@@ -1,12 +1,12 @@
 var BB = require('bb');
+var ItemView = require('item-view');
 var _ = require('underscore');
-var Handlebars = require('handlebars');
 
 /**
  * usage: new ConfirmView({title: text, body: text, [onProceed: function,] [onCancel: function,]})
  */
-module.exports = BB.Marionette.ItemView.extend({
-  template: Handlebars.compile(require('./confirm-view.html')),
+module.exports = ItemView.extend({
+  template: require('./confirm-view.html'),
 
   events: {
     'click .cancel-action': 'onCancel',

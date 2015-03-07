@@ -6,7 +6,7 @@
     "components/handlebars.js": "*"
   },
   "local": ["bb", "feed-collection", "feed-version-collection", "feed-source-collection", "feed-source-collection-view",
-    "feed-version", "editable-text-widget", "application", "confirm-view", "deployment-progress-view"
+    "feed-version", "editable-text-widget", "application", "confirm-view", "deployment-progress-view", "item-view"
   ],
   "main": "deployment-view.js",
   "scripts": ["deployment-view.js"],

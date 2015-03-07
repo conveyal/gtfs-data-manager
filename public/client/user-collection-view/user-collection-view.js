@@ -7,11 +7,12 @@
 
 var BB = require('bb');
 var Handlebars = require('handlebars');
+var ItemView = require('item-view');
 var UserCollection = require('user-collection');
 var User = require('user');
 
-var UserItemView = BB.Marionette.ItemView.extend({
-  template: Handlebars.compile(require('./user-item-view.html')),
+var UserItemView = ItemView.extend({
+  template: require('./user-item-view.html'),
   tagName: 'tr'
 });
 

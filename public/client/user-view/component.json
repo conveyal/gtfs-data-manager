@@ -7,7 +7,7 @@
   },
   "description": "A view used to edit a single user",
   "main": "user-view.js",
-  "local": ["application", "bb", "feed-source-collection"],
+  "local": ["application", "feed-source-collection", "item-view"],
   "scripts": ["user-view.js"],
   "templates": ["user-view.html"]
 }

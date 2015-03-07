@@ -1,10 +1,9 @@
-var BB = require('bb');
-var Handlebars = require('handlebars.js');
 var app = require('application');
 var FeedCollection = require('feed-collection');
+var ItemView = require('item-view');
 
-module.exports = BB.Marionette.ItemView.extend({
-  template: Handlebars.compile(require('./osm-config-view.html')),
+module.exports = ItemView.extend({
+  template: require('./osm-config-view.html'),
 
   events: {
     'click #save-button': 'saveChanges',

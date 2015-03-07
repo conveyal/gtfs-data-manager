@@ -6,6 +6,7 @@ var FeedSourceCollectionView = require('feed-source-collection-view');
 var FeedVersionCollection = require('feed-version-collection');
 var FeedVersion = require('feed-version');
 var Handlebars = require('handlebars');
+var ItemView = require('item-view');
 var EditableTextWidget = require('editable-text-widget');
 var app = require('application');
 var ConfirmView = require('confirm-view');
@@ -13,8 +14,8 @@ var DeploymentProgressView = require('deployment-progress-view');
 var app = require('application');
 
 // FeedVersionItemView is already used on the versions page, so let's keep class names unique
-var FeedVersionDeploymentView = BB.Marionette.ItemView.extend({
-  template: Handlebars.compile(require('./feed-version-deployment-view.html')),
+var FeedVersionDeploymentView = ItemView.extend({
+  template: require('./feed-version-deployment-view.html'),
   tagName: 'tr',
   events: {
     'click .remove-version': 'removeVersion',
