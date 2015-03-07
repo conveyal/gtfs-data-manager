@@ -1,0 +1,10 @@
+{
+  "name": "layout-view",
+  "local": [
+    "bb",
+    "templater"
+  ],
+  "scripts": [
+    "index.js"
+  ]
+}

@@ -1,9 +1,6 @@
-var BB = require('bb');
+var CompositeView = require('composite-view');
 var _ = require('underscore');
 var FeedCollection = require('feed-collection');
-
-var Handlebars = require('handlebars');
-
 var EditableTextWidget = require('editable-text-widget');
 
 /**
@@ -30,8 +27,8 @@ var FeedCollectionItemView = EditableTextWidget.extend({
 /**
  * An editable view of a FeedCollectionCollection
  */
-module.exports = BB.Marionette.CompositeView.extend({
-  template: Handlebars.compile(require('./feed-collection-collection-view.html')),
+module.exports = CompositeView.extend({
+  template: require('./feed-collection-collection-view.html'),
   childView: FeedCollectionItemView,
   childViewContainer: 'ul',
 

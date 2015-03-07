@@ -1,16 +1,15 @@
 var app = require('application');
-var BB = require('bb');
 var FeedSourceCollection = require('feed-source-collection');
 var FeedCollection = require('feed-collection');
 var FeedSourceCollectionView = require('feed-source-collection-view');
-var Handlebars = require('handlebars.js');
+var LayoutView = require('layout-view');
 var _ = require('underscore');
 
-var Overview = BB.Marionette.LayoutView.extend({
+var Overview = LayoutView.extend({
   regions: {
     feedSourceRegion: '#feed-sources'
   },
-  template: Handlebars.compile(require('./feed-collection-route.html')),
+  template: require('./feed-collection-route.html'),
 
   initialize: function(attr) {
     this.feedCollectionId = attr.feedCollectionId;

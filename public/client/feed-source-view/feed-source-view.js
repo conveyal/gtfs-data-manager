@@ -2,17 +2,16 @@
  * Show some information about a feed source
  */
 
-var BB = require('bb');
 var _ = require('underscore');
-var Handlebars = require('handlebars.js');
 var app = require('application');
 var FeedVersion = require('feed-version');
 var FeedVersionView = require('feed-version-view');
 var NoteCollectionView = require('note-collection-view');
 var FeedVersionNavigationView = require('feed-version-navigation-view');
+var LayoutView = require('layout-view');
 
-module.exports = BB.Marionette.LayoutView.extend({
-  template: Handlebars.compile(require("./feed-source-view.html")),
+module.exports = LayoutView.extend({
+  template: require("./feed-source-view.html"),
   regions: {
     validationRegion: '#validation',
     notesRegion: '.source-notes',

@@ -5,8 +5,7 @@
  * Security is implemented on the server anyhow.
  */
 
-var BB = require('bb');
-var Handlebars = require('handlebars');
+var CompositeView = require('composite-view');
 var ItemView = require('item-view');
 var UserCollection = require('user-collection');
 var User = require('user');
@@ -16,8 +15,8 @@ var UserItemView = ItemView.extend({
   tagName: 'tr'
 });
 
-module.exports = BB.Marionette.CompositeView.extend({
-  template: Handlebars.compile(require('./user-collection-view.html')),
+module.exports = CompositeView.extend({
+  template: require('./user-collection-view.html'),
   childView: UserItemView,
   childViewContainer: 'tbody'
 });

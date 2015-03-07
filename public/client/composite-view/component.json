@@ -1,0 +1,10 @@
+{
+  "name": "composite-view",
+  "local": [
+    "bb",
+    "templater"
+  ],
+  "scripts": [
+    "index.js"
+  ]
+}

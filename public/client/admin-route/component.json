@@ -1,10 +1,7 @@
 {
   "name": "admin-route",
   "description": "Route to show all of the defined feed collections",
-  "dependencies": {
-    "components/handlebars.js": "*"
-  },
-  "local": ["application", "bb", "feed-collection-collection", "feed-collection-collection-view"],
+  "local": ["application", "feed-collection-collection", "feed-collection-collection-view", "layout-view"],
   "scripts": ["admin-route.js"],
   "templates": ["admin-route.html"]
 }

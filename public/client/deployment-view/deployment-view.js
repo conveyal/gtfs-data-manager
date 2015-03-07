@@ -1,17 +1,16 @@
 var BB = require('bb');
+var CompositeView = require('composite-view');
 var _ = require('underscore');
 var FeedCollection = require('feed-collection');
 var FeedSourceCollection = require('feed-source-collection');
 var FeedSourceCollectionView = require('feed-source-collection-view');
 var FeedVersionCollection = require('feed-version-collection');
 var FeedVersion = require('feed-version');
-var Handlebars = require('handlebars');
 var ItemView = require('item-view');
 var EditableTextWidget = require('editable-text-widget');
 var app = require('application');
 var ConfirmView = require('confirm-view');
 var DeploymentProgressView = require('deployment-progress-view');
-var app = require('application');
 
 // FeedVersionItemView is already used on the versions page, so let's keep class names unique
 var FeedVersionDeploymentView = ItemView.extend({
@@ -66,8 +65,8 @@ var FeedVersionDeploymentView = ItemView.extend({
   }
 });
 
-module.exports = BB.Marionette.CompositeView.extend({
-  template: Handlebars.compile(require('./deployment-view.html')),
+module.exports = CompositeView.extend({
+  template: require('./deployment-view.html'),
   childView: FeedVersionDeploymentView,
   childViewContainer: 'tbody',
 

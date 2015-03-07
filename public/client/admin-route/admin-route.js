@@ -1,15 +1,14 @@
 var app = require('application');
-var BB = require('bb');
 var FeedCollectionCollectionView = require('feed-collection-collection-view');
 var FeedCollectionCollection = require('feed-collection-collection');
-var Handlebars = require('handlebars.js');
+var LayoutView = require('layout-view');
 
 module.exports = function() {
-  var Admin = BB.Marionette.LayoutView.extend({
+  var Admin = LayoutView.extend({
     regions: {
       collectionRegion: '#collection'
     },
-    template: Handlebars.compile(require('./admin-route.html')),
+    template: require('./admin-route.html'),
     onShow: function() {
       var agencies = new FeedCollectionCollection();
       var instance = this;

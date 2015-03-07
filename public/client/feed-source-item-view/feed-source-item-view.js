@@ -1,21 +1,19 @@
-var BB = require('bb');
 var _ = require('underscore');
-var Handlebars = require('handlebars');
 var app = require('application');
 var ConfirmView = require('confirm-view');
 var EditorAgencyView = require('editor-agency-view');
-
 var EditableTextWidget = require('editable-text-widget');
+var LayoutView = require('layout-view');
 
 /**
  * An item view of a single FeedSource
  */
-module.exports = BB.Marionette.LayoutView.extend({
+module.exports = LayoutView.extend({
   regions: {
     nameRegion: '.name',
     urlRegion: '.url'
   },
-  template: Handlebars.compile(require('./feed-source-item-view.html')),
+  template: require('./feed-source-item-view.html'),
   tagName: 'tr',
 
   events: {

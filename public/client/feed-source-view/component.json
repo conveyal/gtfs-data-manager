@@ -2,18 +2,17 @@
   "name": "feed-source-view",
   "description": "What is the status of a feed source: latest validation results, etc.",
   "dependencies": {
-    "jashkenas/underscore": "*",
-    "components/handlebars.js": "*"
+    "jashkenas/underscore": "*"
   },
   "local": [
     "application",
-    "bb",
     "feed-version",
     "feed-version-collection",
     "feed-version-collection-view",
     "feed-version-view",
     "note-collection-view",
-    "feed-version-navigation-view"
+    "feed-version-navigation-view",
+    "layout-view"
   ],
   "scripts": ["feed-source-view.js"],
   "templates": ["feed-source-view.html"]

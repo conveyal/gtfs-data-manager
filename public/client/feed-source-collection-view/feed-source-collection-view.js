@@ -1,18 +1,17 @@
-var BB = require('bb');
-var _ = require('underscore');
-var FeedSource = require('feed-source');
-var Handlebars = require('handlebars');
 var app = require('application');
-
+var BB = require('bb');
+var CompositeView = require('composite-view');
+var FeedSource = require('feed-source');
 var FeedSourceItemView = require('feed-source-item-view');
+var _ = require('underscore');
 
 /**
  * An editable table of FeedSources
  */
-module.exports = BB.Marionette.CompositeView.extend({
+module.exports = CompositeView.extend({
   childView: FeedSourceItemView,
   childViewContainer: 'tbody',
-  template: Handlebars.compile(require('./feed-source-collection-view.html')),
+  template: require('./feed-source-collection-view.html'),
 
   events: {
     'click .newfeedsource': 'add',

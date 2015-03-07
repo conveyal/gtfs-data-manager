@@ -1,10 +1,9 @@
 {
   "name": "note-collection-view",
   "dependencies": {
-    "jashkenas/underscore": "*",
-    "components/handlebars.js": "*"
+    "jashkenas/underscore": "*"
   },
-  "local": ["bb", "item-view", "note", "note-collection"],
+  "local": ["composite-view", "item-view", "note", "note-collection"],
   "main": "note-collection-view.js",
   "scripts": ["note-collection-view.js"],
   "templates": ["note-collection-view.html", "note-item-view.html"]

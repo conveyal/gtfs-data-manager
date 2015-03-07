@@ -1,10 +1,9 @@
 {
   "name": "deployment-collection-view",
   "dependencies": {
-    "jashkenas/underscore": "*",
-    "components/handlebars.js": "*"
+    "jashkenas/underscore": "*"
   },
-  "local": ["bb", "deployment", "item-view"],
+  "local": ["composite-view", "deployment", "item-view"],
   "scripts": ["deployment-collection-view.js"],
   "templates": ["deployment-collection-view.html", "deployment-item-view.html"]
 }

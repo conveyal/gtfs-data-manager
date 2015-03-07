@@ -2,10 +2,9 @@
   "name": "feed-version-view",
   "description": "show a single feed version",
   "dependencies": {
-    "jashkenas/underscore": "*",
-    "components/handlebars.js": "*"
+    "jashkenas/underscore": "*"
   },
-  "local": ["application", "bb", "feed-version", "note-collection-view", "feed-upload-view", "feed-source", "item-view"],
+  "local": ["application", "bb", "feed-version", "note-collection-view", "feed-upload-view", "feed-source", "item-view", "layout-view"],
   "main": "feed-version-view.js",
   "scripts": ["feed-version-view.js"],
   "templates": ["feed-version-view.html", "invalid-values-list.html"]

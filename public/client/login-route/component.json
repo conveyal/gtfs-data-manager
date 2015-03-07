@@ -1,12 +1,11 @@
 {
   "name": "login-route",
   "dependencies": {
-    "jashkenas/underscore": "*",
-    "components/handlebars.js": "*"
+    "jashkenas/underscore": "*"
   },
   "local": [
     "application",
-    "bb"
+    "layout-view"
   ],
   "scripts": ["login-route.js"],
   "templates": ["login-route.html"]

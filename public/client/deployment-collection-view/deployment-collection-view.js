@@ -1,6 +1,5 @@
-var BB = require('bb');
+var CompositeView = require('composite-view');
 var Deployment = require('deployment');
-var Handlebars = require('handlebars');
 var ItemView = require('item-view');
 var _ = require('underscore');
 
@@ -9,8 +8,8 @@ var DeploymentItemView = ItemView.extend({
   template: require('./deployment-item-view.html')
 });
 
-module.exports = BB.Marionette.CompositeView.extend({
-  template: Handlebars.compile(require('./deployment-collection-view.html')),
+module.exports = CompositeView.extend({
+  template: require('./deployment-collection-view.html'),
   childView: DeploymentItemView,
   childViewContainer: 'tbody',
 

@@ -1,10 +1,9 @@
-var BB = require('bb');
 var _ = require('underscore');
-var Handlebars = require('handlebars.js');
 var app = require('application');
+var LayoutView = require('layout-view');
 
-var Login = BB.Marionette.LayoutView.extend({
-  template: Handlebars.compile(require('./login-route.html')),
+var Login = LayoutView.extend({
+  template: require('./login-route.html'),
   events: {
     'click .login': 'doLogin'
   },

@@ -2,10 +2,9 @@
   "name": "feed-collection-route",
   "description": "An overview of a feed collection: what feeds are defined, &c.",
   "dependencies": {
-    "jashkenas/underscore": "*",
-    "components/handlebars.js": "*"
+    "jashkenas/underscore": "*"
   },
-  "local": ["application", "bb", "feed-collection", "feed-source-collection", "feed-source-collection-view"],
+  "local": ["application", "feed-collection", "feed-source-collection", "feed-source-collection-view", "layout-view"],
   "scripts": ["feed-collection-route.js"],
   "templates": ["feed-collection-route.html"]
 }

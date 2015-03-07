@@ -1,9 +1,8 @@
 // A list of FeedVersions for a particular FeedSource
 
 var app = require('application');
-var BB = require('bb');
+var CompositeView = require('composite-view');
 var FeedSource = require('feed-source');
-var Handlebars = require('handlebars');
 var ItemView = require('item-view');
 
 var FeedVersionItemView = ItemView.extend({
@@ -11,10 +10,10 @@ var FeedVersionItemView = ItemView.extend({
   tagName: 'tr'
 });
 
-module.exports = BB.Marionette.CompositeView.extend({
+module.exports = CompositeView.extend({
   childView: FeedVersionItemView,
   childViewContainer: 'tbody',
-  template: Handlebars.compile(require('./feed-version-collection-view.html')),
+  template: require('./feed-version-collection-view.html'),
 
   initialize: function() {
     // extract the feed source

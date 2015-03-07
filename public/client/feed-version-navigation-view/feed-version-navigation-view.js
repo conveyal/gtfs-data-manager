@@ -1,13 +1,12 @@
-var BB = require('bb');
-var Handlebars = require('handlebars.js');
 var _ = require('underscore');
 var FeedVersion = require('feed-version');
 var FeedUploadView = require('feed-upload-view');
 var FeedSource = require('feed-source');
 var app = require('application');
+var LayoutView = require('layout-view');
 
-module.exports = BB.Marionette.LayoutView.extend({
-  template: Handlebars.compile(require('./feed-version-navigation-view.html')),
+module.exports = LayoutView.extend({
+  template: require('./feed-version-navigation-view.html'),
 
   events: {
     'click .upload-feed': 'uploadFeed',

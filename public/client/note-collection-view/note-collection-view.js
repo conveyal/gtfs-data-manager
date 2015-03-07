@@ -2,9 +2,8 @@
  * Show a bunch of notes, comment-style
  */
 
-var BB = require('bb');
+var CompositeView = require('composite-view');
 var _ = require('underscore');
-var Handlebars = require('handlebars');
 var ItemView = require('item-view');
 var NoteCollection = require('note-collection');
 var Note = require('note');
@@ -17,8 +16,8 @@ var NoteItemView = ItemView.extend({
  * Instantiate a new NoteCollectionView like so:
  * new NoteCollectionView({objectId: 'u-u-i-d', type: 'FEED_SOURCE'})
  */
-module.exports = BB.Marionette.CompositeView.extend({
-  template: Handlebars.compile(require('./note-collection-view.html')),
+module.exports = CompositeView.extend({
+  template: require('./note-collection-view.html'),
   childView: NoteItemView,
   className: 'row',
   events: {

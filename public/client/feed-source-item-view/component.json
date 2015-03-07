@@ -1,10 +1,9 @@
 {
   "name": "feed-source-item-view",
   "dependencies": {
-    "jashkenas/underscore": "*",
-    "components/handlebars.js": "*"
+    "jashkenas/underscore": "*"
   },
-  "local": ["bb", "editable-text-widget", "confirm-view", "application", "editor-agency-view"],
+  "local": ["bb", "editable-text-widget", "confirm-view", "application", "editor-agency-view", "layout-view"],
   "main": "feed-source-item-view.js",
   "scripts": ["feed-source-item-view.js"],
   "templates": ["feed-source-item-view.html"],

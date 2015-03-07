@@ -5,13 +5,13 @@
 
 var BB = require('bb');
 var _ = require('underscore');
-var Handlebars = require('handlebars');
 var app = require('application');
 var NoteCollectionView = require('note-collection-view');
 var FeedUploadView = require('feed-upload-view');
 var FeedSource = require('feed-source');
 var FeedVersion = require('feed-version');
 var ItemView = require('item-view');
+var LayoutView = require('layout-view');
 
 var InvalidValuesList = ItemView.extend({
   // rather than having a ton of levels of nested views, since we're not editing, most of the
@@ -64,8 +64,8 @@ var InvalidValuesList = ItemView.extend({
   }
 });
 
-module.exports = BB.Marionette.LayoutView.extend({
-  template: Handlebars.compile(require('./feed-version-view.html')),
+module.exports = LayoutView.extend({
+  template: require('./feed-version-view.html'),
 
   regions: {
     routesRegion: '#routes',
