@@ -1,0 +1,34 @@
+
+<fieldset class="col-sm-6" data-section="build">
+  <legend>{{ t 'app.otp_config.build' }}</legend>
+  {{#each build}}
+    {{> input}}
+  {{/each}}
+</fieldset>
+
+<fieldset class="col-sm-6" data-section="router">
+  <legend>{{ t 'app.otp_config.router' }}</legend>
+  {{#each router}}
+    {{> input}}
+  {{/each}}
+</fieldset>
+
+<fieldset class="col-sm-12" data-section="updaters">
+  <div class="row">
+    <div class="col-sm-12">
+      <legend>{{ t 'app.otp_config.updaters' }} <button class="btn btn-sm btn-success add-updater"><i class="glyphicon glyphicon-plus"></i> {{ t 'app.otp_config.add_updater' }}</button></legend>
+    </div>
+    {{#each updaters}}
+      <fieldset class="col-sm-4" data-section="updater" data-index="@index">
+        <legend>{{ t 'app.otp_config.updater' }} <button class="btn btn-sm btn-danger remove-updater"><i class="glyphicon glyphicon-remove"></i> {{ t 'app.otp_config.remove_updater' }}</button></legend>
+        {{#each this}}
+          {{> input}}
+        {{/each}}
+      </fieldset>
+    {{/each}}
+  </div>
+</fieldset>
+
+<div class="col-sm-12">
+  <input type="submit" value="{{ t 'app.otp_config.save' }}" class="btn btn-block btn-primary">
+</div>

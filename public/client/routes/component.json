@@ -15,6 +15,7 @@
     "user-collection-route",
     "user-route",
     "new-user-route",
-    "osm-config-route"
+    "osm-config-route",
+    "otp-config-route"
   ]
 }

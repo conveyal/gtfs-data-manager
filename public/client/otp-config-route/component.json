@@ -1,0 +1,12 @@
+{
+  "name": "otp-config-route",
+  "local": [
+    "application",
+    "feed-collection",
+    "feed-source-collection",
+    "otp-config-view"
+  ],
+  "scripts": [
+    "index.js"
+  ]
+}

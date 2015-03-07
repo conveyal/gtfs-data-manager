@@ -13,12 +13,16 @@
 
   {{#showDeploymentButton}}
   <a href="#deployments/{{ feedCollectionId }}" class="btn btn-primary">
-    <span class="glyphicon glyphicon-globe"></span>&nbsp;&nbsp;{{ t "app.deployment.manage_deployments" }}
+    <span class="glyphicon glyphicon-globe"></span> {{ t "app.deployment.manage_deployments" }}
   </a>
   {{/showDeploymentButton}}
 
   <a href="#osmconfig/{{ feedCollectionId }}" class="btn btn-primary">
-    <span class="glyphicon glyphicon-scissors"></span>&nbsp;&nbsp;{{ t "app.osm_config.configure" }}
+    <span class="glyphicon glyphicon-scissors"></span> {{ t "app.osm_config.configure" }}
+  </a>
+
+  <a href="#otpconfig/{{ feedCollectionId }}" class="btn btn-primary">
+    <span class="glyphicon glyphicon-picture"></span> {{ t "app.otp_config.title" }}
   </a>
 </p>
 

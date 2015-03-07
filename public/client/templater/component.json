@@ -1,0 +1,13 @@
+{
+  "name": "templater",
+  "dependencies": {
+    "components/handlebars.js": "*",
+    "ianstormtaylor/to-capital-case": "*"
+  },
+  "scripts": [
+    "index.js"
+  ],
+  "templates": [
+    "input.html"
+  ]
+}

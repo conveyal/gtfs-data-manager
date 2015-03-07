@@ -9,6 +9,7 @@ var Router = BB.Router.extend({
     "admin": "admin",
     "overview/:feedCollectionId": "overview",
     "osmconfig/:feedCollectionId": "osmconfig",
+    "otpconfig/:id": "otpConfig",
     "feed/:feedSourceId/:feedVersionId?userId=:userId&key=:key": "autologin",
     "feed/:feedSourceId/:feedVersionId": "feedsource",
     "feed/:feedSourceId?userId=:userId&key=:key": "autologin",
@@ -30,6 +31,7 @@ var Router = BB.Router.extend({
   versions: require('feed-version-collection-route'),
   deployment: require('deployment-route'),
   deployments: require('deployment-collection-route'),
+  otpConfig: require('otp-config-route'),
   users: require('user-collection-route'),
   user: require('user-route'),
   newUser: require('new-user-route')

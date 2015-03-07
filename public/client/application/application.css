@@ -1,5 +1,9 @@
 /** general shared styles */
 
+body {
+  padding-bottom: 80px;
+}
+
 .spinner {
   animation-name: spinner;
   animation-duration: 1s;

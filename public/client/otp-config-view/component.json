@@ -1,0 +1,15 @@
+{
+  "name": "otp-config-view",
+  "local": [
+    "item-view"
+  ],
+  "scripts": [
+    "index.js"
+  ],
+  "styles": [
+    "style.css"
+  ],
+  "templates": [
+    "template.html"
+  ]
+}

@@ -124,6 +124,17 @@ app.osm_config.east=East Longitude Bound
 app.osm_config.west=West Longitude Bound
 app.osm_config.save=Save Changes
 
+# OTP Configuration
+app.otp_config.title=OTP
+app.otp_config.save=Save Changes
+app.otp_config.add_field=Add Field
+app.otp_config.add_updater=Add Updater
+app.otp_config.remove_updater=Remove Updater
+app.otp_config.build=Build Config
+app.otp_config.router=Router Config
+app.otp_config.updaters=Updaters
+app.otp_config.updater=Updater
+
 app.location.home=Home
 app.location.login=Log in
 app.close=Close
