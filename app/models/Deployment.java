@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import play.Play;
 import utils.DataStore;
 import utils.StringUtils;
@@ -321,6 +322,33 @@ public class Deployment extends Model {
         ByteStreams.copy(conn.getInputStream(), out);
 
         out.closeEntry();
+
+        // write build-config.json and router-config.json
+        FeedCollection feedColl = this.getFeedCollection();
+
+        if(feedColl.buildConfig != null) {
+            ZipEntry buildConfigEntry = new ZipEntry("build-config.json");
+            out.putNextEntry(buildConfigEntry);
+
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.setSerializationInclusion(Include.NON_NULL);
+            byte[] buildConfig = mapper.writer().writeValueAsBytes(feedColl.buildConfig);
+            out.write(buildConfig);
+
+            out.closeEntry();
+        }
+
+        if(feedColl.routerConfig != null) {
+            ZipEntry routerConfigEntry = new ZipEntry("router-config.json");
+            out.putNextEntry(routerConfigEntry);
+
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.setSerializationInclusion(Include.NON_NULL);
+            byte[] routerConfig = mapper.writer().writeValueAsBytes(feedColl.routerConfig);
+            out.write(routerConfig);
+
+            out.closeEntry();
+        }
 
         out.close();
     }

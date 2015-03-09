@@ -1,11 +1,10 @@
 package controllers.api;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map;
 
-import models.FeedCollection;
-import models.JsonViews;
-import models.User;
+import models.*;
 import play.Play;
 import play.libs.F.Function;
 import play.libs.F.Promise;
@@ -50,7 +49,7 @@ public class FeedCollectionController extends Controller {
             return unauthorized();
         
         JsonNode params = request().body().asJson();
-                
+
         JsonNode name = params.get("name");
         if (name != null) {
             c.name = name.asText();
@@ -79,6 +78,90 @@ public class FeedCollectionController extends Controller {
         JsonNode osmNorth = params.get("osmNorth");
         if (osmNorth != null) {
             c.osmNorth = osmNorth.asDouble();
+        }
+
+        if (params.has("buildConfig")) {
+            JsonNode buildConfig = params.get("buildConfig");
+            if(c.buildConfig == null) c.buildConfig = new OtpBuildConfig();
+
+            if(buildConfig.has("subwayAccessTime")) {
+                JsonNode subwayAccessTime = buildConfig.get("subwayAccessTime");
+                // allow client to un-set option via 'null' value
+                c.buildConfig.subwayAccessTime = subwayAccessTime.isNull() ? null : subwayAccessTime.asDouble();
+            }
+
+            if(buildConfig.has("fetchElevationUS")) {
+                JsonNode fetchElevationUS = buildConfig.get("fetchElevationUS");
+                c.buildConfig.fetchElevationUS = fetchElevationUS.isNull() ? null : fetchElevationUS.asBoolean();
+            }
+
+            if(buildConfig.has("stationTransfers")) {
+                JsonNode stationTransfers = buildConfig.get("stationTransfers");
+                c.buildConfig.stationTransfers = stationTransfers.isNull() ? null : stationTransfers.asBoolean();
+            }
+        }
+
+        if (params.has("routerConfig")) {
+            JsonNode routerConfig = params.get("routerConfig");
+            if (c.routerConfig == null) c.routerConfig = new OtpRouterConfig();
+
+            if (routerConfig.has("numItineraries")) {
+                JsonNode numItineraries = routerConfig.get("numItineraries");
+                c.routerConfig.numItineraries = numItineraries.isNull() ? null : numItineraries.asInt();
+            }
+
+            if (routerConfig.has("walkSpeed")) {
+                JsonNode walkSpeed = routerConfig.get("walkSpeed");
+                c.routerConfig.walkSpeed = walkSpeed.isNull() ? null : walkSpeed.asDouble();
+            }
+
+            if (routerConfig.has("carDropoffTime")) {
+                JsonNode carDropoffTime = routerConfig.get("carDropoffTime");
+                c.routerConfig.carDropoffTime = carDropoffTime.isNull() ? null : carDropoffTime.asDouble();
+            }
+
+            if (routerConfig.has("stairsReluctance")) {
+                JsonNode stairsReluctance = routerConfig.get("stairsReluctance");
+                c.routerConfig.stairsReluctance = stairsReluctance.isNull() ? null : stairsReluctance.asDouble();
+            }
+
+            if (routerConfig.has("updaters")) {
+                JsonNode updaters = routerConfig.get("updaters");
+                if (updaters.isArray()) {
+                    c.routerConfig.updaters = new ArrayList<>();
+                    for (int i = 0; i < updaters.size(); i++) {
+                        JsonNode updater = updaters.get(i);
+
+                        OtpRouterConfig.Updater updaterObj = new OtpRouterConfig.Updater();
+                        if(updater.has("type")) {
+                            JsonNode type = updater.get("type");
+                            updaterObj.type = type.isNull() ? null : type.asText();
+                        }
+
+                        if(updater.has("sourceType")) {
+                            JsonNode sourceType = updater.get("sourceType");
+                            updaterObj.sourceType = sourceType.isNull() ? null : sourceType.asText();
+                        }
+
+                        if(updater.has("defaultAgencyId")) {
+                            JsonNode defaultAgencyId = updater.get("defaultAgencyId");
+                            updaterObj.defaultAgencyId = defaultAgencyId.isNull() ? null : defaultAgencyId.asText();
+                        }
+
+                        if(updater.has("url")) {
+                            JsonNode url = updater.get("url");
+                            updaterObj.url = url.isNull() ? null : url.asText();
+                        }
+
+                        if(updater.has("frequencySec")) {
+                            JsonNode frequencySec = updater.get("frequencySec");
+                            updaterObj.frequencySec = frequencySec.isNull() ? null : frequencySec.asInt();
+                        }
+
+                        c.routerConfig.updaters.add(updaterObj);
+                    }
+                }
+            }
         }
 
         // only allow admins to change feed collection owners

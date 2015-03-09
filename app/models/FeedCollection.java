@@ -29,7 +29,16 @@ public class FeedCollection extends Model implements Serializable {
     public Boolean useCustomOsmBounds;
 
     public Double osmNorth, osmSouth, osmEast, osmWest;
-    
+
+    public OtpBuildConfig buildConfig;
+
+    public OtpRouterConfig routerConfig;
+
+    public FeedCollection() {
+        this.buildConfig = new OtpBuildConfig();
+        this.routerConfig = new OtpRouterConfig();
+    }
+
     /**
      * Get all of the FeedCollections that are defined
      */
