@@ -113,7 +113,7 @@ app.deployment.try_it=Try it.
 app.deployment.already_deploying=There is currently a deployment being pushed to this server. Please wait until that deployment finishes before attempting another.
 
 # deploy the public feed download page
-app.deploy-public=Update Feeds
+app.deploy-public=Update feeds available for public download
 app.deploy-public.updating=Uploading feeds
 
 # OSM extract range configuration
