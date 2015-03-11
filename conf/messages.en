@@ -117,7 +117,7 @@ app.deploy-public=Update feeds available for public download
 app.deploy-public.updating=Uploading feeds
 
 # OSM extract range configuration
-app.osm_config.configure=Configure OSM Extract
+app.osm_config.configure=Configure OSM extract
 app.osm_config.north=North Latitude Bound
 app.osm_config.south=South Latitude Bound
 app.osm_config.east=East Longitude Bound
