@@ -8,6 +8,9 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.regex.Pattern;
 
+import org.mapdb.Fun.Function2;
+import org.mapdb.Fun.Tuple2;
+
 import play.Logger;
 import play.Play;
 import utils.DataStore;
@@ -31,8 +34,18 @@ import static utils.StringUtils.getCleanName;
  */
 @JsonInclude(Include.ALWAYS)
 public class FeedVersion extends Model {    
-    private static DataStore<FeedVersion> versionStore = new DataStore<FeedVersion>("feedversions");
-    private static FeedStore feedStore = new FeedStore(Play.application().configuration().getString("application.data.gtfs")); 
+    static DataStore<FeedVersion> versionStore = new DataStore<FeedVersion>("feedversions");
+    private static FeedStore feedStore = new FeedStore(Play.application().configuration().getString("application.data.gtfs"));
+    
+    static {
+        // set up indexing on feed versions by feed source, indexed by <FeedSource ID, version>
+        versionStore.secondaryKey("version", new Function2<Tuple2<String, Integer>, String, FeedVersion> () {
+            @Override
+            public Tuple2<String, Integer> run(String key, FeedVersion fv) {
+                return new Tuple2(fv.feedSourceId, fv.version);
+            }            
+        });
+    }
     
     /**
      * We generate IDs manually, but we need a bit of information to do so
@@ -51,8 +64,6 @@ public class FeedVersion extends Model {
         FeedVersion prev = source.getLatest();
         if (prev != null) {
             this.version = prev.version + 1;
-            this.previousVersionId = prev.id;
-            prev.nextVersionId = this.id;
         }
         else {
             this.version = 1;
@@ -66,22 +77,6 @@ public class FeedVersion extends Model {
         // do nothing
     }
     
-    /**
-     * Remove this feedversion from the chain of feedversions surrounding it.
-     */
-    public void dereference () {
-        FeedVersion prev = getPreviousVersion();
-        if (prev != null)
-            prev.nextVersionId = this.nextVersionId;
-        
-        FeedVersion next = getNextVersion();
-        if (next != null)
-            next.previousVersionId = this.previousVersionId;
-        
-        // Note: versioning will have a gap, but generally this function is used only at the head of the chain
-        // so there will not be an internal gap.
-    }
-    
     /** The feed source this is associated with */
     @JsonView(JsonViews.DataDump.class)
     public String feedSourceId;
@@ -91,24 +86,26 @@ public class FeedVersion extends Model {
         return FeedSource.get(feedSourceId);
     }
     
-    /**
-     * The ID of the previous version of this feed.
-     */
-    public String previousVersionId;
-    
     @JsonIgnore
     public FeedVersion getPreviousVersion () {
-        return previousVersionId != null ? FeedVersion.get(previousVersionId) : null;
+        return versionStore.find("version", new Tuple2(this.feedSourceId, this.version - 1));
     }
     
-    /**
-     * The ID of the next version of this feed.
-     */
-    public String nextVersionId;
+    @JsonView(JsonViews.UserInterface.class)
+    public String getPreviousVersionId () {
+        FeedVersion p = getPreviousVersion();
+        return p != null ? p.id : null;
+    }
     
     @JsonIgnore
     public FeedVersion getNextVersion () {
-        return nextVersionId != null ? FeedVersion.get(nextVersionId) : null;
+        return versionStore.find("version", new Tuple2(this.feedSourceId, this.version + 1));
+    }
+    
+    @JsonView(JsonViews.UserInterface.class)
+    public String getNextVersionId () {
+        FeedVersion p = getNextVersion();
+        return p != null ? p.id : null;
     }
     
     /** The hash of the feed file, for quick checking if the file has been updated */
@@ -212,9 +209,7 @@ public class FeedVersion extends Model {
         File feed = getFeed();
         if (feed.exists())
             feed.delete();
-        
-        this.dereference();
-        
+                
         for (Deployment d : Deployment.getAll()) {
             d.feedVersionIds.remove(this.id);
         }

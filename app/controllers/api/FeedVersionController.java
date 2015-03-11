@@ -166,8 +166,6 @@ public class FeedVersionController extends Controller {
         
         FeedVersion latest = s.getLatest();
         if (latest != null && latest.hash.equals(v.hash)) {
-            // it's the same feed, don't save
-            v.dereference();
             v.getFeed().delete();
             return redirect("/#feed/" + s.id);
         }

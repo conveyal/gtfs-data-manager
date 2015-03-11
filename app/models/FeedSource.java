@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
+import org.mapdb.Fun;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -206,7 +208,6 @@ public class FeedSource extends Model implements Comparable<FeedSource> {
             conn = (HttpURLConnection) url.openConnection();
         } catch (IOException e) {
             Logger.error("Unable to open connection to {}; not fetching feed {}", url, this);
-            newFeed.dereference();
             return null;
         }
         
@@ -223,7 +224,6 @@ public class FeedSource extends Model implements Comparable<FeedSource> {
         
             if (conn.getResponseCode() == HttpURLConnection.HTTP_NOT_MODIFIED) {
                 Logger.info("Feed {} has not been modified", this);
-                newFeed.dereference();
                 return null;
             }
 
@@ -239,7 +239,6 @@ public class FeedSource extends Model implements Comparable<FeedSource> {
                     outStream = new FileOutputStream(out);
                 } catch (FileNotFoundException e) {
                     Logger.error("Unable to open {}", out);
-                    newFeed.dereference();
                     return null;
                 }
                 
@@ -251,12 +250,10 @@ public class FeedSource extends Model implements Comparable<FeedSource> {
             
             else {
                 Logger.error("HTTP status {} retrieving feed {}", conn.getResponseMessage(), this);
-                newFeed.dereference();
                 return null;
             }
         } catch (IOException e) {
             Logger.error("Unable to connect to {}; not fetching feed {}", url, this);
-            newFeed.dereference();
             return null;
         }
         
@@ -267,19 +264,12 @@ public class FeedSource extends Model implements Comparable<FeedSource> {
         if (latest != null && newFeed.hash.equals(latest.hash)) {
             Logger.warn("Feed {} was fetched but has not changed; server operators should add If-Modified-Since support to avoid wasting bandwidth", this);
             newFeed.getFeed().delete();
-            newFeed.dereference();
             return null;
         }
         else {
             newFeed.userId = this.userId;
             newFeed.validate();            
-            newFeed.save();
-            
-            FeedVersion prev = newFeed.getPreviousVersion();
-            if (prev != null) {
-                prev.nextVersionId = newFeed.id;
-                prev.save();
-            }                        
+            newFeed.save();                    
             
             return newFeed;
         }
@@ -310,18 +300,13 @@ public class FeedSource extends Model implements Comparable<FeedSource> {
      */
     @JsonIgnore
     public FeedVersion getLatest () {
-        FeedVersion latest = null;
-    
-        for (FeedVersion version : FeedVersion.getAll()) {
-            // there could be feedsources in the datastore that haven't finished initializing
-            if (this.id.equals(version.feedSourceId)) {
-                if (latest == null || version.updated.after(latest.updated)) {
-                    latest = version;
-                }
-            }
-        }
+        FeedVersion v = FeedVersion.versionStore.findFloor("version", new Fun.Tuple2(this.id, Fun.HI));
         
-        return latest;
+        // the ID doesn't necessarily match, because it will fall back to the previous source in the store if there are no versions for this source
+        if (v == null || !v.feedSourceId.equals(this.id))
+            return null;
+        
+        return v;
     }
     
     @JsonInclude(Include.NON_NULL)
@@ -332,7 +317,7 @@ public class FeedSource extends Model implements Comparable<FeedSource> {
     }
     
     /**
-     * We can't pass the entire latest feed source back, because it contains references back to this feedsource,
+     * We can't pass the entire latest feed version back, because it contains references back to this feedsource,
      * so Jackson doesn't work. So instead we specifically expose the validation results and the latest update.
      * @param id
      * @return

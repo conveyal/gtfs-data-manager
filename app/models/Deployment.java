@@ -12,10 +12,8 @@ import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -458,8 +456,8 @@ public class Deployment extends Model {
             this.feedSource = version.getFeedSource();
             this.updated = version.updated;
             this.id = version.id;
-            this.nextVersionId = version.nextVersionId;
-            this.previousVersionId = version.previousVersionId;
+            this.nextVersionId = version.getNextVersionId();
+            this.previousVersionId = version.getPreviousVersionId();
             this.version = version.version;
         }
     }

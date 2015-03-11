@@ -8,12 +8,15 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.BTreeMap;
+import org.mapdb.Bind;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.Fun;
+import org.mapdb.Fun.Function2;
 import org.mapdb.Pump;
 import org.mapdb.Fun.Tuple2;
 
@@ -24,7 +27,7 @@ import play.Play;
 public class DataStore<T> {
 
     DB db;
-    Map<String,T> map;
+    BTreeMap<String,T> map;
 
     public DataStore(String dataFile) {
 
@@ -141,5 +144,34 @@ public class DataStore<T> {
     public Integer size() {
         return map.keySet().size();
     }
-
+    
+    /** Create a secondary (unique) key */
+    public <K2> void secondaryKey (String name, Function2<K2, String, T> fun) {
+        Map<K2, String> index = db.getTreeMap(name);
+        Bind.secondaryKey(map, index, fun);
+    }
+    
+    /** search using a secondary unique key */
+    public <K2> T find(String name, K2 value) {
+        Map<K2, String> index = db.getTreeMap(name);
+        
+        String id = index.get(value);
+        
+        if (id == null)
+            return null;
+        
+        return map.get(id);
+    }
+    
+    /** find the value with largest key less than or equal to key */
+    public <K2> T findFloor (String name, K2 floor) {
+        BTreeMap<K2, String> index = db.getTreeMap(name);
+        
+        Entry<K2, String> key = index.floorEntry(floor);
+        
+        if (key == null || key.getValue() == null)
+            return null;
+        
+        return map.get(key.getValue());
+    }
 }
