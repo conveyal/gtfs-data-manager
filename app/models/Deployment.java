@@ -21,6 +21,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import play.Logger;
 import play.Play;
 import utils.DataStore;
 import utils.StringUtils;
@@ -373,15 +374,18 @@ public class Deployment extends Model {
         bounds.setRect(versions.get(0).validationResult.bounds);
 
         // i = 1 because we've already included bounds 0
-        // todo: NPE
         for (int i = 1; i < versions.size(); i++) {
-            bounds.add(versions.get(i).validationResult.bounds);
+            SummarizedFeedVersion version = versions.get(i);
+            if (version.validationResult != null && version.validationResult.bounds != null)
+                bounds.add(versions.get(i).validationResult.bounds);
+            else
+                Logger.warn("Feed version %s has no bounds", version);
         }
 
         // expand the bounds by (about) 10 km in every direction
         double degreesPerKmLat = 360D / 40008;
         double degreesPerKmLon =
-                // the diameter of the chord of the earth at this latitude
+                // the circumference of the chord of the earth at this latitude
                 360 /
                 (2 * Math.PI * 6371 * Math.cos(Math.toRadians(bounds.getCenterY())));
 
