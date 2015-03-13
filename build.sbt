@@ -4,7 +4,7 @@ import NativePackagerKeys._
 
 name := """gtfs-data-manager"""
 
-version := "0.2.6"
+version := "0.2.7"
 
 serverLoading in Rpm := ServerLoader.SystemV
 
