@@ -88,7 +88,7 @@ public class FeedSource extends Model implements Comparable<FeedSource> {
     /**
      * What is the GTFS Editor ID of this feed?
      */
-    public Long editorId;
+    public String editorId;
     
     /**
      * Create a new feed. This also creates a user to own this feed.

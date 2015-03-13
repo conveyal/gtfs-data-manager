@@ -100,7 +100,7 @@ public class Application extends Controller {
             });
         }
         
-        final Long id = fs.editorId;
+        final String id = fs.editorId;
         
         String url = Play.application().configuration().getString("application.editor.internal_url");
         

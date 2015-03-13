@@ -86,7 +86,7 @@ public class FeedSourceController extends Controller {
         s.retrievalMethod = FeedSource.FeedRetrievalMethod.valueOf(params.get("retrievalMethod").asText());
         
         if (params.has("editorId")) {
-            s.editorId = params.get("editorId").asLong();
+            s.editorId = params.get("editorId").asText();
         }
         
         s.isPublic = params.get("isPublic").asBoolean();
