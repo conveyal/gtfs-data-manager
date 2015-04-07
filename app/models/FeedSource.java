@@ -216,8 +216,9 @@ public class FeedSource extends Model implements Comparable<FeedSource> {
         if (oauthToken != null)
             conn.addRequestProperty("Authorization", "Bearer " + oauthToken);
         
-        if (latest != null)
-            conn.setIfModifiedSince(latest.updated.getTime());
+        // lastFetched is set to null when the URL changes
+        if (latest != null && this.lastFetched != null)
+            conn.setIfModifiedSince(Math.min(latest.updated.getTime(), this.lastFetched.getTime()));
         
         try {
             conn.connect();
@@ -269,7 +270,10 @@ public class FeedSource extends Model implements Comparable<FeedSource> {
         else {
             newFeed.userId = this.userId;
             newFeed.validate();            
-            newFeed.save();                    
+            newFeed.save();
+            
+            this.lastFetched = newFeed.updated;
+            this.save();
             
             return newFeed;
         }
