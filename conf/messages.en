@@ -188,3 +188,4 @@ app.users=Users
 public.title=Public Feeds
 public.description=The following feeds, in GTFS format, are available for download and use.
 public.last-updated=last updated: {0}
+public.last-checked=last checked: {0}
