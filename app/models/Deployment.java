@@ -337,14 +337,19 @@ public class Deployment extends Model {
             out.closeEntry();
         }
 
-        if(feedColl.routerConfig != null) {
+        String brandingUrlRoot = Play.application().configuration().getString("application.data.branding_public");
+        OtpRouterConfig routerConfig = feedColl.routerConfig;
+        if(routerConfig == null && brandingUrlRoot != null) {
+            routerConfig = new OtpRouterConfig();
+        }
+        if(routerConfig != null) {
+            routerConfig.brandingUrlRoot = brandingUrlRoot;
             ZipEntry routerConfigEntry = new ZipEntry("router-config.json");
             out.putNextEntry(routerConfigEntry);
 
             ObjectMapper mapper = new ObjectMapper();
             mapper.setSerializationInclusion(Include.NON_NULL);
-            byte[] routerConfig = mapper.writer().writeValueAsBytes(feedColl.routerConfig);
-            out.write(routerConfig);
+            out.write(mapper.writer().writeValueAsBytes(routerConfig));
 
             out.closeEntry();
         }

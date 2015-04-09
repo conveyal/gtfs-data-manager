@@ -1,0 +1,15 @@
+{
+  "name": "feed-branding-view",
+  "description": "The branding UI for a feed",
+  "dependencies": {
+    "components/handlebars.js": "*",
+    "jashkenas/underscore": "*"
+  },
+  "local": [
+    "application",
+    "feed-version",
+    "item-view"
+  ],
+  "scripts": ["feed-branding-view.js"],
+  "templates": ["feed-branding-view.html"]
+}

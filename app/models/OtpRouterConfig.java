@@ -33,4 +33,6 @@ public class OtpRouterConfig implements Serializable {
 
         public String defaultAgencyId;
     }
+
+    public String brandingUrlRoot;
 }

@@ -1,5 +1,6 @@
 package controllers.api;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -15,13 +16,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import controllers.Secured;
-import models.FeedCollection;
-import models.FeedSource;
-import models.JsonViews;
-import models.User;
+import models.*;
 import models.User.ProjectPermissions;
+import play.Play;
+import play.api.libs.Files;
 import play.libs.Json;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Security;
 
@@ -35,7 +36,7 @@ public class FeedSourceController extends Controller {
         // TODO: access control
         return ok(json.write(FeedSource.get(id)));
     }
-    
+
     public static Result getAll () throws JsonProcessingException {
         User currentUser = User.getUserByUsername(session("username"));
         
@@ -196,5 +197,39 @@ public class FeedSourceController extends Controller {
         FetchSingleFeedJob job = new FetchSingleFeedJob(s);
         job.run();
         return ok(FeedVersionController.getJsonManager().write(job.result)).as("application/json");
+    }
+
+    public static Result uploadAgencyLogo(String id) {
+        FeedSource feedSource = FeedSource.get(id);
+        if(feedSource == null) return badRequest();
+
+        Http.MultipartFormData body = request().body().asMultipartFormData();
+        Http.MultipartFormData.FilePart picture = body.getFile("picture");
+        if (picture != null) {
+            //String contentType = picture.getContentType();
+            File formFile = picture.getFile();
+
+            String agencyId = body.asFormUrlEncoded().get("agencyId")[0];
+
+            // create the file in the branding assets directory
+            String agencyDir = Play.application().configuration().getString("application.data.branding_internal") + File.separator + agencyId;
+            new File(agencyDir).mkdirs();
+            File brandingFile = new File(agencyDir + File.separator + "logo.png");
+            Files.copyFile(formFile, brandingFile, true);
+
+            // register the branding with the FeedSource
+            AgencyBranding agencyBranding = feedSource.getAgencyBranding(agencyId);
+            if(agencyBranding == null) { // if branding does not already exist for this agency, create it
+                agencyBranding = new AgencyBranding(agencyId);
+                feedSource.addAgencyBranding(agencyBranding);
+            }
+            agencyBranding.hasLogo = true;
+
+            feedSource.save();
+            return redirect("/#feed/" + feedSource.id);
+        } else {
+            flash("error", "Missing file");
+            return redirect("/#feed/" + feedSource.id);
+        }
     }
 }

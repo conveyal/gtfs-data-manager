@@ -10,6 +10,7 @@
     "feed-version-collection",
     "feed-version-collection-view",
     "feed-version-view",
+    "feed-branding-view",
     "note-collection-view",
     "feed-version-navigation-view",
     "layout-view"

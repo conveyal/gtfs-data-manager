@@ -89,7 +89,10 @@ public class FeedSource extends Model implements Comparable<FeedSource> {
      * What is the GTFS Editor ID of this feed?
      */
     public String editorId;
-    
+
+
+    public Collection<AgencyBranding> branding;
+
     /**
      * Create a new feed. This also creates a user to own this feed.
      */
@@ -386,4 +389,23 @@ public class FeedSource extends Model implements Comparable<FeedSource> {
         
         sourceStore.delete(this.id);
     }
+
+    @JsonIgnore
+    public AgencyBranding getAgencyBranding(String agencyId) {
+        if(branding != null) {
+            for (AgencyBranding agencyBranding : branding) {
+                if (agencyBranding.agencyId.equals(agencyId)) return agencyBranding;
+            }
+        }
+        return null;
+    }
+
+    @JsonIgnore
+    public void addAgencyBranding(AgencyBranding agencyBranding) {
+        if(branding == null) {
+            branding = new ArrayList<>();
+        }
+        branding.add(agencyBranding);
+    }
+
 }

@@ -6,6 +6,7 @@ var _ = require('underscore');
 var app = require('application');
 var FeedVersion = require('feed-version');
 var FeedVersionView = require('feed-version-view');
+var FeedBrandingView = require('feed-branding-view');
 var NoteCollectionView = require('note-collection-view');
 var FeedVersionNavigationView = require('feed-version-navigation-view');
 var LayoutView = require('layout-view');
@@ -14,6 +15,7 @@ module.exports = LayoutView.extend({
   template: require("./feed-source-view.html"),
   regions: {
     validationRegion: '#validation',
+    brandingRegion: '#branding',
     notesRegion: '.source-notes',
     versionNavigationRegion: '#version-navigation'
   },
@@ -93,6 +95,11 @@ module.exports = LayoutView.extend({
     this.notesRegion.show(new NoteCollectionView({
       objectId: this.model.get('id'),
       type: 'FEED_SOURCE'
+    }));
+
+    // set up branding
+    this.brandingRegion.show(new FeedBrandingView({
+      feedSource: this.model
     }));
   },
 

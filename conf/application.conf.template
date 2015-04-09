@@ -43,6 +43,12 @@ application.data.gtfs=data/gtfs
 # this can then be served by a front-end HTTP server, e.g. nginx
 application.data.public=data/public
 
+# where the public branding asset files will be put
+# this can then be served by a front-end HTTP server, e.g. nginx
+# application.data.branding_internal=data/branding
+# application.data.branding_public="http://myserver/branding"
+
+
 # Where do we deploy to?
 # Each server (set) has internal URL(s), which are to all of the instances, and a public URL
 # It's fine to have the internal URL be a list with a single item, and the external URL be the same.
