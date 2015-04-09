@@ -100,6 +100,8 @@ public class FeedSourceController extends Controller {
             }
             else {
                 s.url = new URL(url);
+                // reset the last fetched date so it can be fetched again
+                s.lastFetched = null;
             }
         }
     }

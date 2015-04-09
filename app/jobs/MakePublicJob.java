@@ -72,8 +72,13 @@ public class MakePublicJob implements Runnable {
                 continue;
             
             // we don't worry about feed expiration; old data is better than no data.
-            while ((fv = fv.getPreviousVersion()) != null && fv.hasCriticalErrorsExceptingDate())
+            
+            while (fv.getPreviousVersion() != null && fv.hasCriticalErrorsExceptingDate())
                 fv = fv.getPreviousVersion();
+            
+            // if we didn't find anything valid, we might as well use the latest 
+            if (fv.hasCriticalErrorsExceptingDate())
+                fv = fs.getLatest();
             
             versions.add(fv);
         }
