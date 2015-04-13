@@ -22,4 +22,7 @@ public class AgencyBranding implements Serializable {
         this.agencyId = agencyId;
         urlRoot = Play.application().configuration().getString("application.data.branding_public");
     }
+
+    public AgencyBranding() {
+    }
 }

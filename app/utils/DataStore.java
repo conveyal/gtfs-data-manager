@@ -50,7 +50,9 @@ public class DataStore<T> {
                 .closeOnJvmShutdown()
                 .make();
 
-        map = db.getTreeMap(dataFile);
+        DB.BTreeMapMaker maker = db.createTreeMap(dataFile);
+        maker.valueSerializer(new ClassLoaderSerializer());
+        map = maker.makeOrGet();
     }
 
     public DataStore(File directory, String dataFile, List<Fun.Tuple2<String,T>>inputData) {
@@ -94,6 +96,8 @@ public class DataStore<T> {
                 .pumpPresort(100000) 
                 .keySerializer(keySerializer)
                 .make();
+
+
 
         // close/flush db 
         db.close();
