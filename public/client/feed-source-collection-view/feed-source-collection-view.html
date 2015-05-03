@@ -5,6 +5,10 @@
     </button>
   {{/if}}
 
+  <button type="button" class="btn btn-primary fetch-all-feeds">
+    <span class="glyphicon glyphicon-cloud-download"></span> {{ t "app.fetch_all_feeds.button" }}
+  </button>
+  
   {{#if showDeployPublicButton}}
     <button type="button" class="btn btn-primary deploy-public">
       <span class="glyphicon glyphicon-upload"></span> <span class="button-label">{{ t "app.deploy-public" }}</span>

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
+import jobs.FetchProjectFeedsJob;
 import models.*;
 import play.Play;
 import play.libs.F.Function;
@@ -250,5 +251,13 @@ public class FeedCollectionController extends Controller {
                     return ok(wsr.getBody()).as("application/json");
             }
         });
+    }
+
+    public static Result fetchAllFeeds(String id) throws JsonProcessingException {
+        FeedCollection c = FeedCollection.get(id);
+        FetchProjectFeedsJob job = new FetchProjectFeedsJob(c);
+        job.run();
+
+        return ok(FeedVersionController.json.write(job.result)).as("application/json");
     }
 }

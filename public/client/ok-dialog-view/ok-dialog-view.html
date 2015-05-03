@@ -1,0 +1,19 @@
+<div class="modal" role="dialog" aria-labelledby="ok-title">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close ok-action" data-dismiss="modal">
+          <span aria-hidden="true">&times;</span><span class="sr-only">{{ t 'app.close' }}</span>
+        </button>
+        <h4 class="modal-title" id="ok-title">{{ title }}</h4>
+      </div>
+
+      <div class="modal-body">
+        <p>{{{ body }}}</p>
+      </div>
+      <div class="modal-footer">
+        <button role="button" data-dismiss="modal" class="btn btn-default ok-action">OK</button>
+      </div>
+    </div>
+  </div>
+</div>

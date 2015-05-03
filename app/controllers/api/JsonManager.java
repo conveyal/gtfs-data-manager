@@ -3,6 +3,7 @@ package controllers.api;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 
 import com.conveyal.gtfs.model.InvalidValue;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -72,7 +73,11 @@ public class JsonManager<T> {
     public String write (Collection<T> c) throws JsonProcessingException {
         return ow.writeValueAsString(c);
     }
-    
+
+    public String write (Map<String, T> map) throws JsonProcessingException {
+        return ow.writeValueAsString(map);
+    }
+
     public T read (String s) throws JsonParseException, JsonMappingException, IOException {
         return om.readValue(s, theClass);
     }

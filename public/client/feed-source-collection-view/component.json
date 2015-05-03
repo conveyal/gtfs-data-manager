@@ -1,16 +1,21 @@
 {
   "name": "feed-source-collection-view",
   "dependencies": {
-    "jashkenas/underscore": "*"
+    "jashkenas/underscore": "*",
+    "components/handlebars.js": "*"
   },
   "local": [
     "bb",
     "composite-view",
     "feed-source",
     "feed-source-item-view",
-    "application"
+    "application",
+    "ok-dialog-view"
   ],
   "main": "feed-source-collection-view.js",
   "scripts": ["feed-source-collection-view.js"],
-  "templates": ["feed-source-collection-view.html"]
+  "templates": [
+    "feed-source-collection-view.html",
+    "fetch-all-feeds-results.html"
+  ]
 }

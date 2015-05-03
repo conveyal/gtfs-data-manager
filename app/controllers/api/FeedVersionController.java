@@ -37,7 +37,7 @@ import scala.concurrent.duration.Duration;
 
 @Security.Authenticated(Secured.class)
 public class FeedVersionController extends Controller {
-    private static JsonManager<FeedVersion> json =
+    public static JsonManager<FeedVersion> json =
             new JsonManager<FeedVersion>(FeedVersion.class, JsonViews.UserInterface.class);
     private static JsonManager<SummarizedFeedVersion> jsonSummarized =
             new JsonManager<SummarizedFeedVersion>(SummarizedFeedVersion.class, JsonViews.UserInterface.class);

@@ -1,0 +1,13 @@
+{
+  "name": "ok-dialog-view",
+  "description": "Simple OK dialog box",
+  "dependencies": {
+    "jashkenas/underscore": "*"
+  },
+  "local": [
+    "bb",
+    "item-view"
+  ],
+  "scripts": ["ok-dialog-view.js"],
+  "templates": ["ok-dialog-view.html"]
+}

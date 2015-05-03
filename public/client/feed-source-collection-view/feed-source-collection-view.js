@@ -3,6 +3,8 @@ var BB = require('bb');
 var CompositeView = require('composite-view');
 var FeedSource = require('feed-source');
 var FeedSourceItemView = require('feed-source-item-view');
+var OkDialogView = require('ok-dialog-view');
+var Handlebars = require('handlebars');
 var _ = require('underscore');
 
 /**
@@ -16,6 +18,7 @@ module.exports = CompositeView.extend({
   events: {
     'click .newfeedsource': 'add',
     'click .deploy-public': 'deployPublic',
+    'click .fetch-all-feeds': 'fetchAllFeeds',
     'click .sort-by': 'sortBy'
   },
 
@@ -111,5 +114,41 @@ module.exports = CompositeView.extend({
     this.collection.sortAttribute = attr;
 
     this.collection.sort();
+  },
+
+  fetchAllFeeds: function() {
+    var self = this;
+    var dialogTemplate = Handlebars.compile(require('./fetch-all-feeds-results.html'));
+
+    $.ajax({
+      url: 'api/feedcollections/' + this.feedCollectionId + '/fetchAllFeeds',
+      method: 'POST',
+      success: function(data) {
+        var results = {};
+        var updatedFeeds = false;
+        _.each(self.collection.models, function(feedSource) {
+          var name = feedSource.get('name');
+          if(feedSource.get('id') in data) {
+            if(data[feedSource.get('id')] !== null) {
+              results[name] = window.Messages('app.fetch_all_feeds.updated');
+              updatedFeeds = true;
+            }
+            else {
+              results[name] = window.Messages('app.fetch_all_feeds.no_change');
+            }
+          }
+          else {
+            results[name] = window.Messages('app.fetch_all_feeds.not_fetched');
+          }
+        });
+        app.modalRegion.show(new OkDialogView({
+          title: window.Messages('app.fetch_all_feeds.results'),
+          body: dialogTemplate(results),
+          onOk : function() {
+            if(updatedFeeds) location.reload();
+          }
+        }));
+      }
+    });
   }
 });
