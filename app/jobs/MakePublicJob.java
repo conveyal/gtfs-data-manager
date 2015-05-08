@@ -126,7 +126,7 @@ public class MakePublicJob implements Runnable {
             File out = new File(publicDirectory, fileName);
             try {
                 Files.copy(v.getFeed(), out);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 Logger.error("Exception copying feed " + v.getFeedSource().name);
                 e.printStackTrace();
                 // take this feed version out of the list so it is not rendered by the template

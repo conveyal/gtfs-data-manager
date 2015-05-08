@@ -82,7 +82,9 @@ public class Deployment extends Model {
         ArrayList<SummarizedFeedVersion> ret = new ArrayList<SummarizedFeedVersion>(feedVersionIds.size());
 
         for (String id : feedVersionIds) {
-            ret.add(new SummarizedFeedVersion(FeedVersion.get(id)));
+            FeedVersion fv = FeedVersion.get(id);
+            if(fv != null)
+            ret.add(new SummarizedFeedVersion(fv));
         }
 
         return ret;
@@ -255,6 +257,9 @@ public class Deployment extends Model {
             File feed = v.getFeed();
 
             FileInputStream in;
+
+	    Logger.info("dumping: " + v.getFeedSource().name);
+            Logger.info("source: " + v.getFeed());
 
             try {
                 in = new FileInputStream(feed);
