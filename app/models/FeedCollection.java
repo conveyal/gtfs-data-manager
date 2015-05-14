@@ -37,6 +37,7 @@ public class FeedCollection extends Model implements Serializable {
     public FeedCollection() {
         this.buildConfig = new OtpBuildConfig();
         this.routerConfig = new OtpRouterConfig();
+        this.useCustomOsmBounds = false;
     }
 
     /**
