@@ -87,6 +87,8 @@ public class DeployJob implements Runnable {
             
             return;
         }
+
+        Logger.info("Created deployment bundle file: " + temp.getAbsolutePath());
         
         // dump the deployment bundle
         try {
@@ -101,9 +103,6 @@ public class DeployJob implements Runnable {
                 status.message = "app.deployment.error.dump";
             }
             
-            return;
-        }
-        
         synchronized (status) {
             status.built = true;
         }
@@ -175,7 +174,7 @@ public class DeployJob implements Runnable {
         }
 
         // figure out what router we're using
-        String router = deployment.routerId != null ? deployment.routerId : "default"; 
+        String router = deployment.routerId != null ? deployment.routerId : "default";
         
         // load it to OTP
         for (String rawUrl : this.targets) {
