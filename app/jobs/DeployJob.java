@@ -103,6 +103,9 @@ public class DeployJob implements Runnable {
                 status.message = "app.deployment.error.dump";
             }
             
+            return;
+        }
+
         synchronized (status) {
             status.built = true;
         }
