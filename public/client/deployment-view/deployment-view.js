@@ -1,3 +1,5 @@
+var debug = require('debug')('deployment-view');
+
 var BB = require('bb');
 var CompositeView = require('composite-view');
 var _ = require('underscore');
@@ -98,14 +100,17 @@ module.exports = CompositeView.extend({
 
     var $t = $(e.target);
 
+    debug('Deploying ' + instance.model.get('name'));
     // make sure they mean it
     app.modalRegion.show(new ConfirmView({
       title: window.Messages('app.confirm'),
       // todo: multiple servers
       body: window.Messages('app.deployment.confirm', instance.model.get('name'), $t.attr('name')),
       onProceed: function() {
+        var url = 'api/deployments/' + instance.model.id + '/deploy/' + $t.attr('name');
+        debug('Deploying to ' + url);
         $.ajax({
-          url: 'api/deployments/' + instance.model.id + '/deploy/' + $t.attr('name'),
+          url: url,
           method: 'POST',
           success: function() {
             // refetch the deployment, to show where it is deployed to
@@ -125,6 +130,9 @@ module.exports = CompositeView.extend({
             503: function() {
               window.alert(window.Messages('app.deployment.already_deploying'))
             }
+          },
+          error: function( jqXHR, textStatus ) {
+            debug( 'Deploy request failed: ' + textStatus );
           }
         });
       }
