@@ -3,65 +3,68 @@
 # ~~~~
 
 # Auth
-POST    /authenticate                   controllers.Application.authenticate()
+POST          /authenticate                                 controllers.Application.authenticate()
 
 # API CRUD stuff
-GET     /api/feedcollections/geteditoragencies controllers.api.FeedCollectionController.getEditorAgencies()
-GET      /api/feedcollections/:id       controllers.api.FeedCollectionController.get(id:String)
-GET      /api/feedcollections           controllers.api.FeedCollectionController.getAll()
-PUT      /api/feedcollections/:id       controllers.api.FeedCollectionController.update(id:String)
-POST     /api/feedcollections/          controllers.api.FeedCollectionController.create()
-POST     /api/feedcollections/:id/fetchAllFeeds   controllers.api.FeedCollectionController.fetchAllFeeds(id:String)
-
-GET     /api/users/:id                  controllers.api.UserController.get(id:String)
-GET     /api/users                      controllers.api.UserController.getAll()
-POST    /api/users                      controllers.api.UserController.create()
-PUT     /api/users/:id                  controllers.api.UserController.update(id:String)
-
-GET     /api/feedsources/:id            controllers.api.FeedSourceController.get(id:String)
-GET     /api/feedsources/:id/getKey     controllers.api.FeedSourceController.getUserIdAndKey(id:String)
-GET     /api/feedsources                controllers.api.FeedSourceController.getAll()
-POST    /api/feedsources/:id/fetch      controllers.api.FeedSourceController.fetch(id:String)
-PUT     /api/feedsources/:id            controllers.api.FeedSourceController.update(id:String)
-POST    /api/feedsources/               controllers.api.FeedSourceController.create()
-DELETE  /api/feedsources/:id            controllers.api.FeedSourceController.delete(id:String)
-POST    /api/feedsources/:id/uploadAgencyLogo    controllers.api.FeedSourceController.uploadAgencyLogo(id:String)
+# note: in a different controller because it is possible to turn off authentication for only this endpoint
+GET           /api/feedcollections/:id.csv                  controllers.api.CsvExportController.asCsv(id:String)
+GET           /api/feedcollections/geteditoragencies        controllers.api.FeedCollectionController.getEditorAgencies()
+GET           /api/feedcollections/:id                      controllers.api.FeedCollectionController.get(id:String)
+GET           /api/feedcollections                          controllers.api.FeedCollectionController.getAll()
+PUT           /api/feedcollections/:id                      controllers.api.FeedCollectionController.update(id:String)
+POST          /api/feedcollections/                         controllers.api.FeedCollectionController.create()
+POST          /api/feedcollections/:id/fetchAllFeeds        controllers.api.FeedCollectionController.fetchAllFeeds(id:String)
 
 
-GET      /api/feedversions/:id          controllers.api.FeedVersionController.get(id:String)
-GET      /api/feedversions              controllers.api.FeedVersionController.getAll()
-POST     /api/feedversions/             controllers.api.FeedVersionController.create()
+GET           /api/users/:id                                controllers.api.UserController.get(id:String)
+GET           /api/users                                    controllers.api.UserController.getAll()
+POST          /api/users                                    controllers.api.UserController.create()
+PUT           /api/users/:id                                controllers.api.UserController.update(id:String)
 
-POST     /api/deployments/:id/deploy/:target    controllers.api.DeploymentController.deploy(id:String, target:String)
-GET      /api/deployments/status/:target controllers.api.DeploymentController.deploymentStatus(target:String)
-GET      /api/deployments/targets       controllers.api.DeploymentController.targets()
-GET      /api/deployments/:id           controllers.api.DeploymentController.get(id:String)
-GET      /api/deployments               controllers.api.DeploymentController.getAll()
-POST     /api/deployments/              controllers.api.DeploymentController.create()
-PUT      /api/deployments/:id           controllers.api.DeploymentController.update(id:String)
-POST     /api/deployments/fromfeedsource/:id controllers.api.DeploymentController.createFromFeedSource(id:String)
+GET           /api/feedsources/:id                          controllers.api.FeedSourceController.get(id:String)
+GET           /api/feedsources/:id/getKey                   controllers.api.FeedSourceController.getUserIdAndKey(id:String)
+GET           /api/feedsources                              controllers.api.FeedSourceController.getAll()
+POST          /api/feedsources/:id/fetch                    controllers.api.FeedSourceController.fetch(id:String)
+PUT           /api/feedsources/:id                          controllers.api.FeedSourceController.update(id:String)
+POST          /api/feedsources/                             controllers.api.FeedSourceController.create()
+DELETE        /api/feedsources/:id                          controllers.api.FeedSourceController.delete(id:String)
+POST          /api/feedsources/:id/uploadAgencyLogo         controllers.api.FeedSourceController.uploadAgencyLogo(id:String)
 
 
-GET      /api/notes                     controllers.api.NoteController.getAll()
-POST     /api/notes                     controllers.api.NoteController.create()
+GET           /api/feedversions/:id                         controllers.api.FeedVersionController.get(id:String)
+GET           /api/feedversions                             controllers.api.FeedVersionController.getAll()
+POST          /api/feedversions/                            controllers.api.FeedVersionController.create()
 
-GET     /messages.js                    controllers.Application.jsMessages()
-GET     /loggedInUser                   controllers.Application.getLoggedInUser()
-GET     /logout                         controllers.Application.logout()
-POST    /createInitialUser              controllers.Application.createInitialUser()
-GET     /edit/:feedSourceId             controllers.Application.edit(feedSourceId:String)
+POST          /api/deployments/:id/deploy/:target           controllers.api.DeploymentController.deploy(id:String, target:String)
+GET           /api/deployments/status/:target               controllers.api.DeploymentController.deploymentStatus(target:String)
+GET           /api/deployments/targets                      controllers.api.DeploymentController.targets()
+GET           /api/deployments/:id                          controllers.api.DeploymentController.get(id:String)
+GET           /api/deployments                              controllers.api.DeploymentController.getAll()
+POST          /api/deployments/                             controllers.api.DeploymentController.create()
+PUT           /api/deployments/:id                          controllers.api.DeploymentController.update(id:String)
+POST          /api/deployments/fromfeedsource/:id           controllers.api.DeploymentController.createFromFeedSource(id:String)
 
-POST    /deployPublic                   controllers.Application.deployPublic()
+
+GET           /api/notes                                    controllers.api.NoteController.getAll()
+POST          /api/notes                                    controllers.api.NoteController.create()
+
+GET           /messages.js                                  controllers.Application.jsMessages()
+GET           /loggedInUser                                 controllers.Application.getLoggedInUser()
+GET           /logout                                       controllers.Application.logout()
+POST          /createInitialUser                            controllers.Application.createInitialUser()
+GET           /edit/:feedSourceId                           controllers.Application.edit(feedSourceId:String)
+
+POST          /deployPublic                                 controllers.Application.deployPublic()
 
 # TODO: these are adminy things, and are GET requests for convenience
 # This violates the HTTP spec, as GET requests are not supposed to be action-taking
 # We should make these POSTs, and add a page to the management interface to run them
-GET     /fetchGtfs                      controllers.Application.fetchGtfs()
-GET     /revalidate                     controllers.Application.validateGtfs()
+GET           /fetchGtfs                                    controllers.Application.fetchGtfs()
+GET           /revalidate                                   controllers.Application.validateGtfs()
 
-GET     /dump                           controllers.Dump.dump()
-POST    /load                           controllers.Dump.load()
+GET           /dump                                         controllers.Dump.dump()
+POST          /load                                         controllers.Dump.load()
 
 # Map static resources from the /public folder to the / URL path
-GET     /                    controllers.Assets.at(path="/public", file="index.html")
-GET     /*file               controllers.Assets.at(path="/public", file)
+GET           /                                             controllers.Assets.at(path="/public", file="index.html")
+GET           /*file                                        controllers.Assets.at(path="/public", file)

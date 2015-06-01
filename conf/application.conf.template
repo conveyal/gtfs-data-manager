@@ -10,6 +10,9 @@
 # See http://www.playframework.com/documentation/latest/ApplicationSecret for more details.
 application.secret="WRrVVuBC:D<@STKaQamIHh56CWT[Z;Mife3sS2i=qN/GBp:dCbeD=;jq0^R:bsZ"
 
+# Do users have to be authenticated to download a CSV of a feed collection?
+application.require-auth-for-csv-download=true
+
 # The application languages
 # ~~~~~
 application.langs="en"

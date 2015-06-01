@@ -8,7 +8,7 @@
   <button type="button" class="btn btn-primary fetch-all-feeds">
     <span class="glyphicon glyphicon-cloud-download"></span> {{ t "app.fetch_all_feeds.button" }}
   </button>
-  
+
   {{#if showDeployPublicButton}}
     <button type="button" class="btn btn-primary deploy-public">
       <span class="glyphicon glyphicon-upload"></span> <span class="button-label">{{ t "app.deploy-public" }}</span>
@@ -27,6 +27,10 @@
 
   <a href="#otpconfig/{{ feedCollectionId }}" class="btn btn-primary">
     <span class="glyphicon glyphicon-picture"></span> {{ t "app.otp_config.title" }}
+  </a>
+
+  <a href="api/feedcollections/{{ feedCollectionId }}.csv" class="btn btn-primary">
+    <span class="glyphicon glyphicon-download"></span>&nbsp;{{ t "app.download-as-csv" }}
   </a>
 </p>
 

@@ -37,7 +37,8 @@ libraryDependencies ++= Seq(
   "org.julienrf" %% "play-jsmessages" % "1.6.2",
   "com.google.guava" % "guava" % "18.0",
   "com.amazonaws" % "aws-java-sdk-s3" % "1.9.0",
-  "commons-io" % "commons-io" % "2.4"
+  "commons-io" % "commons-io" % "2.4",
+  "net.sourceforge.javacsv" % "javacsv" % "2.0"
 )
 
 resolvers += "Conveyal Maven Repository" at "file:///home/matthewc/.ivy2/cache"
