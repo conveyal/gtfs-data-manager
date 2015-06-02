@@ -115,6 +115,7 @@ app.deployment.already_deploying=There is currently a deployment being pushed to
 
 # deploy the public feed download page
 app.deploy-public=Update Public Feed Download
+app.deploy-public.message=Are you sure you want to update the public feed download page?
 app.deploy-public.updating=Uploading feeds
 
 # OSM extract range configuration

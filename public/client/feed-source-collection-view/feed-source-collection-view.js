@@ -4,6 +4,7 @@ var CompositeView = require('composite-view');
 var FeedSource = require('feed-source');
 var FeedSourceItemView = require('feed-source-item-view');
 var OkDialogView = require('ok-dialog-view');
+var ConfirmView = require('confirm-view');
 var Handlebars = require('handlebars');
 var _ = require('underscore');
 
@@ -79,29 +80,35 @@ module.exports = CompositeView.extend({
   deployPublic: function() {
     var instance = this;
 
-    // user feedback
-    this.$('.deploy-public span.glyphicon')
-      // set up spinner
-      .removeClass('glyphicon-upload').addClass('glyphicon-refresh').addClass('spinner')
-      .parent()
-      .prop('disabled', true);
-
-    this.$('.deploy-public span.button-label')
-      .text(window.Messages('app.deploy-public.updating'));
-
-    $.post('deployPublic', {
-        feedCollectionId: this.feedCollectionId
-      })
-      .done(function() {
+    app.modalRegion.show(new ConfirmView({
+      title: window.Messages('app.deploy-public'),
+      body: window.Messages('app.deploy-public.message'),
+      onProceed: function () {
+        // user feedback
         instance.$('.deploy-public span.glyphicon')
           // set up spinner
-          .addClass('glyphicon-upload').removeClass('glyphicon-refresh').removeClass('spinner')
+          .removeClass('glyphicon-upload').addClass('glyphicon-refresh').addClass('spinner')
           .parent()
-          .prop('disabled', false);
+          .prop('disabled', true);
 
         instance.$('.deploy-public span.button-label')
-          .text(window.Messages('app.deploy-public'));
-      });
+          .text(window.Messages('app.deploy-public.updating'));
+
+        $.post('deployPublic', {
+            feedCollectionId: instance.feedCollectionId
+          })
+          .done(function() {
+            instance.$('.deploy-public span.glyphicon')
+              // set up spinner
+              .addClass('glyphicon-upload').removeClass('glyphicon-refresh').removeClass('spinner')
+              .parent()
+              .prop('disabled', false);
+
+            instance.$('.deploy-public span.button-label')
+              .text(window.Messages('app.deploy-public'));
+          });
+        }
+      }));
   },
 
   /** sort by a particular column. new feeds are still at the top */
