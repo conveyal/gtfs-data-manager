@@ -1,8 +1,12 @@
 <label class="sr-only" for="source-{{ id }}">{{ t 'app.feed_source.select_editor_source' }}</label>
-<select id="source-{{ id }}"{{#if (eq agencies.length 0)}} disabled {{/if}}
+<select id="source-{{ id }}" class="agency" {{#if (eq agencies.length 0)}} disabled {{/if}}
   title="{{ t 'app.feed_source.select_editor_source' }}">
   <option value=""></option>
   {{#each agencies}}
     <option value="{{ id }}">{{ name }}</option>
   {{/each}}
+</select>
+<br/>
+<select id="snapshot-{{ id }}" class="snapshot" {{#if (eq agencies.length 0)}} disabled {{/if}}
+  title="{{ t 'app.feed_source.select_editor_snapshot' }}">
 </select>

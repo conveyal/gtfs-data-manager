@@ -9,6 +9,7 @@ POST          /authenticate                                 controllers.Applicat
 # note: in a different controller because it is possible to turn off authentication for only this endpoint
 GET           /api/feedcollections/:id.csv                  controllers.api.CsvExportController.asCsv(id:String)
 GET           /api/feedcollections/geteditoragencies        controllers.api.FeedCollectionController.getEditorAgencies()
+GET           /api/feedcollections/geteditorsnapshots       controllers.api.FeedCollectionController.getEditorSnapshots()
 GET           /api/feedcollections/:id                      controllers.api.FeedCollectionController.get(id:String)
 GET           /api/feedcollections                          controllers.api.FeedCollectionController.getAll()
 PUT           /api/feedcollections/:id                      controllers.api.FeedCollectionController.update(id:String)

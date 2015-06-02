@@ -118,5 +118,4 @@ module.exports = LayoutView.extend({
       }
     });
   }
-
-})
+});

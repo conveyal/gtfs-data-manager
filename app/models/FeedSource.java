@@ -34,6 +34,8 @@ import utils.DataStore;
  */
 @JsonInclude(Include.ALWAYS)
 public class FeedSource extends Model implements Comparable<FeedSource> {
+    private static final long serialVersionUID = -5696893509128904129l;
+
     private static DataStore<FeedSource> sourceStore = new DataStore<FeedSource>("feedsources");
     
     /**
@@ -41,7 +43,7 @@ public class FeedSource extends Model implements Comparable<FeedSource> {
      */
     @JsonView(JsonViews.DataDump.class)
     public String feedCollectionId;
-    
+
     /**
      * Get the FeedCollection of which this feed is a part
      */
@@ -90,6 +92,12 @@ public class FeedSource extends Model implements Comparable<FeedSource> {
      */
     public String editorId;
 
+    /**
+     * What is the GTFS Editor snapshot for this feed?
+     *
+     * This is the String-formatted snapshot ID, which is the base64-encoded ID and the version number.
+     */
+    public String snapshotVersion;
 
     public Collection<AgencyBranding> branding;
 
@@ -161,7 +169,7 @@ public class FeedSource extends Model implements Comparable<FeedSource> {
         if (this.retrievalMethod.equals(FeedRetrievalMethod.FETCHED_AUTOMATICALLY))
             url = this.url;
         else if (this.retrievalMethod.equals(FeedRetrievalMethod.PRODUCED_IN_HOUSE)) {
-            if (this.editorId == null) {
+            if (this.editorId == null || this.snapshotVersion == null) {
                 Logger.error("Feed {} has no editor id; cannot fetch", this); 
                 return null;
             }
@@ -192,7 +200,7 @@ public class FeedSource extends Model implements Comparable<FeedSource> {
             
             // build the URL
             try {
-                url = new URL(baseUrl + "export/creategtfs?agencySelect=" + this.editorId.toString());
+                url = new URL(baseUrl + "api/snapshot/" + this.snapshotVersion + ".zip");
             } catch (MalformedURLException e) {
                 Logger.error("Invalid URL for editor, check your config.");
                 return null;

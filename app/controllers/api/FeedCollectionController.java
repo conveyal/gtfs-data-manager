@@ -1,9 +1,10 @@
 package controllers.api;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Map;
-
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import controllers.Secured;
 import jobs.FetchProjectFeedsJob;
 import models.*;
 import play.Play;
@@ -15,12 +16,8 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
-
-import controllers.Secured;
+import java.io.IOException;
+import java.util.ArrayList;
 
 @Security.Authenticated(Secured.class)
 public class FeedCollectionController extends Controller {
@@ -243,6 +240,48 @@ public class FeedCollectionController extends Controller {
             }
         });
         
+        return agencyPromise.map(new Function<WSResponse, Result> () {
+            public Result apply (WSResponse wsr) {
+                if (wsr.getStatus() != 200)
+                    return internalServerError();
+                else
+                    return ok(wsr.getBody()).as("application/json");
+            }
+        });
+    }
+
+    public static Promise<Result> getEditorSnapshots () {
+        // note: this is accessible to anyone; for now this is fine but in the future we will want to handle this better
+
+        // first, get a token
+        String url = Play.application().configuration().getString("application.editor.internal_url");
+
+        if (!url.endsWith("/"))
+            url += "/";
+
+        final String baseUrl = url;
+
+        String tokenUrl = baseUrl + "get_token";
+        tokenUrl += "?client_id=" + Play.application().configuration().getString("application.oauth.client_id");
+        tokenUrl += "&client_secret=" + Play.application().configuration().getString("application.oauth.client_secret");
+
+        final Promise<String> tokenPromise = WS.url(tokenUrl).get().map(new Function<WSResponse, String> () {
+            public String apply(WSResponse wsr) throws Throwable {
+                if (wsr.getStatus() != 200)
+                    return null;
+
+                else
+                    return wsr.getBody();
+            }
+        });
+
+        final Promise<WSResponse> agencyPromise = tokenPromise.flatMap(new Function<String, Promise<WSResponse>> () {
+            public Promise<WSResponse> apply(String token) throws Throwable {
+                String snapUrl = baseUrl + "api/snapshot?oauth_token=" + token;
+                return WS.url(snapUrl).get();
+            }
+        });
+
         return agencyPromise.map(new Function<WSResponse, Result> () {
             public Result apply (WSResponse wsr) {
                 if (wsr.getStatus() != 200)

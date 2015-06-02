@@ -1,21 +1,10 @@
 package controllers.api;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import jobs.FetchSingleFeedJob;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import controllers.Secured;
+import jobs.FetchSingleFeedJob;
 import models.*;
 import models.User.ProjectPermissions;
 import play.Play;
@@ -25,6 +14,11 @@ import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Security;
+
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.*;
 
 
 @Security.Authenticated(Secured.class)
@@ -86,9 +80,11 @@ public class FeedSourceController extends Controller {
         s.name = params.get("name").asText();
         s.retrievalMethod = FeedSource.FeedRetrievalMethod.valueOf(params.get("retrievalMethod").asText());
         
-        if (params.has("editorId")) {
+        if (params.has("editorId"))
             s.editorId = params.get("editorId").asText();
-        }
+
+        if (params.has("snapshotVersion"))
+            s.snapshotVersion = params.get("snapshotVersion").asText();
         
         s.isPublic = params.get("isPublic").asBoolean();
         s.deployable = params.get("deployable").asBoolean();
