@@ -79,6 +79,8 @@ app.feed_version.upload_feed=Upload feed
 # For opening the dialog with which to take the action
 app.feed_version.initiate_upload=Upload new version
 app.feed_version.update=Update feed
+app.feed_version.cannot_update=Cannot update feed
+app.feed_version.editor_select=Please select a GTFS Editor agency and snapshot in the table view.
 app.feed_version.updating=Updating . . .
 app.feed_version.no_versions=Feed never loaded
 app.feed_version.load_status=Status message

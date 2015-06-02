@@ -4,7 +4,7 @@
   "dependencies": {
     "jashkenas/underscore": "*"
   },
-  "local": ["application", "feed-version", "feed-source", "feed-upload-view", "layout-view"],
+  "local": ["application", "feed-version", "feed-source", "feed-upload-view", "layout-view", "ok-dialog-view"],
   "main": "feed-version-navigation-view.js",
   "scripts": ["feed-version-navigation-view.js"],
   "templates": ["feed-version-navigation-view.html"]

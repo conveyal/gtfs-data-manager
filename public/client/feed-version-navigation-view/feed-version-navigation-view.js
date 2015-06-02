@@ -4,6 +4,7 @@ var FeedUploadView = require('feed-upload-view');
 var FeedSource = require('feed-source');
 var app = require('application');
 var LayoutView = require('layout-view');
+var OkDialogView = require('ok-dialog-view');
 
 module.exports = LayoutView.extend({
   template: require('./feed-version-navigation-view.html'),
@@ -23,6 +24,15 @@ module.exports = LayoutView.extend({
 
   // fetch the latest version of an autofetched/produced in house feed
   updateFeed: function(e) {
+    var fs = this.model.get('feedSource');
+    if (fs.retrievalMethod == 'PRODUCED_IN_HOUSE' && (!fs.editorId || !fs.snapshotVersion)) {
+      app.modalRegion.show(new OkDialogView({
+        title: window.Messages('app.feed_version.cannot_update'),
+        body: window.Messages('app.feed_version.editor_select')
+      }));
+      return;
+    }
+
     // user feedback
     var $t = $(e.target);
     $t.find('span.glyphicon').addClass('spinner');
