@@ -10,7 +10,8 @@
     "feed-source",
     "feed-source-item-view",
     "application",
-    "ok-dialog-view"
+    "ok-dialog-view",
+    "confirm-view"
   ],
   "main": "feed-source-collection-view.js",
   "scripts": ["feed-source-collection-view.js"],
