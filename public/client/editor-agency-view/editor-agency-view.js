@@ -27,7 +27,10 @@ module.exports = ItemView.extend({
     // even if it is already done, this will still get called
     $.when(module.exports.agencies, module.exports.snapshots).then(function(agencies, snapshots) {
       instance.agencies = agencies[0];
-      instance.snapshots = snapshots[0];
+      // don't include snapshots that don't have dates
+      instance.snapshots = _.filter(snapshots[0], function (snap) {
+        return snap.validFrom && snap.validTo;
+      });
       // this may trigger rendering more than once; oh well.
       instance.render();
     });
@@ -64,6 +67,9 @@ module.exports = ItemView.extend({
     var sel = this.$('.snapshot').empty();
 
     var instance = this;
+
+    // make a blank option so that we don't automatically select a snapshot
+    $('<option>').appendTo(sel);
 
     _.each(agencySnapshots, function(snap) {
       $('<option>')
