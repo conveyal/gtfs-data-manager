@@ -19,3 +19,8 @@ body {
     transform: rotate(1turn);
   }
 }
+
+.affix {
+  position: fixed;
+  top: 0px
+}

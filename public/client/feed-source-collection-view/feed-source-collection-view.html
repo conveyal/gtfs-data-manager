@@ -1,4 +1,4 @@
-<p>
+<p data-spy="affix" data-offset-top="60" data-offset-bottomestyle="top: 20px; width: 100%;">
   {{#if showNewFeedButton}}
     <button type="button" class="btn btn-success newfeedsource">
       <span class="glyphicon glyphicon-plus"></span> {{ t "app.add_feed_source" }}
@@ -36,7 +36,7 @@
 
 <div class="table-responsive">
   <table class="table table-striped table-hover table-condensed">
-    <thead>
+    <thead style="background-color: #fff">
       <th><a href="#" class="sort-by" data-attr="name">{{ t 'app.feed_source.name' }}</a></th>
       <th><a href="#" class="sort-by" data-attr="isPublic">{{ t 'app.feed_source.public' }}</a></th>
       <th><a href="#" class="sort-by" data-attr="deployable">{{ t 'app.feed_source.deployable' }}</a></th>

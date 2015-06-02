@@ -36,6 +36,20 @@ module.exports = CompositeView.extend({
       .appendTo(this.$('a[data-attr="' + this.collection.sortAttribute + '"]').parent());
   },
 
+  onShow: function () {
+    this.$('thead th').each(function () {
+      var th = $(this);
+      th.css('width', th.width() + 'px');
+    });
+
+    this.$('thead').css('width', this.$('thead').width() + 'px')
+      .affix({
+        offset: {
+          top: this.$('thead').offset().top
+        }
+      });
+  },
+
   initialize: function(attr) {
     this.feedCollectionId = attr.feedCollectionId;
     _.bindAll(this, 'add', 'deployPublic', 'sortBy');
