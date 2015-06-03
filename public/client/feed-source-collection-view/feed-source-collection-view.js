@@ -57,7 +57,7 @@ module.exports = CompositeView.extend({
 
     // and the widths
     // (relative to the size of a checkbox)
-    var widths = [6, 1.3, 1.8, 6, 8, 3, 1.5, 1.5, 1.5, 1.5, 3, 3, 2];
+    var widths = [6, 1.3, 1.8, 6, 8, 3, 1.5, 1.5, 1.5, 1.5, 1.5, 3, 3, 1.2];
     var scale = (table.width() - 100) / _.reduce(widths, function (a, b) { return a + b });
 
     for (var i = 0; i < widths.length; i++) {
@@ -66,7 +66,8 @@ module.exports = CompositeView.extend({
     }
 
     // width of the "feed did not load successfully" message
-    var msgWidth = _.reduce(widths.slice(6, 12), function (a, b) { return a + b }) * scale;
+    // + 20 handles the gutters that are left out within this cell
+    var msgWidth = _.reduce(widths.slice(7, 13), function (a, b) { return a + b }) * scale + 20;
     table.find('.loadFailureReason')
       .css('width', msgWidth + 'px')
       .next()
@@ -75,7 +76,7 @@ module.exports = CompositeView.extend({
     // make each td as tall as its tr so that the backgrounds extend to the edges
     table.find('td').each(function () {
       $(this).css('height', $(this).parent().height() + 'px');
-    })
+    });
   },
 
   initialize: function(attr) {
