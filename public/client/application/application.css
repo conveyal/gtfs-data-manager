@@ -1,9 +1,5 @@
 /** general shared styles */
 
-body {
-  padding-bottom: 80px;
-}
-
 .spinner {
   animation-name: spinner;
   animation-duration: 1s;
@@ -18,4 +14,25 @@ body {
   to {
     transform: rotate(1turn);
   }
+}
+
+/* after http://codepen.io/tjvantoll/pen/JEKIu */
+.table-fixed-header {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.table-fixed-header td, .table-fixed-header th {
+  overflow: hidden;
+  display: inline-block;
+}
+
+.table-fixed-header thead {
+  display: block;
+}
+
+.table-fixed-header tbody {
+  overflow: auto;
+  display: block;
 }

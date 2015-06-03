@@ -36,9 +36,51 @@ module.exports = CompositeView.extend({
       .appendTo(this.$('a[data-attr="' + this.collection.sortAttribute + '"]').parent());
   },
 
+  onShow: function () {
+    this.sizeTable();
+    $(window).on('resize.feed-source-collection-view', this.sizeTable);
+  },
+
+  onBeforeDestroy: function () {
+    $(window).off('resize.feed-source-collection-view');
+  },
+
+  /** Size the columns and height */
+  sizeTable: function () {
+
+    var table = this.$('#feedsources');
+
+    // figure the height
+    var height = $(window).height() - table.find('tbody').offset().top - 50;
+
+    table.find('tbody').css('height', height + 'px');
+
+    // and the widths
+    // (relative to the size of a checkbox)
+    var widths = [6, 1.3, 1.8, 6, 8, 3, 1.5, 1.5, 1.5, 1.5, 3, 3, 2];
+    var scale = (table.width() - 100) / _.reduce(widths, function (a, b) { return a + b });
+
+    for (var i = 0; i < widths.length; i++) {
+      table.find('thead th:nth-child(' + (i + 1) + '), tr td:nth-child(' + (i + 1) + ')')
+        .css('width', (widths[i] * scale) + 'px');
+    }
+
+    // width of the "feed did not load successfully" message
+    var msgWidth = _.reduce(widths.slice(6, 12), function (a, b) { return a + b }) * scale;
+    table.find('.loadFailureReason')
+      .css('width', msgWidth + 'px')
+      .next()
+      .css('width', (widths[widths.length - 1] * scale) + 'px');
+
+    // make each td as tall as its tr so that the backgrounds extend to the edges
+    table.find('td').each(function () {
+      $(this).css('height', $(this).parent().height() + 'px');
+    })
+  },
+
   initialize: function(attr) {
     this.feedCollectionId = attr.feedCollectionId;
-    _.bindAll(this, 'add', 'deployPublic', 'sortBy');
+    _.bindAll(this, 'add', 'deployPublic', 'sortBy', 'sizeTable');
 
     // default is to show new feed button
     var showNewFeedButton = _.isUndefined(attr.showNewFeedButton) ? true : attr.showNewFeedButton;
