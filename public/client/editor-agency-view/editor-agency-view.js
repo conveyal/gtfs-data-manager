@@ -69,10 +69,10 @@ module.exports = ItemView.extend({
     var instance = this;
 
     // make a blank option so that we don't automatically select a snapshot
-    $('<option>').appendTo(sel);
+    $('<option></option>').appendTo(sel);
 
     _.each(agencySnapshots, function(snap) {
-      $('<option>')
+      $('<option></option>')
         .attr('value', snap.id)
         .text(snap.name + " (" + snap.version + ")")
         .prop('selected', snap.id === instance.model.get('snapshotVersion'))
