@@ -1,12 +1,21 @@
 package models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.io.ByteStreams;
+import controllers.api.JsonManager;
+import play.Logger;
+import play.Play;
+import utils.DataStore;
+import utils.StringUtils;
+
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.DateFormat;
@@ -17,21 +26,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import play.Logger;
-import play.Play;
-import utils.DataStore;
-import utils.StringUtils;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonView;
-import com.google.common.io.ByteStreams;
-
-import controllers.api.JsonManager;
 
 /**
  * A deployment of (a given version of) OTP on a given set of feeds.
@@ -70,7 +64,11 @@ public class Deployment extends Model {
         ArrayList<FeedVersion> ret = new ArrayList<FeedVersion>(feedVersionIds.size());
 
         for (String id : feedVersionIds) {
-            ret.add(FeedVersion.get(id));
+            FeedVersion v = FeedVersion.get(id);
+            if (v != null)
+                ret.add(v);
+            else
+                Logger.error("Reference integrity error for deployment {} ({}), feed version {} does not exist", this.name, this.id, id);
         }
 
         return ret;
@@ -82,7 +80,13 @@ public class Deployment extends Model {
         ArrayList<SummarizedFeedVersion> ret = new ArrayList<SummarizedFeedVersion>(feedVersionIds.size());
 
         for (String id : feedVersionIds) {
-            ret.add(new SummarizedFeedVersion(FeedVersion.get(id)));
+            FeedVersion v = FeedVersion.get(id);
+
+            // should never happen but can if someone monkeyed around with dump/restore
+            if (v != null)
+                ret.add(new SummarizedFeedVersion(FeedVersion.get(id)));
+            else
+                Logger.error("Reference integrity error for deployment {} ({}), feed version {} does not exist", this.name, this.id, id);
         }
 
         return ret;
