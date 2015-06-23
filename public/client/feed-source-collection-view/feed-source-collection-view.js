@@ -39,6 +39,7 @@ module.exports = CompositeView.extend({
   onShow: function () {
     this.sizeTable();
     $(window).on('resize.feed-source-collection-view', this.sizeTable);
+    this.collection.on('add', this.sizeTable);
   },
 
   onBeforeDestroy: function () {
