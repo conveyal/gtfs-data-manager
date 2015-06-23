@@ -97,6 +97,11 @@ public class FeedCollectionController extends Controller {
                 JsonNode stationTransfers = buildConfig.get("stationTransfers");
                 c.buildConfig.stationTransfers = stationTransfers.isNull() ? null : stationTransfers.asBoolean();
             }
+
+            if (buildConfig.has("fares")) {
+                JsonNode fares = buildConfig.get("fares");
+                c.buildConfig.fares = fares.isNull() ? null : fares.asText();
+            }
         }
 
         if (params.has("routerConfig")) {

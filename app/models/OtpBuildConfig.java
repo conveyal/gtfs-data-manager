@@ -1,7 +1,5 @@
 package models;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-
 import java.io.Serializable;
 
 /**
@@ -9,10 +7,14 @@ import java.io.Serializable;
  */
 
 public class OtpBuildConfig implements Serializable {
+    public static final long serialVersionUID = -2210046696074999545l;
 
     public Boolean fetchElevationUS;
 
     public Boolean stationTransfers;
 
     public Double subwayAccessTime;
+
+    /** Currently only supports no-configuration fares, e.g. New York or San Francisco */
+    public String fares;
 }
