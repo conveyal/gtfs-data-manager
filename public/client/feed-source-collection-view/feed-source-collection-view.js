@@ -165,6 +165,8 @@ module.exports = CompositeView.extend({
     this.collection.sortAttribute = attr;
 
     this.collection.sort();
+
+    this.sizeTable();
   },
 
   fetchAllFeeds: function() {
