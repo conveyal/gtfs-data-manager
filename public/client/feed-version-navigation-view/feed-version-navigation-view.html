@@ -11,7 +11,10 @@
       {{/if}}
     </button>
     <a class="btn btn-default {{ ? (neq version null) '' 'disabled' }}" href="#versions/{{ feedSource.id }}">
-      {{ t 'app.feed_version.show_all_versions' }}</a>
+      <span class="glyphicon glyphicon-globe sr-hidden"></span>&nbsp;&nbsp;{{ t 'app.feed_version.show_all_versions' }}</a>
+
+    <a class="btn btn-default {{ ? (neq version null) '' 'disabled' }}" href="/api/feedversions/gtfs/{{ id }}">
+      <span class="glyphicon glyphicon-download sr-hidden"></span>&nbsp;&nbsp;{{ t 'app.feed_version.download_gtfs' }}</a>
 
     {{#if (eq feedSource.retrievalMethod 'MANUALLY_UPLOADED')}}
       <button role="button" class="btn btn-default upload-feed">
