@@ -27,8 +27,15 @@ public class FeedSourceController extends Controller {
             new JsonManager<FeedSource>(FeedSource.class, JsonViews.UserInterface.class);
     
     public static Result get (String id) throws JsonProcessingException {
-        // TODO: access control
-        return ok(json.write(FeedSource.get(id)));
+        User currentUser = User.getUserByUsername(session("username"));
+
+        FeedSource fs = FeedSource.get(id);
+
+        if (currentUser.admin || currentUser.id.equals(fs.userId) || currentUser.hasReadAccess(fs.id))
+            return ok(json.write(fs));
+
+        else
+            return unauthorized();
     }
 
     public static Result getAll () throws JsonProcessingException {
