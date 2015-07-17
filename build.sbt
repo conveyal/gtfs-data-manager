@@ -42,6 +42,7 @@ libraryDependencies ++= Seq(
   "com.conveyal" % "gtfs-validator-json" % "0.0.1-SNAPSHOT" exclude("org.slf4j", "slf4j-simple")
 )
 
+resolvers += "Local Maven Repository" at "file://"+Path.userHome.absolutePath+"/.m2/repository"
 resolvers += "Conveyal Maven Repository" at "http://maven.conveyal.com"
 resolvers += "Geotoolkit Maven Repository" at "http://maven.geotoolkit.org"
 
