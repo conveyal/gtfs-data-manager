@@ -36,3 +36,11 @@
   overflow: auto;
   display: block;
 }
+
+.navbar {
+  font-size: 14pt; vertical-align: bottom;
+}
+
+.navbar-text {
+  margin-top: 12px;
+}
