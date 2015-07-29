@@ -36,7 +36,7 @@ libraryDependencies ++= Seq(
   "org.mapdb" % "mapdb" % "1.0.6",
   "org.julienrf" %% "play-jsmessages" % "1.6.2",
   "com.google.guava" % "guava" % "18.0",
-  "com.amazonaws" % "aws-java-sdk-s3" % "1.9.0",
+  "com.amazonaws" % "aws-java-sdk-s3" % "1.9.3",
   "commons-io" % "commons-io" % "2.4",
   "net.sourceforge.javacsv" % "javacsv" % "2.0",
   "com.conveyal" % "gtfs-validator-json" % "0.0.1-SNAPSHOT" exclude("org.slf4j", "slf4j-simple")
@@ -45,4 +45,4 @@ libraryDependencies ++= Seq(
 resolvers += "Local Maven Repository" at "file://"+Path.userHome.absolutePath+"/.m2/repository"
 resolvers += "Conveyal Maven Repository" at "http://maven.conveyal.com"
 resolvers += "Geotoolkit Maven Repository" at "http://maven.geotoolkit.org"
-
+resolvers += "OSGeo" at "http://download.osgeo.org/webdav/geotools/"
