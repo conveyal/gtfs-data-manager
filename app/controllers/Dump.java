@@ -1,25 +1,17 @@
 package controllers;
 
-import java.io.IOException;
-import java.util.Collection;
-
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
-
 import controllers.api.JsonManager;
-import models.Deployment;
-import models.FeedCollection;
-import models.FeedSource;
-import models.FeedVersion;
-import models.JsonViews;
-import models.Note;
-import models.User;
+import models.*;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
+
+import java.io.IOException;
+import java.util.Collection;
 
 /**
  * Handle database dump/reload.
@@ -57,8 +49,8 @@ public class Dump extends Controller {
     }
     
     // this is not authenticated, because it has to happen with a bare database (i.e. no users)
-    // this method in particular is coded to allow up to 100MB of data to be posted
-    @BodyParser.Of(value=BodyParser.Json.class, maxLength = 100 * 1024 * 1024)
+    // this method in particular is coded to allow up to 500MB of data to be posted
+    @BodyParser.Of(value=BodyParser.Json.class, maxLength = 500 * 1024 * 1024)
     public static Result load () throws JsonParseException, JsonMappingException, IOException {
         // TODO: really ought to check all tables
         if (User.usersExist())
