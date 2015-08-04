@@ -1,19 +1,11 @@
 package controllers.api;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.NullNode;
+import controllers.Secured;
 import jobs.DeployJob;
-import models.Deployment;
-import models.FeedCollection;
-import models.FeedSource;
-import models.FeedVersion;
-import models.JsonViews;
-import models.User;
-import models.User.ProjectPermissions;
+import models.*;
 import play.libs.Akka;
 import play.libs.Json;
 import play.mvc.BodyParser;
@@ -23,11 +15,13 @@ import play.mvc.Security;
 import scala.concurrent.duration.Duration;
 import utils.DeploymentManager;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.NullNode;
-
-import controllers.Secured;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Security.Authenticated(Secured.class)
 public class DeploymentController extends Controller {
@@ -47,6 +41,30 @@ public class DeploymentController extends Controller {
             return unauthorized();
         else
             return ok(json.write(d)).as("application/json");
+    }
+
+    /** Download all of the GTFS files in the feed */
+    public static Result download (String id) throws IOException {
+        User currentUser = User.getUserByUsername(session("username"));
+        Deployment d = Deployment.get(id);
+
+        if (!currentUser.admin && !currentUser.equals(d.getUser()))
+            return unauthorized();
+
+        File temp = File.createTempFile("deployment", ".zip");
+        // just include GTFS, not any of the ancillary information
+        d.dump(temp, false, false, false);
+
+        FileInputStream fis = new FileInputStream(temp);
+
+        response().setContentType("application/zip");
+        response().setHeader("Content-Disposition", "attachment;filename=" + d.name.replaceAll("[^a-zA-Z0-9]", "") + ".zip");
+
+        // will not actually be deleted until download has completed
+        // http://stackoverflow.com/questions/24372279
+        temp.delete();
+
+        return ok(fis);
     }
 
     public static Result getAll () throws JsonProcessingException {

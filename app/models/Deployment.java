@@ -34,6 +34,8 @@ import java.util.zip.ZipOutputStream;
  */
 @JsonInclude(Include.ALWAYS)
 public class Deployment extends Model {
+    public static final long serialVersionUID = -3213466125935928640L;
+
     private static DataStore<Deployment> deploymentStore = new DataStore<Deployment>("deployments");
 
     public String name;
@@ -228,8 +230,11 @@ public class Deployment extends Model {
     }
 
     /** Dump this deployment to the given file
-     * @throws IOException */
-    public void dump (File output) throws IOException {
+     * @param output the output file
+     * @param includeOsm should an osm.pbf file be included in the dump?
+     * @param includeOtpConfig should OTP build-config.json and router-config.json be included?
+     */
+    public void dump (File output, boolean includeManifest, boolean includeOsm, boolean includeOtpConfig) throws IOException {
         // create the zipfile
         ZipOutputStream out;
         try {
@@ -238,21 +243,23 @@ public class Deployment extends Model {
             throw new RuntimeException(e);
         }
 
-        // save the manifest at the beginning of the file, for read/seek efficiency
+        if (includeManifest) {
+            // save the manifest at the beginning of the file, for read/seek efficiency
+            ZipEntry manifestEntry = new ZipEntry("manifest.json");
+            out.putNextEntry(manifestEntry);
 
-        ZipEntry manifestEntry = new ZipEntry("manifest.json");
-        out.putNextEntry(manifestEntry);
+            // create the json manifest
+            JsonManager<Deployment> jsonManifest = new JsonManager<Deployment>(Deployment.class,
+                    JsonViews.UserInterface.class);
+            // this mixin gives us full feed validation results, not summarized
+            jsonManifest.addMixin(Deployment.class, DeploymentFullFeedVersionMixin.class);
 
-        // create the json
-        JsonManager<Deployment> jsonManifest = new JsonManager<Deployment>(Deployment.class, JsonViews.UserInterface.class);
-        // this mixin gives us full feed validation results, not summarized
-        jsonManifest.addMixin(Deployment.class, DeploymentFullFeedVersionMixin.class);
+            byte[] manifest = jsonManifest.write(this).getBytes();
 
-        byte[] manifest = jsonManifest.write(this).getBytes();
+            out.write(manifest);
 
-        out.write(manifest);
-
-        out.closeEntry();
+            out.closeEntry();
+        }
 
         // write each of the GTFS feeds
         for (FeedVersion v : this.getFullFeedVersions()) {
@@ -302,60 +309,60 @@ public class Deployment extends Model {
             out.closeEntry();
         }
 
-        // extract OSM and insert it into the deployment bundle
-        ZipEntry e = new ZipEntry("osm.pbf");
-        out.putNextEntry(e);
+        if (includeOsm) {
+            // extract OSM and insert it into the deployment bundle
+            ZipEntry e = new ZipEntry("osm.pbf");
+            out.putNextEntry(e);
 
-        // figure out the bounds
-        Rectangle2D bounds = getBounds();
+            // figure out the bounds
+            Rectangle2D bounds = getBounds();
 
-        // call vex server
-        URL vexUrl = new URL(
-                String.format("%s/?n=%.6f&e=%.6f&s=%.6f&w=%.6f",
-                        Play.application().configuration().getString("application.deployment.osm_vex"),
-                        bounds.getMaxY(),
-                        bounds.getMaxX(),
-                        bounds.getMinY(),
-                        bounds.getMinX()
-                        ));
+            // call vex server
+            URL vexUrl = new URL(String.format("%s/?n=%.6f&e=%.6f&s=%.6f&w=%.6f",
+                    Play.application().configuration().getString("application.deployment.osm_vex"),
+                    bounds.getMaxY(), bounds.getMaxX(), bounds.getMinY(), bounds.getMinX()));
 
-        HttpURLConnection conn = (HttpURLConnection) vexUrl.openConnection();
-        conn.connect();
+            HttpURLConnection conn = (HttpURLConnection) vexUrl.openConnection();
+            conn.connect();
 
-        ByteStreams.copy(conn.getInputStream(), out);
-
-        out.closeEntry();
-
-        // write build-config.json and router-config.json
-        FeedCollection feedColl = this.getFeedCollection();
-
-        if(feedColl.buildConfig != null) {
-            ZipEntry buildConfigEntry = new ZipEntry("build-config.json");
-            out.putNextEntry(buildConfigEntry);
-
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.setSerializationInclusion(Include.NON_NULL);
-            byte[] buildConfig = mapper.writer().writeValueAsBytes(feedColl.buildConfig);
-            out.write(buildConfig);
+            ByteStreams.copy(conn.getInputStream(), out);
 
             out.closeEntry();
         }
 
-        String brandingUrlRoot = Play.application().configuration().getString("application.data.branding_public");
-        OtpRouterConfig routerConfig = feedColl.routerConfig;
-        if(routerConfig == null && brandingUrlRoot != null) {
-            routerConfig = new OtpRouterConfig();
-        }
-        if(routerConfig != null) {
-            routerConfig.brandingUrlRoot = brandingUrlRoot;
-            ZipEntry routerConfigEntry = new ZipEntry("router-config.json");
-            out.putNextEntry(routerConfigEntry);
+        if (includeOtpConfig) {
+            // write build-config.json and router-config.json
+            FeedCollection feedColl = this.getFeedCollection();
 
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.setSerializationInclusion(Include.NON_NULL);
-            out.write(mapper.writer().writeValueAsBytes(routerConfig));
+            if (feedColl.buildConfig != null) {
+                ZipEntry buildConfigEntry = new ZipEntry("build-config.json");
+                out.putNextEntry(buildConfigEntry);
 
-            out.closeEntry();
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.setSerializationInclusion(Include.NON_NULL);
+                byte[] buildConfig = mapper.writer().writeValueAsBytes(feedColl.buildConfig);
+                out.write(buildConfig);
+
+                out.closeEntry();
+            }
+
+            String brandingUrlRoot = Play.application().configuration()
+                    .getString("application.data.branding_public");
+            OtpRouterConfig routerConfig = feedColl.routerConfig;
+            if (routerConfig == null && brandingUrlRoot != null) {
+                routerConfig = new OtpRouterConfig();
+            }
+            if (routerConfig != null) {
+                routerConfig.brandingUrlRoot = brandingUrlRoot;
+                ZipEntry routerConfigEntry = new ZipEntry("router-config.json");
+                out.putNextEntry(routerConfigEntry);
+
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.setSerializationInclusion(Include.NON_NULL);
+                out.write(mapper.writer().writeValueAsBytes(routerConfig));
+
+                out.closeEntry();
+            }
         }
 
         out.close();

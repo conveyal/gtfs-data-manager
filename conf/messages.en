@@ -81,7 +81,8 @@ app.feed_version.upload_feed=Upload feed
 app.feed_version.initiate_upload=Upload new version
 app.feed_version.update=Update feed
 app.feed_version.cannot_update=Cannot update feed
-app.feed_version.editor_select=Please select a GTFS Editor agency and snapshot in the table view.
+app.feed_version.editor_select=Please select a GTFS Editor agency in the table view.
+app.feed_version.snapshot=Snapshot
 app.feed_version.updating=Updating . . .
 app.feed_version.no_versions=Feed never loaded
 app.feed_version.load_status=Status message
@@ -115,6 +116,7 @@ app.deployment.error.dump=Error creating deployment bundle
 app.deployment.error.config=OTP server URL not configured properly
 app.deployment.try_it=Try it.
 app.deployment.already_deploying=There is currently a deployment being pushed to this server. Please wait until that deployment finishes before attempting another.
+app.deployment.download=Download
 
 # deploy the public feed download page
 app.deploy-public=Update Public Feed Download

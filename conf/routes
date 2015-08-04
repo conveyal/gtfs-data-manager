@@ -40,6 +40,7 @@ POST          /api/feedversions/                             controllers.api.Fee
 POST          /api/deployments/:id/deploy/:target            controllers.api.DeploymentController.deploy(id:String, target:String)
 GET           /api/deployments/status/:target                controllers.api.DeploymentController.deploymentStatus(target:String)
 GET           /api/deployments/targets                       controllers.api.DeploymentController.targets()
+GET           /api/deployments/:id.zip                       controllers.api.DeploymentController.download(id:String)
 GET           /api/deployments/:id                           controllers.api.DeploymentController.get(id:String)
 GET           /api/deployments                               controllers.api.DeploymentController.getAll()
 POST          /api/deployments/                              controllers.api.DeploymentController.create()
