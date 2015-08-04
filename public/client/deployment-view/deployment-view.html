@@ -1,15 +1,15 @@
 <div class="dropdown pull-right">
-  <div class="btn-group">
     <a class="btn btn-primary" href="api/deployments/{{ id }}.zip">
       <span class="glyphicon glyphicon-download"></span>
       {{ t 'app.deployment.download' }}
     </a>
+    
+    <!-- annoyingly dropdowns don't work in button groups -->
     <button role="button" class="btn btn-primary" id="deploymentDropdown" data-toggle="dropdown">
       <span class="glyphicon glyphicon-globe"></span>
       {{ t 'app.deployment.deploy' }}
       <span class="caret"></span>
     </button>
-  </div>
 
   <ul class="dropdown-menu" role="menu" aria-labelledby="deploymentDropdown">
     {{#each targets}}
