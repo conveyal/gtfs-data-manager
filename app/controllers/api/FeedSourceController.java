@@ -123,6 +123,7 @@ public class FeedSourceController extends Controller {
         else if (currentUser.hasWriteAccess(s.id) || currentUser.id.equals(s.userId)) {
             if (params.has("snapshotVersion")) {
                 s.snapshotVersion = params.get("snapshotVersion").asText();
+                s.save();
             }
             return ok(json.write(s)).as("application/json");
         }
