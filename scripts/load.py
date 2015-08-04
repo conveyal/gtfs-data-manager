@@ -17,4 +17,9 @@ print dump[0:79]
 
 req = urllib2.Request(server + '/load', dump, {'Content-Type': 'application/json', 'Content-Length': len(dump)})
 opener = urllib2.build_opener()
-opener.open(req)
+
+try:
+    opener.open(req)
+except urllib2.URLError, e:
+    print e.code
+    print e.read()
