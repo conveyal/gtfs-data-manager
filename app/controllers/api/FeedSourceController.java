@@ -113,15 +113,19 @@ public class FeedSourceController extends Controller {
         FeedSource s = FeedSource.get(id);
         User currentUser = User.getUserByUsername(session("username"));
 
-        // admins can update anything; non-admins cannot update anything (imagine the havoc if an agency changed their retrieval method,
-        // or set a non-public feed to public)
+        // admins can update anything; non-admins cannot update anything except snapshot
+        JsonNode params = request().body().asJson();
         if (currentUser.admin) {
-            JsonNode params = request().body().asJson();
             applyJsonToFeedSource(s, params);
             s.save();
             return ok(json.write(s)).as("application/json");
         }
-        
+        else if (currentUser.hasWriteAccess(s.id) || currentUser.id.equals(s.userId)) {
+            if (params.has("snapshotVersion")) {
+                s.snapshotVersion = params.get("snapshotVersion").asText();
+            }
+            return ok(json.write(s)).as("application/json");
+        }
         return unauthorized();
     }
     

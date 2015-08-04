@@ -54,6 +54,15 @@
       <th>{{ t 'app.feed_source.last_updated' }}</th>
       <td>{{ dateRender lastUpdated true }}</td>
     </tr>
+    <tr>
+      <th>{{ t 'app.feed_version.snapshot' }}</th>
+      <td>
+        <select id="snapshot-version">
+          {{!-- default option --}}
+          <option></option>
+        </select>
+      </td>
+    </tr>
   </table>
 </div>
 

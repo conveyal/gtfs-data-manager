@@ -22,7 +22,8 @@ module.exports = LayoutView.extend({
 
   events: {
     'click #share-url': 'doNothing',
-    'click .deploy': 'deploy'
+    'click .deploy': 'deploy',
+    'change #snapshot-version': 'changeSnapshot'
   },
 
   initialize: function(attr) {
@@ -101,6 +102,32 @@ module.exports = LayoutView.extend({
     this.brandingRegion.show(new FeedBrandingView({
       feedSource: this.model
     }));
+
+    // set up changeable snapshot IDs
+    if (this.model.get('retrievalMethod') == 'PRODUCED_IN_HOUSE' && this.model.get('editorId')) {
+      $.ajax({
+        url: 'api/feedcollections/geteditorsnapshots/' + this.model.get('editorId'),
+        success: function (snapshots) {
+          snapshots = _.filter(snapshots, function (s) {
+            return s.validFrom && s.validTo;
+          });
+
+          _.each(snapshots, function (s) {
+            $('<option>')
+              .attr('value', s.id)
+              .prop('selected', s.id == instance.model.get('snapshotVersion'))
+              .text(s.name)
+              .appendTo(instance.$('#snapshot-version'));
+          });
+        }
+      })
+    }
+  },
+
+  /** change snapshot version */
+  changeSnapshot: function () {
+    this.model.set('snapshotVersion', this.$('#snapshot-version').val());
+    this.model.save();
   },
 
   // don't bubble clicks in the input field (e.g. to copy)
@@ -119,3 +146,6 @@ module.exports = LayoutView.extend({
     });
   }
 });
+
+/** cache snapshots */
+module.exports.snapshots = null;

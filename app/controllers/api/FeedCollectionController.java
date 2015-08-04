@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.net.UrlEscapers;
 import controllers.Secured;
 import jobs.FetchProjectFeedsJob;
 import models.*;
@@ -255,7 +256,7 @@ public class FeedCollectionController extends Controller {
         });
     }
 
-    public static Promise<Result> getEditorSnapshots () {
+    public static Promise<Result> getEditorSnapshots (final String agencyId) {
         // note: this is accessible to anyone; for now this is fine but in the future we will want to handle this better
 
         // first, get a token
@@ -282,7 +283,7 @@ public class FeedCollectionController extends Controller {
 
         final Promise<WSResponse> agencyPromise = tokenPromise.flatMap(new Function<String, Promise<WSResponse>> () {
             public Promise<WSResponse> apply(String token) throws Throwable {
-                String snapUrl = baseUrl + "api/snapshot?oauth_token=" + token;
+                String snapUrl = baseUrl + "api/snapshot?agencyId=" + UrlEscapers.urlFormParameterEscaper().escape(agencyId) + "&oauth_token=" + token;
                 return WS.url(snapUrl).get();
             }
         });
