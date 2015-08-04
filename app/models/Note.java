@@ -1,12 +1,11 @@
 package models;
 
-import java.util.Collection;
-import java.util.Date;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-
 import utils.DataStore;
+
+import java.util.Collection;
+import java.util.Date;
 
 /**
  * A note about a particular model.
@@ -15,6 +14,8 @@ import utils.DataStore;
  */
 @JsonInclude(Include.ALWAYS)
 public class Note extends Model {
+    private static final long serialVersionUID = 1L;
+
     private static DataStore<Note> noteStore = new DataStore<Note>("notes");
     
     /** The content of the note */

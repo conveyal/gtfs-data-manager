@@ -15,6 +15,8 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
  * or sending unnecessary amounts of data over the wire
  */
 public class FeedValidationResultSummary implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     public LoadStatus loadStatus;
     
     @JsonInclude(Include.ALWAYS)

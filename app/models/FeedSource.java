@@ -34,7 +34,7 @@ import utils.DataStore;
  */
 @JsonInclude(Include.ALWAYS)
 public class FeedSource extends Model implements Comparable<FeedSource> {
-    private static final long serialVersionUID = -5696893509128904129l;
+    private static final long serialVersionUID = 1L;
 
     private static DataStore<FeedSource> sourceStore = new DataStore<FeedSource>("feedsources");
     

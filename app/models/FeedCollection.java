@@ -1,14 +1,13 @@
 package models;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-
 import utils.DataStore;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Represents a collection of feed sources that can be made into a deployment.
@@ -21,6 +20,8 @@ import utils.DataStore;
  */
 @JsonInclude(Include.ALWAYS)
 public class FeedCollection extends Model implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private static DataStore<FeedCollection> collectionStore = new DataStore<FeedCollection>("feedcollections");
     
     /** The name of this feed collection, e.g. NYSDOT. */

@@ -33,7 +33,9 @@ import static utils.StringUtils.getCleanName;
  *
  */
 @JsonInclude(Include.ALWAYS)
-public class FeedVersion extends Model {    
+public class FeedVersion extends Model {
+    private static final long serialVersionUID = 1L;
+
     static DataStore<FeedVersion> versionStore = new DataStore<FeedVersion>("feedversions");
     private static FeedStore feedStore = new FeedStore(Play.application().configuration().getString("application.data.gtfs"));
     

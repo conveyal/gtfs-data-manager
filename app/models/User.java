@@ -1,21 +1,17 @@
 package models;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.UUID;
-
-import org.apache.commons.codec.digest.DigestUtils;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-
+import com.fasterxml.jackson.annotation.JsonView;
+import org.apache.commons.codec.digest.DigestUtils;
 import play.Logger;
 import utils.DataStore;
 import utils.HashUtils;
+
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.Date;
+import java.util.UUID;
 
 @JsonInclude(Include.ALWAYS)
 public class User implements Serializable {
@@ -177,6 +173,8 @@ public class User implements Serializable {
      * as possible, so we use the same framework. Project ID represents a Feed Source ID in this case.
      */
     public static class ProjectPermissions implements Serializable {
+        public static final long serialVersionUID = 1L;
+
         /** The feed source ID */
         public String project_id;
         

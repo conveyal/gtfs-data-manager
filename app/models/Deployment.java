@@ -34,7 +34,7 @@ import java.util.zip.ZipOutputStream;
  */
 @JsonInclude(Include.ALWAYS)
 public class Deployment extends Model {
-    public static final long serialVersionUID = -3213466125935928640L;
+    private static final long serialVersionUID = 1L;
 
     private static DataStore<Deployment> deploymentStore = new DataStore<Deployment>("deployments");
 

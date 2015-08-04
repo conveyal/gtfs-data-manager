@@ -1,13 +1,12 @@
 package models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
+
+import javax.persistence.MappedSuperclass;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import javax.persistence.MappedSuperclass;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonView;
 
 /**
  * The base class for all of the models used by GTFS Data Manager.
@@ -16,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonView;
  */
 @MappedSuperclass
 public abstract class Model {
- 
+
     public Model () {
         // This autogenerates an ID
         // this is OK for dump/restore, because the ID will simply be overridden
