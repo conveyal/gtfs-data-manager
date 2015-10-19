@@ -325,7 +325,9 @@ public class Deployment extends Model {
             HttpURLConnection conn = (HttpURLConnection) vexUrl.openConnection();
             conn.connect();
 
-            ByteStreams.copy(conn.getInputStream(), out);
+            InputStream is = conn.getInputStream();
+            ByteStreams.copy(is, out);
+            is.close();
 
             out.closeEntry();
         }
