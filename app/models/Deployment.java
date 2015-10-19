@@ -385,13 +385,20 @@ public class Deployment extends Model {
             return null;
 
         Rectangle2D bounds = new Rectangle2D.Double();
-        bounds.setRect(versions.get(0).validationResult.bounds);
+        boolean boundsSet = false;
 
         // i = 1 because we've already included bounds 0
-        for (int i = 1; i < versions.size(); i++) {
+        for (int i = 0; i < versions.size(); i++) {
             SummarizedFeedVersion version = versions.get(i);
-            if (version.validationResult != null && version.validationResult.bounds != null)
-                bounds.add(versions.get(i).validationResult.bounds);
+            if (version.validationResult != null && version.validationResult.bounds != null) {
+                if (!boundsSet) {
+                    // set the bounds, don't expand the null bounds
+                    bounds.setRect(versions.get(0).validationResult.bounds);
+                    boundsSet = true;
+                } else {
+                    bounds.add(versions.get(i).validationResult.bounds);
+                }
+            }
             else
                 Logger.warn("Feed version %s has no bounds", version);
         }
