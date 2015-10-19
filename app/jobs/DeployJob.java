@@ -93,7 +93,7 @@ public class DeployJob implements Runnable {
         // dump the deployment bundle
         try {
             this.deployment.dump(temp, true, true, true);
-        } catch (IOException e) {
+        } catch (Exception e) {
             Logger.error("Error dumping deployment");
             e.printStackTrace();
             
