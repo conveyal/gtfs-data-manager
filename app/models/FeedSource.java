@@ -315,7 +315,7 @@ public class FeedSource extends Model implements Comparable<FeedSource> {
      */
     @JsonIgnore
     public FeedVersion getLatest () {
-        FeedVersion v = FeedVersion.versionStore.findFloor("version", new Fun.Tuple2(this.id, Fun.HI));
+        FeedVersion v = FeedVersion.versionStore.findFloor("version", new Object[]{this.id, null});
         
         // the ID doesn't necessarily match, because it will fall back to the previous source in the store if there are no versions for this source
         if (v == null || !v.feedSourceId.equals(this.id))

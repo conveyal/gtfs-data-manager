@@ -1,22 +1,5 @@
 package models;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.Date;
-import java.util.regex.Pattern;
-
-import org.mapdb.Fun.Function2;
-import org.mapdb.Fun.Tuple2;
-
-import play.Logger;
-import play.Play;
-import utils.DataStore;
-import utils.FeedStore;
-import utils.HashUtils;
-
 import com.conveyal.gtfs.validator.json.FeedProcessor;
 import com.conveyal.gtfs.validator.json.FeedValidationResult;
 import com.conveyal.gtfs.validator.json.LoadStatus;
@@ -24,6 +7,24 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonView;
+import org.mapdb.BTreeKeySerializer;
+import org.mapdb.Fun;
+import org.mapdb.Fun.Function2;
+import org.mapdb.Serializer;
+import play.Logger;
+import play.Play;
+import scala.Tuple2;
+import utils.DataStore;
+import utils.FeedStore;
+import utils.HashUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Date;
 
 import static utils.StringUtils.getCleanName;
 
@@ -41,12 +42,16 @@ public class FeedVersion extends Model {
     
     static {
         // set up indexing on feed versions by feed source, indexed by <FeedSource ID, version>
-        versionStore.secondaryKey("version", new Function2<Tuple2<String, Integer>, String, FeedVersion> () {
-            @Override
-            public Tuple2<String, Integer> run(String key, FeedVersion fv) {
-                return new Tuple2(fv.feedSourceId, fv.version);
-            }            
-        });
+        versionStore.secondaryKey("version",
+                new BTreeKeySerializer.ArrayKeySerializer(
+                        new Comparator[]{Fun.COMPARATOR, Fun.COMPARATOR},
+                        new Serializer[]{Serializer.STRING, Serializer.INTEGER}),
+                new Function2<Object[], String, FeedVersion> () {
+                    @Override
+                    public Object[] run(String key, FeedVersion fv) {
+                        return new Object[]{fv.feedSourceId, fv.version};
+                    }
+                });
     }
     
     /**

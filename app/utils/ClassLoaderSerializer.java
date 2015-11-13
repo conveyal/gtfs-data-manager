@@ -8,7 +8,7 @@ import java.io.*;
 /**
  * Deserialize using the thread's class loader, not the root class loader.
  */
-public class ClassLoaderSerializer implements Serializer<Object>, Serializable {
+public class ClassLoaderSerializer extends Serializer<Object> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -28,8 +28,4 @@ public class ClassLoaderSerializer implements Serializer<Object>, Serializable {
         }
     }
 
-    @Override
-    public int fixedSize() {
-        return -1;
-    }
 }

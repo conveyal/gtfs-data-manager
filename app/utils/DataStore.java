@@ -1,28 +1,14 @@
 package utils;
 
+import controllers.Application;
+import org.mapdb.*;
+import org.mapdb.Fun.Function2;
+import play.Logger;
+
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-
-import org.mapdb.BTreeKeySerializer;
-import org.mapdb.BTreeMap;
-import org.mapdb.Bind;
-import org.mapdb.DB;
-import org.mapdb.DBMaker;
-import org.mapdb.Fun;
-import org.mapdb.Fun.Function2;
-import org.mapdb.Pump;
-import org.mapdb.Fun.Tuple2;
-
-import controllers.Application;
-import play.Logger;
-import play.Play;
 
 public class DataStore<T> {
 
@@ -46,16 +32,19 @@ public class DataStore<T> {
             e.printStackTrace();
         }
 
-        db = DBMaker.newFileDB(new File(directory, dataFile + ".db"))
+        db = DBMaker.fileDB(new File(directory, dataFile + ".db"))
+                .cacheHashTableEnable()
                 .closeOnJvmShutdown()
                 .make();
 
-        DB.BTreeMapMaker maker = db.createTreeMap(dataFile);
+        DB.BTreeMapMaker maker = db.treeMapCreate(dataFile);
+        //TODO specify value serializer, add constructor argument?
         maker.valueSerializer(new ClassLoaderSerializer());
+        maker.keySerializer(Serializer.STRING);
         map = maker.makeOrGet();
     }
 
-    public DataStore(File directory, String dataFile, List<Fun.Tuple2<String,T>>inputData) {
+    public DataStore(File directory, String dataFile, List<Fun.Pair<String,T>>inputData) {
 
         if(!directory.exists())
             directory.mkdirs();
@@ -67,34 +56,35 @@ public class DataStore<T> {
             e.printStackTrace();
         }
 
-        db = DBMaker.newFileDB(new File(directory, dataFile + ".db"))
+        db = DBMaker.fileDB(new File(directory, dataFile + ".db"))
                 .transactionDisable()
+                .cacheHashTableEnable()
                 .closeOnJvmShutdown()
                 .make();
 
-        Comparator<Tuple2<String, T>> comparator = new Comparator<Fun.Tuple2<String,T>>(){
+        Comparator<Fun.Pair<String, T>> comparator = new Comparator<Fun.Pair<String,T>>(){
 
             @Override
-            public int compare(Tuple2<String, T> o1,
-                    Tuple2<String, T> o2) {
+            public int compare(Fun.Pair<String, T> o1,
+                               Fun.Pair<String, T> o2) {
                 return o1.a.compareTo(o2.a);
             }
         };
 
         // need to reverse sort list
-        Iterator<Fun.Tuple2<String,T>> iter = Pump.sort(inputData.iterator(),
+        Iterator<Fun.Pair<String,T>> iter = Pump.sort(inputData.iterator(),
                 true, 100000,
                 Collections.reverseOrder(comparator), //reverse  order comparator
-                db.getDefaultSerializer()
+                db.getDefaultSerializer(),
+                null
                 );
 
 
-        BTreeKeySerializer<String> keySerializer = BTreeKeySerializer.STRING;
-
-        map = db.createTreeMap(dataFile)
+        map = db.treeMapCreate(dataFile)
                 .pumpSource(iter)
-                .pumpPresort(100000) 
-                .keySerializer(keySerializer)
+                .pumpPresort(100000)
+                //TODO specify value serializer, add constructor argument?
+                .keySerializer(Serializer.STRING)
                 .make();
 
 
@@ -103,11 +93,15 @@ public class DataStore<T> {
         db.close();
 
         // re-connect with transactions enabled
-        db = DBMaker.newFileDB(new File(directory, dataFile + ".db"))
+        db = DBMaker.fileDB(new File(directory, dataFile + ".db"))
+                .cacheHashTableEnable()
                 .closeOnJvmShutdown()
                 .make();
 
-        map = db.getTreeMap(dataFile);
+        map = db.treeMapCreate(dataFile)
+                //TODO is expiration option restored here?
+                .keySerializer(Serializer.STRING)
+                .makeOrGet();
     }
 
     public void save(String id, T obj) {
@@ -150,15 +144,20 @@ public class DataStore<T> {
     }
     
     /** Create a secondary (unique) key */
-    public <K2> void secondaryKey (String name, Function2<K2, String, T> fun) {
-        Map<K2, String> index = db.getTreeMap(name);
+    public <K2> void secondaryKey (String name, BTreeKeySerializer keySerializer, Function2<K2, String, T> fun) {
+        Map<K2, String> index = db.treeMapCreate(name)
+                .keySerializer(keySerializer)
+                .valueSerializer(Serializer.STRING)
+                .makeOrGet();
         Bind.secondaryKey(map, index, fun);
     }
     
     /** search using a secondary unique key */
     public <K2> T find(String name, K2 value) {
-        Map<K2, String> index = db.getTreeMap(name);
-        
+        Map<K2, String> index = db.treeMapCreate(name)
+                .valueSerializer(Serializer.STRING)
+                .makeOrGet();
+
         String id = index.get(value);
         
         if (id == null)
@@ -169,7 +168,9 @@ public class DataStore<T> {
     
     /** find the value with largest key less than or equal to key */
     public <K2> T findFloor (String name, K2 floor) {
-        BTreeMap<K2, String> index = db.getTreeMap(name);
+        BTreeMap<K2, String> index = db.treeMapCreate(name)
+                .valueSerializer(Serializer.STRING)
+                .makeOrGet();
         
         Entry<K2, String> key = index.floorEntry(floor);
         
