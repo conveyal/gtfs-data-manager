@@ -2,6 +2,7 @@ package models;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -33,7 +34,7 @@ import static utils.StringUtils.getCleanName;
  *
  */
 @JsonInclude(Include.ALWAYS)
-public class FeedVersion extends Model {
+public class FeedVersion extends Model implements Serializable {
     private static final long serialVersionUID = 1L;
 
     static DataStore<FeedVersion> versionStore = new DataStore<FeedVersion>("feedversions");

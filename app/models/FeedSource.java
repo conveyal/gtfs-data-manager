@@ -1,9 +1,6 @@
 package models;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -33,7 +30,7 @@ import utils.DataStore;
  *
  */
 @JsonInclude(Include.ALWAYS)
-public class FeedSource extends Model implements Comparable<FeedSource> {
+public class FeedSource extends Model implements Comparable<FeedSource>, Serializable {
     private static final long serialVersionUID = 1L;
 
     private static DataStore<FeedSource> sourceStore = new DataStore<FeedSource>("feedsources");

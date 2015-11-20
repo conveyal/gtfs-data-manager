@@ -33,7 +33,7 @@ import java.util.zip.ZipOutputStream;
  *
  */
 @JsonInclude(Include.ALWAYS)
-public class Deployment extends Model {
+public class Deployment extends Model implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private static DataStore<Deployment> deploymentStore = new DataStore<Deployment>("deployments");
