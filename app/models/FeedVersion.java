@@ -180,7 +180,7 @@ public class FeedVersion extends Model {
      * @return
      */
     public boolean hasCriticalErrors() {
-        if ((new Date()).after(validationResult.endDate) || hasCriticalErrorsExceptingDate())
+        if (hasCriticalErrorsExceptingDate() || (new Date()).after(validationResult.endDate))
             return true;
         
         else
