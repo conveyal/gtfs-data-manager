@@ -20,6 +20,7 @@ import utils.HashUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -34,7 +35,7 @@ import static utils.StringUtils.getCleanName;
  *
  */
 @JsonInclude(Include.ALWAYS)
-public class FeedVersion extends Model {
+public class FeedVersion extends Model implements Serializable {
     private static final long serialVersionUID = 1L;
 
     static DataStore<FeedVersion> versionStore = new DataStore<FeedVersion>("feedversions");
@@ -185,7 +186,7 @@ public class FeedVersion extends Model {
      * @return
      */
     public boolean hasCriticalErrors() {
-        if ((new Date()).after(validationResult.endDate) || hasCriticalErrorsExceptingDate())
+        if (hasCriticalErrorsExceptingDate() || (new Date()).after(validationResult.endDate))
             return true;
         
         else

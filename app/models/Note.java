@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import utils.DataStore;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 
@@ -13,7 +14,7 @@ import java.util.Date;
  *
  */
 @JsonInclude(Include.ALWAYS)
-public class Note extends Model {
+public class Note extends Model implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private static DataStore<Note> noteStore = new DataStore<Note>("notes");
