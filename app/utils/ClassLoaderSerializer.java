@@ -1,6 +1,7 @@
 package utils;
 
 import org.apache.commons.io.input.ClassLoaderObjectInputStream;
+import org.mapdb.DataIO;
 import org.mapdb.Serializer;
 
 import java.io.*;
@@ -21,7 +22,7 @@ public class ClassLoaderSerializer extends Serializer<Object> implements Seriali
     @Override
     public Object deserialize(DataInput in, int available) throws IOException {
         try {
-            ObjectInputStream in2 = new ClassLoaderObjectInputStream(Thread.currentThread().getContextClassLoader(), (InputStream) in);
+            ObjectInputStream in2 = new ClassLoaderObjectInputStream(Thread.currentThread().getContextClassLoader(), new DataIO.DataInputToStream(in));
             return in2.readObject();
         } catch (ClassNotFoundException e) {
             throw new IOException(e);
