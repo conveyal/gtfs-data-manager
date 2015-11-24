@@ -21,6 +21,7 @@
   </a>
   {{/showDeploymentButton}}
 
+
   <a href="#osmconfig/{{ feedCollectionId }}" class="btn btn-primary">
     <span class="glyphicon glyphicon-scissors"></span> {{ t "app.osm_config.configure" }}
   </a>
@@ -28,6 +29,12 @@
   <a href="#otpconfig/{{ feedCollectionId }}" class="btn btn-primary">
     <span class="glyphicon glyphicon-picture"></span> {{ t "app.otp_config.title" }}
   </a>
+
+  {{#showDownloadButton}}
+  <a href="/api/feedcollections/{{ feedCollectionId }}/download" class="btn btn-primary">
+    <span class="glyphicon glyphicon-download"></span> {{ t "app.feed_collection.download_gtfs" }}
+  </a>
+  {{/showDownloadButton}}
 
   <a href="api/feedcollections/{{ feedCollectionId }}.csv" class="btn btn-primary">
     <span class="glyphicon glyphicon-download"></span>&nbsp;{{ t "app.download-as-csv" }}

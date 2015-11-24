@@ -87,11 +87,13 @@ module.exports = CompositeView.extend({
     // default is to show new feed button
     var showNewFeedButton = _.isUndefined(attr.showNewFeedButton) ? true : attr.showNewFeedButton;
     var showDeployPublicButton = showNewFeedButton;
+    var showDownloadButton = true;
     var showDeploymentButton = !(app.user && !app.user.admin);
 
     if (app.user && !app.user.admin || !app.user) {
       showNewFeedButton = false;
       showDeployPublicButton = false;
+      showDownloadButton = false;
     }
 
     // use a bare model to pass random bits to the template
@@ -99,7 +101,8 @@ module.exports = CompositeView.extend({
       feedCollectionId: this.feedCollectionId,
       showNewFeedButton: showNewFeedButton,
       showDeploymentButton: showDeploymentButton,
-      showDeployPublicButton: showDeployPublicButton
+      showDeployPublicButton: showDeployPublicButton,
+      showDownloadButton: showDownloadButton
     });
   },
 
