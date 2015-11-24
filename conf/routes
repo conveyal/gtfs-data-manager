@@ -15,7 +15,7 @@ GET           /api/feedcollections                           controllers.api.Fee
 PUT           /api/feedcollections/:id                       controllers.api.FeedCollectionController.update(id:String)
 POST          /api/feedcollections/                          controllers.api.FeedCollectionController.create()
 POST          /api/feedcollections/:id/fetchAllFeeds         controllers.api.FeedCollectionController.fetchAllFeeds(id:String)
-
+GET           /api/feedcollections/:id/download              controllers.api.FeedCollectionController.downloadFeeds(id:String)
 
 GET           /api/users/:id                                 controllers.api.UserController.get(id:String)
 GET           /api/users                                     controllers.api.UserController.getAll()

@@ -4,6 +4,7 @@ app.account.logged_in_as=Logged in as {0}
 app.account.not_logged_in=Not logged in
 app.add_feed_collection=New project
 app.new_feed_collection_name=Untitled project
+app.feed_collection.download_gtfs=Download all feeds
 app.feed_collection_name=Project name
 app.edit=Edit
 app.save=Save

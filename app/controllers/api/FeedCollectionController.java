@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.io.ByteStreams;
 import com.google.common.net.UrlEscapers;
 import controllers.Secured;
 import jobs.FetchProjectFeedsJob;
@@ -17,8 +18,11 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.zip.CRC32;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Security.Authenticated(Secured.class)
 public class FeedCollectionController extends Controller {
@@ -304,5 +308,51 @@ public class FeedCollectionController extends Controller {
         job.run();
 
         return ok(FeedVersionController.json.write(job.result)).as("application/json");
+    }
+
+    public static Result downloadFeeds (String id) throws Exception {
+        User currentUser = User.getUserByUsername(session("username"));
+
+        if (!currentUser.admin)
+            return unauthorized();
+
+        FeedCollection c = FeedCollection.get(id);
+
+        // create a zip bundle of all feeds
+        File temp = File.createTempFile("feeds", ".zip");
+        ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(temp)));
+        // we're zipping zipfiles, no point in trying to compress further
+        // stored evidently requires precomputing crcs which I don't want to figure out right now:
+        // https://community.oracle.com/thread/1317430?start=0&tstart=0
+        //zos.setMethod(ZipOutputStream.STORED);
+
+        for (FeedSource s : c.getFeedSources()) {
+            FeedVersion v = s.getLatest();
+            if (v != null) {
+                // give human readable name but add ID to ensure uniqueness.
+                String name = s.name.replaceAll("[^a-zA-Z0-9\\-]", "_") + "_" + s.id + ".zip";
+                ZipEntry ze = new ZipEntry(name);
+
+                File feed = v.getFeed();
+                ze.setSize(feed.length());
+
+                zos.putNextEntry(ze);
+                InputStream is = new BufferedInputStream(new FileInputStream(feed));
+                ByteStreams.copy(is, zos);
+                is.close();
+                zos.closeEntry();
+            }
+        }
+
+        zos.close();
+
+        FileInputStream fis = new FileInputStream(temp);
+
+        // will not be deleted until input stream is closed
+        temp.delete();
+
+        response().setContentType("application/zip");
+        response().setHeader("Content-Disposition", "attachment;filename=" + c.name.replaceAll("[^a-zA-Z0-9]", "") + ".zip");
+        return ok(fis);
     }
 }
