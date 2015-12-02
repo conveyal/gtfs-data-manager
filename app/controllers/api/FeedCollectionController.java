@@ -9,6 +9,8 @@ import com.google.common.net.UrlEscapers;
 import controllers.Secured;
 import jobs.FetchProjectFeedsJob;
 import models.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import play.Play;
 import play.libs.F.Function;
 import play.libs.F.Promise;
@@ -26,6 +28,8 @@ import java.util.zip.ZipOutputStream;
 
 @Security.Authenticated(Secured.class)
 public class FeedCollectionController extends Controller {
+    public static final Logger LOG = LoggerFactory.getLogger(FeedCollectionController.class);
+
     private static JsonManager<FeedCollection> json = 
             new JsonManager<FeedCollection>(FeedCollection.class, JsonViews.UserInterface.class);
     
@@ -329,11 +333,18 @@ public class FeedCollectionController extends Controller {
         for (FeedSource s : c.getFeedSources()) {
             FeedVersion v = s.getLatest();
             if (v != null) {
+                File feed = v.getFeed();
+
+                if (feed == null) {
+                    // TODO why does this happen?
+                    LOG.warn("Feed version {} has no feed file", v);
+                    continue;
+                }
+
                 // give human readable name but add ID to ensure uniqueness.
                 String name = s.name.replaceAll("[^a-zA-Z0-9\\-]", "_") + "_" + s.id + ".zip";
                 ZipEntry ze = new ZipEntry(name);
 
-                File feed = v.getFeed();
                 ze.setSize(feed.length());
 
                 zos.putNextEntry(ze);
