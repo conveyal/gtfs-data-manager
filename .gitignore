@@ -15,8 +15,6 @@ dist
 /.settings
 *~
 \#*\#
-public/build
-public/components
 public/data/*.zip
 .\#*
 conf/application.conf
