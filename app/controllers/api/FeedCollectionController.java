@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.io.ByteStreams;
 import com.google.common.net.UrlEscapers;
-import controllers.Secured;
+import controllers.Auth0SecuredControlled;
 import jobs.FetchProjectFeedsJob;
 import models.*;
 import org.slf4j.Logger;
@@ -16,29 +16,45 @@ import play.libs.F.Function;
 import play.libs.F.Promise;
 import play.libs.ws.WS;
 import play.libs.ws.WSResponse;
-import play.mvc.Controller;
 import play.mvc.Result;
-import play.mvc.Security;
+import utils.Auth0UserProfile;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.zip.CRC32;
+import java.util.Collection;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-@Security.Authenticated(Secured.class)
-public class FeedCollectionController extends Controller {
+//@Security.Authenticated(Secured.class)
+public class FeedCollectionController extends Auth0SecuredControlled {
+
     public static final Logger LOG = LoggerFactory.getLogger(FeedCollectionController.class);
 
     private static JsonManager<FeedCollection> json = 
             new JsonManager<FeedCollection>(FeedCollection.class, JsonViews.UserInterface.class);
     
     public static Result getAll () throws JsonProcessingException {
+        String token = getToken();
+        if(token == null) return unauthorized("Could not find authorization token");
+        Auth0UserProfile userProfile = verifyUser();
+        if(userProfile == null) return unauthorized();
+
+
+        Collection<FeedCollection> filteredFCs = new ArrayList<FeedCollection>();
+
+        for(FeedCollection fc : FeedCollection.getAll()) {
+            if(userProfile.hasProject(fc.id)) {
+                filteredFCs.add(fc);
+            }
+        }
+        return ok(json.write(filteredFCs)).as("application/json");
+
+
         // it's fine to show all feed collections here. they're just folders, the user knows
         // nothing about what is in them.
         // TODO: When we get to a point where we're managing lots of them, for multiple clients on the same server
         // we'll want to change this.
-        return ok(json.write(FeedCollection.getAll())).as("application/json");
+        //return ok(json.write(FeedCollection.getAll())).as("application/json");
     }
     
     public static Result get (String id) throws JsonProcessingException {

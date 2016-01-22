@@ -21,7 +21,7 @@ import java.net.URL;
 import java.util.*;
 
 
-@Security.Authenticated(Secured.class)
+//@Security.Authenticated(Secured.class)
 public class FeedSourceController extends Controller {
     private static JsonManager<FeedSource> json =
             new JsonManager<FeedSource>(FeedSource.class, JsonViews.UserInterface.class);

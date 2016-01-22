@@ -11,10 +11,10 @@ var Login = LayoutView.extend({
   initialize: function(attr) {
     this.returnTo = attr.returnTo
       // bind it so context is layout not a DOM object
-    _.bindAll(this, 'doLogin');
+    //_.bindAll(this, 'doLogin');
   },
 
-  doLogin: function() {
+  /*doLogin: function() {
     var instance = this;
     $.post('/authenticate', {
         username: this.$('input[name="username"]').val(),
@@ -39,7 +39,7 @@ var Login = LayoutView.extend({
       });
 
     return false;
-  },
+  },*/
 
   onShow: function() {
     // init nav
@@ -47,6 +47,25 @@ var Login = LayoutView.extend({
       name: Messages('app.location.login'),
       href: '#login'
     }]);
+
+    var lock = new Auth0Lock('ztOnBIopl4YwuEYnhEItPuwQA0p4IG1Y', 'conveyal.eu.auth0.com');
+    lock.show(function(err, profile, token) {
+      // save profile and token to localStorage
+      console.log('token', token)
+      localStorage.setItem('userToken', token);
+      localStorage.setItem('userProfile', JSON.stringify(profile));
+      document.location.hash = ''
+    }, {
+      container: 'auth0login',
+      authParams: { scope: 'openid email' }
+    });
+    /*lock.show({
+      container: 'auth0login',
+      callbackURL: 'http://localhost:9000/',
+      responseType: 'code', authParams: {
+        scope: 'openid profile'
+      }
+    });*/
   }
 });
 

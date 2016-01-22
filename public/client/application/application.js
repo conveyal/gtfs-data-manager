@@ -36,7 +36,11 @@ app.on('before:start', function() {
   $('#logout').text(Messages('app.logout'))
     .click(function(e) {
       e.preventDefault();
-      $.ajax({
+      console.log('logging out')
+      localStorage.removeItem('userToken')
+      window.location.hash = '#login';
+
+      /*$.ajax({
         url: 'logout',
       }).done(function(data) {
         if (data.status == 'logged_out') {
@@ -46,11 +50,13 @@ app.on('before:start', function() {
           $('#myAccount').addClass('hidden');
           window.location.hash = '#login';
         }
-      });
+      });*/
     });
 
   $('#manageUsers').text(window.Messages("app.user.manage-users"));
   $('#myAccount').text(window.Messages("app.user.my-account"));
+
+
 });
 
 module.exports = app;

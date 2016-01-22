@@ -41,31 +41,38 @@ var Router = BB.Router.extend({
 $(document).ready(function() {
   var router;
 
-  // determine whether the user is logged in or not
-  $.ajax({
-      url: '/loggedInUser'
-    })
-    .done(function(data) {
-      $('#logged-in-user').text(window.Messages('app.account.logged_in_as', data.username));
-      $('#logout').removeClass('hidden');
+  var userToken = localStorage.getItem('userToken');
+  var userProfile = localStorage.getItem('userProfile');
+  if(userProfile && userToken) {
+    userProfile = JSON.parse(userProfile)
+    console.log('logged in', userProfile)
 
-      $('#myAccount').removeClass('hidden').attr('href', '#user/' + data.id);
-
-      if (data.admin)
-        $('#manageUsers').removeClass('hidden');
-
-      app.user = data;
-    })
-    .fail(function() {
-      // assume that we are not logged in
-      // don't let us go to #login/login/login/login/login/overview
-      if (window.location.hash.indexOf('login') != 1
-        && !/\#feed\/[0-9a-z\-]+\?userId=.+&key=.+/.exec(window.location.hash))
-        document.location.hash = '#login/' + window.location.hash.slice(1);
-    })
-    .always(function() {
-      app.start();
-      router = new Router();
-      BB.history.start();
+    BB.$.ajaxSetup({
+      beforeSend(jqXHR) {
+        jqXHR.setRequestHeader('Authorization', 'Bearer ' + userToken);
+        return true;
+      }
     });
+
+    $('#logged-in-user').text(window.Messages('app.account.logged_in_as', userProfile.email));
+    $('#logout').removeClass('hidden');
+
+    $('#myAccount').removeClass('hidden')//.attr('href', '#user/' + data.id);
+
+    app.userProfile = userProfile;
+
+  }
+  else {
+    // assume that we are not logged in
+    // don't let us go to #login/login/login/login/login/overview
+    if (window.location.hash.indexOf('login') != 1
+      && !/\#feed\/[0-9a-z\-]+\?userId=.+&key=.+/.exec(window.location.hash)) {
+      document.location.hash = '#login/' + window.location.hash.slice(1);
+    }
+  }
+
+  app.start();
+  router = new Router();
+  BB.history.start();
+
 });

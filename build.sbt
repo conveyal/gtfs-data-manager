@@ -39,7 +39,8 @@ libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-java-sdk-s3" % "1.9.3",
   "commons-io" % "commons-io" % "2.4",
   "net.sourceforge.javacsv" % "javacsv" % "2.0",
-  "com.conveyal" % "gtfs-validator-json" % "0.0.1-SNAPSHOT" exclude("org.slf4j", "slf4j-simple")
+  "com.conveyal" % "gtfs-validator-json" % "0.0.1-SNAPSHOT" exclude("org.slf4j", "slf4j-simple"),
+  "com.auth0" % "java-jwt" % "2.1.0"
 )
 
 resolvers += "Local Maven Repository" at "file://"+Path.userHome.absolutePath+"/.m2/repository"
