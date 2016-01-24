@@ -16,6 +16,8 @@ dist
 *~
 \#*\#
 public/data/*.zip
+public/build
+public/components
 .\#*
 conf/application.conf
 data
