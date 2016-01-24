@@ -4,6 +4,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.binary.Base64;
+import play.Play;
 import play.mvc.Controller;
 import utils.Auth0UserProfile;
 
@@ -28,9 +29,10 @@ public class Auth0SecuredControlled extends Controller {
     }
 
     protected static Auth0UserProfile verifyUser(String token) {
+        String clientID = Play.application().configuration().getString("application.auth0.client_id");
+        String clientSecret = Play.application().configuration().getString("application.auth0.client_secret");
         JWTVerifier jwtVerifier = new JWTVerifier(
-                new Base64(true).decode("IouN1CLEHsU5DUCkMGAXxSqxO1JY2QC0EMQF8Q-uvIxYsvkZV0aozTk3-FYnpbNG"),
-                "ztOnBIopl4YwuEYnhEItPuwQA0p4IG1Y");
+                new Base64(true).decode(clientSecret), clientID);
 
         try {
             Map<String, Object> decoded = jwtVerifier.verify(token);
@@ -69,7 +71,7 @@ public class Auth0SecuredControlled extends Controller {
 
     protected static String getUserInfo(String token) throws Exception {
 
-        URL url = new URL("https://conveyal.eu.auth0.com/tokeninfo");
+        URL url = new URL("https://" + Play.application().configuration().getString("application.auth0.domain") + "/tokeninfo");
         HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
 
         //add request header

@@ -213,4 +213,11 @@ public class Application extends Controller {
     }
     
     // all of the hard stuff is in controllers.api
+
+    public static Result getAuth0Config() {
+        ObjectNode result = Json.newObject();
+        result.put("domain", Play.application().configuration().getString("application.auth0.domain"));
+        result.put("client_id", Play.application().configuration().getString("application.auth0.client_id"));
+        return ok(result);
+    }
 }

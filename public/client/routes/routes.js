@@ -43,7 +43,8 @@ $(document).ready(function() {
 
   var userToken = localStorage.getItem('userToken');
   var userProfile = localStorage.getItem('userProfile');
-  if(userProfile && userToken) {
+  console.log('found userToken', userToken)
+  if(userProfile && userToken && userToken !== "null") {
     userProfile = JSON.parse(userProfile)
     console.log('logged in', userProfile)
 
