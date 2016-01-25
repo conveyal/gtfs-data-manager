@@ -14,7 +14,37 @@ require('text-helper');
 require('admin-helper');
 require('validation-partial');
 
-var app = new BB.Marionette.Application();
+//var app = new BB.Marionette.Application();
+
+var App = BB.Marionette.Application.extend({
+  initBB: function(token) {
+    BB.$.ajaxSetup({
+      beforeSend(jqXHR) {
+        jqXHR.setRequestHeader('Authorization', 'Bearer ' + token);
+        return true;
+      }
+    });
+  },
+
+  logout: function() {
+    localStorage.removeItem('userToken')
+    window.location.hash = '#login';
+
+    /*$.ajax({
+      url: 'logout',
+    }).done(function(data) {
+      if (data.status == 'logged_out') {
+        $('#logout').addClass("hidden");
+        $('#logged-in-user').text('');
+        $('#manageUsers').addClass('hidden');
+        $('#myAccount').addClass('hidden');
+        window.location.hash = '#login';
+      }
+    });*/
+  }
+});
+
+var app = new App();
 
 app.user = null;
 
@@ -36,21 +66,7 @@ app.on('before:start', function() {
   $('#logout').text(Messages('app.logout'))
     .click(function(e) {
       e.preventDefault();
-      console.log('logging out')
-      localStorage.removeItem('userToken')
-      window.location.hash = '#login';
-
-      /*$.ajax({
-        url: 'logout',
-      }).done(function(data) {
-        if (data.status == 'logged_out') {
-          $('#logout').addClass("hidden");
-          $('#logged-in-user').text('');
-          $('#manageUsers').addClass('hidden');
-          $('#myAccount').addClass('hidden');
-          window.location.hash = '#login';
-        }
-      });*/
+      app.logout();
     });
 
   $('#manageUsers').text(window.Messages("app.user.manage-users"));

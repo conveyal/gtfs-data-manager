@@ -42,25 +42,33 @@ $(document).ready(function() {
   var router;
 
   var userToken = localStorage.getItem('userToken');
-  var userProfile = localStorage.getItem('userProfile');
-  console.log('found userToken', userToken)
-  if(userProfile && userToken && userToken !== "null") {
-    userProfile = JSON.parse(userProfile)
-    console.log('logged in', userProfile)
+  //console.log('found userToken', userToken)
 
-    BB.$.ajaxSetup({
-      beforeSend(jqXHR) {
-        jqXHR.setRequestHeader('Authorization', 'Bearer ' + userToken);
-        return true;
+  if(userToken && userToken !== "null") {
+
+    $.ajax({
+      url: "https://conveyal.eu.auth0.com/tokeninfo",
+      data: {
+        id_token: userToken
+      },
+      contentType: "application/json",
+      success: function(data) {
+        app.userProfile = data;
+
+        app.initBB(userToken);
+
+        $('#logged-in-user').text(window.Messages('app.account.logged_in_as', app.userProfile.email));
+        $('#logout').removeClass('hidden');
+
+        $('#myAccount').removeClass('hidden')
+
+        startApp();
+      },
+      error: function() {
+        console.log('tokeninfo problem, logging out');
+        app.logout();
       }
     });
-
-    $('#logged-in-user').text(window.Messages('app.account.logged_in_as', userProfile.email));
-    $('#logout').removeClass('hidden');
-
-    $('#myAccount').removeClass('hidden')//.attr('href', '#user/' + data.id);
-
-    app.userProfile = userProfile;
 
   }
   else {
@@ -70,10 +78,13 @@ $(document).ready(function() {
       && !/\#feed\/[0-9a-z\-]+\?userId=.+&key=.+/.exec(window.location.hash)) {
       document.location.hash = '#login/' + window.location.hash.slice(1);
     }
+    startApp();
   }
 
+});
+
+function startApp() {
   app.start();
   router = new Router();
   BB.history.start();
-
-});
+}

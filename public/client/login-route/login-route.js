@@ -48,20 +48,19 @@ var Login = LayoutView.extend({
       href: '#login'
     }]);
 
-    console.log('show login')
     $.ajax({
       url: 'auth0Config',
       success: function(data) {
-        console.log('auth0Config', data);
         var lock = new Auth0Lock(data.client_id, data.domain);
         lock.show(function(err, profile, token) {
           if(err) {
             console.log(err)
           } else {
             // save profile and token to localStorage
-            console.log('token', token)
             localStorage.setItem('userToken', token);
-            localStorage.setItem('userProfile', JSON.stringify(profile));
+
+            app.initBB(token);
+
             document.location.hash = ''
           }
         }, {
@@ -69,13 +68,6 @@ var Login = LayoutView.extend({
         });
       }
     });
-    /*lock.show({
-      container: 'auth0login',
-      callbackURL: 'http://localhost:9000/',
-      responseType: 'code', authParams: {
-        scope: 'openid profile'
-      }
-    });*/
   }
 });
 
