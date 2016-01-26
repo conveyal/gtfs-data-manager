@@ -64,11 +64,15 @@ public class FeedCollectionController extends Auth0SecuredController {
     }
     
     public static Result update (String id) throws JsonProcessingException {
+
+        String token = getToken();
+        if(token == null) return unauthorized("Could not find authorization token");
+        Auth0UserProfile userProfile = verifyUser();
+        if(userProfile == null) return unauthorized();
+
         FeedCollection c = FeedCollection.get(id);
-        
-        User currentUser = User.getUserByUsername(session("username"));
-        
-        if (!currentUser.admin)
+
+        if(!userProfile.canAdministerProject(c.id))
             return unauthorized();
         
         JsonNode params = request().body().asJson();
@@ -193,7 +197,7 @@ public class FeedCollectionController extends Auth0SecuredController {
         }
 
         // only allow admins to change feed collection owners
-        if (currentUser.admin) {
+        /*if (currentUser.admin) {
             JsonNode uname = params.get("user");
         
             // TODO: test
@@ -203,7 +207,7 @@ public class FeedCollectionController extends Auth0SecuredController {
         
             if (u != null)
                 c.setUser(u);
-        }
+        }*/
         
         c.save();
         
@@ -211,9 +215,15 @@ public class FeedCollectionController extends Auth0SecuredController {
     }
     
     public static Result create () throws JsonParseException, JsonMappingException, IOException {
-        User currentUser = User.getUserByUsername(session("username"));
+
+        String token = getToken();
+        if(token == null) return unauthorized("Could not find authorization token");
+        Auth0UserProfile userProfile = verifyUser();
+        if(userProfile == null) return unauthorized();
+
+        //User currentUser = User.getUserByUsername(session("username"));
         
-        if (!currentUser.admin)
+        if (!userProfile.canAdministerApplication())
             return unauthorized();
         
         JsonNode params = request().body().asJson();
@@ -221,7 +231,7 @@ public class FeedCollectionController extends Auth0SecuredController {
         FeedCollection c = new FeedCollection();
         
         // TODO: fail gracefully
-        c.name = params.get("name").asText();
+        /*c.name = params.get("name").asText();
         JsonNode uname = params.get("user/username");
         
         User u = null;
@@ -233,7 +243,7 @@ public class FeedCollectionController extends Auth0SecuredController {
             
         c.setUser(u);
         
-        c.save();
+        c.save();*/
         
         return ok(json.write(c)).as("application/json");
     }

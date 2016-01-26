@@ -1,7 +1,9 @@
-<p>
-  <button type="button" class="btn btn-success newfeedcoll">
-    <span class="glyphicon glyphicon-plus"></span> {{ t "app.add_feed_collection" }}
-  </button>
-</p>
+{{#canAdministerApp this}}
+  <p>
+    <button type="button" class="btn btn-success newfeedcoll">
+      <span class="glyphicon glyphicon-plus"></span> {{ t "app.add_feed_collection" }}
+    </button>
+  </p>
+{{/canAdministerApp}}
 
 <ul class="list-group"></ul>

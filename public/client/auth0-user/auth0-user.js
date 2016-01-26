@@ -43,4 +43,14 @@ Auth0User.prototype.canManageFeed = function (projectID, feedID) {
   return false;
 };
 
+Auth0User.prototype.canAdministerApp = function () {
+  if(this.dt && this.dt.permissions) {
+    for(var i=0; i<this.dt.permissions.length; i++) {
+      var permission = this.dt.permissions[i];
+      if(permission.type === "administer-application") return true;
+    }
+  }
+  return false;
+};
+
 module.exports = Auth0User;

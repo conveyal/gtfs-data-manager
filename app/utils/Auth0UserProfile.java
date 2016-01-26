@@ -53,17 +53,24 @@ public class Auth0UserProfile {
     public static class DatatoolsInfo {
 
         Project[] projects;
+        Permission[] permissions;
 
         public DatatoolsInfo() {
         }
 
-        public DatatoolsInfo(Project[] projects) {
+        public DatatoolsInfo(Project[] projects, Permission[] permissions) {
             this.projects = projects;
+            this.permissions = permissions;
         }
 
         public void setProjects(Project[] projects) {
             this.projects = projects;
         }
+
+        public void setPermissions(Permission[] permissions) {
+            this.permissions = permissions;
+        }
+
     }
 
 
@@ -118,6 +125,17 @@ public class Auth0UserProfile {
     public boolean hasProject(String projectID) {
         for(Project project : app_metadata.datatools.projects) {
             if (project.project_id.equals(projectID)) return true;
+        }
+        return false;
+    }
+
+    public boolean canAdministerApplication() {
+        if(app_metadata.datatools.permissions != null) {
+            for(Permission permission : app_metadata.datatools.permissions) {
+                if(permission.type.equals("administer-application")) {
+                    return true;
+                }
+            }
         }
         return false;
     }
