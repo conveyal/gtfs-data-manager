@@ -62,11 +62,18 @@ public class FeedVersionController extends Auth0SecuredController {
      * Grab this feed version's GTFS.
      */
     public static Result getGtfs (String id) throws JsonProcessingException {
-        // TODO: handle authentication
+        Auth0UserProfile userProfile = getSessionProfile();
+        if(userProfile == null) return unauthorized();
+
         FeedVersion v = FeedVersion.get(id);
         FeedSource s = v.getFeedSource();
 
-        return ok(v.getFeed());
+        if (userProfile.canAdministerProject(s.feedCollectionId) || userProfile.canViewFeed(s.feedCollectionId, s.id)) {
+            return ok(v.getFeed());
+        }
+        else {
+            return unauthorized();
+        }
     }
 
 
