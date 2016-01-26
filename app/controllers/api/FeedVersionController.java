@@ -62,20 +62,11 @@ public class FeedVersionController extends Auth0SecuredController {
      * Grab this feed version's GTFS.
      */
     public static Result getGtfs (String id) throws JsonProcessingException {
-        String token = getToken();
-        if(token == null) return unauthorized("Could not find authorization token");
-        Auth0UserProfile userProfile = verifyUser();
-        if(userProfile == null) return unauthorized();
-
+        // TODO: handle authentication
         FeedVersion v = FeedVersion.get(id);
         FeedSource s = v.getFeedSource();
 
-        if (userProfile.canAdministerProject(s.feedCollectionId) || userProfile.canViewFeed(s.feedCollectionId, s.id)) {
-            return ok(v.getFeed());
-        }
-        else {
-            return unauthorized();
-        }
+        return ok(v.getFeed());
     }
 
 
