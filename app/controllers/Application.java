@@ -220,4 +220,12 @@ public class Application extends Controller {
         result.put("client_id", Play.application().configuration().getString("application.auth0.client_id"));
         return ok(result);
     }
+
+    public static Result preflight(String path) {
+        response().setHeader("Access-Control-Allow-Origin", "*");
+        response().setHeader("Allow", "*");
+        response().setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
+        response().setHeader("Access-Control-Allow-Headers", "Authorization, Origin, X-Requested-With, Content-Type, Accept, Referer, User-Agent");
+        return ok();
+    }
 }

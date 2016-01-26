@@ -108,4 +108,18 @@ public class Auth0UserProfile {
         }
         return false;
     }
+
+    public boolean canAdministerProject(String projectID) {
+        for(Project project : app_metadata.datatools.projects) {
+            if (project.project_id.equals(projectID)) {
+                for(Permission permission : project.permissions) {
+                    if(permission.type.equals("administer-project")) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+
+    }
 }

@@ -72,3 +72,6 @@ POST          /load                                          controllers.Dump.lo
 # Map static resources from the /public folder to the / URL path
 GET           /                                              controllers.Assets.at(path="/public", file="index.html")
 GET           /*file                                         controllers.Assets.at(path="/public", file)
+
+OPTIONS       /                                              controllers.Application.preflight(path="")
+OPTIONS       /*path                                         controllers.Application.preflight(path)

@@ -3,6 +3,7 @@ package controllers.api;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import controllers.Auth0SecuredControlled;
 import controllers.Secured;
 import jobs.FetchSingleFeedJob;
 import models.*;
@@ -14,6 +15,7 @@ import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Security;
+import utils.Auth0UserProfile;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -22,7 +24,7 @@ import java.util.*;
 
 
 //@Security.Authenticated(Secured.class)
-public class FeedSourceController extends Controller {
+public class FeedSourceController extends Auth0SecuredControlled {
     private static JsonManager<FeedSource> json =
             new JsonManager<FeedSource>(FeedSource.class, JsonViews.UserInterface.class);
     
@@ -39,8 +41,12 @@ public class FeedSourceController extends Controller {
     }
 
     public static Result getAll () throws JsonProcessingException {
-        User currentUser = User.getUserByUsername(session("username"));
-        
+        //User currentUser = User.getUserByUsername(session("username"));
+        String token = getToken();
+        if(token == null) return unauthorized("Could not find authorization token");
+        Auth0UserProfile userProfile = verifyUser();
+        if(userProfile == null) return unauthorized();
+
         // parse the query parameters
         String fcId = request().getQueryString("feedcollection");
         FeedCollection fc = null;
@@ -54,31 +60,22 @@ public class FeedSourceController extends Controller {
         else {
             feedSources = fc.getFeedSources();
         }
-        
-        if (!currentUser.admin) {
-            if (currentUser.projectPermissions == null)
-                return unauthorized();
-            
-            Set<String> canRead = new HashSet<String>(currentUser.projectPermissions.size());
-            
-            for (ProjectPermissions p : currentUser.projectPermissions) {
-                if (p.read != null && p.read) {
-                    canRead.add(p.project_id);
-                }
-            }
-            
+
+        if(!userProfile.canAdministerProject(fcId)) {
+            Set<String> canRead = new HashSet<String>();
+
             // filter the list, only show the ones this user has permission to access
             List<FeedSource> filtered = new ArrayList<FeedSource>();
-            
+
             for (FeedSource fs : feedSources) {
                 if (canRead.contains(fs.id)) {
                     filtered.add(fs);
                 }
             }
-            
+
             feedSources = filtered;
         }
-        
+
         return ok(json.write(feedSources)).as("application/json");
     }
     
