@@ -14,6 +14,15 @@ module.exports = LayoutView.extend({
     'click .update-feed': 'updateFeed'
   },
 
+  serializeData: function() {
+    var feedSourceID = this.model.get('feedSource').id;
+    var feedCollectionID = this.model.get('feedSource').feedCollection.id;
+    var ret = {
+      canManageFeed : app.auth0User.canManageFeed(feedCollectionID, feedSourceID)
+    };
+    return Object.assign(ret, this.model.toJSON());
+  },
+
   // show the feed upload dialog
   uploadFeed: function(e) {
     // model is so that it knows what feed source to upload to
