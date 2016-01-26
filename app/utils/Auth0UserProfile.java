@@ -10,14 +10,27 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class Auth0UserProfile {
 
     String email;
+    String user_id;
     AppMetadata app_metadata;
 
     public Auth0UserProfile() {
     }
 
 
+    public String getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(String user_id) {
+        this.user_id = user_id;
+    }
+
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public void setApp_metadata(AppMetadata app_metadata) {

@@ -5,6 +5,7 @@ import java.util.Date;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import controllers.Auth0SecuredController;
 import models.FeedSource;
 import models.FeedVersion;
 import models.JsonViews;
@@ -17,14 +18,17 @@ import controllers.Secured;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Security;
+import utils.Auth0UserProfile;
 
-@Security.Authenticated(Secured.class)
-public class NoteController extends Controller {
+public class NoteController extends Auth0SecuredController {
     private static JsonManager<Note> json =
             new JsonManager<Note>(Note.class, JsonViews.UserInterface.class);
     
     public static Result getAll () throws JsonProcessingException {
-        User currentUser = User.getUserByUsername(session("username"));
+        String token = getToken();
+        if(token == null) return unauthorized("Could not find authorization token");
+        Auth0UserProfile userProfile = verifyUser();
+        if(userProfile == null) return unauthorized();
 
         String typeStr = request().getQueryString("type");
         String objectId = request().getQueryString("objectId");
@@ -64,7 +68,7 @@ public class NoteController extends Controller {
         }
      
         // check if the user has permission
-        if (currentUser.admin || currentUser.equals(s.getUser()) || currentUser.hasReadAccess(s.id)) {
+        if (userProfile.canAdministerProject(s.feedCollectionId) || userProfile.canViewFeed(s.feedCollectionId, s.id)) {
             return ok(json.write(model.getNotes())).as("application/json");
         }
         else {
@@ -73,7 +77,10 @@ public class NoteController extends Controller {
     }
     
     public static Result create () throws JsonProcessingException {
-        User currentUser = User.getUserByUsername(session("username"));
+        String token = getToken();
+        if(token == null) return unauthorized("Could not find authorization token");
+        Auth0UserProfile userProfile = verifyUser();
+        if(userProfile == null) return unauthorized();
 
         JsonNode params = request().body().asJson();
         
@@ -115,11 +122,12 @@ public class NoteController extends Controller {
         }
         
         // check if the user has permission
-        if (currentUser.admin || currentUser.equals(s.getUser()) || currentUser.hasWriteAccess(s.id)) {
+        if (userProfile.canAdministerProject(s.feedCollectionId) || userProfile.canViewFeed(s.feedCollectionId, s.id)) {
             Note n = new Note();
             n.note = params.get("note").asText();
             // folks can't make comments as other folks
-            n.userId = currentUser.id;
+            n.userId = userProfile.getUser_id();
+            n.userEmail = userProfile.getEmail();
             n.date = new Date();
             n.type = type;
             model.addNote(n);
