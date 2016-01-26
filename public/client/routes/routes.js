@@ -1,5 +1,6 @@
 var app = require('application');
 var BB = require('bb');
+var Auth0User = require('auth0-user');
 
 var Router = BB.Router.extend({
   routes: {
@@ -53,11 +54,12 @@ $(document).ready(function() {
       },
       contentType: "application/json",
       success: function(data) {
-        app.userProfile = data;
+        //app.userProfile = data;
+        app.auth0User = new Auth0User(data);
 
         app.initBB(userToken);
 
-        $('#logged-in-user').text(window.Messages('app.account.logged_in_as', app.userProfile.email));
+        $('#logged-in-user').text(window.Messages('app.account.logged_in_as', app.auth0User.getEmail()));
         $('#logout').removeClass('hidden');
 
         $('#myAccount').removeClass('hidden')

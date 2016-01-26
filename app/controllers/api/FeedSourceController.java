@@ -128,14 +128,17 @@ public class FeedSourceController extends Auth0SecuredControlled {
     }
     
     public static Result create () throws MalformedURLException, JsonProcessingException {
-        User currentUser = User.getUserByUsername(session("username"));
+        String token = getToken();
+        if(token == null) return unauthorized("Could not find authorization token");
+        Auth0UserProfile userProfile = verifyUser();
+        if(userProfile == null) return unauthorized();
         
         // parse the result
         JsonNode params = request().body().asJson();
         
         FeedCollection c = FeedCollection.get(params.get("feedCollection").get("id").asText());
         
-        if (currentUser.admin) {
+        if (userProfile.canAdministerProject(c.id)) {
             FeedSource s = new FeedSource(params.get("name").asText());
             // not setting user because feed sources are automatically assigned a unique user
             s.setFeedCollection(c);
@@ -152,10 +155,13 @@ public class FeedSourceController extends Auth0SecuredControlled {
     }
     
     public static Result delete (String id) {
-        User currentUser = User.getUserByUsername(session("username"));
+        String token = getToken();
+        if(token == null) return unauthorized("Could not find authorization token");
+        Auth0UserProfile userProfile = verifyUser();
+        if(userProfile == null) return unauthorized();
 
-        if (currentUser.admin) {
-            FeedSource s = FeedSource.get(id);
+        FeedSource s = FeedSource.get(id);
+        if (userProfile.canAdministerProject(s.getFeedCollection().id)) {
             s.delete();
             return ok();
         }

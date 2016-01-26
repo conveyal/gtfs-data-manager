@@ -3,6 +3,7 @@
   "scripts": ["routes.js"],
   "local": [
     "application",
+    "auth0-user",
     "bb",
     "login-route",
     "deployment-route",

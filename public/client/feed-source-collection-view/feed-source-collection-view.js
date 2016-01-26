@@ -90,7 +90,7 @@ module.exports = CompositeView.extend({
     var showDownloadButton = true;
     var showDeploymentButton = !(app.user && !app.user.admin);
 
-    if (app.user && !app.user.admin || !app.user) {
+    if (app.auth0User && !app.auth0User.canAdminsterProject(this.feedCollectionId) || !app.auth0User) {
       showNewFeedButton = false;
       showDeployPublicButton = false;
       showDownloadButton = false;
