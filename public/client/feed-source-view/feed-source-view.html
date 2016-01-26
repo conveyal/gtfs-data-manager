@@ -15,10 +15,10 @@
       </div>
     {{/if}}
 
-    <button class="btn btn-primary deploy" {{#unless latestVersionId}}disabled{{/unless}}>
+    <!--<button class="btn btn-primary deploy" {{#unless latestVersionId}}disabled{{/unless}}>
       <span class="glyphicon glyphicon-globe"></span>
       {{ t 'app.deployment.deploy' }}
-    </button>
+    </button>-->
 
     {{#if (and (eq retrievalMethod 'PRODUCED_IN_HOUSE') (neq editorId null) (neq editorId ''))}}
       {{!-- /edit/id just redirects to GTFS Editor --}}

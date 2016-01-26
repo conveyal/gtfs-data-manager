@@ -3,11 +3,10 @@
     <button type="button" class="btn btn-success newfeedsource">
       <span class="glyphicon glyphicon-plus"></span> {{ t "app.add_feed_source" }}
     </button>
+    <button type="button" class="btn btn-primary fetch-all-feeds">
+      <span class="glyphicon glyphicon-cloud-download"></span> {{ t "app.fetch_all_feeds.button" }}
+    </button>
   {{/if}}
-
-  <button type="button" class="btn btn-primary fetch-all-feeds">
-    <span class="glyphicon glyphicon-cloud-download"></span> {{ t "app.fetch_all_feeds.button" }}
-  </button>
 
   {{#if showDeployPublicButton}}
     <button type="button" class="btn btn-primary deploy-public">
@@ -19,16 +18,13 @@
   <a href="#deployments/{{ feedCollectionId }}" class="btn btn-primary">
     <span class="glyphicon glyphicon-globe"></span> {{ t "app.deployment.manage_deployments" }}
   </a>
-  {{/showDeploymentButton}}
-
-
   <a href="#osmconfig/{{ feedCollectionId }}" class="btn btn-primary">
     <span class="glyphicon glyphicon-scissors"></span> {{ t "app.osm_config.configure" }}
   </a>
-
   <a href="#otpconfig/{{ feedCollectionId }}" class="btn btn-primary">
     <span class="glyphicon glyphicon-picture"></span> {{ t "app.otp_config.title" }}
   </a>
+  {{/showDeploymentButton}}
 
   {{#showDownloadButton}}
   <a href="/api/feedcollections/{{ feedCollectionId }}/download" class="btn btn-primary">
@@ -36,9 +32,9 @@
   </a>
   {{/showDownloadButton}}
 
-  <a href="api/feedcollections/{{ feedCollectionId }}.csv" class="btn btn-primary">
+  <!--<a href="api/feedcollections/{{ feedCollectionId }}.csv" class="btn btn-primary">
     <span class="glyphicon glyphicon-download"></span>&nbsp;{{ t "app.download-as-csv" }}
-  </a>
+  </a>-->
 </p>
 
 <div class="table-responsive table-fixed-header-wrapper">
