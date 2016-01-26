@@ -40,10 +40,23 @@ public class Auth0SecuredController extends Controller {
             String userInfo = getUserInfo(token);
 
             ObjectMapper m = new ObjectMapper();
+            session().put("profile", userInfo);
             return m.readValue(userInfo, Auth0UserProfile.class);
 
         } catch (Exception e) {
             System.out.println("error validating token");
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    protected static Auth0UserProfile getSessionProfile() {
+        try {
+            String profile = session("profile");
+            ObjectMapper m = new ObjectMapper();
+            return m.readValue(profile, Auth0UserProfile.class);
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

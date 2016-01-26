@@ -194,7 +194,7 @@ public class FeedSourceController extends Auth0SecuredController {
         if(userProfile == null) return unauthorized();
 
         FeedSource s = FeedSource.get(id);
-        
+
         // ways to have permission to do this:
         // 1) be an admin
         // 2) have access to this feed through project permissions
@@ -208,8 +208,15 @@ public class FeedSourceController extends Auth0SecuredController {
     }
 
     public static Result uploadAgencyLogo(String id) {
+
+        Auth0UserProfile userProfile = getSessionProfile();
+        if(userProfile == null) return unauthorized();
+
         FeedSource feedSource = FeedSource.get(id);
         if(feedSource == null) return badRequest();
+
+        if (!userProfile.canAdministerProject(feedSource.feedCollectionId) && !userProfile.canManageFeed(feedSource.feedCollectionId, feedSource.id))
+            return unauthorized();
 
         Http.MultipartFormData body = request().body().asMultipartFormData();
         Http.MultipartFormData.FilePart picture = body.getFile("picture");

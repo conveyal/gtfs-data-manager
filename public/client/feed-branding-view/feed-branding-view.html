@@ -19,12 +19,14 @@
             {{/hasAgencyLogo}}
           </td>
           <td>
-            <form name="imageUpload" id="imageUploadForm" action="/api/feedsources/{{ ../feedSource.id }}/uploadAgencyLogo" enctype="multipart/form-data" method="post">
-              <input style="display: inline;" type="file" name="picture">
-              <input type="hidden" name="agencyId" value="{{ this }}">
-              <input style="display: inline;" class="btn btn-primary upload-button" type="submit">
-            </form>
-            <!--<button class="btn btn-primary clear-button" data-agencyid="{{ this }}">Clear Branding</button>-->
+            {{#canManageBranding this}}
+              <form name="imageUpload" id="imageUploadForm" action="/api/feedsources/{{ ../../feedSource.id }}/uploadAgencyLogo" enctype="multipart/form-data" method="post">
+                <input style="display: inline;" type="file" name="picture">
+                <input type="hidden" name="agencyId" value="{{ this }}">
+                <input style="display: inline;" class="btn btn-primary upload-button" type="submit">
+              </form>
+              <!--<button class="btn btn-primary clear-button" data-agencyid="{{ this }}">Clear Branding</button>-->
+            {{/canManageBranding}}
           </td>
         </tr>
       {{/each}}

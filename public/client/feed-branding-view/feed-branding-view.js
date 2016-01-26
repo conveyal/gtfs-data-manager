@@ -1,6 +1,7 @@
 var ItemView = require('item-view');
 var FeedVersion = require('feed-version');
 var _ = require('underscore');
+var app = require('application');
 
 var Handlebars = require('handlebars');
 
@@ -23,13 +24,12 @@ module.exports = ItemView.extend({
       });
     }
 
-
     Handlebars.registerHelper(
       'hasAgencyLogo',
       function(agencyId, options) {
         var branding = self.getAgencyBranding(agencyId);
         if(branding !== null && branding.hasLogo) return options.fn(this);
-        return options.inverse(this);;
+        return options.inverse(this);
       }
     );
 
@@ -43,6 +43,15 @@ module.exports = ItemView.extend({
       }
     );
 
+    Handlebars.registerHelper(
+      'canManageBranding',
+      function(agencyId, options) {
+        var fs = self.model.get('feedSource');
+        var canManageFeed = app.auth0User.canManageFeed(fs.feedCollection.id, fs.id);
+        if(canManageFeed) return options.fn(this);
+        return options.inverse(this);
+      }
+    );
   },
 
   getAgencyBranding: function(agencyId) {
