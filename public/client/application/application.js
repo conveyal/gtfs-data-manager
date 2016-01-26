@@ -41,19 +41,19 @@ var App = BB.Marionette.Application.extend({
 
   logout: function() {
     localStorage.removeItem('userToken')
-    window.location.hash = '#login';
 
-    /*$.ajax({
+    $.ajax({
       url: 'logout',
     }).done(function(data) {
       if (data.status == 'logged_out') {
+        console.log("logout success");
         $('#logout').addClass("hidden");
         $('#logged-in-user').text('');
         $('#manageUsers').addClass('hidden');
         $('#myAccount').addClass('hidden');
         window.location.hash = '#login';
       }
-    });*/
+    });
   }
 });
 
