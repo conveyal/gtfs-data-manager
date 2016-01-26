@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.io.ByteStreams;
 import com.google.common.net.UrlEscapers;
-import controllers.Auth0SecuredControlled;
+import controllers.Auth0SecuredController;
 import jobs.FetchProjectFeedsJob;
 import models.*;
 import org.slf4j.Logger;
@@ -26,7 +26,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 //@Security.Authenticated(Secured.class)
-public class FeedCollectionController extends Auth0SecuredControlled {
+public class FeedCollectionController extends Auth0SecuredController {
 
     public static final Logger LOG = LoggerFactory.getLogger(FeedCollectionController.class);
 

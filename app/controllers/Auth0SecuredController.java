@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
  * Created by demory on 1/17/16.
  */
 
-public class Auth0SecuredControlled extends Controller {
+public class Auth0SecuredController extends Controller {
 
     protected static Auth0UserProfile verifyUser() {
         String token = getToken();

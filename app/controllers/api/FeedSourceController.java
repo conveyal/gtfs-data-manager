@@ -3,18 +3,14 @@ package controllers.api;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import controllers.Auth0SecuredControlled;
-import controllers.Secured;
+import controllers.Auth0SecuredController;
 import jobs.FetchSingleFeedJob;
 import models.*;
-import models.User.ProjectPermissions;
 import play.Play;
 import play.api.libs.Files;
 import play.libs.Json;
-import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
-import play.mvc.Security;
 import utils.Auth0UserProfile;
 
 import java.io.File;
@@ -24,7 +20,7 @@ import java.util.*;
 
 
 //@Security.Authenticated(Secured.class)
-public class FeedSourceController extends Auth0SecuredControlled {
+public class FeedSourceController extends Auth0SecuredController {
     private static JsonManager<FeedSource> json =
             new JsonManager<FeedSource>(FeedSource.class, JsonViews.UserInterface.class);
     
