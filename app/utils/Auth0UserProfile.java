@@ -120,6 +120,35 @@ public class Auth0UserProfile {
             }
         }
         return false;
+    }
 
+    public boolean canViewFeed(String projectID, String feedID) {
+        for(Project project : app_metadata.datatools.projects) {
+            if (project.project_id.equals(projectID)) {
+                for(Permission permission : project.permissions) {
+                    if(permission.type.equals("view-feed")) {
+                        for(String thisFeedID : permission.feeds) {
+                            if(thisFeedID.equals(feedID)) return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean canManageFeed(String projectID, String feedID) {
+        for(Project project : app_metadata.datatools.projects) {
+            if (project.project_id.equals(projectID)) {
+                for(Permission permission : project.permissions) {
+                    if(permission.type.equals("manage-feed")) {
+                        for(String thisFeedID : permission.feeds) {
+                            if(thisFeedID.equals(feedID)) return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 }

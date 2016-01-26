@@ -4,6 +4,7 @@ var Breadcrumb = require('breadcrumb-nav');
 var es5 = require('es5-shim');
 var es6 = require('es6-shim');
 var Handlebars = require('Handlebars');
+var Auth0User = require('auth0-user');
 
 // register Handlebars helpers and partials
 require('date-render-helper');
@@ -11,12 +12,24 @@ require('class-helper');
 require('logic-helper');
 require('translate-helper');
 require('text-helper');
-require('admin-helper');
+//require('admin-helper');
 require('validation-partial');
 
 //var app = new BB.Marionette.Application();
 
 var App = BB.Marionette.Application.extend({
+
+  userLoggedIn: function(token, profile) {
+
+    this.auth0User = new Auth0User(profile);
+
+    $('#logged-in-user').text(window.Messages('app.account.logged_in_as', this.auth0User.getEmail()));
+    $('#logout').removeClass('hidden');
+    $('#myAccount').removeClass('hidden');
+
+    this.initBB(token);
+  },
+
   initBB: function(token) {
     BB.$.ajaxSetup({
       beforeSend(jqXHR) {

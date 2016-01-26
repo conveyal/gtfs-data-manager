@@ -80,6 +80,7 @@ module.exports = LayoutView.extend({
     }
 
     // expose the copypastable URL to allow users to view/edit
+    /*console.log(this.model)
     if (app.user.admin) {
       instance = this;
       $.ajax({
@@ -90,7 +91,7 @@ module.exports = LayoutView.extend({
             '&key=' + encodeURIComponent(data.key));
         }
       });
-    }
+    }*/
 
     // set up comments
     this.notesRegion.show(new NoteCollectionView({

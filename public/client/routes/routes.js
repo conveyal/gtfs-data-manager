@@ -54,15 +54,7 @@ $(document).ready(function() {
       },
       contentType: "application/json",
       success: function(data) {
-        //app.userProfile = data;
-        app.auth0User = new Auth0User(data);
-
-        app.initBB(userToken);
-
-        $('#logged-in-user').text(window.Messages('app.account.logged_in_as', app.auth0User.getEmail()));
-        $('#logout').removeClass('hidden');
-
-        $('#myAccount').removeClass('hidden')
+        app.userLoggedIn(userToken, data);
 
         startApp();
       },

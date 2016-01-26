@@ -59,7 +59,9 @@ var Login = LayoutView.extend({
             // save profile and token to localStorage
             localStorage.setItem('userToken', token);
 
-            app.initBB(token);
+            app.userLoggedIn(token, profile);
+            //app.initBB(token);
+
 
             document.location.hash = ''
           }

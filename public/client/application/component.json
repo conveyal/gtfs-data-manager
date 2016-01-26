@@ -8,6 +8,7 @@
   },
   "scripts": ["application.js"],
   "local": [
+    "auth0-user",
     "bb",
     "date-render-helper",
     "translate-helper",
