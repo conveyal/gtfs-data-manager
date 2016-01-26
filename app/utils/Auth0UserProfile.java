@@ -141,7 +141,7 @@ public class Auth0UserProfile {
                 for(Permission permission : project.permissions) {
                     if(permission.type.equals("view-feed")) {
                         for(String thisFeedID : permission.feeds) {
-                            if(thisFeedID.equals(feedID)) return true;
+                            if(thisFeedID.equals(feedID) || thisFeedID.equals("*")) return true;
                         }
                     }
                 }
@@ -156,7 +156,7 @@ public class Auth0UserProfile {
                 for(Permission permission : project.permissions) {
                     if(permission.type.equals("manage-feed")) {
                         for(String thisFeedID : permission.feeds) {
-                            if(thisFeedID.equals(feedID)) return true;
+                            if(thisFeedID.equals(feedID) || thisFeedID.equals("*")) return true;
                         }
                     }
                 }

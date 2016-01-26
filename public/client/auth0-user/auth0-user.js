@@ -31,7 +31,7 @@ Auth0User.prototype.canManageFeed = function (projectID, feedID) {
           if(permission.type === "administer-project") return true;
           if(permission.type === "manage-feed") {
             for (var k = 0; k < permission.feeds.length; k++) {
-              if (permission.feeds[k] === feedID) {
+              if (permission.feeds[k] === feedID || permission.feeds[k] === "*") {
                 return true;
               }
             }
