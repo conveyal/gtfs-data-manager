@@ -141,6 +141,7 @@ public class Auth0UserProfile {
     }
 
     public boolean canAdministerProject(String projectID) {
+        if(canAdministerApplication()) return true;
         for(Project project : app_metadata.datatools.projects) {
             if (project.project_id.equals(projectID)) {
                 for(Permission permission : project.permissions) {

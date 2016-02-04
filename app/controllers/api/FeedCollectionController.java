@@ -42,11 +42,13 @@ public class FeedCollectionController extends Auth0SecuredController {
 
         Collection<FeedCollection> filteredFCs = new ArrayList<FeedCollection>();
 
+        System.out.println("found projects: " + FeedCollection.getAll().size());
         for(FeedCollection fc : FeedCollection.getAll()) {
-            if(userProfile.hasProject(fc.id)) {
+            if(userProfile.hasProject(fc.id) || userProfile.canAdministerApplication()) {
                 filteredFCs.add(fc);
             }
         }
+
         return ok(json.write(filteredFCs)).as("application/json");
 
 
@@ -216,6 +218,7 @@ public class FeedCollectionController extends Auth0SecuredController {
     
     public static Result create () throws JsonParseException, JsonMappingException, IOException {
 
+        System.out.println("creating project");
         String token = getToken();
         if(token == null) return unauthorized("Could not find authorization token");
         Auth0UserProfile userProfile = verifyUser();
@@ -227,9 +230,9 @@ public class FeedCollectionController extends Auth0SecuredController {
             return unauthorized();
         
         JsonNode params = request().body().asJson();
-        
+
         FeedCollection c = new FeedCollection();
-        
+
         // TODO: fail gracefully
         /*c.name = params.get("name").asText();
         JsonNode uname = params.get("user/username");
@@ -241,10 +244,10 @@ public class FeedCollectionController extends Auth0SecuredController {
         if (u == null)
             u = currentUser;
             
-        c.setUser(u);
+        c.setUser(u);*/
         
-        c.save();*/
-        
+        c.save();
+
         return ok(json.write(c)).as("application/json");
     }
     

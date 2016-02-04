@@ -109,24 +109,23 @@ public class FeedVersionController extends Auth0SecuredController {
      * @throws JsonProcessingException 
      */
     public static Result create () throws JsonProcessingException {
-        String token = getToken();
-        if(token == null) return unauthorized("Could not find authorization token");
-        Auth0UserProfile userProfile = verifyUser();
+
+        Auth0UserProfile userProfile = getSessionProfile();
         if(userProfile == null) return unauthorized();
-        
+
         MultipartFormData body = request().body().asMultipartFormData();
         Map<String, String[]> params = body.asFormUrlEncoded();
         
         FeedSource s = FeedSource.get(params.get("feedSourceId")[0]);
 
-        if (userProfile.canAdministerProject(s.feedCollectionId) || userProfile.canManageFeed(s.feedCollectionId, s.id))
+        if (!userProfile.canAdministerProject(s.feedCollectionId) && !userProfile.canManageFeed(s.feedCollectionId, s.id))
             return unauthorized();
-        
+
         if (FeedRetrievalMethod.FETCHED_AUTOMATICALLY.equals(s.retrievalMethod))
             return badRequest("Feed is autofetched! Cannot upload.");
         
         FeedVersion v = new FeedVersion(s);
-        v.setUser(s.getUser());
+        v.setUser(userProfile);
         
         File toSave = v.newFeed();
         FilePart uploadPart = body.getFile("feed");

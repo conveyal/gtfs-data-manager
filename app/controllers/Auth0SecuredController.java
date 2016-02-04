@@ -29,6 +29,14 @@ public class Auth0SecuredController extends Controller {
     }
 
     protected static Auth0UserProfile verifyUser(String token) {
+
+        if(token == null) token = getToken();
+
+        if(token == null) {
+            System.err.println("Could not read token from request");
+            return null;
+        }
+
         String clientID = Play.application().configuration().getString("application.auth0.client_id");
         String clientSecret = Play.application().configuration().getString("application.auth0.client_secret");
         JWTVerifier jwtVerifier = new JWTVerifier(

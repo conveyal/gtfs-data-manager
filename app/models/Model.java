@@ -2,6 +2,7 @@ package models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
+import utils.Auth0UserProfile;
 
 import javax.persistence.MappedSuperclass;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.UUID;
  */
 @MappedSuperclass
 public abstract class Model {
+    private static final long serialVersionUID = 1L;
 
     public Model () {
         // This autogenerates an ID
@@ -61,14 +63,14 @@ public abstract class Model {
      */
     @JsonView(JsonViews.UserInterface.class)
     public User getUser () {
-        return User.getUser(userId);
+        return null;//User.getUser(userId);
     }
     
     /**
      * Set the owner of this object
      */
-    public void setUser (User user) {
-        userId = user.id != null ? user.id : User.getUserId(user.username);
+    public void setUser (Auth0UserProfile profile) {
+        userId = profile.getUser_id();
     }
 
     public void addNote(Note n) {

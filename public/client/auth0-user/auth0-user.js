@@ -8,6 +8,7 @@ Auth0User.prototype.getEmail = function () {
 };
 
 Auth0User.prototype.canAdminsterProject = function (projectID) {
+  if(this.canAdministerApp()) return true;
   if(this.dt && this.dt.projects) {
     for(var i=0; i< this.dt.projects.length; i++) {
       var project = this.dt.projects[i];
@@ -22,6 +23,7 @@ Auth0User.prototype.canAdminsterProject = function (projectID) {
 };
 
 Auth0User.prototype.canManageFeed = function (projectID, feedID) {
+  if(this.canAdministerApp()) return true;
   if(this.dt && this.dt.projects) {
     for(var i=0; i< this.dt.projects.length; i++) {
       var project = this.dt.projects[i];
