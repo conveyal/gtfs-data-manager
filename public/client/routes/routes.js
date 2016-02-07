@@ -46,7 +46,7 @@ $(document).ready(function() {
   //console.log('found userToken', userToken)
 
   if(userToken && userToken !== "null") {
-
+    console.log('found token');
     $.ajax({
       url: "https://conveyal.eu.auth0.com/tokeninfo",
       data: {
@@ -66,13 +66,43 @@ $(document).ready(function() {
 
   }
   else {
-    // assume that we are not logged in
-    // don't let us go to #login/login/login/login/login/overview
-    if (window.location.hash.indexOf('login') != 1
-      && !/\#feed\/[0-9a-z\-]+\?userId=.+&key=.+/.exec(window.location.hash)) {
-      document.location.hash = '#login/' + window.location.hash.slice(1);
-    }
-    startApp();
+    // check for SSO login
+    $.ajax({
+      url: 'auth0Config',
+      success: function(data) {
+        var lock = new Auth0Lock(data.client_id, data.domain);
+
+        // check if this is an SSO callback
+        var hash = lock.parseHash(window.location.hash);
+        if (hash && hash.id_token) {
+          // the user came back from the login (either SSO or regular login),
+          // save the token
+          localStorage.setItem('userToken', hash.id_token);
+
+          // redirect to "targetUrl" if any
+          window.location.href = hash.state || '';
+          return;
+        }
+
+        // check if logged in elsewhere via SSO
+        lock.$auth0.getSSOData(function(err, data) {
+          if (!err && data.sso) {
+            // there is! redirect to Auth0 for SSO
+            lock.$auth0.signin({
+              callbackOnLocationHash: true
+            });
+          } else { // assume that we are not logged in
+            // don't let us go to #login/login/login/login/login/overview
+            if (window.location.hash.indexOf('login') != 1
+              && !/\#feed\/[0-9a-z\-]+\?userId=.+&key=.+/.exec(window.location.hash)) {
+              document.location.hash = '#login/' + window.location.hash.slice(1);
+            }
+            startApp();
+          }
+        });
+      }
+    });
+
   }
 
 });
