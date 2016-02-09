@@ -1,6 +1,7 @@
 var app = require('application');
 var BB = require('bb');
 var CompositeView = require('composite-view');
+var FeedCollection = require('feed-collection');
 var FeedSource = require('feed-source');
 var FeedSourceItemView = require('feed-source-item-view');
 var OkDialogView = require('ok-dialog-view');
@@ -20,6 +21,7 @@ module.exports = CompositeView.extend({
     'click .newfeedsource': 'add',
     'click .deploy-public': 'deployPublic',
     'click .fetch-all-feeds': 'fetchAllFeeds',
+    'click .project-settings': 'projectSettings',
     'click .sort-by': 'sortBy'
   },
 
@@ -205,6 +207,47 @@ module.exports = CompositeView.extend({
           }
         }));
       }
+    });
+  },
+
+  projectSettings: function() {
+    var dialogTemplate = Handlebars.compile(require('./project-settings.html'));
+
+    var view = this;
+
+    var fc = new FeedCollection({
+      id: this.feedCollectionId
+    });
+    var fcDf = fc.fetch();
+
+    $.when(fcDf).done(function() {
+      app.modalRegion.show(new ConfirmView({
+        title: window.Messages('app.project_settings'),
+        body: dialogTemplate(),
+        onProceed : function() {
+          var timezone = this.$el.find('.timezone').val();
+          var language = this.$el.find('.language').val();
+          var locationLat = this.$el.find('.location-lat').val();
+          var locationLon = this.$el.find('.location-lon').val();
+
+          fc.set('defaultTimeZone', timezone);
+          fc.set('defaultLanguage', language);
+          fc.set('defaultLocationLat', locationLat);
+          fc.set('defaultLocationLon', locationLon);
+
+          fc.save().done(function() {
+            })
+            .fail(function() {
+              window.alert('Error saving OSM settings');
+            });
+        },
+        onShow: function() {
+          this.$el.find('.timezone').val(fc.get('defaultTimeZone'))
+          this.$el.find('.language').val(fc.get('defaultLanguage'))
+          this.$el.find('.location-lat').val(fc.get('defaultLocationLat'))
+          this.$el.find('.location-lon').val(fc.get('defaultLocationLon'))
+        }
+      }));
     });
   }
 });

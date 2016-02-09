@@ -11,7 +11,11 @@ module.exports = BB.Model.extend({
     osmEast: null,
     osmNorth: null,
     buildConfig: null,
-    routerConfig: null
+    routerConfig: null,
+    defaultTimeZone: null,
+    defaultLanguage: null,
+    defaultLocationLat: null,
+    defaultLocationLon: null
   },
   urlRoot: 'api/feedcollections/'
 });

@@ -198,6 +198,27 @@ public class FeedCollectionController extends Auth0SecuredController {
             }
         }
 
+        JsonNode defaultTimeZone  = params.get("defaultTimeZone");
+        if (defaultTimeZone != null) {
+            c.defaultTimeZone = defaultTimeZone.asText();
+        }
+
+        JsonNode defaultLanguage  = params.get("defaultLanguage");
+        if (defaultLanguage != null) {
+            c.defaultLanguage = defaultLanguage.asText();
+        }
+
+        JsonNode defaultLocationLat  = params.get("defaultLocationLat");
+        if (defaultLocationLat != null) {
+            c.defaultLocationLat = defaultLocationLat.asDouble();
+        }
+
+        JsonNode defaultLocationLon  = params.get("defaultLocationLon");
+        if (defaultLocationLon != null) {
+            c.defaultLocationLon = defaultLocationLon.asDouble();
+        }
+
+
         // only allow admins to change feed collection owners
         /*if (currentUser.admin) {
             JsonNode uname = params.get("user");
