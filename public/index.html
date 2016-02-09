@@ -33,15 +33,22 @@
         <a class="navbar-brand" id="appName" href="#"></a>
       </div>
 
-      <div class="collapse navbar-collapse" id="navbar-collapse">
-        <ul class="nav navbar-nav navbar-right">
-          <li><a href="#" id="logout" class="hidden"></a></li>
-          <li><a href="#" id="myAccount" class="hidden"></a></li>
-          <li><a href="#users" id="manageUsers" class="hidden"></a></li>
-          <li><a href="/docs/data_manager_user_guide.pdf"><span class="glyphicon glyphicon-question-sign"></span> Guide</a></li>
-        </ul>
-        <p id="logged-in-user" class="navbar-text navbar-right"></p>
-      </div>
+      <ul class="nav navbar-nav">
+        <li role="presentation" class="active"><a href="#">Manager</a></li>
+        <li role="presentation"><a href="http://localhost:9001">Editor</a></li>
+        <li role="presentation"><a href="http://localhost:3000">Users</a></li>
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="/docs/data_manager_user_guide.pdf"><span class="glyphicon glyphicon-question-sign"></span> Guide</a></li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-user"></span> <span id="logged-in-user"></span> <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="#">Account settings</a></li>
+            <li><a href="#" id="logout">Log out</a></li>
+          </ul>
+        </li>
+      </ul>
     </div>
   </div>
 

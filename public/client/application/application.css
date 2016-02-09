@@ -38,7 +38,8 @@
 }
 
 .navbar {
-  font-size: 14pt; vertical-align: bottom;
+  height: 30px;
+  font-size: 10pt; vertical-align: bottom;
 }
 
 .navbar-text {
