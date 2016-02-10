@@ -42,6 +42,10 @@ module.exports = CompositeView.extend({
   initialize: function() {
     _.bindAll(this, 'add');
 
+    if(this.collection.length === 1) {
+      window.location = '/#overview/' + this.collection.models[0].get('id');
+    }
+
     Handlebars.registerHelper(
       'canAdministerApp',
       function(name, options) {
