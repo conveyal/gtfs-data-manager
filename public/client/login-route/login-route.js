@@ -52,7 +52,10 @@ var Login = LayoutView.extend({
       url: 'auth0Config',
       success: function(data) {
         var lock = new Auth0Lock(data.client_id, data.domain);
-        lock.show(function(err, profile, token) {
+        lock.show({
+          icon: 'https://mtc-manager.conveyal.com/images/login_logo.png',
+          connections: ['Username-Password-Authentication']
+        }, function(err, profile, token) {
           if(err) {
             console.log(err)
           } else {
