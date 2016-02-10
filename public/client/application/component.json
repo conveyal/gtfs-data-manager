@@ -1,7 +1,7 @@
 {
   "name": "application",
   "dependencies": {
-    "components/bootstrap": "3.3.6",
+    "components/bootstrap": "3.3.2",
     "components/handlebars.js": "*",
     "es-shims/es5-shim": "*",
     "es-shims/es6-shim": "0.34.2"
