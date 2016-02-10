@@ -1,12 +1,14 @@
 {
   "name": "application",
   "dependencies": {
-    "components/bootstrap": "3.3.2",
+    "components/bootstrap": "3.3.6",
     "components/handlebars.js": "*",
     "es-shims/es5-shim": "*",
-    "es-shims/es6-shim": "*"
+    "es-shims/es6-shim": "0.34.2"
   },
-  "scripts": ["application.js"],
+  "scripts": [
+    "application.js"
+  ],
   "local": [
     "bb",
     "date-render-helper",
@@ -18,5 +20,7 @@
     "admin-helper",
     "validation-partial"
   ],
-  "styles": ["application.css"]
+  "styles": [
+    "application.css"
+  ]
 }
