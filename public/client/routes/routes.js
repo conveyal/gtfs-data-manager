@@ -45,33 +45,32 @@ $(document).ready(function() {
   var userToken = localStorage.getItem('userToken');
   //console.log('found userToken', userToken)
 
-  if(userToken && userToken !== "null") {
-    console.log('found token');
-    $.ajax({
-      url: "https://conveyal.eu.auth0.com/tokeninfo",
-      data: {
-        id_token: userToken
-      },
-      contentType: "application/json",
-      success: function(data) {
-        app.userLoggedIn(userToken, data);
+  $.ajax({
+    url: 'auth0Config',
+    success: function(data) {
+      var lock = new Auth0Lock(data.client_id, data.domain);
 
-        startApp();
-      },
-      error: function() {
-        console.log('tokeninfo problem, logging out');
-        app.logout();
+      if(userToken && userToken !== "null") {
+        console.log('found token, calling tokeninfo');
+        $.ajax({
+          url: 'https://' + data.domain + '/tokeninfo',
+          data: {
+            id_token: userToken
+          },
+          contentType: "application/json",
+          success: function(data) {
+            console.log('got tokeninfo')
+            app.userLoggedIn(userToken, data, lock);
+            startApp();
+          },
+          error: function(err) {
+            console.log('tokeninfo problem, logging out', err);
+            app.logout();
+          }
+        });
+
       }
-    });
-
-  }
-  else {
-    // check for SSO login
-    $.ajax({
-      url: 'auth0Config',
-      success: function(data) {
-        var lock = new Auth0Lock(data.client_id, data.domain);
-
+      else { // check for SSO login
         // check if this is an SSO callback
         var hash = lock.parseHash(window.location.hash);
         if (hash && hash.id_token) {
@@ -101,9 +100,8 @@ $(document).ready(function() {
           }
         });
       }
-    });
-
-  }
+    }
+  });
 
 });
 

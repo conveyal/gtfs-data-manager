@@ -14,33 +14,6 @@ var Login = LayoutView.extend({
     //_.bindAll(this, 'doLogin');
   },
 
-  /*doLogin: function() {
-    var instance = this;
-    $.post('/authenticate', {
-        username: this.$('input[name="username"]').val(),
-        password: this.$('input[name="password"]').val()
-      })
-      .then(function(data) {
-        $('#logged-in-user').text(window.Messages('app.account.logged_in_as', data.username));
-        $('#logout').removeClass('hidden');
-        $('#myAccount').removeClass('hidden').attr('href', '#user/' + data.id);
-
-        if (data.admin)
-          $('#manageUsers').removeClass('hidden');
-
-        // note: log out is handled in application.js
-
-        app.user = data;
-
-        window.location.hash = instance.returnTo ? instance.returnTo : '#admin';
-      })
-      .fail(function() {
-        window.alert('Log in failed');
-      });
-
-    return false;
-  },*/
-
   onShow: function() {
     // init nav
     app.nav.setLocation([{
@@ -62,9 +35,8 @@ var Login = LayoutView.extend({
             // save profile and token to localStorage
             localStorage.setItem('userToken', token);
 
-            app.userLoggedIn(token, profile);
+            app.userLoggedIn(token, profile, lock);
             //app.initBB(token);
-
 
             document.location.hash = ''
           }

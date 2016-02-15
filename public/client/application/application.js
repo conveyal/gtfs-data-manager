@@ -19,7 +19,7 @@ require('validation-partial');
 
 var App = BB.Marionette.Application.extend({
 
-  userLoggedIn: function(token, profile) {
+  userLoggedIn: function(token, profile, lock) {
 
     this.auth0User = new Auth0User(profile);
 
@@ -28,6 +28,22 @@ var App = BB.Marionette.Application.extend({
     $('#myAccount').removeClass('hidden');
 
     this.initBB(token);
+
+    // set up single logout
+    setInterval(function() {
+      // if the token is not in local storage, there is nothing to check (i.e. the user is already logged out)
+      if (!localStorage.getItem('userToken')) return;
+
+      lock.$auth0.getSSOData(function(err, data) {
+        // if there is still a session, do nothing
+        if (err || (data && data.sso)) return;
+
+        // if we get here, it means there is no session on Auth0,
+        // then remove the token and redirect to #login
+        localStorage.removeItem('userToken');
+        window.location.href = '/'
+      });
+    }, 5000)
   },
 
   initBB: function(token) {
@@ -42,17 +58,12 @@ var App = BB.Marionette.Application.extend({
   logout: function() {
     localStorage.removeItem('userToken')
 
-    $.ajax({
-      url: 'logout',
-    }).done(function(data) {
-      if (data.status == 'logged_out') {
-        console.log("logout success");
-        $('#logout').addClass("hidden");
-        $('#logged-in-user').text('');
-        $('#manageUsers').addClass('hidden');
-        $('#myAccount').addClass('hidden');
-        window.location.hash = '#login';
-      }
+    // logout from the data manager server
+    $.ajax('logout').done(function(data) {
+      // logout from Auth0, redirecting to the manager home page
+      var loc = window.location;
+      var redirect = loc.protocol + "//" + loc.hostname + (loc.port ? ':' + loc.port: '');
+      window.location.replace('https://conveyal.eu.auth0.com/v2/logout?returnTo=' + redirect);
     });
   }
 });
