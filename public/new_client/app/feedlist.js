@@ -2,7 +2,11 @@ import React from 'react'
 import $ from 'jquery'
 import moment from 'moment'
 
+import { Link } from 'react-router'
+
 import { Panel, Grid, Row, Col, Button, Table, Glyphicon } from 'react-bootstrap'
+
+import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table'
 
 import CreateUser from './createuser'
 import UserSettings from './usersettings'
@@ -12,7 +16,9 @@ import config from './config'
 
 import styles from './style.css'
 
-export default class UserList extends React.Component {
+import 'react_table_css'
+
+export default class FeedList extends React.Component {
 
   constructor (props) {
     super(props)
@@ -29,7 +35,8 @@ export default class UserList extends React.Component {
 
   fetchFeeds () {
     $.ajax({
-      url : '/api/public/feedsources?feedcollection=06ddd58a-3275-48d6-9b50-1d46c7b24c8e',
+      // Hard coded feed collection id
+      url : '/api/public/feedsources?feedcollection=' + config.projectID,
       headers: {
 //        'Authorization': 'Bearer ' + this.props.token
       }
@@ -49,60 +56,8 @@ export default class UserList extends React.Component {
     })
   }
 
-  updateUser (user, permissions) {
-
-    var dtMetadata = user.app_metadata.datatools
-    for(var project of dtMetadata.projects) {
-      if (project.project_id === config.projectID) project.permissions = permissions
-    }
-
-    var payload = {
-      user_id: user.user_id,
-      data: dtMetadata
-    }
-
-    $.ajax({
-      url : '/secured/updateUser',
-      data: payload,
-      method: 'post',
-      headers: {
-        'Authorization': 'Bearer ' + this.props.token
-      }
-    }).done((data) => {
-      console.log('update user ok', data)
-      this.fetchUsers()
-    })
-  }
-
-  createUser (email, password, permissions) {
-    var projects = []
-    projects.push({
-      project_id: config.projectID,
-      permissions: permissions
-    })
-
-    var payload = {
-      email: email,
-      password: password,
-      projects: projects
-    }
-
-    $.ajax({
-      url : '/secured/createUser',
-      data: payload,
-      method: 'post',
-      headers: {
-        'Authorization': 'Bearer ' + this.props.token
-      }
-    }).done((data) => {
-      this.fetchUsers()
-    })
-
-  }
-
   render () {
     return (
-
       <Grid>
         <Row>
           <Col xs={12}>
@@ -115,35 +70,90 @@ export default class UserList extends React.Component {
             <h3>{this.state.collectionName}</h3>
           </Col>
         </Row>
-        <Table striped hover>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Updated</th>
-              <th>Link</th>
-            </tr>
-          </thead>
-          <tbody>
-          {this.state.feeds.map((feed, i) => {
-            return <FeedRow
-              feed={feed}
-              key={i}
-            />
-          })}
-          </tbody>
-        </Table>
+        <FeedTable
+          feeds={this.state.feeds}
+        />
       </Grid>
     )
   }
 }
 
-class FeedRow extends React.Component {
+class OldFeedTable extends React.Component {
+  render () {
+    return (
+      <Table striped hover>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Updated</th>
+            <th>Link</th>
+          </tr>
+        </thead>
+        <tbody>
+        {this.state.feeds.map((feed, i) => {
+          return <FeedRow
+            feed={feed}
+            key={i}
+          />
+        })}
+        </tbody>
+      </Table>
+    )
+  }
+}
 
+class FeedTable extends React.Component {
+  feedFormat(cell, row){
+    return cell ? <Link to={'feed/' + row.id}>{cell}</Link> : ''
+  }
+  dateFormat(cell, row){
+    return cell ? moment(cell).format('MMMM Do YYYY, h:mm a') : ''
+  }
+  urlFormat(cell, row){
+    return cell ? <a href={cell}><Glyphicon glyph="new-window" /></a> : ''
+  }
+  dateSort(a, b, order){
+    return b.lastUpdated - a.lastUpdated
+  }
+  regionFormat(cell, row){
+    return 'San Francisco Bay Area'
+  }
+  stateFormat(cell, row){
+    return 'California'
+  }
+  countryFormat(cell, row){
+    return 'United States'
+  }
   constructor (props) {
     super(props)
-    this.state = {
-      isEditing : false
-    }
+  }
+
+  render () {
+    return (
+      <BootstrapTable 
+        data={this.props.feeds} 
+        pagination={true}
+        striped={true} 
+        hover={true}
+        search={true}
+      >
+        <TableHeaderColumn isKey={true} dataSort={true} hidden={true} dataField="id">Feed ID</TableHeaderColumn>
+        <TableHeaderColumn dataSort={true} dataField="name" dataFormat={this.feedFormat}>Feed Name</TableHeaderColumn>
+        <TableHeaderColumn dataSort={true} dataFormat={this.regionFormat} dataField="region">Region</TableHeaderColumn>
+        <TableHeaderColumn dataSort={true} dataFormat={this.stateFormat} dataField="state">State or Province</TableHeaderColumn>
+        <TableHeaderColumn dataSort={true} dataFormat={this.countryFormat} dataField="country">Country</TableHeaderColumn>
+        <TableHeaderColumn dataSort={true} dataField="lastUpdated" sortFunc={this.dateSort} dataFormat={this.dateFormat}>Last Updated</TableHeaderColumn>
+        <TableHeaderColumn dataSort={true} dataField="lastUpdated" hidden={true}>last_update</TableHeaderColumn>
+        <TableHeaderColumn dataField="url" dataFormat={this.urlFormat}>Link to GTFS</TableHeaderColumn>
+      </BootstrapTable>
+    )
+  }
+}
+
+class FeedRow extends React.Component {
+  
+  constructor (props) {
+    super(props)
   }
 
   render () {
