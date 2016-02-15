@@ -1,0 +1,6 @@
+export default {
+  auth0Domain : 'your_domain.auth0.com',
+  auth0ClientID : 'your_auth0_client_id',
+  projectID : 'default_gtfs_manager_project_id',
+  dataManagerURL : 'http://localhost:9000'
+}
