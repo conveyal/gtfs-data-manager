@@ -6,7 +6,7 @@ var _ = require('underscore');
 var app = require('application');
 var FeedVersion = require('feed-version');
 var FeedVersionView = require('feed-version-view');
-var FeedBrandingView = require('feed-branding-view');
+var FeedAgencyView = require('feed-agency-view');
 var NoteCollectionView = require('note-collection-view');
 var FeedVersionNavigationView = require('feed-version-navigation-view');
 var LayoutView = require('layout-view');
@@ -15,7 +15,7 @@ module.exports = LayoutView.extend({
   template: require("./feed-source-view.html"),
   regions: {
     validationRegion: '#validation',
-    brandingRegion: '#branding',
+    agencyRegion: '#agency',
     notesRegion: '.source-notes',
     versionNavigationRegion: '#version-navigation'
   },
@@ -100,14 +100,15 @@ module.exports = LayoutView.extend({
     }));
 
     // set up branding
-    this.brandingRegion.show(new FeedBrandingView({
+    this.agencyRegion.show(new FeedAgencyView({
       feedSource: this.model
     }));
 
     // set up changeable snapshot IDs
-    if (this.model.get('retrievalMethod') == 'PRODUCED_IN_HOUSE' && this.model.get('editorId')) {
+    /*if (this.model.get('retrievalMethod') == 'PRODUCED_IN_HOUSE') { //} && this.model.get('editorId') {
+      console.log('getting ed snapshots..');
       $.ajax({
-        url: 'api/feedcollections/geteditorsnapshots/' + this.model.get('editorId'),
+        url: 'api/feedsources/' + this.model.get('id') + '/getEditorSnapshots',
         success: function (snapshots) {
           snapshots = _.filter(snapshots, function (s) {
             return s.validFrom && s.validTo;
@@ -122,7 +123,7 @@ module.exports = LayoutView.extend({
           });
         }
       })
-    }
+    }*/
   },
 
   /** change snapshot version */

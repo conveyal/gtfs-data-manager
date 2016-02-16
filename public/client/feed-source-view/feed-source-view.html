@@ -20,13 +20,14 @@
       {{ t 'app.deployment.deploy' }}
     </button>-->
 
+    <!--
     {{#if (and (eq retrievalMethod 'PRODUCED_IN_HOUSE') (neq editorId null) (neq editorId ''))}}
       {{!-- /edit/id just redirects to GTFS Editor --}}
       <a class="btn btn-primary edit-feed" target="_blank" href="edit/{{ id }}">
         <span class="glyphicon glyphicon-pencil"></span>
         {{ t 'app.feed_source.edit'}}
       </a>
-    {{/if}}
+    {{/if}}-->
   </div>
 </h2>
 
@@ -54,7 +55,7 @@
       <th>{{ t 'app.feed_source.last_updated' }}</th>
       <td>{{ dateRender lastUpdated true }}</td>
     </tr>
-    <tr>
+    <!--<tr>
       <th>{{ t 'app.feed_version.snapshot' }}</th>
       <td>
         <select id="snapshot-version">
@@ -62,15 +63,17 @@
           <option></option>
         </select>
       </td>
-    </tr>
+    </tr>-->
   </table>
 </div>
 
-<h4>{{ t 'app.note.source_notes' }}</h4>
-<p class="source-notes"></p>
+<div id="agency"></div>
+
+<div id="source-notes-container">
+  <h3>{{ t 'app.note.source_notes' }}</h3>
+  <p class="source-notes"></p>
+</div>
 
 <div id="version-navigation"></div>
 
 <div id="validation"></div>
-
-<div id="branding"></div>

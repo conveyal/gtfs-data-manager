@@ -1,0 +1,40 @@
+<h3>Agencies</h3>
+
+<div class="table-responsive">
+  <table class="table table-striped">
+    <tbody>
+      <thead>
+        <th>Agency</th>
+        <th>Branding</th>
+        <th>Editor Snapshot</th>
+        <th></th>
+      </thead>
+      {{#each feedSource.latestValidation.agencies}}
+        <tr>
+          <td>{{ this }}</td>
+          <td>
+            {{#hasAgencyLogo this}}
+              <img src="{{getAgencyLogoUrl this}}" style="max-width: 200px; max-height: 50px;">
+            {{else}}
+              (No Branding)
+            {{/hasAgencyLogo}}
+            {{#canManageBranding this}}
+              <button class="btn btn-primary update-logo-button" data-agency-id="{{this}}">Update Logo</button>
+            {{/canManageBranding}}
+          </td>
+          <td>
+            <select id="snapshot-version">
+              {{!-- default option --}}
+              <option></option>
+            </select>
+          </td>
+          <td>
+            <button class="btn btn-primary edit-agency-button" data-agency-id="{{this}}">Edit Agency GTFS</button>
+          </td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+
+  <button class="btn btn-primary deploy">Update Feed from Selected Snapshot</button>
+</div>

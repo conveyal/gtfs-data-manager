@@ -3,14 +3,15 @@ var FeedVersion = require('feed-version');
 var _ = require('underscore');
 var app = require('application');
 
+var UpdateLogoDialog = require('./update-logo');
+
 var Handlebars = require('handlebars');
 
 module.exports = ItemView.extend({
-  template: require('./feed-branding-view.html'),
+  template: require('./feed-agency-view.html'),
 
   events: {
-      'click .upload-button': 'upload',
-      'submit form': 'onSubmit'
+      'click .update-logo-button': 'updateLogo'
   },
 
   initialize: function(attr) {
@@ -64,12 +65,16 @@ module.exports = ItemView.extend({
     return retval;
   },
 
-  onSubmit: function(evt) {
-    var filename = evt.target[0].value;
-    if(!filename || filename.toLowerCase().indexOf('.png', filename.length - 4) === -1) {
-      alert('Must be a PNG file');
-      evt.preventDefault();
-    }
+  updateLogo: function(evt) {
+    //var dialogTemplate = Handlebars.compile(require('./update-branding.html'));
+
+    var agencyId = $(evt.target).data('agencyId');
+    var view = this;
+
+    app.modalRegion.show(new UpdateLogoDialog ({
+      agencyId : agencyId,
+      feedSourceId : view.model.get('feedSource').id
+    }));
   }
 
  });
