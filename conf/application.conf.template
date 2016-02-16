@@ -90,6 +90,10 @@ application.auth0.domain="yourdomain.auth0.com"
 application.auth0.client_id="your-client-id"
 application.auth0.client_secret="your-client-secret"
 
+# Datatools suite configuration
+application.editor_url="http://localhost:9001"
+application.user_admin_url="http://localhost:3000"
+
 # Evolutions
 # ~~~~~
 # You can disable evolutions if needed
