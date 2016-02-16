@@ -21,29 +21,22 @@ var Login = LayoutView.extend({
       href: '#login'
     }]);
 
-    $.ajax({
-      url: 'auth0Config',
-      success: function(data) {
-        var lock = new Auth0Lock(data.client_id, data.domain);
-        lock.show({
-          icon: 'https://mtc-manager.conveyal.com/images/login_logo.png',
-          connections: ['Username-Password-Authentication']
-        }, function(err, profile, token) {
-          if(err) {
-            console.log(err)
-          } else {
-            // save profile and token to localStorage
-            localStorage.setItem('userToken', token);
+    var lock = new Auth0Lock(app.config.auth0ClientId, app.config.auth0Domain);
+    lock.show({
+      icon: 'https://mtc-manager.conveyal.com/images/login_logo.png',
+      connections: ['Username-Password-Authentication']
+    }, function(err, profile, token) {
+      if(err) {
+        console.log(err)
+      } else {
+        // save profile and token to localStorage
+        localStorage.setItem('userToken', token);
 
-            app.userLoggedIn(token, profile, lock);
-            //app.initBB(token);
-
-            document.location.hash = ''
-          }
-        }, {
-          container: 'auth0login'
-        });
+        app.userLoggedIn(token, profile, lock);
+        document.location.hash = ''
       }
+    }, {
+      container: 'auth0login'
     });
   }
 });

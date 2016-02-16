@@ -46,14 +46,15 @@ $(document).ready(function() {
   //console.log('found userToken', userToken)
 
   $.ajax({
-    url: 'auth0Config',
+    url: 'config',
     success: function(data) {
-      var lock = new Auth0Lock(data.client_id, data.domain);
+      app.config = data;
+      var lock = new Auth0Lock(data.auth0ClientId, data.auth0Domain);
 
       if(userToken && userToken !== "null") {
         console.log('found token, calling tokeninfo');
         $.ajax({
-          url: 'https://' + data.domain + '/tokeninfo',
+          url: 'https://' + data.auth0Domain + '/tokeninfo',
           data: {
             id_token: userToken
           },

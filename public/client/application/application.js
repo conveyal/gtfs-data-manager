@@ -29,9 +29,8 @@ var App = BB.Marionette.Application.extend({
 
     this.initBB(token);
 
-    var self = this;
-
     // set up single logout
+    var self = this;
     setInterval(function() {
       // if the token is not in local storage, there is nothing to check (i.e. the user is already logged out)
       if (!localStorage.getItem('userToken')) return;
@@ -59,12 +58,13 @@ var App = BB.Marionette.Application.extend({
   logout: function() {
     localStorage.removeItem('userToken')
 
+    var self = this;
     // logout from the data manager server
     $.ajax('logout').done(function(data) {
       // logout from Auth0, redirecting to the manager home page
       var loc = window.location;
       var redirect = loc.protocol + "//" + loc.hostname + (loc.port ? ':' + loc.port: '');
-      window.location.replace('https://conveyal.eu.auth0.com/v2/logout?returnTo=' + redirect);
+      window.location.replace('https://' + self.config.auth0Domain + '/v2/logout?returnTo=' + redirect);
     });
   }
 });
@@ -94,9 +94,8 @@ app.on('before:start', function() {
       app.logout();
     });
 
-  $('#manageUsers').text(window.Messages("app.user.manage-users"));
-  $('#myAccount').text(window.Messages("app.user.my-account"));
-
+  $('#editorLink').prop('href', app.config.editorUrl);
+  $('#userAdminLink').prop('href', app.config.userAdminUrl);
 
 });
 
