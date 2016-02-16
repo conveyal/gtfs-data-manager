@@ -29,6 +29,8 @@ var App = BB.Marionette.Application.extend({
 
     this.initBB(token);
 
+    var self = this;
+
     // set up single logout
     setInterval(function() {
       // if the token is not in local storage, there is nothing to check (i.e. the user is already logged out)
@@ -40,8 +42,7 @@ var App = BB.Marionette.Application.extend({
 
         // if we get here, it means there is no session on Auth0,
         // then remove the token and redirect to #login
-        localStorage.removeItem('userToken');
-        window.location.href = '/'
+        self.logout();
       });
     }, 5000)
   },
