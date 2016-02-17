@@ -93,6 +93,7 @@ application.auth0.client_secret="your-client-secret"
 # Datatools suite configuration
 application.editor_url="http://localhost:9001"
 application.user_admin_url="http://localhost:3000"
+application.logo="http://gtfs-assets-dev.conveyal.com/data_manager.png"
 
 # Evolutions
 # ~~~~~

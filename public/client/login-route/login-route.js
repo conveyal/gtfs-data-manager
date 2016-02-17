@@ -22,10 +22,13 @@ var Login = LayoutView.extend({
     }]);
 
     var lock = new Auth0Lock(app.config.auth0ClientId, app.config.auth0Domain);
-    lock.show({
-      icon: 'https://mtc-manager.conveyal.com/images/login_logo.png',
-      connections: ['Username-Password-Authentication']
-    }, function(err, profile, token) {
+    var lockOptions = {
+      connections: ['Username-Password-Authentication'],
+      closable: false
+    };
+    if (app.config.logo) lockOptions.icon = app.config.logo;
+
+    lock.show(lockOptions, function (err, profile, token) {
       if(err) {
         console.log(err)
       } else {
