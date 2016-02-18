@@ -31,6 +31,10 @@ POST          /api/feedsources/                              controllers.api.Fee
 DELETE        /api/feedsources/:id                           controllers.api.FeedSourceController.delete(id:String)
 POST          /api/feedsources/:id/uploadAgencyLogo          controllers.api.FeedSourceController.uploadAgencyLogo(id:String)
 
+GET           /api/public/feedsources/:id                    controllers.api.FeedSourceController.getPublic(id:String)
+GET           /api/public/feedsources                        controllers.api.FeedSourceController.getAllPublic()
+
+
 
 GET           /api/feedversions/:id                          controllers.api.FeedVersionController.get(id:String)
 GET           /api/feedversions/gtfs/:id                     controllers.api.FeedVersionController.getGtfs(id:String)
@@ -71,7 +75,13 @@ POST          /load                                          controllers.Dump.lo
 
 # Map static resources from the /public folder to the / URL path
 GET           /                                              controllers.Assets.at(path="/public", file="index.html")
+
+GET           /publicfeeds                                   controllers.Assets.at(path="/public", file="new_client/dist/index.html")
+GET           /publicfeeds/*file                             controllers.Assets.at(path="/public", file)
+
 GET           /*file                                         controllers.Assets.at(path="/public", file)
+
+
 
 OPTIONS       /                                              controllers.Application.preflight(path="")
 OPTIONS       /*path                                         controllers.Application.preflight(path)

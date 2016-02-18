@@ -21,4 +21,5 @@ public/components
 .\#*
 conf/application.conf
 data
+node_modules
 

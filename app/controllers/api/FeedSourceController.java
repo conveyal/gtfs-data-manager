@@ -39,6 +39,21 @@ public class FeedSourceController extends Auth0SecuredController {
             return unauthorized();
     }
 
+    public static Result getPublic (String id) throws JsonProcessingException {
+//        String token = getToken();
+//        if(token == null) return unauthorized("Could not find authorization token");
+//        Auth0UserProfile userProfile = verifyUser();
+//        if(userProfile == null) return unauthorized();
+
+        FeedSource fs = FeedSource.get(id);
+
+        if (fs.isPublic)
+            return ok(json.write(fs));
+
+        else
+            return unauthorized();
+    }
+
     public static Result getAll () throws JsonProcessingException {
         String token = getToken();
         if(token == null) return unauthorized("Could not find authorization token");
@@ -71,6 +86,43 @@ public class FeedSourceController extends Auth0SecuredController {
 
             feedSources = filtered;
         }
+
+        return ok(json.write(feedSources)).as("application/json");
+    }
+
+    // public call to get feed sources
+    public static Result getAllPublic () throws JsonProcessingException {
+//        String token = getToken();
+//        if(token == null) return unauthorized("Could not find authorization token");
+//        Auth0UserProfile userProfile = verifyUser();
+//        if(userProfile == null) return unauthorized();
+
+        // parse the query parameters
+        String fcId = request().getQueryString("feedcollection");
+        FeedCollection fc = null;
+        if (fcId != null)
+            fc = FeedCollection.get(fcId);
+
+        Collection<FeedSource> feedSources;
+        if (fc == null) {
+            feedSources = FeedSource.getAll();
+        }
+        else {
+            feedSources = fc.getFeedSources();
+        }
+
+//        if(!userProfile.canAdministerProject(fcId)) {
+            // filter the list, only show the ones this user has permission to access
+            List<FeedSource> filtered = new ArrayList<FeedSource>();
+
+            for (FeedSource fs : feedSources) {
+                if (fs.isPublic) {
+                    filtered.add(fs);
+                }
+            }
+
+            feedSources = filtered;
+//        }
 
         return ok(json.write(feedSources)).as("application/json");
     }
