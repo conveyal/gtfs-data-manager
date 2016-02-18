@@ -13,6 +13,7 @@ import jobs.FetchProjectFeedsActor;
 import jobs.FetchProjectFeedsJob;
 import models.*;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -79,15 +80,27 @@ public class FeedCollectionController extends Auth0SecuredController {
         
         return ok(json.write(c)).as("application/json");
     }
-    public static Cancellable scheduleAutoFeedFetch (String id, int hour, int minute, int interval, String timezone){
+    public static Cancellable scheduleAutoFeedFetch (String id, int hour, int minute, int interval, String timezoneId){
 
         // First cancel any already scheduled auto fetch task for this feed collection id.
         cancelAutoFetch(id);
 
         Cancellable task;
 
+        DateTimeZone timezone;
+
+        if (timezoneId != null){
+            timezone = DateTimeZone.forID(timezoneId);
+        }
+        else{
+            timezone = DateTimeZone.forID("America/New_York");
+        }
+        System.out.println("Using timezone: " + timezone.getID());
+
         long initialDelay = 0;
-        DateTime now = DateTime.now();
+        
+        DateTime now = DateTime.now().withZone(timezone);
+
         DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/yyyy HH:mm");
         String dtString = String.valueOf(now.getDayOfMonth()) + "/" + String.valueOf(now.getMonthOfYear()) + "/" + String.valueOf(now.getYear()) + " " + String.valueOf(hour) + ":" + String.valueOf(minute);
         System.out.println(dtString);
