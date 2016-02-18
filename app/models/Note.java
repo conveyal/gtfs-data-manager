@@ -27,7 +27,9 @@ public class Note extends Model implements Serializable {
     
     /** What is the ID of the object it is recorded on */
     public String objectId;
-    
+
+    public String userEmail;
+
     /** When was this comment made? */
     public Date date;
     

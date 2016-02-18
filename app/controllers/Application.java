@@ -39,14 +39,14 @@ public class Application extends Controller {
 
     public static Result authenticate () throws JsonProcessingException {
         Map<String,String[]> params = request().body().asFormUrlEncoded();
-        
+
         // username+password-based auth
         if (params.containsKey("username") && params.containsKey("password")) {
 
             // check if the user successfully authenticated
             User u = User.getUserByUsername(params.get("username")[0]);
             if (u != null && u.checkPassword(params.get("password")[0])) {
-                session("username", u.username);            
+                session("username", u.username);
                 return getLoggedInUser();
             }
             else {
@@ -56,7 +56,7 @@ public class Application extends Controller {
         // userid+key-based auth
         else if (params.containsKey("userId") && params.containsKey("key")) {
             User u = User.getUser(params.get("userId")[0]);
-            
+
             if (u.checkKey(params.get("key")[0])) {
                 session("username", u.username);
                 return getLoggedInUser();
@@ -69,7 +69,7 @@ public class Application extends Controller {
             return unauthorized();
         }
     }
-    
+
     /**
      * Edit a particular feed by delegating to the editor.
      * @param id
@@ -79,7 +79,7 @@ public class Application extends Controller {
     public static Promise<Result> edit (String feedSourceId) {
         User currentUser = User.getUserByUsername(session("username"));
         FeedSource fs = FeedSource.get(feedSourceId);
-        
+
         if (fs == null || fs.retrievalMethod != FeedRetrievalMethod.PRODUCED_IN_HOUSE) {
             return Promise.promise(new Function0<Result> () {
                 @Override
@@ -87,10 +87,10 @@ public class Application extends Controller {
                     return badRequest("Invalid agency");
                 }
             });
-        }        
-        
+        }
+
         // get a token for this agency only
-        if (currentUser == null || 
+        if (currentUser == null ||
                 !(currentUser.hasWriteAccess(fs.id) || currentUser.id.equals(fs.userId) || Boolean.TRUE.equals(currentUser.admin))) {
             return Promise.promise(new Function0<Result> () {
                 @Override
@@ -99,25 +99,25 @@ public class Application extends Controller {
                 }
             });
         }
-        
+
         final String id = fs.editorId;
-        
+
         String url = Play.application().configuration().getString("application.editor.internal_url");
-        
+
         if (!url.endsWith("/"))
             url = url + "/";
-        
+
         String publicUrl = Play.application().configuration().getString("application.editor.public_url");
-        
+
         if (!publicUrl.endsWith("/"))
             publicUrl += "/";
-        
+
         final String baseUrl = publicUrl;
-        
+
         url += "get_token?agency=" + id.toString();
         url += "&client_id=" +  Play.application().configuration().getString("application.oauth.client_id");
         url += "&client_secret=" +  Play.application().configuration().getString("application.oauth.client_secret");
-        
+
         return WS.url(url).get().map(new Function<WSResponse, Result> () {
             public Result apply (WSResponse wsr) {
                 if (wsr.getStatus() != 200) {
@@ -130,14 +130,14 @@ public class Application extends Controller {
             }
         });
     }
-    
+
     public static Result logout () {
         session().clear();
         ObjectNode result = Json.newObject();
         result.put("status", "logged_out");
         return ok(result);
     }
-    
+
     // used by the web app to see who is logged in
     public static Result getLoggedInUser () throws JsonProcessingException {
         if (session("username") != null) {
@@ -148,41 +148,41 @@ public class Application extends Controller {
             return unauthorized();
         }
     }
-    
+
     public static Result createInitialUser () throws JsonParseException, JsonMappingException, IOException {
         Map<String,String[]> params = request().body().asFormUrlEncoded();
-        
+
         if (User.usersExist())
             return unauthorized();
 
         User u = new User(params.get("username")[0], params.get("password")[0], params.get("email")[0]);
-        
+
         if (params.containsKey("admin"))
             u.admin = "true".equals(params.get("admin")[0]);
-        
+
         u.save();
-        
+
         return ok("user created");
     }
-    
+
     public static Result jsMessages() {
         return ok(messages.generate("window.Messages"));
     }
-    
+
     // kick off a gtfs update
     @Security.Authenticated(Admin.class)
     public static Result fetchGtfs () {
         User u = User.getUserByUsername(session("username"));
-        
+
         Akka.system().scheduler().scheduleOnce(
                 Duration.create(50, TimeUnit.MILLISECONDS),
                 new FetchGtfsJob(),
                 Akka.system().dispatcher()
                 );
-        
+
         return ok("Running");
     }
-    
+
     @Security.Authenticated(Admin.class)
     public static Result validateGtfs () {
         Akka.system().scheduler().scheduleOnce(
@@ -190,27 +190,45 @@ public class Application extends Controller {
                 new RevalidateAllFeedVersionsJob(),
                 Akka.system().dispatcher()
                 );
-        
+
         return ok("Running");
     }
-    
+
     /** Copy all the public feeds to the public feeds directory */
     @Security.Authenticated(Admin.class)
     public static Result deployPublic () {
         String[] feedCollectionId = request().body().asFormUrlEncoded().get("feedCollectionId");
-        
+
         if (feedCollectionId == null || feedCollectionId.length != 1)
             return  badRequest("Please specify exactly one feed collection");
-        
+
         FeedCollection fc = FeedCollection.get(feedCollectionId[0]);
-        
+
         if (fc == null)
             return notFound("no such feed collection!");
-        
+
         // run as sync job; if it gets too slow change to async
         new MakePublicJob(fc).run();
         return ok("Done");
     }
-    
+
     // all of the hard stuff is in controllers.api
+
+    public static Result getConfig() {
+        ObjectNode result = Json.newObject();
+        result.put("auth0Domain", Play.application().configuration().getString("application.auth0.domain"));
+        result.put("auth0ClientId", Play.application().configuration().getString("application.auth0.client_id"));
+        result.put("editorUrl", Play.application().configuration().getString("application.editor_url"));
+        result.put("userAdminUrl", Play.application().configuration().getString("application.user_admin_url"));
+        result.put("logo", Play.application().configuration().getString("application.logo"));
+        return ok(result);
+    }
+
+    public static Result preflight(String path) {
+        response().setHeader("Access-Control-Allow-Origin", "*");
+        response().setHeader("Allow", "*");
+        response().setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
+        response().setHeader("Access-Control-Allow-Headers", "Authorization, Origin, X-Requested-With, Content-Type, Accept, Referer, User-Agent");
+        return ok();
+    }
 }

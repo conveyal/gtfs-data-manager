@@ -6,15 +6,16 @@
   },
   "local": [
     "application",
+    "feed-agency-view",
     "feed-version",
     "feed-version-collection",
     "feed-version-collection-view",
     "feed-version-view",
-    "feed-branding-view",
     "note-collection-view",
     "feed-version-navigation-view",
     "layout-view"
   ],
   "scripts": ["feed-source-view.js"],
-  "templates": ["feed-source-view.html"]
+  "templates": ["feed-source-view.html"],
+  "styles": ["feed-source-view.css"]
 }

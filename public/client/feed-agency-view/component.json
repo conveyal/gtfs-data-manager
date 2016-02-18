@@ -1,0 +1,23 @@
+{
+  "name": "feed-agency-view",
+  "description": "View for a list of agencies contained within a feed",
+  "dependencies": {
+    "components/handlebars.js": "*",
+    "jashkenas/underscore": "*"
+  },
+  "local": [
+    "application",
+    "bb",
+    "confirm-view",
+    "feed-version",
+    "item-view"
+  ],
+  "scripts": [
+    "feed-agency-view.js",
+    "update-logo.js"
+  ],
+  "templates": [
+    "feed-agency-view.html",
+    "update-logo.html"
+  ]
+}

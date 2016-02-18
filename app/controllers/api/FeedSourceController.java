@@ -3,17 +3,15 @@ package controllers.api;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import controllers.Secured;
+import controllers.Auth0SecuredController;
 import jobs.FetchSingleFeedJob;
 import models.*;
-import models.User.ProjectPermissions;
 import play.Play;
 import play.api.libs.Files;
 import play.libs.Json;
-import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
-import play.mvc.Security;
+import utils.Auth0UserProfile;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -21,17 +19,20 @@ import java.net.URL;
 import java.util.*;
 
 
-@Security.Authenticated(Secured.class)
-public class FeedSourceController extends Controller {
+//@Security.Authenticated(Secured.class)
+public class FeedSourceController extends Auth0SecuredController {
     private static JsonManager<FeedSource> json =
             new JsonManager<FeedSource>(FeedSource.class, JsonViews.UserInterface.class);
     
     public static Result get (String id) throws JsonProcessingException {
-        User currentUser = User.getUserByUsername(session("username"));
+        String token = getToken();
+        if(token == null) return unauthorized("Could not find authorization token");
+        Auth0UserProfile userProfile = verifyUser();
+        if(userProfile == null) return unauthorized();
 
         FeedSource fs = FeedSource.get(id);
 
-        if (currentUser.admin || currentUser.id.equals(fs.userId) || currentUser.hasReadAccess(fs.id))
+        if (userProfile.canAdministerProject(fs.feedCollectionId) || userProfile.canViewFeed(fs.feedCollectionId, fs.id))
             return ok(json.write(fs));
 
         else
@@ -39,8 +40,11 @@ public class FeedSourceController extends Controller {
     }
 
     public static Result getAll () throws JsonProcessingException {
-        User currentUser = User.getUserByUsername(session("username"));
-        
+        String token = getToken();
+        if(token == null) return unauthorized("Could not find authorization token");
+        Auth0UserProfile userProfile = verifyUser();
+        if(userProfile == null) return unauthorized();
+
         // parse the query parameters
         String fcId = request().getQueryString("feedcollection");
         FeedCollection fc = null;
@@ -54,31 +58,20 @@ public class FeedSourceController extends Controller {
         else {
             feedSources = fc.getFeedSources();
         }
-        
-        if (!currentUser.admin) {
-            if (currentUser.projectPermissions == null)
-                return unauthorized();
-            
-            Set<String> canRead = new HashSet<String>(currentUser.projectPermissions.size());
-            
-            for (ProjectPermissions p : currentUser.projectPermissions) {
-                if (p.read != null && p.read) {
-                    canRead.add(p.project_id);
-                }
-            }
-            
+
+        if(!userProfile.canAdministerProject(fcId)) {
             // filter the list, only show the ones this user has permission to access
             List<FeedSource> filtered = new ArrayList<FeedSource>();
-            
+
             for (FeedSource fs : feedSources) {
-                if (canRead.contains(fs.id)) {
+                if (userProfile.canViewFeed(fcId, fs.id)) {
                     filtered.add(fs);
                 }
             }
-            
+
             feedSources = filtered;
         }
-        
+
         return ok(json.write(feedSources)).as("application/json");
     }
     
@@ -110,35 +103,34 @@ public class FeedSourceController extends Controller {
     }
     
     public static Result update (String id) throws JsonProcessingException, MalformedURLException {
-        FeedSource s = FeedSource.get(id);
-        User currentUser = User.getUserByUsername(session("username"));
+        String token = getToken();
+        if(token == null) return unauthorized("Could not find authorization token");
+        Auth0UserProfile userProfile = verifyUser();
+        if(userProfile == null) return unauthorized();
 
-        // admins can update anything; non-admins cannot update anything except snapshot
+        FeedSource s = FeedSource.get(id);
+
         JsonNode params = request().body().asJson();
-        if (currentUser.admin) {
+        if (userProfile.canAdministerProject(s.feedCollectionId) || userProfile.canManageFeed(s.feedCollectionId, s.id)) {
             applyJsonToFeedSource(s, params);
             s.save();
-            return ok(json.write(s)).as("application/json");
-        }
-        else if (currentUser.hasWriteAccess(s.id) || currentUser.id.equals(s.userId)) {
-            if (params.has("snapshotVersion")) {
-                s.snapshotVersion = params.get("snapshotVersion").asText();
-                s.save();
-            }
             return ok(json.write(s)).as("application/json");
         }
         return unauthorized();
     }
     
     public static Result create () throws MalformedURLException, JsonProcessingException {
-        User currentUser = User.getUserByUsername(session("username"));
+        String token = getToken();
+        if(token == null) return unauthorized("Could not find authorization token");
+        Auth0UserProfile userProfile = verifyUser();
+        if(userProfile == null) return unauthorized();
         
         // parse the result
         JsonNode params = request().body().asJson();
         
         FeedCollection c = FeedCollection.get(params.get("feedCollection").get("id").asText());
         
-        if (currentUser.admin) {
+        if (userProfile.canAdministerProject(c.id)) {
             FeedSource s = new FeedSource(params.get("name").asText());
             // not setting user because feed sources are automatically assigned a unique user
             s.setFeedCollection(c);
@@ -155,10 +147,13 @@ public class FeedSourceController extends Controller {
     }
     
     public static Result delete (String id) {
-        User currentUser = User.getUserByUsername(session("username"));
+        String token = getToken();
+        if(token == null) return unauthorized("Could not find authorization token");
+        Auth0UserProfile userProfile = verifyUser();
+        if(userProfile == null) return unauthorized();
 
-        if (currentUser.admin) {
-            FeedSource s = FeedSource.get(id);
+        FeedSource s = FeedSource.get(id);
+        if (userProfile.canAdministerProject(s.getFeedCollection().id)) {
             s.delete();
             return ok();
         }
@@ -193,15 +188,18 @@ public class FeedSourceController extends Controller {
      * @throws JsonProcessingException 
      */
     public static Result fetch (String id) throws JsonProcessingException {
-        User currentUser = User.getUserByUsername(session("username"));
+        String token = getToken();
+        if(token == null) return unauthorized("Could not find authorization token");
+        Auth0UserProfile userProfile = verifyUser();
+        if(userProfile == null) return unauthorized();
+
         FeedSource s = FeedSource.get(id);
-        
-        // three ways to have permission to do this:
+
+        // ways to have permission to do this:
         // 1) be an admin
-        // 2) be the autogenerated user associated with this feed
-        // 3) have access to this feed through project permissions
+        // 2) have access to this feed through project permissions
         // if all fail, the user cannot do this.
-        if (!currentUser.admin && !currentUser.equals(s.getUser()) && !currentUser.hasWriteAccess(s.id))
+        if (!userProfile.canAdministerProject(s.feedCollectionId) && !userProfile.canManageFeed(s.feedCollectionId, s.id))
             return unauthorized();
         
         FetchSingleFeedJob job = new FetchSingleFeedJob(s);
@@ -210,8 +208,15 @@ public class FeedSourceController extends Controller {
     }
 
     public static Result uploadAgencyLogo(String id) {
+
+        Auth0UserProfile userProfile = getSessionProfile();
+        if(userProfile == null) return unauthorized();
+
         FeedSource feedSource = FeedSource.get(id);
         if(feedSource == null) return badRequest();
+
+        if (!userProfile.canAdministerProject(feedSource.feedCollectionId) && !userProfile.canManageFeed(feedSource.feedCollectionId, feedSource.id))
+            return unauthorized();
 
         Http.MultipartFormData body = request().body().asMultipartFormData();
         Http.MultipartFormData.FilePart picture = body.getFile("picture");

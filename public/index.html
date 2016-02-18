@@ -10,6 +10,9 @@
   <link rel="stylesheet" href="build/components/bootstrap/3.3.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="build/build.css">
 
+  <script src="https://cdn.auth0.com/js/lock-8.1.min.js"></script>
+  <script src="https://gtfs-assets-dev.conveyal.com/navbar_legacy.js"></script>
+
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
   <!--[if lt IE 9]>
@@ -19,7 +22,7 @@
 </head>
 
 <body>
-  <div class="navbar navbar-default">
+  <!--<div class="navbar navbar-default">
     <div class="container-fluid">
       <div class="navbar-header">
         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
@@ -31,17 +34,25 @@
         <a class="navbar-brand" id="appName" href="#"></a>
       </div>
 
-      <div class="collapse navbar-collapse" id="navbar-collapse">
-        <ul class="nav navbar-nav navbar-right">
-          <li><a href="#" id="logout" class="hidden"></a></li>
-          <li><a href="#" id="myAccount" class="hidden"></a></li>
-          <li><a href="#users" id="manageUsers" class="hidden"></a></li>
-          <li><a href="/docs/data_manager_user_guide.pdf"><span class="glyphicon glyphicon-question-sign"></span> Guide</a></li>
-        </ul>
-        <p id="logged-in-user" class="navbar-text navbar-right"></p>
-      </div>
+      <ul class="nav navbar-nav">
+        <li role="presentation" class="active"><a href="#">Manager</a></li>
+        <li role="presentation"><a href="#" id="editorLink">Editor</a></li>
+        <li role="presentation"><a href="#" id="userAdminLink">Users</a></li>
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="/docs/data_manager_user_guide.pdf"><span class="glyphicon glyphicon-question-sign"></span> Guide</a></li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-user"></span> <span id="logged-in-user"></span> <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="#">Account settings</a></li>
+            <li><a href="#" id="logout">Log out</a></li>
+          </ul>
+        </li>
+      </ul>
     </div>
-  </div>
+  </div>-->
+  <div id="navbar">Navbar area</div>
 
   <div class="container-fluid">
     <div class="row">

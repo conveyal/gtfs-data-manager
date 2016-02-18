@@ -21,6 +21,7 @@ import play.Logger;
 import play.Play;
 import play.libs.ws.WS;
 import play.libs.ws.WSResponse;
+import utils.Auth0UserProfile;
 import utils.DataStore;
 
 
@@ -139,7 +140,7 @@ public class FeedSource extends Model implements Comparable<FeedSource>, Seriali
     }
     
     @Override
-    public void setUser (User u) {
+    public void setUser (Auth0UserProfile user) {
         throw new IllegalArgumentException("FeedSources are permanently associated with a single user");
     }
     

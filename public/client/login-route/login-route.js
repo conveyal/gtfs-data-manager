@@ -11,34 +11,7 @@ var Login = LayoutView.extend({
   initialize: function(attr) {
     this.returnTo = attr.returnTo
       // bind it so context is layout not a DOM object
-    _.bindAll(this, 'doLogin');
-  },
-
-  doLogin: function() {
-    var instance = this;
-    $.post('/authenticate', {
-        username: this.$('input[name="username"]').val(),
-        password: this.$('input[name="password"]').val()
-      })
-      .then(function(data) {
-        $('#logged-in-user').text(window.Messages('app.account.logged_in_as', data.username));
-        $('#logout').removeClass('hidden');
-        $('#myAccount').removeClass('hidden').attr('href', '#user/' + data.id);
-
-        if (data.admin)
-          $('#manageUsers').removeClass('hidden');
-
-        // note: log out is handled in application.js
-
-        app.user = data;
-
-        window.location.hash = instance.returnTo ? instance.returnTo : '#admin';
-      })
-      .fail(function() {
-        window.alert('Log in failed');
-      });
-
-    return false;
+    //_.bindAll(this, 'doLogin');
   },
 
   onShow: function() {
@@ -47,6 +20,27 @@ var Login = LayoutView.extend({
       name: Messages('app.location.login'),
       href: '#login'
     }]);
+
+    var lock = new Auth0Lock(app.config.auth0ClientId, app.config.auth0Domain);
+    var lockOptions = {
+      connections: ['Username-Password-Authentication'],
+      closable: false
+    };
+    if (app.config.logo) lockOptions.icon = app.config.logo;
+
+    lock.show(lockOptions, function (err, profile, token) {
+      if(err) {
+        console.log(err)
+      } else {
+        // save profile and token to localStorage
+        localStorage.setItem('userToken', token);
+
+        app.userLoggedIn(token, profile, lock);
+        document.location.hash = ''
+      }
+    }, {
+      container: 'auth0login'
+    });
   }
 });
 

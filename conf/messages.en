@@ -1,6 +1,6 @@
 app.account.username=username
 app.account.password=password
-app.account.logged_in_as=Logged in as {0}
+app.account.logged_in_as={0}
 app.account.not_logged_in=Not logged in
 app.add_feed_collection=New project
 app.new_feed_collection_name=Untitled project
@@ -151,6 +151,11 @@ app.fetch_all_feeds.results=Fetch All Feeds Results
 app.fetch_all_feeds.updated=Fetched updated feed
 app.fetch_all_feeds.no_change=Feed not changed online
 app.fetch_all_feeds.not_fetched=Not an automatically fetched feed
+
+app.project_settings=Project Settings
+app.project_settings.timezone=Default Timezone
+app.project_settings.language=Default Language
+app.project_settings.location=Default Location (Lat, Lon)
 
 app.location.home=Home
 app.location.login=Log in

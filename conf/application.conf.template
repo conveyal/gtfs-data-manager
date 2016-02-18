@@ -85,16 +85,15 @@ application.deployment.osm_vex="http://localhost:8282"
 # A buffer in km to apply to the GTFS bounds when extracting OSM. Defaults to 10 if not specified.
 # application.deployment.osm_buffer_km=10
 
-# The public URL of the GTFS Editor; this is where users will be redirected to when they click 'edit' on a feed source
-application.editor.public_url="http://localhost:9000/"
-# The internal URL of the GTFS Editor, used when Manager communicates directly with editor
-# It's perfectly fine for this to be the same as the public URL; it is specified separately in case
-# editor and manager are running on the same machine and can talk to each other on localhost, or in case
-# they are in a data center with internal networking.
-application.editor.internal_url="http://localhost:9000/"
+# Auth0 configuration
+application.auth0.domain="yourdomain.auth0.com"
+application.auth0.client_id="your-client-id"
+application.auth0.client_secret="your-client-secret"
 
-application.oauth.client_id=abc
-application.oauth.client_secret=123
+# Datatools suite configuration
+application.editor_url="http://localhost:9001"
+application.user_admin_url="http://localhost:3000"
+application.logo="http://gtfs-assets-dev.conveyal.com/data_manager.png"
 
 # Evolutions
 # ~~~~~

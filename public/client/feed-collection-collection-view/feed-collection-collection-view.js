@@ -3,6 +3,9 @@ var _ = require('underscore');
 var FeedCollection = require('feed-collection');
 var EditableTextWidget = require('editable-text-widget');
 
+var Handlebars = require('handlebars');
+var app = require('application');
+
 /**
  * An item view of a single FeedCollection
  */
@@ -38,6 +41,19 @@ module.exports = CompositeView.extend({
   },
   initialize: function() {
     _.bindAll(this, 'add');
+
+    if(this.collection.length === 1) {
+      window.location = '/#overview/' + this.collection.models[0].get('id');
+    }
+
+    Handlebars.registerHelper(
+      'canAdministerApp',
+      function(name, options) {
+        var canAdministerApp = app.auth0User.canAdministerApp();
+        if(canAdministerApp) return options.fn(this);
+        return options.inverse(this);
+      }
+    );
   },
 
   /** Add an item to the collection */
@@ -47,5 +63,16 @@ module.exports = CompositeView.extend({
     this.collection.add(new FeedCollection({
       name: window.Messages('app.new_feed_collection_name')
     }));
-  }
+  },
+
+  /*serializeData: function() {
+    // include the current user so that the view can figure out what is fair game for editing
+    var ret = {
+      canAdministerApp: true
+    };
+    return ret;
+    //return Object.assign(ret, this.model.toJSON());
+  },*/
+
+
 });

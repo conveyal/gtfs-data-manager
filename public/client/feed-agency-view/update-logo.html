@@ -1,0 +1,23 @@
+<div class="modal" role="dialog" aria-labelledby="confirm-title">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close cancel-action" data-dismiss="modal">
+          <span aria-hidden="true">&times;</span><span class="sr-only">{{ t 'app.close' }}</span>
+        </button>
+        <h4 class="modal-title" id="confirm-title">Update Logo for {{agencyId}}</h4>
+      </div>
+      <form name="imageUpload" id="imageUploadForm" action="/api/feedsources/{{feedSourceId}}/uploadAgencyLogo" enctype="multipart/form-data" method="post">
+        <div class="modal-body">
+          <p>
+            <input style="display: inline;" type="file" name="picture" />
+            <input type="hidden" name="agencyId" value="{{agencyId}}" />
+          </p>
+        </div>
+        <div class="modal-footer">
+          <input style="display: inline;" class="btn btn-primary upload-button" type="submit" />
+        </div>
+    </form>
+    </div>
+  </div>
+</div>

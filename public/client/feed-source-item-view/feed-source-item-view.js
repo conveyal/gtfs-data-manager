@@ -24,6 +24,14 @@ module.exports = LayoutView.extend({
 
   initialize: function() {
     _.bindAll(this, 'editBool', 'editSource', 'removeSource', 'handleUrlRegion');
+
+    var canAdminsterProject = app.auth0User.canAdminsterProject(this.model.get('feedCollection').id);
+    this.model.set('canAdminsterProject', canAdminsterProject);
+
+    var canManageFeed = app.auth0User.canManageFeed(this.model.get('feedCollection').id, this.model.get('id'));
+    this.model.set('canManageFeed', canManageFeed);
+
+    console.log(this.model)
   },
 
   // edit a boolean value
@@ -58,9 +66,12 @@ module.exports = LayoutView.extend({
   },
 
   onShow: function() {
+    var canManageFeed = app.auth0User.canManageFeed(this.model.get('feedCollection').id, this.model.get('id'));
+
     var nameField = new EditableTextWidget({
       model: this.model,
       attribute: 'name',
+      disabled: !canManageFeed,
       href: function() {
         if (this.model.id === null) {
           // make it a no-op until saved
@@ -82,12 +93,15 @@ module.exports = LayoutView.extend({
 
   // figure out what belongs in the URL region: a URL editor, a GTFS Editor selector, or nothing
   handleUrlRegion: function() {
+    var canManageFeed = app.auth0User.canManageFeed(this.model.get('feedCollection').id, this.model.get('id'));
+
     var retrievalMethod = this.model.get('retrievalMethod');
     if (retrievalMethod == 'FETCHED_AUTOMATICALLY') {
       this.urlRegion.show(new EditableTextWidget({
         model: this.model,
         maxWidth: 35,
         attribute: 'url',
+        disabled: !canManageFeed,
         href: function() {
           return this.model.get('url');
         }

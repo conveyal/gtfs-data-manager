@@ -35,6 +35,12 @@ public class FeedCollection extends Model implements Serializable {
 
     public OtpRouterConfig routerConfig;
 
+    public String defaultTimeZone;
+
+    public String defaultLanguage;
+
+    public Double defaultLocationLat, defaultLocationLon;
+
     public FeedCollection() {
         this.buildConfig = new OtpBuildConfig();
         this.routerConfig = new OtpRouterConfig();

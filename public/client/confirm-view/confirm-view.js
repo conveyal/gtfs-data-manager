@@ -25,5 +25,6 @@ module.exports = ItemView.extend({
 
   onShow: function() {
     this.$el.find('.modal').modal();
+    if(this.options.onShow) this.options.onShow.call(this);
   }
 });

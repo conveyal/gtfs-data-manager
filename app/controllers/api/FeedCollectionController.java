@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.io.ByteStreams;
 import com.google.common.net.UrlEscapers;
-import controllers.Secured;
+import controllers.Auth0SecuredController;
 import jobs.FetchProjectFeedsJob;
 import models.*;
 import org.slf4j.Logger;
@@ -16,29 +16,47 @@ import play.libs.F.Function;
 import play.libs.F.Promise;
 import play.libs.ws.WS;
 import play.libs.ws.WSResponse;
-import play.mvc.Controller;
 import play.mvc.Result;
-import play.mvc.Security;
+import utils.Auth0UserProfile;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.zip.CRC32;
+import java.util.Collection;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-@Security.Authenticated(Secured.class)
-public class FeedCollectionController extends Controller {
+//@Security.Authenticated(Secured.class)
+public class FeedCollectionController extends Auth0SecuredController {
+
     public static final Logger LOG = LoggerFactory.getLogger(FeedCollectionController.class);
 
     private static JsonManager<FeedCollection> json = 
             new JsonManager<FeedCollection>(FeedCollection.class, JsonViews.UserInterface.class);
     
     public static Result getAll () throws JsonProcessingException {
+        String token = getToken();
+        if(token == null) return unauthorized("Could not find authorization token");
+        Auth0UserProfile userProfile = verifyUser();
+        if(userProfile == null) return unauthorized();
+
+
+        Collection<FeedCollection> filteredFCs = new ArrayList<FeedCollection>();
+
+        System.out.println("found projects: " + FeedCollection.getAll().size());
+        for(FeedCollection fc : FeedCollection.getAll()) {
+            if(userProfile.hasProject(fc.id) || userProfile.canAdministerApplication()) {
+                filteredFCs.add(fc);
+            }
+        }
+
+        return ok(json.write(filteredFCs)).as("application/json");
+
+
         // it's fine to show all feed collections here. they're just folders, the user knows
         // nothing about what is in them.
         // TODO: When we get to a point where we're managing lots of them, for multiple clients on the same server
         // we'll want to change this.
-        return ok(json.write(FeedCollection.getAll())).as("application/json");
+        //return ok(json.write(FeedCollection.getAll())).as("application/json");
     }
     
     public static Result get (String id) throws JsonProcessingException {
@@ -48,11 +66,15 @@ public class FeedCollectionController extends Controller {
     }
     
     public static Result update (String id) throws JsonProcessingException {
+
+        String token = getToken();
+        if(token == null) return unauthorized("Could not find authorization token");
+        Auth0UserProfile userProfile = verifyUser();
+        if(userProfile == null) return unauthorized();
+
         FeedCollection c = FeedCollection.get(id);
-        
-        User currentUser = User.getUserByUsername(session("username"));
-        
-        if (!currentUser.admin)
+
+        if(!userProfile.canAdministerProject(c.id))
             return unauthorized();
         
         JsonNode params = request().body().asJson();
@@ -176,8 +198,29 @@ public class FeedCollectionController extends Controller {
             }
         }
 
+        JsonNode defaultTimeZone  = params.get("defaultTimeZone");
+        if (defaultTimeZone != null) {
+            c.defaultTimeZone = defaultTimeZone.asText();
+        }
+
+        JsonNode defaultLanguage  = params.get("defaultLanguage");
+        if (defaultLanguage != null) {
+            c.defaultLanguage = defaultLanguage.asText();
+        }
+
+        JsonNode defaultLocationLat  = params.get("defaultLocationLat");
+        if (defaultLocationLat != null) {
+            c.defaultLocationLat = defaultLocationLat.asDouble();
+        }
+
+        JsonNode defaultLocationLon  = params.get("defaultLocationLon");
+        if (defaultLocationLon != null) {
+            c.defaultLocationLon = defaultLocationLon.asDouble();
+        }
+
+
         // only allow admins to change feed collection owners
-        if (currentUser.admin) {
+        /*if (currentUser.admin) {
             JsonNode uname = params.get("user");
         
             // TODO: test
@@ -187,7 +230,7 @@ public class FeedCollectionController extends Controller {
         
             if (u != null)
                 c.setUser(u);
-        }
+        }*/
         
         c.save();
         
@@ -195,17 +238,24 @@ public class FeedCollectionController extends Controller {
     }
     
     public static Result create () throws JsonParseException, JsonMappingException, IOException {
-        User currentUser = User.getUserByUsername(session("username"));
+
+        System.out.println("creating project");
+        String token = getToken();
+        if(token == null) return unauthorized("Could not find authorization token");
+        Auth0UserProfile userProfile = verifyUser();
+        if(userProfile == null) return unauthorized();
+
+        //User currentUser = User.getUserByUsername(session("username"));
         
-        if (!currentUser.admin)
+        if (!userProfile.canAdministerApplication())
             return unauthorized();
         
         JsonNode params = request().body().asJson();
-        
+
         FeedCollection c = new FeedCollection();
-        
+
         // TODO: fail gracefully
-        c.name = params.get("name").asText();
+        /*c.name = params.get("name").asText();
         JsonNode uname = params.get("user/username");
         
         User u = null;
@@ -215,10 +265,10 @@ public class FeedCollectionController extends Controller {
         if (u == null)
             u = currentUser;
             
-        c.setUser(u);
+        c.setUser(u);*/
         
         c.save();
-        
+
         return ok(json.write(c)).as("application/json");
     }
     

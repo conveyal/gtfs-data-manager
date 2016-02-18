@@ -1,0 +1,6 @@
+{
+  "name": "auth0-user",
+  "description": "Helper class for working with auth0 user profile",
+  "main": "auth0-user.js",
+  "scripts": ["auth0-user.js"]
+}

@@ -1,8 +1,8 @@
 <td class="name"></td>
-<td><input class="edit-bool" type="checkbox" name="isPublic" {{ ? isPublic 'checked' '' }} /></td>
-<td><input class="edit-bool" type="checkbox" name="deployable" {{ ? deployable 'checked' '' }} /></td>
+<td><input class="edit-bool" type="checkbox" name="isPublic" {{ ? isPublic 'checked' '' }} {{ ? canManageFeed '' 'disabled' }}/></td>
+<td><input class="edit-bool" type="checkbox" name="deployable" {{ ? deployable 'checked' '' }} {{ ? canManageFeed '' 'disabled' }}/></td>
 <td>
-  <select class="feed-source" name="retrievalMethod">
+  <select class="feed-source" name="retrievalMethod" {{ ? canManageFeed '' 'disabled' }}>
     <option value="FETCHED_AUTOMATICALLY" {{ ? (eq retrievalMethod 'FETCHED_AUTOMATICALLY') 'selected' '' }}>{{ t 'app.feed_source.retrieval_method.FETCHED_AUTOMATICALLY' }}</option>
     <option value="MANUALLY_UPLOADED" {{ ? (eq retrievalMethod 'MANUALLY_UPLOADED') 'selected' '' }}>{{ t 'app.feed_source.retrieval_method.MANUALLY_UPLOADED' }}</option>
     <option value="PRODUCED_IN_HOUSE" {{ ? (eq retrievalMethod 'PRODUCED_IN_HOUSE') 'selected' '' }}>{{ t 'app.feed_source.retrieval_method.PRODUCED_IN_HOUSE' }}</option>
@@ -20,8 +20,10 @@
 {{/if}}
 
 <td>
-  <button role="button" class="btn btn-danger btn-sm remove-feed">
-    <span class="glyphicon glyphicon-remove"></span>
-    <span class="sr-only">{{ t 'app.feed_source.delete' }}</span>
-  </button>
+  {{#if canAdminsterProject}}
+    <button role="button" class="btn btn-danger btn-sm remove-feed">
+      <span class="glyphicon glyphicon-remove"></span>
+      <span class="sr-only">{{ t 'app.feed_source.delete' }}</span>
+    </button>
+  {{/if}}
 </td>

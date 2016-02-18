@@ -16,6 +16,7 @@ module.exports = ItemView.extend({
   initialize: function(attr) {
     this.attribute = attr.attribute || this.attribute;
     this.maxWidth = attr.maxWidth;
+    this.disabled = attr.disabled
     this.href = attr.href || this.href;
 
     _.bindAll(this, 'edit');
@@ -76,7 +77,8 @@ module.exports = ItemView.extend({
       displayText: text,
       value: value,
       placeholder: text,
-      href: href
+      href: href,
+      disabled: this.disabled
     };
   }
 });
