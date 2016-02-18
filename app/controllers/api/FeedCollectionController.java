@@ -89,7 +89,7 @@ public class FeedCollectionController extends Auth0SecuredController {
 
         DateTimeZone timezone;
 
-        if (timezoneId != null){
+        if (timezoneId != null && timezoneId != ""){
             timezone = DateTimeZone.forID(timezoneId);
         }
         else{
