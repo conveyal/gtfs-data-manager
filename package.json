@@ -25,6 +25,7 @@
     "moment": "^2.11.2",
     "react": "^0.14.3",
     "react-bootstrap": "^0.28.1",
+    "react-bootstrap-table": "^1.5.1",
     "react-dom": "^0.14.3",
     "react-router": "^2.0.0",
     "request": "^2.67.0"
