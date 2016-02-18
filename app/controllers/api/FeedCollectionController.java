@@ -255,8 +255,10 @@ public class FeedCollectionController extends Auth0SecuredController {
         FeedCollection c = new FeedCollection();
 
         // TODO: fail gracefully
-        /*c.name = params.get("name").asText();
-        JsonNode uname = params.get("user/username");
+        c.name = params.get("name").asText();
+        c.setUser(userProfile);
+
+        /*JsonNode uname = params.get("user/username");
         
         User u = null;
         if (uname != null)
