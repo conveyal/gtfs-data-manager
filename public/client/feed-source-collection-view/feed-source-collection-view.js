@@ -229,16 +229,25 @@ module.exports = CompositeView.extend({
           var language = this.$el.find('.language').val();
           var locationLat = this.$el.find('.location-lat').val();
           var locationLon = this.$el.find('.location-lon').val();
+          var autoFetchFeeds = this.$el.find('.auto-fetch').is(":checked");
+          var autoFetchAM = +this.$el.find('.fetch-time-am').val();
+          var rawHour = +this.$el.find('.fetch-time-hr').val();
+          var autoFetchHour = !autoFetchAM   ?  rawHour + 12 : rawHour;
+          var autoFetchMinute = +this.$el.find('.fetch-time-min').val();
+          var autoFetchTime = autoFetchHour * 100 + autoFetchMinute;
 
           fc.set('defaultTimeZone', timezone);
           fc.set('defaultLanguage', language);
           fc.set('defaultLocationLat', locationLat);
           fc.set('defaultLocationLon', locationLon);
+          fc.set('autoFetchFeeds', autoFetchFeeds);
+          fc.set('autoFetchHour', autoFetchHour);
+          fc.set('autoFetchMinute', autoFetchMinute);
 
           fc.save().done(function() {
             })
             .fail(function() {
-              window.alert('Error saving OSM settings');
+              window.alert('Error saving OSM settings'); // is this the right error message??
             });
         },
         onShow: function() {
@@ -246,6 +255,10 @@ module.exports = CompositeView.extend({
           this.$el.find('.language').val(fc.get('defaultLanguage'))
           this.$el.find('.location-lat').val(fc.get('defaultLocationLat'))
           this.$el.find('.location-lon').val(fc.get('defaultLocationLon'))
+          this.$el.find('.auto-fetch').prop('checked', fc.get('autoFetchFeeds'))
+          this.$el.find('.fetch-time-hr').val(fc.get('autoFetchHour') % 12) // modulus division by 12 to get 12 hour value
+          this.$el.find('.fetch-time-min').val(fc.get('autoFetchMinute'))
+          this.$el.find('.fetch-time-am').val(fc.get('autoFetchHour') > 12 ? "0" : "1") // set value based on fetch hour
         }
       }));
     });

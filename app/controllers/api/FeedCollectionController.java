@@ -1,14 +1,21 @@
 package controllers.api;
 
+import akka.actor.Cancellable;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.Maps;
 import com.google.common.io.ByteStreams;
 import com.google.common.net.UrlEscapers;
 import controllers.Auth0SecuredController;
+import jobs.FetchProjectFeedsActor;
 import jobs.FetchProjectFeedsJob;
 import models.*;
+import org.joda.time.DateTime;
+import org.joda.time.LocalDateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.Play;
@@ -17,11 +24,18 @@ import play.libs.F.Promise;
 import play.libs.ws.WS;
 import play.libs.ws.WSResponse;
 import play.mvc.Result;
+import scala.concurrent.duration.Duration;
 import utils.Auth0UserProfile;
+
+import play.libs.Akka;
+import akka.actor.ActorRef;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -29,6 +43,7 @@ import java.util.zip.ZipOutputStream;
 public class FeedCollectionController extends Auth0SecuredController {
 
     public static final Logger LOG = LoggerFactory.getLogger(FeedCollectionController.class);
+    public static Map<String, Cancellable> autoFetchMap = Maps.newHashMap();;
 
     private static JsonManager<FeedCollection> json = 
             new JsonManager<FeedCollection>(FeedCollection.class, JsonViews.UserInterface.class);
@@ -64,7 +79,48 @@ public class FeedCollectionController extends Auth0SecuredController {
         
         return ok(json.write(c)).as("application/json");
     }
-    
+    public static Cancellable scheduleAutoFeedFetch (String id, int hour, int minute, int interval, String timezone){
+
+        // First cancel any already scheduled auto fetch task for this feed collection id.
+        cancelAutoFetch(id);
+
+        Cancellable task;
+
+        long initialDelay = 0;
+        DateTime now = DateTime.now();
+        DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/yyyy HH:mm");
+        String dtString = String.valueOf(now.getDayOfMonth()) + "/" + String.valueOf(now.getMonthOfYear()) + "/" + String.valueOf(now.getYear()) + " " + String.valueOf(hour) + ":" + String.valueOf(minute);
+        System.out.println(dtString);
+
+        DateTime startTime = formatter.parseDateTime(dtString);
+        long diffInMinutes = (startTime.getMillis() - now.getMillis()) / 1000 / 60;
+        System.out.println(diffInMinutes);
+        if ( diffInMinutes >= 0 ){
+            initialDelay = diffInMinutes; // delay in minutes
+        }
+        else{
+            initialDelay = 24 * 60 + diffInMinutes; // wait for one day plus difference (which is negative)
+        }
+        System.out.println("Scheduling the feed auto fetch daemon to kick off in " + String.valueOf(initialDelay) + " minutes." );
+        ActorRef fetchActor = Akka.system().actorOf(FetchProjectFeedsActor.props(id), "fetch-feeds" + UUID.randomUUID());
+
+        task = Akka.system().scheduler().schedule(
+                Duration.create(initialDelay, TimeUnit.MINUTES), // initial delay
+                Duration.create(interval, TimeUnit.DAYS), // frequency
+                fetchActor,
+                "fetch-feeds",
+                Akka.system().dispatcher(),
+                null
+        );
+        return task;
+    }
+    public static void cancelAutoFetch(String id){
+        FeedCollection c = FeedCollection.get(id);
+        if ( c != null && autoFetchMap.get(c.id) != null) {
+            System.out.println("Cancelling the feed auto fetch daemon for projectID: " + c.id);
+            autoFetchMap.get(c.id).cancel();
+        }
+    }
     public static Result update (String id) throws JsonProcessingException {
 
         String token = getToken();
@@ -216,6 +272,33 @@ public class FeedCollectionController extends Auth0SecuredController {
         JsonNode defaultLocationLon  = params.get("defaultLocationLon");
         if (defaultLocationLon != null) {
             c.defaultLocationLon = defaultLocationLon.asDouble();
+        }
+
+
+        JsonNode autoFetchHour = params.get("autoFetchHour");
+        if (autoFetchHour != null) {
+            c.autoFetchHour = autoFetchHour.asInt();
+        }
+
+        JsonNode autoFetchMinute  = params.get("autoFetchMinute");
+        if (autoFetchMinute != null) {
+            c.autoFetchMinute = autoFetchMinute.asInt();
+        }
+
+        JsonNode autoFetchFeeds  = params.get("autoFetchFeeds");
+        if (autoFetchFeeds != null) {
+            c.autoFetchFeeds = autoFetchFeeds.asBoolean();
+
+            // If auto fetch flag is turned on
+            if (c.autoFetchFeeds){
+                int interval = 1; // once per day interval
+                autoFetchMap.put(c.id, scheduleAutoFeedFetch(c.id, c.autoFetchHour, c.autoFetchMinute, interval, c.defaultTimeZone));
+            }
+
+            // otherwise, cancel any existing task for this id
+            else{
+                cancelAutoFetch(c.id);
+            }
         }
 
 
