@@ -88,13 +88,12 @@ public class FeedCollectionController extends Auth0SecuredController {
         Cancellable task;
 
         DateTimeZone timezone;
-
-        if (timezoneId != null && timezoneId != ""){
+        try {
             timezone = DateTimeZone.forID(timezoneId);
-        }
-        else{
+        }catch(Exception e){
             timezone = DateTimeZone.forID("America/New_York");
         }
+
         System.out.println("Using timezone: " + timezone.getID());
 
         long initialDelay = 0;
