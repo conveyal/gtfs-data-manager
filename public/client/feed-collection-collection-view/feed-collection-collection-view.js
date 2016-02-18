@@ -22,7 +22,7 @@ var FeedCollectionItemView = EditableTextWidget.extend({
       EditableTextWidget.prototype.onShow.call(this);
 
     if (!this.model.get('id'))
-    // new feed
+      // new feed
       this.edit();
   }
 });
@@ -42,7 +42,7 @@ module.exports = CompositeView.extend({
   initialize: function() {
     _.bindAll(this, 'add');
 
-    if(this.collection.length === 1) {
+    if(this.collection.length === 1 && !app.auth0User.canAdministerApp()) {
       window.location = '/#overview/' + this.collection.models[0].get('id');
     }
 
