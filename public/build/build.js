@@ -4707,13 +4707,13 @@ require.modules["es-shims~es5-shim"] = require.modules["es-shims~es5-shim@v4.1.0
 require.modules["es5-shim"] = require.modules["es-shims~es5-shim@v4.1.0"];
 
 
-require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
+require.register("es-shims~es6-shim@0.34.2", Function("exports, module",
 " /*!\n\
   * https://github.com/paulmillr/es6-shim\n\
-  * @license es6-shim Copyright 2013-2015 by Paul Miller (http://paulmillr.com)\n\
+  * @license es6-shim Copyright 2013-2016 by Paul Miller (http://paulmillr.com)\n\
   *   and contributors,  MIT License\n\
-  * es6-shim: v0.27.1\n\
-  * see https://github.com/paulmillr/es6-shim/blob/0.27.1/LICENSE\n\
+  * es6-shim: v0.34.2\n\
+  * see https://github.com/paulmillr/es6-shim/blob/0.34.2/LICENSE\n\
   * Details and documentation:\n\
   * https://github.com/paulmillr/es6-shim/\n\
   */\n\
@@ -4727,7 +4727,7 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
     define(factory);\n\
   } else if (typeof exports === 'object') {\n\
     // Node. Does not work with strict CommonJS, but\n\
-    // only CommonJS-like enviroments that support module.exports,\n\
+    // only CommonJS-like environments that support module.exports,\n\
     // like Node.\n\
     module.exports = factory();\n\
   } else {\n\
@@ -4737,77 +4737,42 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
 }(this, function () {\n\
   'use strict';\n\
 \n\
-  var isCallableWithoutNew = function (func) {\n\
+  var _apply = Function.call.bind(Function.apply);\n\
+  var _call = Function.call.bind(Function.call);\n\
+  var isArray = Array.isArray;\n\
+  var keys = Object.keys;\n\
+\n\
+  var not = function notThunker(func) {\n\
+    return function notThunk() { return !_apply(func, this, arguments); };\n\
+  };\n\
+  var throwsError = function (func) {\n\
     try {\n\
       func();\n\
-    } catch (e) {\n\
       return false;\n\
-    }\n\
-    return true;\n\
-  };\n\
-\n\
-  var supportsSubclassing = function (C, f) {\n\
-    /* jshint proto:true */\n\
-    try {\n\
-      var Sub = function () { C.apply(this, arguments); };\n\
-      if (!Sub.__proto__) { return false; /* skip test on IE < 11 */ }\n\
-      Object.setPrototypeOf(Sub, C);\n\
-      Sub.prototype = Object.create(C.prototype, {\n\
-        constructor: { value: C }\n\
-      });\n\
-      return f(Sub);\n\
     } catch (e) {\n\
-      return false;\n\
-    }\n\
-  };\n\
-\n\
-  var arePropertyDescriptorsSupported = function () {\n\
-    try {\n\
-      Object.defineProperty({}, 'x', {});\n\
       return true;\n\
-    } catch (e) { /* this is IE 8. */\n\
+    }\n\
+  };\n\
+  var valueOrFalseIfThrows = function valueOrFalseIfThrows(func) {\n\
+    try {\n\
+      return func();\n\
+    } catch (e) {\n\
       return false;\n\
     }\n\
   };\n\
 \n\
-  var startsWithRejectsRegex = function () {\n\
-    var rejectsRegex = false;\n\
-    if (String.prototype.startsWith) {\n\
-      try {\n\
-        '/a/'.startsWith(/a/);\n\
-      } catch (e) { /* this is spec compliant */\n\
-        rejectsRegex = true;\n\
-      }\n\
-    }\n\
-    return rejectsRegex;\n\
+  var isCallableWithoutNew = not(throwsError);\n\
+  var arePropertyDescriptorsSupported = function () {\n\
+    // if Object.defineProperty exists but throws, it's IE 8\n\
+    return !throwsError(function () { Object.defineProperty({}, 'x', { get: function () {} }); });\n\
   };\n\
-\n\
-  /*jshint evil: true */\n\
-  var getGlobal = new Function('return this;');\n\
-  /*jshint evil: false */\n\
-\n\
-  var globals = getGlobal();\n\
-  var global_isFinite = globals.isFinite;\n\
   var supportsDescriptors = !!Object.defineProperty && arePropertyDescriptorsSupported();\n\
-  var startsWithIsCompliant = startsWithRejectsRegex();\n\
-  var _indexOf = Function.call.bind(String.prototype.indexOf);\n\
-  var _toString = Function.call.bind(Object.prototype.toString);\n\
-  var _hasOwnProperty = Function.call.bind(Object.prototype.hasOwnProperty);\n\
-  var ArrayIterator; // make our implementation private\n\
-  var noop = function () {};\n\
+  var functionsHaveNames = (function foo() {}).name === 'foo';\n\
 \n\
-  var Symbol = globals.Symbol || {};\n\
-  var symbolSpecies = Symbol.species || '@@species';\n\
-  var Type = {\n\
-    object: function (x) { return x !== null && typeof x === 'object'; },\n\
-    string: function (x) { return _toString(x) === '[object String]'; },\n\
-    regex: function (x) { return _toString(x) === '[object RegExp]'; },\n\
-    symbol: function (x) {\n\
-      /*jshint notypeof: true */\n\
-      return typeof globals.Symbol === 'function' && typeof x === 'symbol';\n\
-      /*jshint notypeof: false */\n\
-    }\n\
-  };\n\
+  var _forEach = Function.call.bind(Array.prototype.forEach);\n\
+  var _reduce = Function.call.bind(Array.prototype.reduce);\n\
+  var _filter = Function.call.bind(Array.prototype.filter);\n\
+  var _some = Function.call.bind(Array.prototype.some);\n\
 \n\
   var defineProperty = function (object, name, value, force) {\n\
     if (!force && name in object) { return; }\n\
@@ -4822,6 +4787,21 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
       object[name] = value;\n\
     }\n\
   };\n\
+\n\
+  // Define configurable, writable and non-enumerable props\n\
+  // if they don’t exist.\n\
+  var defineProperties = function (object, map, forceOverride) {\n\
+    _forEach(keys(map), function (name) {\n\
+      var method = map[name];\n\
+      defineProperty(object, name, method, !!forceOverride);\n\
+    });\n\
+  };\n\
+\n\
+  var _toString = Function.call.bind(Object.prototype.toString);\n\
+  var isCallable = typeof /abc/ === 'function' ? function IsCallableSlow(x) {\n\
+    // Some old browsers (IE, FF) say that typeof /abc/ === 'function'\n\
+    return typeof x === 'function' && _toString(x) === '[object Function]';\n\
+  } : function IsCallableFast(x) { return typeof x === 'function'; };\n\
 \n\
   var Value = {\n\
     getter: function (object, name, getter) {\n\
@@ -4855,31 +4835,127 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
         object[property] = newValue;\n\
       }\n\
     },\n\
+    defineByDescriptor: function (object, property, descriptor) {\n\
+      if (supportsDescriptors) {\n\
+        Object.defineProperty(object, property, descriptor);\n\
+      } else if ('value' in descriptor) {\n\
+        object[property] = descriptor.value;\n\
+      }\n\
+    },\n\
     preserveToString: function (target, source) {\n\
-      defineProperty(target, 'toString', source.toString.bind(source), true);\n\
+      if (source && isCallable(source.toString)) {\n\
+        defineProperty(target, 'toString', source.toString.bind(source), true);\n\
+      }\n\
     }\n\
-  };\n\
-\n\
-  // Define configurable, writable and non-enumerable props\n\
-  // if they don’t exist.\n\
-  var defineProperties = function (object, map) {\n\
-    Object.keys(map).forEach(function (name) {\n\
-      var method = map[name];\n\
-      defineProperty(object, name, method, false);\n\
-    });\n\
   };\n\
 \n\
   // Simple shim for Object.create on ES3 browsers\n\
   // (unlike real shim, no attempt to support `prototype === null`)\n\
   var create = Object.create || function (prototype, properties) {\n\
-    function Prototype() {}\n\
+    var Prototype = function Prototype() {};\n\
     Prototype.prototype = prototype;\n\
     var object = new Prototype();\n\
     if (typeof properties !== 'undefined') {\n\
-      defineProperties(object, properties);\n\
+      keys(properties).forEach(function (key) {\n\
+        Value.defineByDescriptor(object, key, properties[key]);\n\
+      });\n\
     }\n\
     return object;\n\
   };\n\
+\n\
+  var supportsSubclassing = function (C, f) {\n\
+    if (!Object.setPrototypeOf) { return false; /* skip test on IE < 11 */ }\n\
+    return valueOrFalseIfThrows(function () {\n\
+      var Sub = function Subclass(arg) {\n\
+        var o = new C(arg);\n\
+        Object.setPrototypeOf(o, Subclass.prototype);\n\
+        return o;\n\
+      };\n\
+      Object.setPrototypeOf(Sub, C);\n\
+      Sub.prototype = create(C.prototype, {\n\
+        constructor: { value: Sub }\n\
+      });\n\
+      return f(Sub);\n\
+    });\n\
+  };\n\
+\n\
+  var getGlobal = function () {\n\
+    /* global self, window, global */\n\
+    // the only reliable means to get the global object is\n\
+    // `Function('return this')()`\n\
+    // However, this causes CSP violations in Chrome apps.\n\
+    if (typeof self !== 'undefined') { return self; }\n\
+    if (typeof window !== 'undefined') { return window; }\n\
+    if (typeof global !== 'undefined') { return global; }\n\
+    throw new Error('unable to locate global object');\n\
+  };\n\
+\n\
+  var globals = getGlobal();\n\
+  var globalIsFinite = globals.isFinite;\n\
+  var _indexOf = Function.call.bind(String.prototype.indexOf);\n\
+  var _concat = Function.call.bind(Array.prototype.concat);\n\
+  var _sort = Function.call.bind(Array.prototype.sort);\n\
+  var _strSlice = Function.call.bind(String.prototype.slice);\n\
+  var _push = Function.call.bind(Array.prototype.push);\n\
+  var _pushApply = Function.apply.bind(Array.prototype.push);\n\
+  var _shift = Function.call.bind(Array.prototype.shift);\n\
+  var _max = Math.max;\n\
+  var _min = Math.min;\n\
+  var _floor = Math.floor;\n\
+  var _abs = Math.abs;\n\
+  var _log = Math.log;\n\
+  var _sqrt = Math.sqrt;\n\
+  var _hasOwnProperty = Function.call.bind(Object.prototype.hasOwnProperty);\n\
+  var ArrayIterator; // make our implementation private\n\
+  var noop = function () {};\n\
+\n\
+  var Symbol = globals.Symbol || {};\n\
+  var symbolSpecies = Symbol.species || '@@species';\n\
+\n\
+  var numberIsNaN = Number.isNaN || function isNaN(value) {\n\
+    // NaN !== NaN, but they are identical.\n\
+    // NaNs are the only non-reflexive value, i.e., if x !== x,\n\
+    // then x is NaN.\n\
+    // isNaN is broken: it converts its argument to number, so\n\
+    // isNaN('foo') => true\n\
+    return value !== value;\n\
+  };\n\
+  var numberIsFinite = Number.isFinite || function isFinite(value) {\n\
+    return typeof value === 'number' && globalIsFinite(value);\n\
+  };\n\
+\n\
+  // taken directly from https://github.com/ljharb/is-arguments/blob/master/index.js\n\
+  // can be replaced with require('is-arguments') if we ever use a build process instead\n\
+  var isStandardArguments = function isArguments(value) {\n\
+    return _toString(value) === '[object Arguments]';\n\
+  };\n\
+  var isLegacyArguments = function isArguments(value) {\n\
+    return value !== null &&\n\
+      typeof value === 'object' &&\n\
+      typeof value.length === 'number' &&\n\
+      value.length >= 0 &&\n\
+      _toString(value) !== '[object Array]' &&\n\
+      _toString(value.callee) === '[object Function]';\n\
+  };\n\
+  var isArguments = isStandardArguments(arguments) ? isStandardArguments : isLegacyArguments;\n\
+\n\
+  var Type = {\n\
+    primitive: function (x) { return x === null || (typeof x !== 'function' && typeof x !== 'object'); },\n\
+    object: function (x) { return x !== null && typeof x === 'object'; },\n\
+    string: function (x) { return _toString(x) === '[object String]'; },\n\
+    regex: function (x) { return _toString(x) === '[object RegExp]'; },\n\
+    symbol: function (x) {\n\
+      return typeof globals.Symbol === 'function' && typeof x === 'symbol';\n\
+    }\n\
+  };\n\
+\n\
+  var overrideNative = function overrideNative(object, property, replacement) {\n\
+    var original = object[property];\n\
+    defineProperty(object, property, replacement, true);\n\
+    Value.preserveToString(object[property], original);\n\
+  };\n\
+\n\
+  var hasSymbols = typeof Symbol === 'function' && typeof Symbol['for'] === 'function' && Type.symbol(Symbol());\n\
 \n\
   // This is a private name in the es6 spec, equal to '[Symbol.iterator]'\n\
   // we're going to use an arbitrary _-prefixed name to make our shims\n\
@@ -4893,34 +4969,14 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
   if (globals.Set && typeof new globals.Set()['@@iterator'] === 'function') {\n\
     $iterator$ = '@@iterator';\n\
   }\n\
-  var addIterator = function (prototype, impl) {\n\
-    if (!impl) { impl = function iterator() { return this; }; }\n\
-    var o = {};\n\
-    o[$iterator$] = impl;\n\
-    defineProperties(prototype, o);\n\
-    if (!prototype[$iterator$] && Type.symbol($iterator$)) {\n\
-      // implementations are buggy when $iterator$ is a Symbol\n\
-      prototype[$iterator$] = impl;\n\
-    }\n\
-  };\n\
 \n\
-  // taken directly from https://github.com/ljharb/is-arguments/blob/master/index.js\n\
-  // can be replaced with require('is-arguments') if we ever use a build process instead\n\
-  var isArguments = function isArguments(value) {\n\
-    var str = _toString(value);\n\
-    var result = str === '[object Arguments]';\n\
-    if (!result) {\n\
-      result = str !== '[object Array]' &&\n\
-        value !== null &&\n\
-        typeof value === 'object' &&\n\
-        typeof value.length === 'number' &&\n\
-        value.length >= 0 &&\n\
-        _toString(value.callee) === '[object Function]';\n\
-    }\n\
-    return result;\n\
-  };\n\
+  // Reflect\n\
+  if (!globals.Reflect) {\n\
+    defineProperty(globals, 'Reflect', {});\n\
+  }\n\
+  var Reflect = globals.Reflect;\n\
 \n\
-  var safeApply = Function.call.bind(Function.apply);\n\
+  var $String = String;\n\
 \n\
   var ES = {\n\
     // https://people.mozilla.org/~jorendorff/es6-draft.html#sec-call-f-v-args\n\
@@ -4929,7 +4985,7 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
       if (!ES.IsCallable(F)) {\n\
         throw new TypeError(F + ' is not a function');\n\
       }\n\
-      return safeApply(F, V, args);\n\
+      return _apply(F, V, args);\n\
     },\n\
 \n\
     RequireObjectCoercible: function (x, optMessage) {\n\
@@ -4937,23 +4993,34 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
       if (x == null) {\n\
         throw new TypeError(optMessage || 'Cannot call method on ' + x);\n\
       }\n\
+      return x;\n\
     },\n\
 \n\
+    // This might miss the \"(non-standard exotic and does not implement\n\
+    // [[Call]])\" case from\n\
+    // http://www.ecma-international.org/ecma-262/6.0/#sec-typeof-operator-runtime-semantics-evaluation\n\
+    // but we can't find any evidence these objects exist in practice.\n\
+    // If we find some in the future, you could test `Object(x) === x`,\n\
+    // which is reliable according to\n\
+    // http://www.ecma-international.org/ecma-262/6.0/#sec-toobject\n\
+    // but is not well optimized by runtimes and creates an object\n\
+    // whenever it returns false, and thus is very slow.\n\
     TypeIsObject: function (x) {\n\
-      /* jshint eqnull:true */\n\
-      // this is expensive when it returns false; use this function\n\
-      // when you expect it to return true in the common case.\n\
-      return x != null && Object(x) === x;\n\
+      if (x === void 0 || x === null || x === true || x === false) {\n\
+        return false;\n\
+      }\n\
+      return typeof x === 'function' || typeof x === 'object';\n\
     },\n\
 \n\
     ToObject: function (o, optMessage) {\n\
-      ES.RequireObjectCoercible(o, optMessage);\n\
-      return Object(o);\n\
+      return Object(ES.RequireObjectCoercible(o, optMessage));\n\
     },\n\
 \n\
-    IsCallable: function (x) {\n\
-      // some versions of IE say that typeof /abc/ === 'function'\n\
-      return typeof x === 'function' && _toString(x) === '[object Function]';\n\
+    IsCallable: isCallable,\n\
+\n\
+    IsConstructor: function (x) {\n\
+      // We can't tell callables from constructors in ES5\n\
+      return ES.IsCallable(x);\n\
     },\n\
 \n\
     ToInt32: function (x) {\n\
@@ -4973,9 +5040,9 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
 \n\
     ToInteger: function (value) {\n\
       var number = ES.ToNumber(value);\n\
-      if (Number.isNaN(number)) { return 0; }\n\
-      if (number === 0 || !Number.isFinite(number)) { return number; }\n\
-      return (number > 0 ? 1 : -1) * Math.floor(Math.abs(number));\n\
+      if (numberIsNaN(number)) { return 0; }\n\
+      if (number === 0 || !numberIsFinite(number)) { return number; }\n\
+      return (number > 0 ? 1 : -1) * _floor(_abs(number));\n\
     },\n\
 \n\
     ToLength: function (value) {\n\
@@ -4991,12 +5058,12 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
         if (a === 0) { return 1 / a === 1 / b; }\n\
         return true;\n\
       }\n\
-      return Number.isNaN(a) && Number.isNaN(b);\n\
+      return numberIsNaN(a) && numberIsNaN(b);\n\
     },\n\
 \n\
     SameValueZero: function (a, b) {\n\
       // same as SameValue except for SameValueZero(+0, -0) == true\n\
-      return (a === b) || (Number.isNaN(a) && Number.isNaN(b));\n\
+      return (a === b) || (numberIsNaN(a) && numberIsNaN(b));\n\
     },\n\
 \n\
     IsIterable: function (o) {\n\
@@ -5008,15 +5075,53 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
         // special case support for `arguments`\n\
         return new ArrayIterator(o, 'value');\n\
       }\n\
-      var itFn = o[$iterator$];\n\
+      var itFn = ES.GetMethod(o, $iterator$);\n\
       if (!ES.IsCallable(itFn)) {\n\
+        // Better diagnostics if itFn is null or undefined\n\
         throw new TypeError('value is not an iterable');\n\
       }\n\
-      var it = itFn.call(o);\n\
+      var it = ES.Call(itFn, o);\n\
       if (!ES.TypeIsObject(it)) {\n\
         throw new TypeError('bad iterator');\n\
       }\n\
       return it;\n\
+    },\n\
+\n\
+    GetMethod: function (o, p) {\n\
+      var func = ES.ToObject(o)[p];\n\
+      if (func === void 0 || func === null) {\n\
+        return void 0;\n\
+      }\n\
+      if (!ES.IsCallable(func)) {\n\
+        throw new TypeError('Method not callable: ' + p);\n\
+      }\n\
+      return func;\n\
+    },\n\
+\n\
+    IteratorComplete: function (iterResult) {\n\
+      return !!(iterResult.done);\n\
+    },\n\
+\n\
+    IteratorClose: function (iterator, completionIsThrow) {\n\
+      var returnMethod = ES.GetMethod(iterator, 'return');\n\
+      if (returnMethod === void 0) {\n\
+        return;\n\
+      }\n\
+      var innerResult, innerException;\n\
+      try {\n\
+        innerResult = ES.Call(returnMethod, iterator);\n\
+      } catch (e) {\n\
+        innerException = e;\n\
+      }\n\
+      if (completionIsThrow) {\n\
+        return;\n\
+      }\n\
+      if (innerException) {\n\
+        throw innerException;\n\
+      }\n\
+      if (!ES.TypeIsObject(innerResult)) {\n\
+        throw new TypeError(\"Iterator's return method returned a non-object.\");\n\
+      }\n\
     },\n\
 \n\
     IteratorNext: function (it) {\n\
@@ -5027,192 +5132,272 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
       return result;\n\
     },\n\
 \n\
-    Construct: function (C, args) {\n\
-      // CreateFromConstructor\n\
-      var obj;\n\
-      if (ES.IsCallable(C[symbolSpecies])) {\n\
-        obj = C[symbolSpecies]();\n\
-      } else {\n\
-        // OrdinaryCreateFromConstructor\n\
-        obj = create(C.prototype || null);\n\
+    IteratorStep: function (it) {\n\
+      var result = ES.IteratorNext(it);\n\
+      var done = ES.IteratorComplete(result);\n\
+      return done ? false : result;\n\
+    },\n\
+\n\
+    Construct: function (C, args, newTarget, isES6internal) {\n\
+      var target = typeof newTarget === 'undefined' ? C : newTarget;\n\
+\n\
+      if (!isES6internal && Reflect.construct) {\n\
+        // Try to use Reflect.construct if available\n\
+        return Reflect.construct(C, args, target);\n\
       }\n\
-      // Mark that we've used the es6 construct path\n\
-      // (see emulateES6construct)\n\
-      defineProperties(obj, { _es6construct: true });\n\
+      // OK, we have to fake it.  This will only work if the\n\
+      // C.[[ConstructorKind]] == \"base\" -- but that's the only\n\
+      // kind we can make in ES5 code anyway.\n\
+\n\
+      // OrdinaryCreateFromConstructor(target, \"%ObjectPrototype%\")\n\
+      var proto = target.prototype;\n\
+      if (!ES.TypeIsObject(proto)) {\n\
+        proto = Object.prototype;\n\
+      }\n\
+      var obj = create(proto);\n\
       // Call the constructor.\n\
       var result = ES.Call(C, obj, args);\n\
       return ES.TypeIsObject(result) ? result : obj;\n\
     },\n\
 \n\
+    SpeciesConstructor: function (O, defaultConstructor) {\n\
+      var C = O.constructor;\n\
+      if (C === void 0) {\n\
+        return defaultConstructor;\n\
+      }\n\
+      if (!ES.TypeIsObject(C)) {\n\
+        throw new TypeError('Bad constructor');\n\
+      }\n\
+      var S = C[symbolSpecies];\n\
+      if (S === void 0 || S === null) {\n\
+        return defaultConstructor;\n\
+      }\n\
+      if (!ES.IsConstructor(S)) {\n\
+        throw new TypeError('Bad @@species');\n\
+      }\n\
+      return S;\n\
+    },\n\
+\n\
     CreateHTML: function (string, tag, attribute, value) {\n\
-      var S = String(string);\n\
+      var S = ES.ToString(string);\n\
       var p1 = '<' + tag;\n\
       if (attribute !== '') {\n\
-        var V = String(value);\n\
+        var V = ES.ToString(value);\n\
         var escapedV = V.replace(/\"/g, '&quot;');\n\
         p1 += ' ' + attribute + '=\"' + escapedV + '\"';\n\
       }\n\
       var p2 = p1 + '>';\n\
       var p3 = p2 + S;\n\
       return p3 + '</' + tag + '>';\n\
+    },\n\
+\n\
+    IsRegExp: function IsRegExp(argument) {\n\
+      if (!ES.TypeIsObject(argument)) {\n\
+        return false;\n\
+      }\n\
+      var isRegExp = argument[Symbol.match];\n\
+      if (typeof isRegExp !== 'undefined') {\n\
+        return !!isRegExp;\n\
+      }\n\
+      return Type.regex(argument);\n\
+    },\n\
+\n\
+    ToString: function ToString(string) {\n\
+      return $String(string);\n\
     }\n\
   };\n\
 \n\
-  var emulateES6construct = function (o) {\n\
-    if (!ES.TypeIsObject(o)) { throw new TypeError('bad object'); }\n\
-    // es5 approximation to es6 subclass semantics: in es6, 'new Foo'\n\
-    // would invoke Foo.@@species to allocation/initialize the new object.\n\
-    // In es5 we just get the plain object.  So if we detect an\n\
-    // uninitialized object, invoke o.constructor.@@species\n\
-    if (!o._es6construct) {\n\
-      if (o.constructor && ES.IsCallable(o.constructor[symbolSpecies])) {\n\
-        o = o.constructor[symbolSpecies](o);\n\
+  // Well-known Symbol shims\n\
+  if (supportsDescriptors && hasSymbols) {\n\
+    var defineWellKnownSymbol = function defineWellKnownSymbol(name) {\n\
+      if (Type.symbol(Symbol[name])) {\n\
+        return Symbol[name];\n\
       }\n\
-      defineProperties(o, { _es6construct: true });\n\
-    }\n\
-    return o;\n\
-  };\n\
-\n\
-\n\
-  var numberConversion = (function () {\n\
-    // from https://github.com/inexorabletash/polyfill/blob/master/typedarray.js#L176-L266\n\
-    // with permission and license, per https://twitter.com/inexorabletash/status/372206509540659200\n\
-\n\
-    function roundToEven(n) {\n\
-      var w = Math.floor(n), f = n - w;\n\
-      if (f < 0.5) {\n\
-        return w;\n\
-      }\n\
-      if (f > 0.5) {\n\
-        return w + 1;\n\
-      }\n\
-      return w % 2 ? w + 1 : w;\n\
-    }\n\
-\n\
-    function packIEEE754(v, ebits, fbits) {\n\
-      var bias = (1 << (ebits - 1)) - 1,\n\
-        s, e, f,\n\
-        i, bits, str, bytes;\n\
-\n\
-      // Compute sign, exponent, fraction\n\
-      if (v !== v) {\n\
-        // NaN\n\
-        // http://dev.w3.org/2006/webapi/WebIDL/#es-type-mapping\n\
-        e = (1 << ebits) - 1;\n\
-        f = Math.pow(2, fbits - 1);\n\
-        s = 0;\n\
-      } else if (v === Infinity || v === -Infinity) {\n\
-        e = (1 << ebits) - 1;\n\
-        f = 0;\n\
-        s = (v < 0) ? 1 : 0;\n\
-      } else if (v === 0) {\n\
-        e = 0;\n\
-        f = 0;\n\
-        s = (1 / v === -Infinity) ? 1 : 0;\n\
-      } else {\n\
-        s = v < 0;\n\
-        v = Math.abs(v);\n\
-\n\
-        if (v >= Math.pow(2, 1 - bias)) {\n\
-          e = Math.min(Math.floor(Math.log(v) / Math.LN2), 1023);\n\
-          f = roundToEven(v / Math.pow(2, e) * Math.pow(2, fbits));\n\
-          if (f / Math.pow(2, fbits) >= 2) {\n\
-            e = e + 1;\n\
-            f = 1;\n\
-          }\n\
-          if (e > bias) {\n\
-            // Overflow\n\
-            e = (1 << ebits) - 1;\n\
-            f = 0;\n\
-          } else {\n\
-            // Normal\n\
-            e = e + bias;\n\
-            f = f - Math.pow(2, fbits);\n\
-          }\n\
-        } else {\n\
-          // Subnormal\n\
-          e = 0;\n\
-          f = roundToEven(v / Math.pow(2, 1 - bias - fbits));\n\
-        }\n\
-      }\n\
-\n\
-      // Pack sign, exponent, fraction\n\
-      bits = [];\n\
-      for (i = fbits; i; i -= 1) {\n\
-        bits.push(f % 2 ? 1 : 0);\n\
-        f = Math.floor(f / 2);\n\
-      }\n\
-      for (i = ebits; i; i -= 1) {\n\
-        bits.push(e % 2 ? 1 : 0);\n\
-        e = Math.floor(e / 2);\n\
-      }\n\
-      bits.push(s ? 1 : 0);\n\
-      bits.reverse();\n\
-      str = bits.join('');\n\
-\n\
-      // Bits to bytes\n\
-      bytes = [];\n\
-      while (str.length) {\n\
-        bytes.push(parseInt(str.slice(0, 8), 2));\n\
-        str = str.slice(8);\n\
-      }\n\
-      return bytes;\n\
-    }\n\
-\n\
-    function unpackIEEE754(bytes, ebits, fbits) {\n\
-      // Bytes to bits\n\
-      var bits = [], i, j, b, str,\n\
-          bias, s, e, f;\n\
-\n\
-      for (i = bytes.length; i; i -= 1) {\n\
-        b = bytes[i - 1];\n\
-        for (j = 8; j; j -= 1) {\n\
-          bits.push(b % 2 ? 1 : 0);\n\
-          b = b >> 1;\n\
-        }\n\
-      }\n\
-      bits.reverse();\n\
-      str = bits.join('');\n\
-\n\
-      // Unpack sign, exponent, fraction\n\
-      bias = (1 << (ebits - 1)) - 1;\n\
-      s = parseInt(str.slice(0, 1), 2) ? -1 : 1;\n\
-      e = parseInt(str.slice(1, 1 + ebits), 2);\n\
-      f = parseInt(str.slice(1 + ebits), 2);\n\
-\n\
-      // Produce number\n\
-      if (e === (1 << ebits) - 1) {\n\
-        return f !== 0 ? NaN : s * Infinity;\n\
-      } else if (e > 0) {\n\
-        // Normalized\n\
-        return s * Math.pow(2, e - bias) * (1 + f / Math.pow(2, fbits));\n\
-      } else if (f !== 0) {\n\
-        // Denormalized\n\
-        return s * Math.pow(2, -(bias - 1)) * (f / Math.pow(2, fbits));\n\
-      } else {\n\
-        return s < 0 ? -0 : 0;\n\
-      }\n\
-    }\n\
-\n\
-    function unpackFloat64(b) { return unpackIEEE754(b, 11, 52); }\n\
-    function packFloat64(v) { return packIEEE754(v, 11, 52); }\n\
-    function unpackFloat32(b) { return unpackIEEE754(b, 8, 23); }\n\
-    function packFloat32(v) { return packIEEE754(v, 8, 23); }\n\
-\n\
-    var conversions = {\n\
-      toFloat32: function (num) { return unpackFloat32(packFloat32(num)); }\n\
+      var sym = Symbol['for']('Symbol.' + name);\n\
+      Object.defineProperty(Symbol, name, {\n\
+        configurable: false,\n\
+        enumerable: false,\n\
+        writable: false,\n\
+        value: sym\n\
+      });\n\
+      return sym;\n\
     };\n\
-    if (typeof Float32Array !== 'undefined') {\n\
-      var float32array = new Float32Array(1);\n\
-      conversions.toFloat32 = function (num) {\n\
-        float32array[0] = num;\n\
-        return float32array[0];\n\
+    if (!Type.symbol(Symbol.search)) {\n\
+      var symbolSearch = defineWellKnownSymbol('search');\n\
+      var originalSearch = String.prototype.search;\n\
+      defineProperty(RegExp.prototype, symbolSearch, function search(string) {\n\
+        return ES.Call(originalSearch, string, [this]);\n\
+      });\n\
+      var searchShim = function search(regexp) {\n\
+        var O = ES.RequireObjectCoercible(this);\n\
+        if (regexp !== null && typeof regexp !== 'undefined') {\n\
+          var searcher = ES.GetMethod(regexp, symbolSearch);\n\
+          if (typeof searcher !== 'undefined') {\n\
+            return ES.Call(searcher, regexp, [O]);\n\
+          }\n\
+        }\n\
+        return ES.Call(originalSearch, O, [ES.ToString(regexp)]);\n\
       };\n\
+      overrideNative(String.prototype, 'search', searchShim);\n\
     }\n\
-    return conversions;\n\
-  }());\n\
+    if (!Type.symbol(Symbol.replace)) {\n\
+      var symbolReplace = defineWellKnownSymbol('replace');\n\
+      var originalReplace = String.prototype.replace;\n\
+      defineProperty(RegExp.prototype, symbolReplace, function replace(string, replaceValue) {\n\
+        return ES.Call(originalReplace, string, [this, replaceValue]);\n\
+      });\n\
+      var replaceShim = function replace(searchValue, replaceValue) {\n\
+        var O = ES.RequireObjectCoercible(this);\n\
+        if (searchValue !== null && typeof searchValue !== 'undefined') {\n\
+          var replacer = ES.GetMethod(searchValue, symbolReplace);\n\
+          if (typeof replacer !== 'undefined') {\n\
+            return ES.Call(replacer, searchValue, [O, replaceValue]);\n\
+          }\n\
+        }\n\
+        return ES.Call(originalReplace, O, [ES.ToString(searchValue), replaceValue]);\n\
+      };\n\
+      overrideNative(String.prototype, 'replace', replaceShim);\n\
+    }\n\
+    if (!Type.symbol(Symbol.split)) {\n\
+      var symbolSplit = defineWellKnownSymbol('split');\n\
+      var originalSplit = String.prototype.split;\n\
+      defineProperty(RegExp.prototype, symbolSplit, function split(string, limit) {\n\
+        return ES.Call(originalSplit, string, [this, limit]);\n\
+      });\n\
+      var splitShim = function split(separator, limit) {\n\
+        var O = ES.RequireObjectCoercible(this);\n\
+        if (separator !== null && typeof separator !== 'undefined') {\n\
+          var splitter = ES.GetMethod(separator, symbolSplit);\n\
+          if (typeof splitter !== 'undefined') {\n\
+            return ES.Call(splitter, separator, [O, limit]);\n\
+          }\n\
+        }\n\
+        return ES.Call(originalSplit, O, [ES.ToString(separator), limit]);\n\
+      };\n\
+      overrideNative(String.prototype, 'split', splitShim);\n\
+    }\n\
+    var symbolMatchExists = Type.symbol(Symbol.match);\n\
+    var stringMatchIgnoresSymbolMatch = symbolMatchExists && (function () {\n\
+      // Firefox 41, through Nightly 45 has Symbol.match, but String#match ignores it.\n\
+      // Firefox 40 and below have Symbol.match but String#match works fine.\n\
+      var o = {};\n\
+      o[Symbol.match] = function () { return 42; };\n\
+      return 'a'.match(o) !== 42;\n\
+    }());\n\
+    if (!symbolMatchExists || stringMatchIgnoresSymbolMatch) {\n\
+      var symbolMatch = defineWellKnownSymbol('match');\n\
 \n\
-  defineProperties(String, {\n\
+      var originalMatch = String.prototype.match;\n\
+      defineProperty(RegExp.prototype, symbolMatch, function match(string) {\n\
+        return ES.Call(originalMatch, string, [this]);\n\
+      });\n\
+\n\
+      var matchShim = function match(regexp) {\n\
+        var O = ES.RequireObjectCoercible(this);\n\
+        if (regexp !== null && typeof regexp !== 'undefined') {\n\
+          var matcher = ES.GetMethod(regexp, symbolMatch);\n\
+          if (typeof matcher !== 'undefined') {\n\
+            return ES.Call(matcher, regexp, [O]);\n\
+          }\n\
+        }\n\
+        return ES.Call(originalMatch, O, [ES.ToString(regexp)]);\n\
+      };\n\
+      overrideNative(String.prototype, 'match', matchShim);\n\
+    }\n\
+  }\n\
+\n\
+  var wrapConstructor = function wrapConstructor(original, replacement, keysToSkip) {\n\
+    Value.preserveToString(replacement, original);\n\
+    if (Object.setPrototypeOf) {\n\
+      // sets up proper prototype chain where possible\n\
+      Object.setPrototypeOf(original, replacement);\n\
+    }\n\
+    if (supportsDescriptors) {\n\
+      _forEach(Object.getOwnPropertyNames(original), function (key) {\n\
+        if (key in noop || keysToSkip[key]) { return; }\n\
+        Value.proxy(original, key, replacement);\n\
+      });\n\
+    } else {\n\
+      _forEach(Object.keys(original), function (key) {\n\
+        if (key in noop || keysToSkip[key]) { return; }\n\
+        replacement[key] = original[key];\n\
+      });\n\
+    }\n\
+    replacement.prototype = original.prototype;\n\
+    Value.redefine(original.prototype, 'constructor', replacement);\n\
+  };\n\
+\n\
+  var defaultSpeciesGetter = function () { return this; };\n\
+  var addDefaultSpecies = function (C) {\n\
+    if (supportsDescriptors && !_hasOwnProperty(C, symbolSpecies)) {\n\
+      Value.getter(C, symbolSpecies, defaultSpeciesGetter);\n\
+    }\n\
+  };\n\
+\n\
+  var addIterator = function (prototype, impl) {\n\
+    var implementation = impl || function iterator() { return this; };\n\
+    defineProperty(prototype, $iterator$, implementation);\n\
+    if (!prototype[$iterator$] && Type.symbol($iterator$)) {\n\
+      // implementations are buggy when $iterator$ is a Symbol\n\
+      prototype[$iterator$] = implementation;\n\
+    }\n\
+  };\n\
+\n\
+  var createDataProperty = function createDataProperty(object, name, value) {\n\
+    if (supportsDescriptors) {\n\
+      Object.defineProperty(object, name, {\n\
+        configurable: true,\n\
+        enumerable: true,\n\
+        writable: true,\n\
+        value: value\n\
+      });\n\
+    } else {\n\
+      object[name] = value;\n\
+    }\n\
+  };\n\
+  var createDataPropertyOrThrow = function createDataPropertyOrThrow(object, name, value) {\n\
+    createDataProperty(object, name, value);\n\
+    if (!ES.SameValue(object[name], value)) {\n\
+      throw new TypeError('property is nonconfigurable');\n\
+    }\n\
+  };\n\
+\n\
+  var emulateES6construct = function (o, defaultNewTarget, defaultProto, slots) {\n\
+    // This is an es5 approximation to es6 construct semantics.  in es6,\n\
+    // 'new Foo' invokes Foo.[[Construct]] which (for almost all objects)\n\
+    // just sets the internal variable NewTarget (in es6 syntax `new.target`)\n\
+    // to Foo and then returns Foo().\n\
+\n\
+    // Many ES6 object then have constructors of the form:\n\
+    // 1. If NewTarget is undefined, throw a TypeError exception\n\
+    // 2. Let xxx by OrdinaryCreateFromConstructor(NewTarget, yyy, zzz)\n\
+\n\
+    // So we're going to emulate those first two steps.\n\
+    if (!ES.TypeIsObject(o)) {\n\
+      throw new TypeError('Constructor requires `new`: ' + defaultNewTarget.name);\n\
+    }\n\
+    var proto = defaultNewTarget.prototype;\n\
+    if (!ES.TypeIsObject(proto)) {\n\
+      proto = defaultProto;\n\
+    }\n\
+    var obj = create(proto);\n\
+    for (var name in slots) {\n\
+      if (_hasOwnProperty(slots, name)) {\n\
+        var value = slots[name];\n\
+        defineProperty(obj, name, value, true);\n\
+      }\n\
+    }\n\
+    return obj;\n\
+  };\n\
+\n\
+  // Firefox 31 reports this function's length as 0\n\
+  // https://bugzilla.mozilla.org/show_bug.cgi?id=1062484\n\
+  if (String.fromCodePoint && String.fromCodePoint.length !== 1) {\n\
+    var originalFromCodePoint = String.fromCodePoint;\n\
+    overrideNative(String, 'fromCodePoint', function fromCodePoint(codePoints) { return ES.Call(originalFromCodePoint, this, arguments); });\n\
+  }\n\
+\n\
+  var StringShims = {\n\
     fromCodePoint: function fromCodePoint(codePoints) {\n\
       var result = [];\n\
       var next;\n\
@@ -5223,11 +5408,11 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
         }\n\
 \n\
         if (next < 0x10000) {\n\
-          result.push(String.fromCharCode(next));\n\
+          _push(result, String.fromCharCode(next));\n\
         } else {\n\
           next -= 0x10000;\n\
-          result.push(String.fromCharCode((next >> 10) + 0xD800));\n\
-          result.push(String.fromCharCode((next % 0x400) + 0xDC00));\n\
+          _push(result, String.fromCharCode((next >> 10) + 0xD800));\n\
+          _push(result, String.fromCharCode((next % 0x400) + 0xDC00));\n\
         }\n\
       }\n\
       return result.join('');\n\
@@ -5235,8 +5420,7 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
 \n\
     raw: function raw(callSite) {\n\
       var cooked = ES.ToObject(callSite, 'bad callSite');\n\
-      var rawValue = cooked.raw;\n\
-      var rawString = ES.ToObject(rawValue, 'bad raw value');\n\
+      var rawString = ES.ToObject(cooked.raw, 'bad raw value');\n\
       var len = rawString.length;\n\
       var literalsegments = ES.ToLength(len);\n\
       if (literalsegments <= 0) {\n\
@@ -5247,28 +5431,25 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
       var nextIndex = 0;\n\
       var nextKey, next, nextSeg, nextSub;\n\
       while (nextIndex < literalsegments) {\n\
-        nextKey = String(nextIndex);\n\
-        next = rawString[nextKey];\n\
-        nextSeg = String(next);\n\
-        stringElements.push(nextSeg);\n\
+        nextKey = ES.ToString(nextIndex);\n\
+        nextSeg = ES.ToString(rawString[nextKey]);\n\
+        _push(stringElements, nextSeg);\n\
         if (nextIndex + 1 >= literalsegments) {\n\
           break;\n\
         }\n\
         next = nextIndex + 1 < arguments.length ? arguments[nextIndex + 1] : '';\n\
-        nextSub = String(next);\n\
-        stringElements.push(nextSub);\n\
-        nextIndex++;\n\
+        nextSub = ES.ToString(next);\n\
+        _push(stringElements, nextSub);\n\
+        nextIndex += 1;\n\
       }\n\
       return stringElements.join('');\n\
     }\n\
-  });\n\
-\n\
-  // Firefox 31 reports this function's length as 0\n\
-  // https://bugzilla.mozilla.org/show_bug.cgi?id=1062484\n\
-  if (String.fromCodePoint.length !== 1) {\n\
-    var originalFromCodePoint = Function.apply.bind(String.fromCodePoint);\n\
-    defineProperty(String, 'fromCodePoint', function fromCodePoint(codePoints) { return originalFromCodePoint(this, arguments); }, true);\n\
+  };\n\
+  if (String.raw && String.raw({ raw: { 0: 'x', 1: 'y', length: 2 } }) !== 'xy') {\n\
+    // IE 11 TP has a broken String.raw implementation\n\
+    overrideNative(String, 'raw', StringShims.raw);\n\
   }\n\
+  defineProperties(String, StringShims);\n\
 \n\
   // Fast repeat, uses the `Exponentiation by squaring` algorithm.\n\
   // Perf: http://jsperf.com/string-repeat2/2\n\
@@ -5280,52 +5461,61 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
   };\n\
   var stringMaxLength = Infinity;\n\
 \n\
-  var StringShims = {\n\
+  var StringPrototypeShims = {\n\
     repeat: function repeat(times) {\n\
-      ES.RequireObjectCoercible(this);\n\
-      var thisStr = String(this);\n\
-      times = ES.ToInteger(times);\n\
-      if (times < 0 || times >= stringMaxLength) {\n\
+      var thisStr = ES.ToString(ES.RequireObjectCoercible(this));\n\
+      var numTimes = ES.ToInteger(times);\n\
+      if (numTimes < 0 || numTimes >= stringMaxLength) {\n\
         throw new RangeError('repeat count must be less than infinity and not overflow maximum string size');\n\
       }\n\
-      return stringRepeat(thisStr, times);\n\
+      return stringRepeat(thisStr, numTimes);\n\
     },\n\
 \n\
-    startsWith: function (searchStr) {\n\
-      ES.RequireObjectCoercible(this);\n\
-      var thisStr = String(this);\n\
-      if (Type.regex(searchStr)) {\n\
+    startsWith: function startsWith(searchString) {\n\
+      var S = ES.ToString(ES.RequireObjectCoercible(this));\n\
+      if (ES.IsRegExp(searchString)) {\n\
         throw new TypeError('Cannot call method \"startsWith\" with a regex');\n\
       }\n\
-      searchStr = String(searchStr);\n\
-      var startArg = arguments.length > 1 ? arguments[1] : void 0;\n\
-      var start = Math.max(ES.ToInteger(startArg), 0);\n\
-      return thisStr.slice(start, start + searchStr.length) === searchStr;\n\
+      var searchStr = ES.ToString(searchString);\n\
+      var position;\n\
+      if (arguments.length > 1) {\n\
+        position = arguments[1];\n\
+      }\n\
+      var start = _max(ES.ToInteger(position), 0);\n\
+      return _strSlice(S, start, start + searchStr.length) === searchStr;\n\
     },\n\
 \n\
-    endsWith: function (searchStr) {\n\
-      ES.RequireObjectCoercible(this);\n\
-      var thisStr = String(this);\n\
-      if (Type.regex(searchStr)) {\n\
+    endsWith: function endsWith(searchString) {\n\
+      var S = ES.ToString(ES.RequireObjectCoercible(this));\n\
+      if (ES.IsRegExp(searchString)) {\n\
         throw new TypeError('Cannot call method \"endsWith\" with a regex');\n\
       }\n\
-      searchStr = String(searchStr);\n\
-      var thisLen = thisStr.length;\n\
-      var posArg = arguments.length > 1 ? arguments[1] : void 0;\n\
-      var pos = typeof posArg === 'undefined' ? thisLen : ES.ToInteger(posArg);\n\
-      var end = Math.min(Math.max(pos, 0), thisLen);\n\
-      return thisStr.slice(end - searchStr.length, end) === searchStr;\n\
+      var searchStr = ES.ToString(searchString);\n\
+      var len = S.length;\n\
+      var endPosition;\n\
+      if (arguments.length > 1) {\n\
+        endPosition = arguments[1];\n\
+      }\n\
+      var pos = typeof endPosition === 'undefined' ? len : ES.ToInteger(endPosition);\n\
+      var end = _min(_max(pos, 0), len);\n\
+      return _strSlice(S, end - searchStr.length, end) === searchStr;\n\
     },\n\
 \n\
     includes: function includes(searchString) {\n\
-      var position = arguments.length > 1 ? arguments[1] : void 0;\n\
+      if (ES.IsRegExp(searchString)) {\n\
+        throw new TypeError('\"includes\" does not accept a RegExp');\n\
+      }\n\
+      var searchStr = ES.ToString(searchString);\n\
+      var position;\n\
+      if (arguments.length > 1) {\n\
+        position = arguments[1];\n\
+      }\n\
       // Somehow this trick makes method 100% compat with the spec.\n\
-      return _indexOf(this, searchString, position) !== -1;\n\
+      return _indexOf(this, searchStr, position) !== -1;\n\
     },\n\
 \n\
-    codePointAt: function (pos) {\n\
-      ES.RequireObjectCoercible(this);\n\
-      var thisStr = String(this);\n\
+    codePointAt: function codePointAt(pos) {\n\
+      var thisStr = ES.ToString(ES.RequireObjectCoercible(this));\n\
       var position = ES.ToInteger(pos);\n\
       var length = thisStr.length;\n\
       if (position >= 0 && position < length) {\n\
@@ -5338,33 +5528,72 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
       }\n\
     }\n\
   };\n\
-  defineProperties(String.prototype, StringShims);\n\
-\n\
-  var hasStringTrimBug = '\\u0085'.trim().length !== 1;\n\
-  if (hasStringTrimBug) {\n\
-    delete String.prototype.trim;\n\
-    // whitespace from: http://es5.github.io/#x15.5.4.20\n\
-    // implementation from https://github.com/es-shims/es5-shim/blob/v3.4.0/es5-shim.js#L1304-L1324\n\
-    var ws = [\n\
-      '\\x09\\x0A\\x0B\\x0C\\x0D\\x20\\xA0\\u1680\\u180E\\u2000\\u2001\\u2002\\u2003',\n\
-      '\\u2004\\u2005\\u2006\\u2007\\u2008\\u2009\\u200A\\u202F\\u205F\\u3000\\u2028',\n\
-      '\\u2029\\uFEFF'\n\
-    ].join('');\n\
-    var trimRegexp = new RegExp('(^[' + ws + ']+)|([' + ws + ']+$)', 'g');\n\
-    defineProperties(String.prototype, {\n\
-      trim: function () {\n\
-        if (typeof this === 'undefined' || this === null) {\n\
-          throw new TypeError(\"can't convert \" + this + ' to object');\n\
-        }\n\
-        return String(this).replace(trimRegexp, '');\n\
-      }\n\
-    });\n\
+  if (String.prototype.includes && 'a'.includes('a', Infinity) !== false) {\n\
+    overrideNative(String.prototype, 'includes', StringPrototypeShims.includes);\n\
   }\n\
+\n\
+  if (String.prototype.startsWith && String.prototype.endsWith) {\n\
+    var startsWithRejectsRegex = throwsError(function () {\n\
+      /* throws if spec-compliant */\n\
+      '/a/'.startsWith(/a/);\n\
+    });\n\
+    var startsWithHandlesInfinity = 'abc'.startsWith('a', Infinity) === false;\n\
+    if (!startsWithRejectsRegex || !startsWithHandlesInfinity) {\n\
+      // Firefox (< 37?) and IE 11 TP have a noncompliant startsWith implementation\n\
+      overrideNative(String.prototype, 'startsWith', StringPrototypeShims.startsWith);\n\
+      overrideNative(String.prototype, 'endsWith', StringPrototypeShims.endsWith);\n\
+    }\n\
+  }\n\
+  if (hasSymbols) {\n\
+    var startsWithSupportsSymbolMatch = valueOrFalseIfThrows(function () {\n\
+      var re = /a/;\n\
+      re[Symbol.match] = false;\n\
+      return '/a/'.startsWith(re);\n\
+    });\n\
+    if (!startsWithSupportsSymbolMatch) {\n\
+      overrideNative(String.prototype, 'startsWith', StringPrototypeShims.startsWith);\n\
+    }\n\
+    var endsWithSupportsSymbolMatch = valueOrFalseIfThrows(function () {\n\
+      var re = /a/;\n\
+      re[Symbol.match] = false;\n\
+      return '/a/'.endsWith(re);\n\
+    });\n\
+    if (!endsWithSupportsSymbolMatch) {\n\
+      overrideNative(String.prototype, 'endsWith', StringPrototypeShims.endsWith);\n\
+    }\n\
+    var includesSupportsSymbolMatch = valueOrFalseIfThrows(function () {\n\
+      var re = /a/;\n\
+      re[Symbol.match] = false;\n\
+      return '/a/'.includes(re);\n\
+    });\n\
+    if (!includesSupportsSymbolMatch) {\n\
+      overrideNative(String.prototype, 'includes', StringPrototypeShims.includes);\n\
+    }\n\
+  }\n\
+\n\
+  defineProperties(String.prototype, StringPrototypeShims);\n\
+\n\
+  // whitespace from: http://es5.github.io/#x15.5.4.20\n\
+  // implementation from https://github.com/es-shims/es5-shim/blob/v3.4.0/es5-shim.js#L1304-L1324\n\
+  var ws = [\n\
+    '\\x09\\x0A\\x0B\\x0C\\x0D\\x20\\xA0\\u1680\\u180E\\u2000\\u2001\\u2002\\u2003',\n\
+    '\\u2004\\u2005\\u2006\\u2007\\u2008\\u2009\\u200A\\u202F\\u205F\\u3000\\u2028',\n\
+    '\\u2029\\uFEFF'\n\
+  ].join('');\n\
+  var trimRegexp = new RegExp('(^[' + ws + ']+)|([' + ws + ']+$)', 'g');\n\
+  var trimShim = function trim() {\n\
+    return ES.ToString(ES.RequireObjectCoercible(this)).replace(trimRegexp, '');\n\
+  };\n\
+  var nonWS = ['\\u0085', '\\u200b', '\\ufffe'].join('');\n\
+  var nonWSregex = new RegExp('[' + nonWS + ']', 'g');\n\
+  var isBadHexRegex = /^[\\-+]0x[0-9a-f]+$/i;\n\
+  var hasStringTrimBug = nonWS.trim().length !== nonWS.length;\n\
+  defineProperty(String.prototype, 'trim', trimShim, hasStringTrimBug);\n\
 \n\
   // see https://people.mozilla.org/~jorendorff/es6-draft.html#sec-string.prototype-@@iterator\n\
   var StringIterator = function (s) {\n\
     ES.RequireObjectCoercible(s);\n\
-    this._s = String(s);\n\
+    this._s = ES.ToString(s);\n\
     this._i = 0;\n\
   };\n\
   StringIterator.prototype.next = function () {\n\
@@ -5388,60 +5617,66 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
     return new StringIterator(this);\n\
   });\n\
 \n\
-  if (!startsWithIsCompliant) {\n\
-    // Firefox has a noncompliant startsWith implementation\n\
-    defineProperty(String.prototype, 'startsWith', StringShims.startsWith, true);\n\
-    defineProperty(String.prototype, 'endsWith', StringShims.endsWith, true);\n\
-  }\n\
-\n\
   var ArrayShims = {\n\
-    from: function from(iterable) {\n\
-      var mapFn = arguments.length > 1 ? arguments[1] : void 0;\n\
-\n\
-      var list = ES.ToObject(iterable, 'bad iterable');\n\
-      if (typeof mapFn !== 'undefined' && !ES.IsCallable(mapFn)) {\n\
-        throw new TypeError('Array.from: when provided, the second argument must be a function');\n\
+    from: function from(items) {\n\
+      var C = this;\n\
+      var mapFn;\n\
+      if (arguments.length > 1) {\n\
+        mapFn = arguments[1];\n\
+      }\n\
+      var mapping, T;\n\
+      if (typeof mapFn === 'undefined') {\n\
+        mapping = false;\n\
+      } else {\n\
+        if (!ES.IsCallable(mapFn)) {\n\
+          throw new TypeError('Array.from: when provided, the second argument must be a function');\n\
+        }\n\
+        if (arguments.length > 2) {\n\
+          T = arguments[2];\n\
+        }\n\
+        mapping = true;\n\
       }\n\
 \n\
-      var hasThisArg = arguments.length > 2;\n\
-      var thisArg = hasThisArg ? arguments[2] : void 0;\n\
-\n\
-      var usingIterator = ES.IsIterable(list);\n\
-      // does the spec really mean that Arrays should use ArrayIterator?\n\
+      // Note that that Arrays will use ArrayIterator:\n\
       // https://bugs.ecmascript.org/show_bug.cgi?id=2416\n\
-      //if (Array.isArray(list)) { usingIterator=false; }\n\
+      var usingIterator = typeof (isArguments(items) || ES.GetMethod(items, $iterator$)) !== 'undefined';\n\
 \n\
-      var length;\n\
-      var result, i, value;\n\
+      var length, result, i;\n\
       if (usingIterator) {\n\
-        i = 0;\n\
-        result = ES.IsCallable(this) ? Object(new this()) : [];\n\
-        var it = usingIterator ? ES.GetIterator(list) : null;\n\
-        var iterationValue;\n\
+        result = ES.IsConstructor(C) ? Object(new C()) : [];\n\
+        var iterator = ES.GetIterator(items);\n\
+        var next, nextValue;\n\
 \n\
-        do {\n\
-          iterationValue = ES.IteratorNext(it);\n\
-          if (!iterationValue.done) {\n\
-            value = iterationValue.value;\n\
-            if (mapFn) {\n\
-              result[i] = hasThisArg ? mapFn.call(thisArg, value, i) : mapFn(value, i);\n\
-            } else {\n\
-              result[i] = value;\n\
-            }\n\
-            i += 1;\n\
+        i = 0;\n\
+        while (true) {\n\
+          next = ES.IteratorStep(iterator);\n\
+          if (next === false) {\n\
+            break;\n\
           }\n\
-        } while (!iterationValue.done);\n\
+          nextValue = next.value;\n\
+          try {\n\
+            if (mapping) {\n\
+              nextValue = typeof T === 'undefined' ? mapFn(nextValue, i) : _call(mapFn, T, nextValue, i);\n\
+            }\n\
+            result[i] = nextValue;\n\
+          } catch (e) {\n\
+            ES.IteratorClose(iterator, true);\n\
+            throw e;\n\
+          }\n\
+          i += 1;\n\
+        }\n\
         length = i;\n\
       } else {\n\
-        length = ES.ToLength(list.length);\n\
-        result = ES.IsCallable(this) ? Object(new this(length)) : new Array(length);\n\
+        var arrayLike = ES.ToObject(items);\n\
+        length = ES.ToLength(arrayLike.length);\n\
+        result = ES.IsConstructor(C) ? Object(new C(length)) : new Array(length);\n\
+        var value;\n\
         for (i = 0; i < length; ++i) {\n\
-          value = list[i];\n\
-          if (mapFn) {\n\
-            result[i] = hasThisArg ? mapFn.call(thisArg, value, i) : mapFn(value, i);\n\
-          } else {\n\
-            result[i] = value;\n\
+          value = arrayLike[i];\n\
+          if (mapping) {\n\
+            value = typeof T === 'undefined' ? mapFn(value, i) : _call(mapFn, T, value, i);\n\
           }\n\
+          result[i] = value;\n\
         }\n\
       }\n\
 \n\
@@ -5450,28 +5685,23 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
     },\n\
 \n\
     of: function of() {\n\
-      return Array.from.call(this, arguments);\n\
+      var len = arguments.length;\n\
+      var C = this;\n\
+      var A = isArray(C) || !ES.IsCallable(C) ? new Array(len) : ES.Construct(C, [len]);\n\
+      for (var k = 0; k < len; ++k) {\n\
+        createDataPropertyOrThrow(A, k, arguments[k]);\n\
+      }\n\
+      A.length = len;\n\
+      return A;\n\
     }\n\
   };\n\
   defineProperties(Array, ArrayShims);\n\
-\n\
-  var arrayFromSwallowsNegativeLengths = function () {\n\
-    try {\n\
-      return Array.from({ length: -1 }).length === 0;\n\
-    } catch (e) {\n\
-      return false;\n\
-    }\n\
-  };\n\
-  // Fixes a Firefox bug in v32\n\
-  // https://bugzilla.mozilla.org/show_bug.cgi?id=1063993\n\
-  if (!arrayFromSwallowsNegativeLengths()) {\n\
-    defineProperty(Array, 'from', ArrayShims.from, true);\n\
-  }\n\
+  addDefaultSpecies(Array);\n\
 \n\
   // Given an argument x, it will return an IteratorResult object,\n\
   // with value set to x and done to false.\n\
   // Given no arguments, it will return an iterator completion object.\n\
-  var iterator_result = function (x) {\n\
+  var iteratorResult = function (x) {\n\
     return { value: x, done: arguments.length === 0 };\n\
   };\n\
 \n\
@@ -5511,39 +5741,52 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
   });\n\
   addIterator(ArrayIterator.prototype);\n\
 \n\
-  var ObjectIterator = function (object, kind) {\n\
-    this.object = object;\n\
-    // Don't generate keys yet.\n\
-    this.array = null;\n\
-    this.kind = kind;\n\
+  var orderKeys = function orderKeys(a, b) {\n\
+    var aNumeric = String(ES.ToInteger(a)) === a;\n\
+    var bNumeric = String(ES.ToInteger(b)) === b;\n\
+    if (aNumeric && bNumeric) {\n\
+      return b - a;\n\
+    } else if (aNumeric && !bNumeric) {\n\
+      return -1;\n\
+    } else if (!aNumeric && bNumeric) {\n\
+      return 1;\n\
+    } else {\n\
+      return a.localeCompare(b);\n\
+    }\n\
   };\n\
-\n\
-  function getAllKeys(object) {\n\
+  var getAllKeys = function getAllKeys(object) {\n\
+    var ownKeys = [];\n\
     var keys = [];\n\
 \n\
     for (var key in object) {\n\
-      keys.push(key);\n\
+      _push(_hasOwnProperty(object, key) ? ownKeys : keys, key);\n\
     }\n\
+    _sort(ownKeys, orderKeys);\n\
+    _sort(keys, orderKeys);\n\
 \n\
-    return keys;\n\
-  }\n\
+    return _concat(ownKeys, keys);\n\
+  };\n\
+\n\
+  var ObjectIterator = function (object, kind) {\n\
+    defineProperties(this, {\n\
+      object: object,\n\
+      array: getAllKeys(object),\n\
+      kind: kind\n\
+    });\n\
+  };\n\
 \n\
   defineProperties(ObjectIterator.prototype, {\n\
-    next: function () {\n\
-      var key, array = this.array;\n\
+    next: function next() {\n\
+      var key;\n\
+      var array = this.array;\n\
 \n\
       if (!(this instanceof ObjectIterator)) {\n\
         throw new TypeError('Not an ObjectIterator');\n\
       }\n\
 \n\
-      // Keys not generated\n\
-      if (array === null) {\n\
-        array = this.array = getAllKeys(this.object);\n\
-      }\n\
-\n\
       // Find next key in the object\n\
-      while (ES.ToLength(array.length) > 0) {\n\
-        key = array.shift();\n\
+      while (array.length > 0) {\n\
+        key = _shift(array);\n\
 \n\
         // The candidate key isn't defined on object.\n\
         // Must have been deleted, or object[[Prototype]]\n\
@@ -5553,31 +5796,46 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
         }\n\
 \n\
         if (this.kind === 'key') {\n\
-          return iterator_result(key);\n\
+          return iteratorResult(key);\n\
         } else if (this.kind === 'value') {\n\
-          return iterator_result(this.object[key]);\n\
+          return iteratorResult(this.object[key]);\n\
         } else {\n\
-          return iterator_result([key, this.object[key]]);\n\
+          return iteratorResult([key, this.object[key]]);\n\
         }\n\
       }\n\
 \n\
-      return iterator_result();\n\
+      return iteratorResult();\n\
     }\n\
   });\n\
   addIterator(ObjectIterator.prototype);\n\
 \n\
+  // note: this is positioned here because it depends on ArrayIterator\n\
+  var arrayOfSupportsSubclassing = Array.of === ArrayShims.of || (function () {\n\
+    // Detects a bug in Webkit nightly r181886\n\
+    var Foo = function Foo(len) { this.length = len; };\n\
+    Foo.prototype = [];\n\
+    var fooArr = Array.of.apply(Foo, [1, 2]);\n\
+    return fooArr instanceof Foo && fooArr.length === 2;\n\
+  }());\n\
+  if (!arrayOfSupportsSubclassing) {\n\
+    overrideNative(Array, 'of', ArrayShims.of);\n\
+  }\n\
+\n\
   var ArrayPrototypeShims = {\n\
     copyWithin: function copyWithin(target, start) {\n\
-      var end = arguments[2]; // copyWithin.length must be 2\n\
       var o = ES.ToObject(this);\n\
       var len = ES.ToLength(o.length);\n\
-      target = ES.ToInteger(target);\n\
-      start = ES.ToInteger(start);\n\
-      var to = target < 0 ? Math.max(len + target, 0) : Math.min(target, len);\n\
-      var from = start < 0 ? Math.max(len + start, 0) : Math.min(start, len);\n\
-      end = typeof end === 'undefined' ? len : ES.ToInteger(end);\n\
-      var fin = end < 0 ? Math.max(len + end, 0) : Math.min(end, len);\n\
-      var count = Math.min(fin - from, len - to);\n\
+      var relativeTarget = ES.ToInteger(target);\n\
+      var relativeStart = ES.ToInteger(start);\n\
+      var to = relativeTarget < 0 ? _max(len + relativeTarget, 0) : _min(relativeTarget, len);\n\
+      var from = relativeStart < 0 ? _max(len + relativeStart, 0) : _min(relativeStart, len);\n\
+      var end;\n\
+      if (arguments.length > 2) {\n\
+        end = arguments[2];\n\
+      }\n\
+      var relativeEnd = typeof end === 'undefined' ? len : ES.ToInteger(end);\n\
+      var finalItem = relativeEnd < 0 ? _max(len + relativeEnd, 0) : _min(relativeEnd, len);\n\
+      var count = _min(finalItem - from, len - to);\n\
       var direction = 1;\n\
       if (from < to && to < (from + count)) {\n\
         direction = -1;\n\
@@ -5585,10 +5843,10 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
         to += count - 1;\n\
       }\n\
       while (count > 0) {\n\
-        if (_hasOwnProperty(o, from)) {\n\
+        if (from in o) {\n\
           o[to] = o[from];\n\
         } else {\n\
-          delete o[from];\n\
+          delete o[to];\n\
         }\n\
         from += direction;\n\
         to += direction;\n\
@@ -5598,14 +5856,20 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
     },\n\
 \n\
     fill: function fill(value) {\n\
-      var start = arguments.length > 1 ? arguments[1] : void 0;\n\
-      var end = arguments.length > 2 ? arguments[2] : void 0;\n\
+      var start;\n\
+      if (arguments.length > 1) {\n\
+        start = arguments[1];\n\
+      }\n\
+      var end;\n\
+      if (arguments.length > 2) {\n\
+        end = arguments[2];\n\
+      }\n\
       var O = ES.ToObject(this);\n\
       var len = ES.ToLength(O.length);\n\
       start = ES.ToInteger(typeof start === 'undefined' ? 0 : start);\n\
       end = ES.ToInteger(typeof end === 'undefined' ? len : end);\n\
 \n\
-      var relativeStart = start < 0 ? Math.max(len + start, 0) : Math.min(start, len);\n\
+      var relativeStart = start < 0 ? _max(len + start, 0) : _min(start, len);\n\
       var relativeEnd = end < 0 ? len + end : end;\n\
 \n\
       for (var i = relativeStart; i < len && i < relativeEnd; ++i) {\n\
@@ -5624,7 +5888,7 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
       for (var i = 0, value; i < length; i++) {\n\
         value = list[i];\n\
         if (thisArg) {\n\
-          if (predicate.call(thisArg, value, i, list)) { return value; }\n\
+          if (_call(predicate, thisArg, value, i, list)) { return value; }\n\
         } else if (predicate(value, i, list)) {\n\
           return value;\n\
         }\n\
@@ -5640,7 +5904,7 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
       var thisArg = arguments.length > 1 ? arguments[1] : null;\n\
       for (var i = 0; i < length; i++) {\n\
         if (thisArg) {\n\
-          if (predicate.call(thisArg, list[i], i, list)) { return i; }\n\
+          if (_call(predicate, thisArg, list[i], i, list)) { return i; }\n\
         } else if (predicate(list[i], i, list)) {\n\
           return i;\n\
         }\n\
@@ -5679,11 +5943,10 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
     }\n\
   }\n\
   // Chrome 40 defines Array#values with the incorrect name, although Array#{keys,entries} have the correct name\n\
-  if (Array.prototype.values && Array.prototype.values.name !== 'values') {\n\
+  if (functionsHaveNames && Array.prototype.values && Array.prototype.values.name !== 'values') {\n\
     var originalArrayPrototypeValues = Array.prototype.values;\n\
-    defineProperty(Array.prototype, 'values', function values() { return originalArrayPrototypeValues.call(this); }, true);\n\
+    overrideNative(Array.prototype, 'values', function values() { return ES.Call(originalArrayPrototypeValues, this, arguments); });\n\
     defineProperty(Array.prototype, $iterator$, Array.prototype.values, true);\n\
-    Value.preserveToString(Array.prototype.values, originalArrayPrototypeValues);\n\
   }\n\
   defineProperties(Array.prototype, ArrayPrototypeShims);\n\
 \n\
@@ -5692,6 +5955,166 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
   // any way to identify its iterator.  So add our own shimmed field.\n\
   if (Object.getPrototypeOf) {\n\
     addIterator(Object.getPrototypeOf([].values()));\n\
+  }\n\
+\n\
+  // note: this is positioned here because it relies on Array#entries\n\
+  var arrayFromSwallowsNegativeLengths = (function () {\n\
+    // Detects a Firefox bug in v32\n\
+    // https://bugzilla.mozilla.org/show_bug.cgi?id=1063993\n\
+    return valueOrFalseIfThrows(function () { return Array.from({ length: -1 }).length === 0; });\n\
+  }());\n\
+  var arrayFromHandlesIterables = (function () {\n\
+    // Detects a bug in Webkit nightly r181886\n\
+    var arr = Array.from([0].entries());\n\
+    return arr.length === 1 && isArray(arr[0]) && arr[0][0] === 0 && arr[0][1] === 0;\n\
+  }());\n\
+  if (!arrayFromSwallowsNegativeLengths || !arrayFromHandlesIterables) {\n\
+    overrideNative(Array, 'from', ArrayShims.from);\n\
+  }\n\
+  var arrayFromHandlesUndefinedMapFunction = (function () {\n\
+    // Microsoft Edge v0.11 throws if the mapFn argument is *provided* but undefined,\n\
+    // but the spec doesn't care if it's provided or not - undefined doesn't throw.\n\
+    return valueOrFalseIfThrows(function () { return Array.from([0], void 0); });\n\
+  }());\n\
+  if (!arrayFromHandlesUndefinedMapFunction) {\n\
+    var origArrayFrom = Array.from;\n\
+    overrideNative(Array, 'from', function from(items) {\n\
+      if (arguments.length > 1 && typeof arguments[1] !== 'undefined') {\n\
+        return ES.Call(origArrayFrom, this, arguments);\n\
+      } else {\n\
+        return _call(origArrayFrom, this, items);\n\
+      }\n\
+    });\n\
+  }\n\
+\n\
+  var int32sAsOne = -(Math.pow(2, 32) - 1);\n\
+  var toLengthsCorrectly = function (method, reversed) {\n\
+    var obj = { length: int32sAsOne };\n\
+    obj[reversed ? ((obj.length >>> 0) - 1) : 0] = true;\n\
+    return valueOrFalseIfThrows(function () {\n\
+      _call(method, obj, function () {\n\
+        // note: in nonconforming browsers, this will be called\n\
+        // -1 >>> 0 times, which is 4294967295, so the throw matters.\n\
+        throw new RangeError('should not reach here');\n\
+      }, []);\n\
+      return true;\n\
+    });\n\
+  };\n\
+  if (!toLengthsCorrectly(Array.prototype.forEach)) {\n\
+    var originalForEach = Array.prototype.forEach;\n\
+    overrideNative(Array.prototype, 'forEach', function forEach(callbackFn) {\n\
+      return ES.Call(originalForEach, this.length >= 0 ? this : [], arguments);\n\
+    }, true);\n\
+  }\n\
+  if (!toLengthsCorrectly(Array.prototype.map)) {\n\
+    var originalMap = Array.prototype.map;\n\
+    overrideNative(Array.prototype, 'map', function map(callbackFn) {\n\
+      return ES.Call(originalMap, this.length >= 0 ? this : [], arguments);\n\
+    }, true);\n\
+  }\n\
+  if (!toLengthsCorrectly(Array.prototype.filter)) {\n\
+    var originalFilter = Array.prototype.filter;\n\
+    overrideNative(Array.prototype, 'filter', function filter(callbackFn) {\n\
+      return ES.Call(originalFilter, this.length >= 0 ? this : [], arguments);\n\
+    }, true);\n\
+  }\n\
+  if (!toLengthsCorrectly(Array.prototype.some)) {\n\
+    var originalSome = Array.prototype.some;\n\
+    overrideNative(Array.prototype, 'some', function some(callbackFn) {\n\
+      return ES.Call(originalSome, this.length >= 0 ? this : [], arguments);\n\
+    }, true);\n\
+  }\n\
+  if (!toLengthsCorrectly(Array.prototype.every)) {\n\
+    var originalEvery = Array.prototype.every;\n\
+    overrideNative(Array.prototype, 'every', function every(callbackFn) {\n\
+      return ES.Call(originalEvery, this.length >= 0 ? this : [], arguments);\n\
+    }, true);\n\
+  }\n\
+  if (!toLengthsCorrectly(Array.prototype.reduce)) {\n\
+    var originalReduce = Array.prototype.reduce;\n\
+    overrideNative(Array.prototype, 'reduce', function reduce(callbackFn) {\n\
+      return ES.Call(originalReduce, this.length >= 0 ? this : [], arguments);\n\
+    }, true);\n\
+  }\n\
+  if (!toLengthsCorrectly(Array.prototype.reduceRight, true)) {\n\
+    var originalReduceRight = Array.prototype.reduceRight;\n\
+    overrideNative(Array.prototype, 'reduceRight', function reduceRight(callbackFn) {\n\
+      return ES.Call(originalReduceRight, this.length >= 0 ? this : [], arguments);\n\
+    }, true);\n\
+  }\n\
+\n\
+  var lacksOctalSupport = Number('0o10') !== 8;\n\
+  var lacksBinarySupport = Number('0b10') !== 2;\n\
+  var trimsNonWhitespace = _some(nonWS, function (c) {\n\
+    return Number(c + 0 + c) === 0;\n\
+  });\n\
+  if (lacksOctalSupport || lacksBinarySupport || trimsNonWhitespace) {\n\
+    var OrigNumber = Number;\n\
+    var binaryRegex = /^0b[01]+$/i;\n\
+    var octalRegex = /^0o[0-7]+$/i;\n\
+    // Note that in IE 8, RegExp.prototype.test doesn't seem to exist: ie, \"test\" is an own property of regexes. wtf.\n\
+    var isBinary = binaryRegex.test.bind(binaryRegex);\n\
+    var isOctal = octalRegex.test.bind(octalRegex);\n\
+    var toPrimitive = function (O) { // need to replace this with `es-to-primitive/es6`\n\
+      var result;\n\
+      if (typeof O.valueOf === 'function') {\n\
+        result = O.valueOf();\n\
+        if (Type.primitive(result)) {\n\
+          return result;\n\
+        }\n\
+      }\n\
+      if (typeof O.toString === 'function') {\n\
+        result = O.toString();\n\
+        if (Type.primitive(result)) {\n\
+          return result;\n\
+        }\n\
+      }\n\
+      throw new TypeError('No default value');\n\
+    };\n\
+    var hasNonWS = nonWSregex.test.bind(nonWSregex);\n\
+    var isBadHex = isBadHexRegex.test.bind(isBadHexRegex);\n\
+    var NumberShim = (function () {\n\
+      // this is wrapped in an IIFE because of IE 6-8's wacky scoping issues with named function expressions.\n\
+      var NumberShim = function Number(value) {\n\
+        var primValue;\n\
+        if (arguments.length > 0) {\n\
+          primValue = Type.primitive(value) ? value : toPrimitive(value, 'number');\n\
+        } else {\n\
+          primValue = 0;\n\
+        }\n\
+        if (typeof primValue === 'string') {\n\
+          primValue = ES.Call(trimShim, primValue);\n\
+          if (isBinary(primValue)) {\n\
+            primValue = parseInt(_strSlice(primValue, 2), 2);\n\
+          } else if (isOctal(primValue)) {\n\
+            primValue = parseInt(_strSlice(primValue, 2), 8);\n\
+          } else if (hasNonWS(primValue) || isBadHex(primValue)) {\n\
+            primValue = NaN;\n\
+          }\n\
+        }\n\
+        var receiver = this;\n\
+        var valueOfSucceeds = valueOrFalseIfThrows(function () {\n\
+          OrigNumber.prototype.valueOf.call(receiver);\n\
+          return true;\n\
+        });\n\
+        if (receiver instanceof NumberShim && !valueOfSucceeds) {\n\
+          return new OrigNumber(primValue);\n\
+        }\n\
+        /* jshint newcap: false */\n\
+        return OrigNumber(primValue);\n\
+        /* jshint newcap: true */\n\
+      };\n\
+      return NumberShim;\n\
+    }());\n\
+    wrapConstructor(OrigNumber, NumberShim, {});\n\
+    /* globals Number: true */\n\
+    /* eslint-disable no-undef */\n\
+    /* jshint -W020 */\n\
+    Number = NumberShim;\n\
+    Value.redefine(globals, 'Number', NumberShim);\n\
+    /* jshint +W020 */\n\
+    /* eslint-enable no-undef */\n\
+    /* globals Number: false */\n\
   }\n\
 \n\
   var maxSafeInteger = Math.pow(2, 53) - 1;\n\
@@ -5703,60 +6126,98 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
     parseInt: globals.parseInt,\n\
     parseFloat: globals.parseFloat,\n\
 \n\
-    isFinite: function (value) {\n\
-      return typeof value === 'number' && global_isFinite(value);\n\
+    isFinite: numberIsFinite,\n\
+\n\
+    isInteger: function isInteger(value) {\n\
+      return numberIsFinite(value) && ES.ToInteger(value) === value;\n\
     },\n\
 \n\
-    isInteger: function (value) {\n\
-      return Number.isFinite(value) && ES.ToInteger(value) === value;\n\
+    isSafeInteger: function isSafeInteger(value) {\n\
+      return Number.isInteger(value) && _abs(value) <= Number.MAX_SAFE_INTEGER;\n\
     },\n\
 \n\
-    isSafeInteger: function (value) {\n\
-      return Number.isInteger(value) && Math.abs(value) <= Number.MAX_SAFE_INTEGER;\n\
-    },\n\
-\n\
-    isNaN: function (value) {\n\
-      // NaN !== NaN, but they are identical.\n\
-      // NaNs are the only non-reflexive value, i.e., if x !== x,\n\
-      // then x is NaN.\n\
-      // isNaN is broken: it converts its argument to number, so\n\
-      // isNaN('foo') => true\n\
-      return value !== value;\n\
-    }\n\
+    isNaN: numberIsNaN\n\
   });\n\
+  // Firefox 37 has a conforming Number.parseInt, but it's not === to the global parseInt (fixed in v40)\n\
+  defineProperty(Number, 'parseInt', globals.parseInt, Number.parseInt !== globals.parseInt);\n\
 \n\
   // Work around bugs in Array#find and Array#findIndex -- early\n\
   // implementations skipped holes in sparse arrays. (Note that the\n\
   // implementations of find/findIndex indirectly use shimmed\n\
   // methods of Number, so this test has to happen down here.)\n\
   /*jshint elision: true */\n\
+  /* eslint-disable no-sparse-arrays */\n\
   if (![, 1].find(function (item, idx) { return idx === 0; })) {\n\
-    defineProperty(Array.prototype, 'find', ArrayPrototypeShims.find, true);\n\
+    overrideNative(Array.prototype, 'find', ArrayPrototypeShims.find);\n\
   }\n\
   if ([, 1].findIndex(function (item, idx) { return idx === 0; }) !== 0) {\n\
-    defineProperty(Array.prototype, 'findIndex', ArrayPrototypeShims.findIndex, true);\n\
+    overrideNative(Array.prototype, 'findIndex', ArrayPrototypeShims.findIndex);\n\
   }\n\
+  /* eslint-enable no-sparse-arrays */\n\
   /*jshint elision: false */\n\
 \n\
+  var isEnumerableOn = Function.bind.call(Function.bind, Object.prototype.propertyIsEnumerable);\n\
+  var ensureEnumerable = function ensureEnumerable(obj, prop) {\n\
+    if (supportsDescriptors && isEnumerableOn(obj, prop)) {\n\
+      Object.defineProperty(obj, prop, { enumerable: false });\n\
+    }\n\
+  };\n\
+  var sliceArgs = function sliceArgs() {\n\
+    // per https://github.com/petkaantonov/bluebird/wiki/Optimization-killers#32-leaking-arguments\n\
+    // and https://gist.github.com/WebReflection/4327762cb87a8c634a29\n\
+    var initial = Number(this);\n\
+    var len = arguments.length;\n\
+    var desiredArgCount = len - initial;\n\
+    var args = new Array(desiredArgCount < 0 ? 0 : desiredArgCount);\n\
+    for (var i = initial; i < len; ++i) {\n\
+      args[i - initial] = arguments[i];\n\
+    }\n\
+    return args;\n\
+  };\n\
+  var assignTo = function assignTo(source) {\n\
+    return function assignToSource(target, key) {\n\
+      target[key] = source[key];\n\
+      return target;\n\
+    };\n\
+  };\n\
+  var assignReducer = function (target, source) {\n\
+    var sourceKeys = keys(Object(source));\n\
+    var symbols;\n\
+    if (ES.IsCallable(Object.getOwnPropertySymbols)) {\n\
+      symbols = _filter(Object.getOwnPropertySymbols(Object(source)), isEnumerableOn(source));\n\
+    }\n\
+    return _reduce(_concat(sourceKeys, symbols || []), assignTo(source), target);\n\
+  };\n\
+\n\
+  var ObjectShims = {\n\
+    // 19.1.3.1\n\
+    assign: function (target, source) {\n\
+      var to = ES.ToObject(target, 'Cannot convert undefined or null to object');\n\
+      return _reduce(ES.Call(sliceArgs, 1, arguments), assignReducer, to);\n\
+    },\n\
+\n\
+    // Added in WebKit in https://bugs.webkit.org/show_bug.cgi?id=143865\n\
+    is: function is(a, b) {\n\
+      return ES.SameValue(a, b);\n\
+    }\n\
+  };\n\
+  var assignHasPendingExceptions = Object.assign && Object.preventExtensions && (function () {\n\
+    // Firefox 37 still has \"pending exception\" logic in its Object.assign implementation,\n\
+    // which is 72% slower than our shim, and Firefox 40's native implementation.\n\
+    var thrower = Object.preventExtensions({ 1: 2 });\n\
+    try {\n\
+      Object.assign(thrower, 'xy');\n\
+    } catch (e) {\n\
+      return thrower[1] === 'y';\n\
+    }\n\
+  }());\n\
+  if (assignHasPendingExceptions) {\n\
+    overrideNative(Object, 'assign', ObjectShims.assign);\n\
+  }\n\
+  defineProperties(Object, ObjectShims);\n\
+\n\
   if (supportsDescriptors) {\n\
-    defineProperties(Object, {\n\
-      // 19.1.3.1\n\
-      assign: function (target, source) {\n\
-        if (!ES.TypeIsObject(target)) {\n\
-          throw new TypeError('target must be an object');\n\
-        }\n\
-        return Array.prototype.reduce.call(arguments, function (target, source) {\n\
-          return Object.keys(Object(source)).reduce(function (target, key) {\n\
-            target[key] = source[key];\n\
-            return target;\n\
-          }, target);\n\
-        });\n\
-      },\n\
-\n\
-      is: function (a, b) {\n\
-        return ES.SameValue(a, b);\n\
-      },\n\
-\n\
+    var ES5ObjectShims = {\n\
       // 19.1.3.9\n\
       // shim from https://gist.github.com/WebReflection/5593554\n\
       setPrototypeOf: (function (Object, magic) {\n\
@@ -5773,14 +6234,14 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
 \n\
         var setPrototypeOf = function (O, proto) {\n\
           checkArgs(O, proto);\n\
-          set.call(O, proto);\n\
+          _call(set, O, proto);\n\
           return O;\n\
         };\n\
 \n\
         try {\n\
           // this works already in Firefox and Safari\n\
           set = Object.getOwnPropertyDescriptor(Object.prototype, magic).set;\n\
-          set.call({}, null);\n\
+          _call(set, {}, null);\n\
         } catch (e) {\n\
           if (Object.prototype !== {}[magic]) {\n\
             // IE < 11 cannot be shimmed\n\
@@ -5809,7 +6270,9 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
         }\n\
         return setPrototypeOf;\n\
       }(Object, '__proto__'))\n\
-    });\n\
+    };\n\
+\n\
+    defineProperties(Object, ES5ObjectShims);\n\
   }\n\
 \n\
   // Workaround bug in Opera 12 where setPrototypeOf(x, null) doesn't work,\n\
@@ -5825,190 +6288,125 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
         return result === FAKENULL ? null : result;\n\
       };\n\
       Object.setPrototypeOf = function (o, p) {\n\
-        if (p === null) { p = FAKENULL; }\n\
-        return spo(o, p);\n\
+        var proto = p === null ? FAKENULL : p;\n\
+        return spo(o, proto);\n\
       };\n\
       Object.setPrototypeOf.polyfill = false;\n\
     }());\n\
   }\n\
 \n\
-  var objectKeysAcceptsPrimitives = (function () {\n\
-    try {\n\
-      Object.keys('foo');\n\
-      return true;\n\
-    } catch (e) {\n\
-      return false;\n\
-    }\n\
-  }());\n\
+  var objectKeysAcceptsPrimitives = !throwsError(function () { Object.keys('foo'); });\n\
   if (!objectKeysAcceptsPrimitives) {\n\
     var originalObjectKeys = Object.keys;\n\
-    defineProperty(Object, 'keys', function keys(value) {\n\
+    overrideNative(Object, 'keys', function keys(value) {\n\
       return originalObjectKeys(ES.ToObject(value));\n\
-    }, true);\n\
-    Value.preserveToString(Object.keys, originalObjectKeys);\n\
+    });\n\
+    keys = Object.keys;\n\
   }\n\
 \n\
   if (Object.getOwnPropertyNames) {\n\
-    var objectGOPNAcceptsPrimitives = (function () {\n\
-      try {\n\
-        Object.getOwnPropertyNames('foo');\n\
-        return true;\n\
-      } catch (e) {\n\
-        return false;\n\
-      }\n\
-    }());\n\
+    var objectGOPNAcceptsPrimitives = !throwsError(function () { Object.getOwnPropertyNames('foo'); });\n\
     if (!objectGOPNAcceptsPrimitives) {\n\
+      var cachedWindowNames = typeof window === 'object' ? Object.getOwnPropertyNames(window) : [];\n\
       var originalObjectGetOwnPropertyNames = Object.getOwnPropertyNames;\n\
-      defineProperty(Object, 'getOwnPropertyNames', function getOwnPropertyNames(value) {\n\
-        return originalObjectGetOwnPropertyNames(ES.ToObject(value));\n\
-      }, true);\n\
-      Value.preserveToString(Object.getOwnPropertyNames, originalObjectGetOwnPropertyNames);\n\
+      overrideNative(Object, 'getOwnPropertyNames', function getOwnPropertyNames(value) {\n\
+        var val = ES.ToObject(value);\n\
+        if (_toString(val) === '[object Window]') {\n\
+          try {\n\
+            return originalObjectGetOwnPropertyNames(val);\n\
+          } catch (e) {\n\
+            // IE bug where layout engine calls userland gOPN for cross-domain `window` objects\n\
+            return _concat([], cachedWindowNames);\n\
+          }\n\
+        }\n\
+        return originalObjectGetOwnPropertyNames(val);\n\
+      });\n\
     }\n\
   }\n\
   if (Object.getOwnPropertyDescriptor) {\n\
-    var objectGOPDAcceptsPrimitives = (function () {\n\
-      try {\n\
-        Object.getOwnPropertyDescriptor('foo', 'bar');\n\
-        return true;\n\
-      } catch (e) {\n\
-        return false;\n\
-      }\n\
-    }());\n\
+    var objectGOPDAcceptsPrimitives = !throwsError(function () { Object.getOwnPropertyDescriptor('foo', 'bar'); });\n\
     if (!objectGOPDAcceptsPrimitives) {\n\
       var originalObjectGetOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;\n\
-      defineProperty(Object, 'getOwnPropertyDescriptor', function getOwnPropertyDescriptor(value, property) {\n\
+      overrideNative(Object, 'getOwnPropertyDescriptor', function getOwnPropertyDescriptor(value, property) {\n\
         return originalObjectGetOwnPropertyDescriptor(ES.ToObject(value), property);\n\
-      }, true);\n\
-      Value.preserveToString(Object.getOwnPropertyDescriptor, originalObjectGetOwnPropertyDescriptor);\n\
+      });\n\
     }\n\
   }\n\
   if (Object.seal) {\n\
-    var objectSealAcceptsPrimitives = (function () {\n\
-      try {\n\
-        Object.seal('foo');\n\
-        return true;\n\
-      } catch (e) {\n\
-        return false;\n\
-      }\n\
-    }());\n\
+    var objectSealAcceptsPrimitives = !throwsError(function () { Object.seal('foo'); });\n\
     if (!objectSealAcceptsPrimitives) {\n\
       var originalObjectSeal = Object.seal;\n\
-      defineProperty(Object, 'seal', function seal(value) {\n\
+      overrideNative(Object, 'seal', function seal(value) {\n\
         if (!Type.object(value)) { return value; }\n\
         return originalObjectSeal(value);\n\
-      }, true);\n\
-      Value.preserveToString(Object.seal, originalObjectSeal);\n\
+      });\n\
     }\n\
   }\n\
   if (Object.isSealed) {\n\
-    var objectIsSealedAcceptsPrimitives = (function () {\n\
-      try {\n\
-        Object.isSealed('foo');\n\
-        return true;\n\
-      } catch (e) {\n\
-        return false;\n\
-      }\n\
-    }());\n\
+    var objectIsSealedAcceptsPrimitives = !throwsError(function () { Object.isSealed('foo'); });\n\
     if (!objectIsSealedAcceptsPrimitives) {\n\
       var originalObjectIsSealed = Object.isSealed;\n\
-      defineProperty(Object, 'isSealed', function isSealed(value) {\n\
+      overrideNative(Object, 'isSealed', function isSealed(value) {\n\
         if (!Type.object(value)) { return true; }\n\
         return originalObjectIsSealed(value);\n\
-      }, true);\n\
-      Value.preserveToString(Object.isSealed, originalObjectIsSealed);\n\
+      });\n\
     }\n\
   }\n\
   if (Object.freeze) {\n\
-    var objectFreezeAcceptsPrimitives = (function () {\n\
-      try {\n\
-        Object.freeze('foo');\n\
-        return true;\n\
-      } catch (e) {\n\
-        return false;\n\
-      }\n\
-    }());\n\
+    var objectFreezeAcceptsPrimitives = !throwsError(function () { Object.freeze('foo'); });\n\
     if (!objectFreezeAcceptsPrimitives) {\n\
       var originalObjectFreeze = Object.freeze;\n\
-      defineProperty(Object, 'freeze', function freeze(value) {\n\
+      overrideNative(Object, 'freeze', function freeze(value) {\n\
         if (!Type.object(value)) { return value; }\n\
         return originalObjectFreeze(value);\n\
-      }, true);\n\
-      Value.preserveToString(Object.freeze, originalObjectFreeze);\n\
+      });\n\
     }\n\
   }\n\
   if (Object.isFrozen) {\n\
-    var objectIsFrozenAcceptsPrimitives = (function () {\n\
-      try {\n\
-        Object.isFrozen('foo');\n\
-        return true;\n\
-      } catch (e) {\n\
-        return false;\n\
-      }\n\
-    }());\n\
+    var objectIsFrozenAcceptsPrimitives = !throwsError(function () { Object.isFrozen('foo'); });\n\
     if (!objectIsFrozenAcceptsPrimitives) {\n\
       var originalObjectIsFrozen = Object.isFrozen;\n\
-      defineProperty(Object, 'isFrozen', function isFrozen(value) {\n\
+      overrideNative(Object, 'isFrozen', function isFrozen(value) {\n\
         if (!Type.object(value)) { return true; }\n\
         return originalObjectIsFrozen(value);\n\
-      }, true);\n\
-      Value.preserveToString(Object.isFrozen, originalObjectIsFrozen);\n\
+      });\n\
     }\n\
   }\n\
   if (Object.preventExtensions) {\n\
-    var objectPreventExtensionsAcceptsPrimitives = (function () {\n\
-      try {\n\
-        Object.preventExtensions('foo');\n\
-        return true;\n\
-      } catch (e) {\n\
-        return false;\n\
-      }\n\
-    }());\n\
+    var objectPreventExtensionsAcceptsPrimitives = !throwsError(function () { Object.preventExtensions('foo'); });\n\
     if (!objectPreventExtensionsAcceptsPrimitives) {\n\
       var originalObjectPreventExtensions = Object.preventExtensions;\n\
-      defineProperty(Object, 'preventExtensions', function preventExtensions(value) {\n\
+      overrideNative(Object, 'preventExtensions', function preventExtensions(value) {\n\
         if (!Type.object(value)) { return value; }\n\
         return originalObjectPreventExtensions(value);\n\
-      }, true);\n\
-      Value.preserveToString(Object.preventExtensions, originalObjectPreventExtensions);\n\
+      });\n\
     }\n\
   }\n\
   if (Object.isExtensible) {\n\
-    var objectIsExtensibleAcceptsPrimitives = (function () {\n\
-      try {\n\
-        Object.isExtensible('foo');\n\
-        return true;\n\
-      } catch (e) {\n\
-        return false;\n\
-      }\n\
-    }());\n\
+    var objectIsExtensibleAcceptsPrimitives = !throwsError(function () { Object.isExtensible('foo'); });\n\
     if (!objectIsExtensibleAcceptsPrimitives) {\n\
       var originalObjectIsExtensible = Object.isExtensible;\n\
-      defineProperty(Object, 'isExtensible', function isExtensible(value) {\n\
+      overrideNative(Object, 'isExtensible', function isExtensible(value) {\n\
         if (!Type.object(value)) { return false; }\n\
         return originalObjectIsExtensible(value);\n\
-      }, true);\n\
-      Value.preserveToString(Object.isExtensible, originalObjectIsExtensible);\n\
+      });\n\
     }\n\
   }\n\
   if (Object.getPrototypeOf) {\n\
-    var objectGetProtoAcceptsPrimitives = (function () {\n\
-      try {\n\
-        Object.getPrototypeOf('foo');\n\
-        return true;\n\
-      } catch (e) {\n\
-        return false;\n\
-      }\n\
-    }());\n\
+    var objectGetProtoAcceptsPrimitives = !throwsError(function () { Object.getPrototypeOf('foo'); });\n\
     if (!objectGetProtoAcceptsPrimitives) {\n\
       var originalGetProto = Object.getPrototypeOf;\n\
-      defineProperty(Object, 'getPrototypeOf', function getPrototypeOf(value) {\n\
+      overrideNative(Object, 'getPrototypeOf', function getPrototypeOf(value) {\n\
         return originalGetProto(ES.ToObject(value));\n\
-      }, true);\n\
-      Value.preserveToString(Object.getPrototypeOf, originalGetProto);\n\
+      });\n\
     }\n\
   }\n\
 \n\
-  if (!RegExp.prototype.flags && supportsDescriptors) {\n\
+  var hasFlags = supportsDescriptors && (function () {\n\
+    var desc = Object.getOwnPropertyDescriptor(RegExp.prototype, 'flags');\n\
+    return desc && ES.IsCallable(desc.get);\n\
+  }());\n\
+  if (supportsDescriptors && !hasFlags) {\n\
     var regExpFlagsGetter = function flags() {\n\
       if (!ES.TypeIsObject(this)) {\n\
         throw new TypeError('Method called on incompatible type: must be an object.');\n\
@@ -6035,102 +6433,154 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
     Value.getter(RegExp.prototype, 'flags', regExpFlagsGetter);\n\
   }\n\
 \n\
-  var regExpSupportsFlagsWithRegex = (function () {\n\
-    try {\n\
-      return String(new RegExp(/a/g, 'i')) === '/a/i';\n\
-    } catch (e) {\n\
-      return false;\n\
-    }\n\
+  var regExpSupportsFlagsWithRegex = supportsDescriptors && valueOrFalseIfThrows(function () {\n\
+    return String(new RegExp(/a/g, 'i')) === '/a/i';\n\
+  });\n\
+  var regExpNeedsToSupportSymbolMatch = hasSymbols && supportsDescriptors && (function () {\n\
+    // Edge 0.12 supports flags fully, but does not support Symbol.match\n\
+    var regex = /./;\n\
+    regex[Symbol.match] = false;\n\
+    return RegExp(regex) === regex;\n\
   }());\n\
 \n\
-  if (!regExpSupportsFlagsWithRegex && supportsDescriptors) {\n\
+  if (supportsDescriptors && (!regExpSupportsFlagsWithRegex || regExpNeedsToSupportSymbolMatch)) {\n\
+    var flagsGetter = Object.getOwnPropertyDescriptor(RegExp.prototype, 'flags').get;\n\
+    var sourceDesc = Object.getOwnPropertyDescriptor(RegExp.prototype, 'source') || {};\n\
+    var legacySourceGetter = function () { return this.source; }; // prior to it being a getter, it's own + nonconfigurable\n\
+    var sourceGetter = ES.IsCallable(sourceDesc.get) ? sourceDesc.get : legacySourceGetter;\n\
+\n\
     var OrigRegExp = RegExp;\n\
-    var RegExpShim = function RegExp(pattern, flags) {\n\
-      if (Type.regex(pattern) && Type.string(flags)) {\n\
-        return new RegExp(pattern.source, flags);\n\
-      }\n\
-      return new OrigRegExp(pattern, flags);\n\
-    };\n\
-    Value.preserveToString(RegExpShim, OrigRegExp);\n\
-    if (Object.setPrototypeOf) {\n\
-      // sets up proper prototype chain where possible\n\
-      Object.setPrototypeOf(OrigRegExp, RegExpShim);\n\
-    }\n\
-    Object.getOwnPropertyNames(OrigRegExp).forEach(function (key) {\n\
-      if (key === '$input') { return; } // Chrome < v39 & Opera < 26 have a nonstandard \"$input\" property\n\
-      if (key in noop) { return; }\n\
-      Value.proxy(OrigRegExp, key, RegExpShim);\n\
+    var RegExpShim = (function () {\n\
+      return function RegExp(pattern, flags) {\n\
+        var patternIsRegExp = ES.IsRegExp(pattern);\n\
+        var calledWithNew = this instanceof RegExp;\n\
+        if (!calledWithNew && patternIsRegExp && typeof flags === 'undefined' && pattern.constructor === RegExp) {\n\
+          return pattern;\n\
+        }\n\
+\n\
+        var P = pattern;\n\
+        var F = flags;\n\
+        if (Type.regex(pattern)) {\n\
+          P = ES.Call(sourceGetter, pattern);\n\
+          F = typeof flags === 'undefined' ? ES.Call(flagsGetter, pattern) : flags;\n\
+          return new RegExp(P, F);\n\
+        } else if (patternIsRegExp) {\n\
+          P = pattern.source;\n\
+          F = typeof flags === 'undefined' ? pattern.flags : flags;\n\
+        }\n\
+        return new OrigRegExp(pattern, flags);\n\
+      };\n\
+    }());\n\
+    wrapConstructor(OrigRegExp, RegExpShim, {\n\
+      $input: true // Chrome < v39 & Opera < 26 have a nonstandard \"$input\" property\n\
     });\n\
-    RegExpShim.prototype = OrigRegExp.prototype;\n\
-    Value.redefine(OrigRegExp.prototype, 'constructor', RegExpShim);\n\
-    /*globals RegExp: true */\n\
+    /* globals RegExp: true */\n\
+    /* eslint-disable no-undef */\n\
+    /* jshint -W020 */\n\
     RegExp = RegExpShim;\n\
     Value.redefine(globals, 'RegExp', RegExpShim);\n\
-    /*globals RegExp: false */\n\
+    /* jshint +W020 */\n\
+    /* eslint-enable no-undef */\n\
+    /* globals RegExp: false */\n\
   }\n\
 \n\
+  if (supportsDescriptors) {\n\
+    var regexGlobals = {\n\
+      input: '$_',\n\
+      lastMatch: '$&',\n\
+      lastParen: '$+',\n\
+      leftContext: '$`',\n\
+      rightContext: '$\\''\n\
+    };\n\
+    _forEach(keys(regexGlobals), function (prop) {\n\
+      if (prop in RegExp && !(regexGlobals[prop] in RegExp)) {\n\
+        Value.getter(RegExp, regexGlobals[prop], function get() {\n\
+          return RegExp[prop];\n\
+        });\n\
+      }\n\
+    });\n\
+  }\n\
+  addDefaultSpecies(RegExp);\n\
+\n\
+  var inverseEpsilon = 1 / Number.EPSILON;\n\
+  var roundTiesToEven = function roundTiesToEven(n) {\n\
+    // Even though this reduces down to `return n`, it takes advantage of built-in rounding.\n\
+    return (n + inverseEpsilon) - inverseEpsilon;\n\
+  };\n\
+  var BINARY_32_EPSILON = Math.pow(2, -23);\n\
+  var BINARY_32_MAX_VALUE = Math.pow(2, 127) * (2 - BINARY_32_EPSILON);\n\
+  var BINARY_32_MIN_VALUE = Math.pow(2, -126);\n\
+  var numberCLZ = Number.prototype.clz;\n\
+  delete Number.prototype.clz; // Safari 8 has Number#clz\n\
+\n\
   var MathShims = {\n\
-    acosh: function (value) {\n\
+    acosh: function acosh(value) {\n\
       var x = Number(value);\n\
       if (Number.isNaN(x) || value < 1) { return NaN; }\n\
       if (x === 1) { return 0; }\n\
       if (x === Infinity) { return x; }\n\
-      return Math.log(x / Math.E + Math.sqrt(x + 1) * Math.sqrt(x - 1) / Math.E) + 1;\n\
+      return _log(x / Math.E + _sqrt(x + 1) * _sqrt(x - 1) / Math.E) + 1;\n\
     },\n\
 \n\
-    asinh: function (value) {\n\
-      value = Number(value);\n\
-      if (value === 0 || !global_isFinite(value)) {\n\
-        return value;\n\
+    asinh: function asinh(value) {\n\
+      var x = Number(value);\n\
+      if (x === 0 || !globalIsFinite(x)) {\n\
+        return x;\n\
       }\n\
-      return value < 0 ? -Math.asinh(-value) : Math.log(value + Math.sqrt(value * value + 1));\n\
+      return x < 0 ? -Math.asinh(-x) : _log(x + _sqrt(x * x + 1));\n\
     },\n\
 \n\
-    atanh: function (value) {\n\
-      value = Number(value);\n\
-      if (Number.isNaN(value) || value < -1 || value > 1) {\n\
+    atanh: function atanh(value) {\n\
+      var x = Number(value);\n\
+      if (Number.isNaN(x) || x < -1 || x > 1) {\n\
         return NaN;\n\
       }\n\
-      if (value === -1) { return -Infinity; }\n\
-      if (value === 1) { return Infinity; }\n\
-      if (value === 0) { return value; }\n\
-      return 0.5 * Math.log((1 + value) / (1 - value));\n\
+      if (x === -1) { return -Infinity; }\n\
+      if (x === 1) { return Infinity; }\n\
+      if (x === 0) { return x; }\n\
+      return 0.5 * _log((1 + x) / (1 - x));\n\
     },\n\
 \n\
-    cbrt: function (value) {\n\
-      value = Number(value);\n\
-      if (value === 0) { return value; }\n\
-      var negate = value < 0, result;\n\
-      if (negate) { value = -value; }\n\
-      result = Math.pow(value, 1 / 3);\n\
+    cbrt: function cbrt(value) {\n\
+      var x = Number(value);\n\
+      if (x === 0) { return x; }\n\
+      var negate = x < 0, result;\n\
+      if (negate) { x = -x; }\n\
+      if (x === Infinity) {\n\
+        result = Infinity;\n\
+      } else {\n\
+        result = Math.exp(_log(x) / 3);\n\
+        // from http://en.wikipedia.org/wiki/Cube_root#Numerical_methods\n\
+        result = (x / (result * result) + (2 * result)) / 3;\n\
+      }\n\
       return negate ? -result : result;\n\
     },\n\
 \n\
-    clz32: function (value) {\n\
+    clz32: function clz32(value) {\n\
       // See https://bugs.ecmascript.org/show_bug.cgi?id=2465\n\
-      value = Number(value);\n\
-      var number = ES.ToUint32(value);\n\
+      var x = Number(value);\n\
+      var number = ES.ToUint32(x);\n\
       if (number === 0) {\n\
         return 32;\n\
       }\n\
-      return 32 - (number).toString(2).length;\n\
+      return numberCLZ ? ES.Call(numberCLZ, number) : 31 - _floor(_log(number + 0.5) * Math.LOG2E);\n\
     },\n\
 \n\
-    cosh: function (value) {\n\
-      value = Number(value);\n\
-      if (value === 0) { return 1; } // +0 or -0\n\
-      if (Number.isNaN(value)) { return NaN; }\n\
-      if (!global_isFinite(value)) { return Infinity; }\n\
-      if (value < 0) { value = -value; }\n\
-      if (value > 21) { return Math.exp(value) / 2; }\n\
-      return (Math.exp(value) + Math.exp(-value)) / 2;\n\
+    cosh: function cosh(value) {\n\
+      var x = Number(value);\n\
+      if (x === 0) { return 1; } // +0 or -0\n\
+      if (Number.isNaN(x)) { return NaN; }\n\
+      if (!globalIsFinite(x)) { return Infinity; }\n\
+      if (x < 0) { x = -x; }\n\
+      if (x > 21) { return Math.exp(x) / 2; }\n\
+      return (Math.exp(x) + Math.exp(-x)) / 2;\n\
     },\n\
 \n\
-    expm1: function (value) {\n\
+    expm1: function expm1(value) {\n\
       var x = Number(value);\n\
       if (x === -Infinity) { return -1; }\n\
-      if (!global_isFinite(x) || value === 0) { return x; }\n\
-      if (Math.abs(x) > 0.5) {\n\
+      if (!globalIsFinite(x) || x === 0) { return x; }\n\
+      if (_abs(x) > 0.5) {\n\
         return Math.exp(x) - 1;\n\
       }\n\
       // A more precise approximation using Taylor series expansion\n\
@@ -6146,75 +6596,59 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
       return sum;\n\
     },\n\
 \n\
-    hypot: function (x, y) {\n\
-      var anyNaN = false;\n\
-      var allZero = true;\n\
-      var anyInfinity = false;\n\
-      var numbers = [];\n\
-      Array.prototype.every.call(arguments, function (arg) {\n\
-        var num = Number(arg);\n\
-        if (Number.isNaN(num)) {\n\
-          anyNaN = true;\n\
-        } else if (num === Infinity || num === -Infinity) {\n\
-          anyInfinity = true;\n\
-        } else if (num !== 0) {\n\
-          allZero = false;\n\
+    hypot: function hypot(x, y) {\n\
+      var result = 0;\n\
+      var largest = 0;\n\
+      for (var i = 0; i < arguments.length; ++i) {\n\
+        var value = _abs(Number(arguments[i]));\n\
+        if (largest < value) {\n\
+          result *= (largest / value) * (largest / value);\n\
+          result += 1;\n\
+          largest = value;\n\
+        } else {\n\
+          result += (value > 0 ? (value / largest) * (value / largest) : value);\n\
         }\n\
-        if (anyInfinity) {\n\
-          return false;\n\
-        } else if (!anyNaN) {\n\
-          numbers.push(Math.abs(num));\n\
-        }\n\
-        return true;\n\
-      });\n\
-      if (anyInfinity) { return Infinity; }\n\
-      if (anyNaN) { return NaN; }\n\
-      if (allZero) { return 0; }\n\
-\n\
-      numbers.sort(function (a, b) { return b - a; });\n\
-      var largest = numbers[0];\n\
-      var divided = numbers.map(function (number) { return number / largest; });\n\
-      var sum = divided.reduce(function (sum, number) { return sum + (number * number); }, 0);\n\
-      return largest * Math.sqrt(sum);\n\
+      }\n\
+      return largest === Infinity ? Infinity : largest * _sqrt(result);\n\
     },\n\
 \n\
-    log2: function (value) {\n\
-      return Math.log(value) * Math.LOG2E;\n\
+    log2: function log2(value) {\n\
+      return _log(value) * Math.LOG2E;\n\
     },\n\
 \n\
-    log10: function (value) {\n\
-      return Math.log(value) * Math.LOG10E;\n\
+    log10: function log10(value) {\n\
+      return _log(value) * Math.LOG10E;\n\
     },\n\
 \n\
-    log1p: function (value) {\n\
+    log1p: function log1p(value) {\n\
       var x = Number(value);\n\
       if (x < -1 || Number.isNaN(x)) { return NaN; }\n\
       if (x === 0 || x === Infinity) { return x; }\n\
       if (x === -1) { return -Infinity; }\n\
 \n\
-      return (1 + x) - 1 === 0 ? x : x * (Math.log(1 + x) / ((1 + x) - 1));\n\
+      return (1 + x) - 1 === 0 ? x : x * (_log(1 + x) / ((1 + x) - 1));\n\
     },\n\
 \n\
-    sign: function (value) {\n\
-      var number = +value;\n\
+    sign: function sign(value) {\n\
+      var number = Number(value);\n\
       if (number === 0) { return number; }\n\
       if (Number.isNaN(number)) { return number; }\n\
       return number < 0 ? -1 : 1;\n\
     },\n\
 \n\
-    sinh: function (value) {\n\
+    sinh: function sinh(value) {\n\
       var x = Number(value);\n\
-      if (!global_isFinite(value) || value === 0) { return value; }\n\
+      if (!globalIsFinite(x) || x === 0) { return x; }\n\
 \n\
-      if (Math.abs(x) < 1) {\n\
+      if (_abs(x) < 1) {\n\
         return (Math.expm1(x) - Math.expm1(-x)) / 2;\n\
       }\n\
       return (Math.exp(x - 1) - Math.exp(-x - 1)) * Math.E / 2;\n\
     },\n\
 \n\
-    tanh: function (value) {\n\
+    tanh: function tanh(value) {\n\
       var x = Number(value);\n\
-      if (Number.isNaN(value) || x === 0) { return x; }\n\
+      if (Number.isNaN(x) || x === 0) { return x; }\n\
       if (x === Infinity) { return 1; }\n\
       if (x === -Infinity) { return -1; }\n\
       var a = Math.expm1(x);\n\
@@ -6224,75 +6658,108 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
       return (a - b) / (Math.exp(x) + Math.exp(-x));\n\
     },\n\
 \n\
-    trunc: function (value) {\n\
-      var number = Number(value);\n\
-      return number < 0 ? -Math.floor(-number) : Math.floor(number);\n\
+    trunc: function trunc(value) {\n\
+      var x = Number(value);\n\
+      return x < 0 ? -_floor(-x) : _floor(x);\n\
     },\n\
 \n\
-    imul: function (x, y) {\n\
+    imul: function imul(x, y) {\n\
       // taken from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/imul\n\
-      x = ES.ToUint32(x);\n\
-      y = ES.ToUint32(y);\n\
-      var ah = (x >>> 16) & 0xffff;\n\
-      var al = x & 0xffff;\n\
-      var bh = (y >>> 16) & 0xffff;\n\
-      var bl = y & 0xffff;\n\
+      var a = ES.ToUint32(x);\n\
+      var b = ES.ToUint32(y);\n\
+      var ah = (a >>> 16) & 0xffff;\n\
+      var al = a & 0xffff;\n\
+      var bh = (b >>> 16) & 0xffff;\n\
+      var bl = b & 0xffff;\n\
       // the shift by 0 fixes the sign on the high part\n\
       // the final |0 converts the unsigned value into a signed value\n\
       return ((al * bl) + (((ah * bl + al * bh) << 16) >>> 0) | 0);\n\
     },\n\
 \n\
-    fround: function (x) {\n\
-      if (x === 0 || x === Infinity || x === -Infinity || Number.isNaN(x)) {\n\
-        return x;\n\
+    fround: function fround(x) {\n\
+      var v = Number(x);\n\
+      if (v === 0 || v === Infinity || v === -Infinity || numberIsNaN(v)) {\n\
+        return v;\n\
       }\n\
-      var num = Number(x);\n\
-      return numberConversion.toFloat32(num);\n\
+      var sign = Math.sign(v);\n\
+      var abs = _abs(v);\n\
+      if (abs < BINARY_32_MIN_VALUE) {\n\
+        return sign * roundTiesToEven(abs / BINARY_32_MIN_VALUE / BINARY_32_EPSILON) * BINARY_32_MIN_VALUE * BINARY_32_EPSILON;\n\
+      }\n\
+      // Veltkamp's splitting (?)\n\
+      var a = (1 + BINARY_32_EPSILON / Number.EPSILON) * abs;\n\
+      var result = a - (a - abs);\n\
+      if (result > BINARY_32_MAX_VALUE || numberIsNaN(result)) {\n\
+        return sign * Infinity;\n\
+      }\n\
+      return sign * result;\n\
     }\n\
   };\n\
   defineProperties(Math, MathShims);\n\
+  // IE 11 TP has an imprecise log1p: reports Math.log1p(-1e-17) as 0\n\
+  defineProperty(Math, 'log1p', MathShims.log1p, Math.log1p(-1e-17) !== -1e-17);\n\
+  // IE 11 TP has an imprecise asinh: reports Math.asinh(-1e7) as not exactly equal to -Math.asinh(1e7)\n\
+  defineProperty(Math, 'asinh', MathShims.asinh, Math.asinh(-1e7) !== -Math.asinh(1e7));\n\
   // Chrome 40 has an imprecise Math.tanh with very small numbers\n\
   defineProperty(Math, 'tanh', MathShims.tanh, Math.tanh(-2e-17) !== -2e-17);\n\
   // Chrome 40 loses Math.acosh precision with high numbers\n\
   defineProperty(Math, 'acosh', MathShims.acosh, Math.acosh(Number.MAX_VALUE) === Infinity);\n\
+  // Firefox 38 on Windows\n\
+  defineProperty(Math, 'cbrt', MathShims.cbrt, Math.abs(1 - Math.cbrt(1e-300) / 1e-100) / Number.EPSILON > 8);\n\
   // node 0.11 has an imprecise Math.sinh with very small numbers\n\
   defineProperty(Math, 'sinh', MathShims.sinh, Math.sinh(-2e-17) !== -2e-17);\n\
   // FF 35 on Linux reports 22025.465794806725 for Math.expm1(10)\n\
   var expm1OfTen = Math.expm1(10);\n\
   defineProperty(Math, 'expm1', MathShims.expm1, expm1OfTen > 22025.465794806719 || expm1OfTen < 22025.4657948067165168);\n\
 \n\
-  var roundHandlesBoundaryConditions = Math.round(0.5 - Number.EPSILON / 4) === 0 && Math.round(-0.5 + Number.EPSILON / 3.99) === 1;\n\
   var origMathRound = Math.round;\n\
-  defineProperty(Math, 'round', function round(x) {\n\
-    if (-0.5 <= x && x < 0.5 && x !== 0) {\n\
-      return Math.sign(x * 0);\n\
-    }\n\
-    return origMathRound(x);\n\
-  }, !roundHandlesBoundaryConditions);\n\
+  // breaks in e.g. Safari 8, Internet Explorer 11, Opera 12\n\
+  var roundHandlesBoundaryConditions = Math.round(0.5 - Number.EPSILON / 4) === 0 && Math.round(-0.5 + Number.EPSILON / 3.99) === 1;\n\
 \n\
+  // When engines use Math.floor(x + 0.5) internally, Math.round can be buggy for large integers.\n\
+  // This behavior should be governed by \"round to nearest, ties to even mode\"\n\
+  // see https://people.mozilla.org/~jorendorff/es6-draft.html#sec-ecmascript-language-types-number-type\n\
+  // These are the boundary cases where it breaks.\n\
+  var smallestPositiveNumberWhereRoundBreaks = inverseEpsilon + 1;\n\
+  var largestPositiveNumberWhereRoundBreaks = 2 * inverseEpsilon - 1;\n\
+  var roundDoesNotIncreaseIntegers = [smallestPositiveNumberWhereRoundBreaks, largestPositiveNumberWhereRoundBreaks].every(function (num) {\n\
+    return Math.round(num) === num;\n\
+  });\n\
+  defineProperty(Math, 'round', function round(x) {\n\
+    var floor = _floor(x);\n\
+    var ceil = floor === -1 ? -0 : floor + 1;\n\
+    return x - floor < 0.5 ? floor : ceil;\n\
+  }, !roundHandlesBoundaryConditions || !roundDoesNotIncreaseIntegers);\n\
+  Value.preserveToString(Math.round, origMathRound);\n\
+\n\
+  var origImul = Math.imul;\n\
   if (Math.imul(0xffffffff, 5) !== -5) {\n\
     // Safari 6.1, at least, reports \"0\" for this value\n\
     Math.imul = MathShims.imul;\n\
+    Value.preserveToString(Math.imul, origImul);\n\
+  }\n\
+  if (Math.imul.length !== 2) {\n\
+    // Safari 8.0.4 has a length of 1\n\
+    // fixed in https://bugs.webkit.org/show_bug.cgi?id=143658\n\
+    overrideNative(Math, 'imul', function imul(x, y) {\n\
+      return ES.Call(origImul, Math, arguments);\n\
+    });\n\
   }\n\
 \n\
   // Promises\n\
   // Simplest possible implementation; use a 3rd-party library if you\n\
   // want the best possible speed and/or long stack traces.\n\
   var PromiseShim = (function () {\n\
-\n\
-    var Promise, Promise$prototype;\n\
+    var setTimeout = globals.setTimeout;\n\
+    // some environments don't have setTimeout - no way to shim here.\n\
+    if (typeof setTimeout !== 'function' && typeof setTimeout !== 'object') { return; }\n\
 \n\
     ES.IsPromise = function (promise) {\n\
       if (!ES.TypeIsObject(promise)) {\n\
         return false;\n\
       }\n\
-      if (!promise._promiseConstructor) {\n\
-        // _promiseConstructor is a bit more unique than _status, so we'll\n\
-        // check that instead of the [[PromiseStatus]] internal field.\n\
-        return false;\n\
-      }\n\
-      if (typeof promise._status === 'undefined') {\n\
-        return false; // uninitialized\n\
+      if (typeof promise._promise === 'undefined') {\n\
+        return false; // uninitialized, or missing our hidden field.\n\
       }\n\
       return true;\n\
     };\n\
@@ -6300,26 +6767,27 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
     // \"PromiseCapability\" in the spec is what most promise implementations\n\
     // call a \"deferred\".\n\
     var PromiseCapability = function (C) {\n\
-      if (!ES.IsCallable(C)) {\n\
-        throw new TypeError('bad promise constructor');\n\
+      if (!ES.IsConstructor(C)) {\n\
+        throw new TypeError('Bad promise constructor');\n\
       }\n\
       var capability = this;\n\
       var resolver = function (resolve, reject) {\n\
+        if (capability.resolve !== void 0 || capability.reject !== void 0) {\n\
+          throw new TypeError('Bad Promise implementation!');\n\
+        }\n\
         capability.resolve = resolve;\n\
         capability.reject = reject;\n\
       };\n\
-      capability.promise = ES.Construct(C, [resolver]);\n\
-      // see https://bugs.ecmascript.org/show_bug.cgi?id=2478\n\
-      if (!capability.promise._es6construct) {\n\
-        throw new TypeError('bad promise constructor');\n\
-      }\n\
+      // Initialize fields to inform optimizers about the object shape.\n\
+      capability.resolve = void 0;\n\
+      capability.reject = void 0;\n\
+      capability.promise = new C(resolver);\n\
       if (!(ES.IsCallable(capability.resolve) && ES.IsCallable(capability.reject))) {\n\
-        throw new TypeError('bad promise constructor');\n\
+        throw new TypeError('Bad promise constructor');\n\
       }\n\
     };\n\
 \n\
     // find an appropriate setImmediate-alike\n\
-    var setTimeout = globals.setTimeout;\n\
     var makeZeroTimeout;\n\
     /*global window */\n\
     if (typeof window !== 'undefined' && ES.IsCallable(window.postMessage)) {\n\
@@ -6328,14 +6796,14 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
         var timeouts = [];\n\
         var messageName = 'zero-timeout-message';\n\
         var setZeroTimeout = function (fn) {\n\
-          timeouts.push(fn);\n\
+          _push(timeouts, fn);\n\
           window.postMessage(messageName, '*');\n\
         };\n\
         var handleMessage = function (event) {\n\
           if (event.source === window && event.data === messageName) {\n\
             event.stopPropagation();\n\
             if (timeouts.length === 0) { return; }\n\
-            var fn = timeouts.shift();\n\
+            var fn = _shift(timeouts);\n\
             fn();\n\
           }\n\
         };\n\
@@ -6349,125 +6817,217 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
       // global Promise below (in order to workaround bugs)\n\
       // https://github.com/Raynos/observ-hash/issues/2#issuecomment-35857671\n\
       var P = globals.Promise;\n\
-      return P && P.resolve && function (task) {\n\
-        return P.resolve().then(task);\n\
+      var pr = P && P.resolve && P.resolve();\n\
+      return pr && function (task) {\n\
+        return pr.then(task);\n\
       };\n\
     };\n\
     /*global process */\n\
+    /* jscs:disable disallowMultiLineTernary */\n\
     var enqueue = ES.IsCallable(globals.setImmediate) ?\n\
-      globals.setImmediate.bind(globals) :\n\
+      globals.setImmediate :\n\
       typeof process === 'object' && process.nextTick ? process.nextTick :\n\
       makePromiseAsap() ||\n\
       (ES.IsCallable(makeZeroTimeout) ? makeZeroTimeout() :\n\
       function (task) { setTimeout(task, 0); }); // fallback\n\
+    /* jscs:enable disallowMultiLineTernary */\n\
 \n\
-    var updatePromiseFromPotentialThenable = function (x, capability) {\n\
-      if (!ES.TypeIsObject(x)) {\n\
-        return false;\n\
-      }\n\
-      var resolve = capability.resolve;\n\
-      var reject = capability.reject;\n\
-      try {\n\
-        var then = x.then; // only one invocation of accessor\n\
-        if (!ES.IsCallable(then)) { return false; }\n\
-        then.call(x, resolve, reject);\n\
-      } catch (e) {\n\
-        reject(e);\n\
-      }\n\
-      return true;\n\
-    };\n\
+    // Constants for Promise implementation\n\
+    var PROMISE_IDENTITY = function (x) { return x; };\n\
+    var PROMISE_THROWER = function (e) { throw e; };\n\
+    var PROMISE_PENDING = 0;\n\
+    var PROMISE_FULFILLED = 1;\n\
+    var PROMISE_REJECTED = 2;\n\
+    // We store fulfill/reject handlers and capabilities in a single array.\n\
+    var PROMISE_FULFILL_OFFSET = 0;\n\
+    var PROMISE_REJECT_OFFSET = 1;\n\
+    var PROMISE_CAPABILITY_OFFSET = 2;\n\
+    // This is used in an optimization for chaining promises via then.\n\
+    var PROMISE_FAKE_CAPABILITY = {};\n\
 \n\
-    var triggerPromiseReactions = function (reactions, x) {\n\
-      reactions.forEach(function (reaction) {\n\
-        enqueue(function () {\n\
-          // PromiseReactionTask\n\
-          var handler = reaction.handler;\n\
-          var capability = reaction.capability;\n\
-          var resolve = capability.resolve;\n\
-          var reject = capability.reject;\n\
-          try {\n\
-            var result = handler(x);\n\
-            if (result === capability.promise) {\n\
-              throw new TypeError('self resolution');\n\
-            }\n\
-            var updateResult =\n\
-              updatePromiseFromPotentialThenable(result, capability);\n\
-            if (!updateResult) {\n\
-              resolve(result);\n\
-            }\n\
-          } catch (e) {\n\
-            reject(e);\n\
-          }\n\
-        });\n\
+    var enqueuePromiseReactionJob = function (handler, capability, argument) {\n\
+      enqueue(function () {\n\
+        promiseReactionJob(handler, capability, argument);\n\
       });\n\
     };\n\
 \n\
-    var promiseResolutionHandler = function (promise, onFulfilled, onRejected) {\n\
-      return function (x) {\n\
-        if (x === promise) {\n\
-          return onRejected(new TypeError('self resolution'));\n\
-        }\n\
-        var C = promise._promiseConstructor;\n\
-        var capability = new PromiseCapability(C);\n\
-        var updateResult = updatePromiseFromPotentialThenable(x, capability);\n\
-        if (updateResult) {\n\
-          return capability.promise.then(onFulfilled, onRejected);\n\
-        } else {\n\
-          return onFulfilled(x);\n\
-        }\n\
-      };\n\
+    var promiseReactionJob = function (handler, promiseCapability, argument) {\n\
+      var handlerResult, f;\n\
+      if (promiseCapability === PROMISE_FAKE_CAPABILITY) {\n\
+        // Fast case, when we don't actually need to chain through to a\n\
+        // (real) promiseCapability.\n\
+        return handler(argument);\n\
+      }\n\
+      try {\n\
+        handlerResult = handler(argument);\n\
+        f = promiseCapability.resolve;\n\
+      } catch (e) {\n\
+        handlerResult = e;\n\
+        f = promiseCapability.reject;\n\
+      }\n\
+      f(handlerResult);\n\
     };\n\
 \n\
-    Promise = function (resolver) {\n\
-      var promise = this;\n\
-      promise = emulateES6construct(promise);\n\
-      if (!promise._promiseConstructor) {\n\
-        // we use _promiseConstructor as a stand-in for the internal\n\
-        // [[PromiseStatus]] field; it's a little more unique.\n\
-        throw new TypeError('bad promise');\n\
+    var fulfillPromise = function (promise, value) {\n\
+      var _promise = promise._promise;\n\
+      var length = _promise.reactionLength;\n\
+      if (length > 0) {\n\
+        enqueuePromiseReactionJob(\n\
+          _promise.fulfillReactionHandler0,\n\
+          _promise.reactionCapability0,\n\
+          value\n\
+        );\n\
+        _promise.fulfillReactionHandler0 = void 0;\n\
+        _promise.rejectReactions0 = void 0;\n\
+        _promise.reactionCapability0 = void 0;\n\
+        if (length > 1) {\n\
+          for (var i = 1, idx = 0; i < length; i++, idx += 3) {\n\
+            enqueuePromiseReactionJob(\n\
+              _promise[idx + PROMISE_FULFILL_OFFSET],\n\
+              _promise[idx + PROMISE_CAPABILITY_OFFSET],\n\
+              value\n\
+            );\n\
+            promise[idx + PROMISE_FULFILL_OFFSET] = void 0;\n\
+            promise[idx + PROMISE_REJECT_OFFSET] = void 0;\n\
+            promise[idx + PROMISE_CAPABILITY_OFFSET] = void 0;\n\
+          }\n\
+        }\n\
       }\n\
-      if (typeof promise._status !== 'undefined') {\n\
-        throw new TypeError('promise already initialized');\n\
-      }\n\
-      // see https://bugs.ecmascript.org/show_bug.cgi?id=2482\n\
-      if (!ES.IsCallable(resolver)) {\n\
-        throw new TypeError('not a valid resolver');\n\
-      }\n\
-      promise._status = 'unresolved';\n\
-      promise._resolveReactions = [];\n\
-      promise._rejectReactions = [];\n\
+      _promise.result = value;\n\
+      _promise.state = PROMISE_FULFILLED;\n\
+      _promise.reactionLength = 0;\n\
+    };\n\
 \n\
+    var rejectPromise = function (promise, reason) {\n\
+      var _promise = promise._promise;\n\
+      var length = _promise.reactionLength;\n\
+      if (length > 0) {\n\
+        enqueuePromiseReactionJob(\n\
+          _promise.rejectReactionHandler0,\n\
+          _promise.reactionCapability0,\n\
+          reason\n\
+        );\n\
+        _promise.fulfillReactionHandler0 = void 0;\n\
+        _promise.rejectReactions0 = void 0;\n\
+        _promise.reactionCapability0 = void 0;\n\
+        if (length > 1) {\n\
+          for (var i = 1, idx = 0; i < length; i++, idx += 3) {\n\
+            enqueuePromiseReactionJob(\n\
+              _promise[idx + PROMISE_REJECT_OFFSET],\n\
+              _promise[idx + PROMISE_CAPABILITY_OFFSET],\n\
+              reason\n\
+            );\n\
+            promise[idx + PROMISE_FULFILL_OFFSET] = void 0;\n\
+            promise[idx + PROMISE_REJECT_OFFSET] = void 0;\n\
+            promise[idx + PROMISE_CAPABILITY_OFFSET] = void 0;\n\
+          }\n\
+        }\n\
+      }\n\
+      _promise.result = reason;\n\
+      _promise.state = PROMISE_REJECTED;\n\
+      _promise.reactionLength = 0;\n\
+    };\n\
+\n\
+    var createResolvingFunctions = function (promise) {\n\
+      var alreadyResolved = false;\n\
       var resolve = function (resolution) {\n\
-        if (promise._status !== 'unresolved') { return; }\n\
-        var reactions = promise._resolveReactions;\n\
-        promise._result = resolution;\n\
-        promise._resolveReactions = void 0;\n\
-        promise._rejectReactions = void 0;\n\
-        promise._status = 'has-resolution';\n\
-        triggerPromiseReactions(reactions, resolution);\n\
+        var then;\n\
+        if (alreadyResolved) { return; }\n\
+        alreadyResolved = true;\n\
+        if (resolution === promise) {\n\
+          return rejectPromise(promise, new TypeError('Self resolution'));\n\
+        }\n\
+        if (!ES.TypeIsObject(resolution)) {\n\
+          return fulfillPromise(promise, resolution);\n\
+        }\n\
+        try {\n\
+          then = resolution.then;\n\
+        } catch (e) {\n\
+          return rejectPromise(promise, e);\n\
+        }\n\
+        if (!ES.IsCallable(then)) {\n\
+          return fulfillPromise(promise, resolution);\n\
+        }\n\
+        enqueue(function () {\n\
+          promiseResolveThenableJob(promise, resolution, then);\n\
+        });\n\
       };\n\
       var reject = function (reason) {\n\
-        if (promise._status !== 'unresolved') { return; }\n\
-        var reactions = promise._rejectReactions;\n\
-        promise._result = reason;\n\
-        promise._resolveReactions = void 0;\n\
-        promise._rejectReactions = void 0;\n\
-        promise._status = 'has-rejection';\n\
-        triggerPromiseReactions(reactions, reason);\n\
+        if (alreadyResolved) { return; }\n\
+        alreadyResolved = true;\n\
+        return rejectPromise(promise, reason);\n\
       };\n\
+      return { resolve: resolve, reject: reject };\n\
+    };\n\
+\n\
+    var optimizedThen = function (then, thenable, resolve, reject) {\n\
+      // Optimization: since we discard the result, we can pass our\n\
+      // own then implementation a special hint to let it know it\n\
+      // doesn't have to create it.  (The PROMISE_FAKE_CAPABILITY\n\
+      // object is local to this implementation and unforgeable outside.)\n\
+      if (then === Promise$prototype$then) {\n\
+        _call(then, thenable, resolve, reject, PROMISE_FAKE_CAPABILITY);\n\
+      } else {\n\
+        _call(then, thenable, resolve, reject);\n\
+      }\n\
+    };\n\
+    var promiseResolveThenableJob = function (promise, thenable, then) {\n\
+      var resolvingFunctions = createResolvingFunctions(promise);\n\
+      var resolve = resolvingFunctions.resolve;\n\
+      var reject = resolvingFunctions.reject;\n\
       try {\n\
-        resolver(resolve, reject);\n\
+        optimizedThen(then, thenable, resolve, reject);\n\
       } catch (e) {\n\
         reject(e);\n\
       }\n\
-      return promise;\n\
     };\n\
+\n\
+    var Promise$prototype, Promise$prototype$then;\n\
+    var Promise = (function () {\n\
+      var PromiseShim = function Promise(resolver) {\n\
+        if (!(this instanceof PromiseShim)) {\n\
+          throw new TypeError('Constructor Promise requires \"new\"');\n\
+        }\n\
+        if (this && this._promise) {\n\
+          throw new TypeError('Bad construction');\n\
+        }\n\
+        // see https://bugs.ecmascript.org/show_bug.cgi?id=2482\n\
+        if (!ES.IsCallable(resolver)) {\n\
+          throw new TypeError('not a valid resolver');\n\
+        }\n\
+        var promise = emulateES6construct(this, PromiseShim, Promise$prototype, {\n\
+          _promise: {\n\
+            result: void 0,\n\
+            state: PROMISE_PENDING,\n\
+            // The first member of the \"reactions\" array is inlined here,\n\
+            // since most promises only have one reaction.\n\
+            // We've also exploded the 'reaction' object to inline the\n\
+            // \"handler\" and \"capability\" fields, since both fulfill and\n\
+            // reject reactions share the same capability.\n\
+            reactionLength: 0,\n\
+            fulfillReactionHandler0: void 0,\n\
+            rejectReactionHandler0: void 0,\n\
+            reactionCapability0: void 0\n\
+          }\n\
+        });\n\
+        var resolvingFunctions = createResolvingFunctions(promise);\n\
+        var reject = resolvingFunctions.reject;\n\
+        try {\n\
+          resolver(resolvingFunctions.resolve, reject);\n\
+        } catch (e) {\n\
+          reject(e);\n\
+        }\n\
+        return promise;\n\
+      };\n\
+      return PromiseShim;\n\
+    }());\n\
     Promise$prototype = Promise.prototype;\n\
+\n\
     var _promiseAllResolver = function (index, values, capability, remaining) {\n\
-      var done = false;\n\
+      var alreadyCalled = false;\n\
       return function (x) {\n\
-        if (done) { return; } // protect against being called multiple times\n\
-        done = true;\n\
+        if (alreadyCalled) { return; }\n\
+        alreadyCalled = true;\n\
         values[index] = x;\n\
         if ((--remaining.count) === 0) {\n\
           var resolve = capability.resolve;\n\
@@ -6476,143 +7036,199 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
       };\n\
     };\n\
 \n\
-    defineProperty(Promise, symbolSpecies, function (obj) {\n\
-      var constructor = this;\n\
-      // AllocatePromise\n\
-      // The `obj` parameter is a hack we use for es5\n\
-      // compatibility.\n\
-      var prototype = constructor.prototype || Promise$prototype;\n\
-      obj = obj || create(prototype);\n\
-      defineProperties(obj, {\n\
-        _status: void 0,\n\
-        _result: void 0,\n\
-        _resolveReactions: void 0,\n\
-        _rejectReactions: void 0,\n\
-        _promiseConstructor: void 0\n\
-      });\n\
-      obj._promiseConstructor = constructor;\n\
-      return obj;\n\
-    });\n\
+    var performPromiseAll = function (iteratorRecord, C, resultCapability) {\n\
+      var it = iteratorRecord.iterator;\n\
+      var values = [], remaining = { count: 1 }, next, nextValue;\n\
+      var index = 0;\n\
+      while (true) {\n\
+        try {\n\
+          next = ES.IteratorStep(it);\n\
+          if (next === false) {\n\
+            iteratorRecord.done = true;\n\
+            break;\n\
+          }\n\
+          nextValue = next.value;\n\
+        } catch (e) {\n\
+          iteratorRecord.done = true;\n\
+          throw e;\n\
+        }\n\
+        values[index] = void 0;\n\
+        var nextPromise = C.resolve(nextValue);\n\
+        var resolveElement = _promiseAllResolver(\n\
+          index, values, resultCapability, remaining\n\
+        );\n\
+        remaining.count += 1;\n\
+        optimizedThen(nextPromise.then, nextPromise, resolveElement, resultCapability.reject);\n\
+        index += 1;\n\
+      }\n\
+      if ((--remaining.count) === 0) {\n\
+        var resolve = resultCapability.resolve;\n\
+        resolve(values); // call w/ this===undefined\n\
+      }\n\
+      return resultCapability.promise;\n\
+    };\n\
+\n\
+    var performPromiseRace = function (iteratorRecord, C, resultCapability) {\n\
+      var it = iteratorRecord.iterator, next, nextValue, nextPromise;\n\
+      while (true) {\n\
+        try {\n\
+          next = ES.IteratorStep(it);\n\
+          if (next === false) {\n\
+            // NOTE: If iterable has no items, resulting promise will never\n\
+            // resolve; see:\n\
+            // https://github.com/domenic/promises-unwrapping/issues/75\n\
+            // https://bugs.ecmascript.org/show_bug.cgi?id=2515\n\
+            iteratorRecord.done = true;\n\
+            break;\n\
+          }\n\
+          nextValue = next.value;\n\
+        } catch (e) {\n\
+          iteratorRecord.done = true;\n\
+          throw e;\n\
+        }\n\
+        nextPromise = C.resolve(nextValue);\n\
+        optimizedThen(nextPromise.then, nextPromise, resultCapability.resolve, resultCapability.reject);\n\
+      }\n\
+      return resultCapability.promise;\n\
+    };\n\
+\n\
     defineProperties(Promise, {\n\
       all: function all(iterable) {\n\
         var C = this;\n\
-        var capability = new PromiseCapability(C);\n\
-        var resolve = capability.resolve;\n\
-        var reject = capability.reject;\n\
-        try {\n\
-          if (!ES.IsIterable(iterable)) {\n\
-            throw new TypeError('bad iterable');\n\
-          }\n\
-          var it = ES.GetIterator(iterable);\n\
-          var values = [], remaining = { count: 1 };\n\
-          for (var index = 0; ; index++) {\n\
-            var next = ES.IteratorNext(it);\n\
-            if (next.done) {\n\
-              break;\n\
-            }\n\
-            var nextPromise = C.resolve(next.value);\n\
-            var resolveElement = _promiseAllResolver(\n\
-              index, values, capability, remaining\n\
-            );\n\
-            remaining.count++;\n\
-            nextPromise.then(resolveElement, capability.reject);\n\
-          }\n\
-          if ((--remaining.count) === 0) {\n\
-            resolve(values); // call w/ this===undefined\n\
-          }\n\
-        } catch (e) {\n\
-          reject(e);\n\
+        if (!ES.TypeIsObject(C)) {\n\
+          throw new TypeError('Promise is not object');\n\
         }\n\
-        return capability.promise;\n\
+        var capability = new PromiseCapability(C);\n\
+        var iterator, iteratorRecord;\n\
+        try {\n\
+          iterator = ES.GetIterator(iterable);\n\
+          iteratorRecord = { iterator: iterator, done: false };\n\
+          return performPromiseAll(iteratorRecord, C, capability);\n\
+        } catch (e) {\n\
+          var exception = e;\n\
+          if (iteratorRecord && !iteratorRecord.done) {\n\
+            try {\n\
+              ES.IteratorClose(iterator, true);\n\
+            } catch (ee) {\n\
+              exception = ee;\n\
+            }\n\
+          }\n\
+          var reject = capability.reject;\n\
+          reject(exception);\n\
+          return capability.promise;\n\
+        }\n\
       },\n\
 \n\
       race: function race(iterable) {\n\
         var C = this;\n\
-        var capability = new PromiseCapability(C);\n\
-        var resolve = capability.resolve;\n\
-        var reject = capability.reject;\n\
-        try {\n\
-          if (!ES.IsIterable(iterable)) {\n\
-            throw new TypeError('bad iterable');\n\
-          }\n\
-          var it = ES.GetIterator(iterable);\n\
-          while (true) {\n\
-            var next = ES.IteratorNext(it);\n\
-            if (next.done) {\n\
-              // If iterable has no items, resulting promise will never\n\
-              // resolve; see:\n\
-              // https://github.com/domenic/promises-unwrapping/issues/75\n\
-              // https://bugs.ecmascript.org/show_bug.cgi?id=2515\n\
-              break;\n\
-            }\n\
-            var nextPromise = C.resolve(next.value);\n\
-            nextPromise.then(resolve, reject);\n\
-          }\n\
-        } catch (e) {\n\
-          reject(e);\n\
+        if (!ES.TypeIsObject(C)) {\n\
+          throw new TypeError('Promise is not object');\n\
         }\n\
-        return capability.promise;\n\
+        var capability = new PromiseCapability(C);\n\
+        var iterator, iteratorRecord;\n\
+        try {\n\
+          iterator = ES.GetIterator(iterable);\n\
+          iteratorRecord = { iterator: iterator, done: false };\n\
+          return performPromiseRace(iteratorRecord, C, capability);\n\
+        } catch (e) {\n\
+          var exception = e;\n\
+          if (iteratorRecord && !iteratorRecord.done) {\n\
+            try {\n\
+              ES.IteratorClose(iterator, true);\n\
+            } catch (ee) {\n\
+              exception = ee;\n\
+            }\n\
+          }\n\
+          var reject = capability.reject;\n\
+          reject(exception);\n\
+          return capability.promise;\n\
+        }\n\
       },\n\
 \n\
       reject: function reject(reason) {\n\
         var C = this;\n\
+        if (!ES.TypeIsObject(C)) {\n\
+          throw new TypeError('Bad promise constructor');\n\
+        }\n\
         var capability = new PromiseCapability(C);\n\
-        var rejectPromise = capability.reject;\n\
-        rejectPromise(reason); // call with this===undefined\n\
+        var rejectFunc = capability.reject;\n\
+        rejectFunc(reason); // call with this===undefined\n\
         return capability.promise;\n\
       },\n\
 \n\
       resolve: function resolve(v) {\n\
+        // See https://esdiscuss.org/topic/fixing-promise-resolve for spec\n\
         var C = this;\n\
+        if (!ES.TypeIsObject(C)) {\n\
+          throw new TypeError('Bad promise constructor');\n\
+        }\n\
         if (ES.IsPromise(v)) {\n\
-          var constructor = v._promiseConstructor;\n\
+          var constructor = v.constructor;\n\
           if (constructor === C) { return v; }\n\
         }\n\
         var capability = new PromiseCapability(C);\n\
-        var resolvePromise = capability.resolve;\n\
-        resolvePromise(v); // call with this===undefined\n\
+        var resolveFunc = capability.resolve;\n\
+        resolveFunc(v); // call with this===undefined\n\
         return capability.promise;\n\
       }\n\
     });\n\
 \n\
     defineProperties(Promise$prototype, {\n\
       'catch': function (onRejected) {\n\
-        return this.then(void 0, onRejected);\n\
+        return this.then(null, onRejected);\n\
       },\n\
 \n\
       then: function then(onFulfilled, onRejected) {\n\
         var promise = this;\n\
         if (!ES.IsPromise(promise)) { throw new TypeError('not a promise'); }\n\
-        // this.constructor not this._promiseConstructor; see\n\
-        // https://bugs.ecmascript.org/show_bug.cgi?id=2513\n\
-        var C = this.constructor;\n\
-        var capability = new PromiseCapability(C);\n\
-        if (!ES.IsCallable(onRejected)) {\n\
-          onRejected = function (e) { throw e; };\n\
+        var C = ES.SpeciesConstructor(promise, Promise);\n\
+        var resultCapability;\n\
+        var returnValueIsIgnored = arguments.length > 2 && arguments[2] === PROMISE_FAKE_CAPABILITY;\n\
+        if (returnValueIsIgnored && C === Promise) {\n\
+          resultCapability = PROMISE_FAKE_CAPABILITY;\n\
+        } else {\n\
+          resultCapability = new PromiseCapability(C);\n\
         }\n\
-        if (!ES.IsCallable(onFulfilled)) {\n\
-          onFulfilled = function (x) { return x; };\n\
+        // PerformPromiseThen(promise, onFulfilled, onRejected, resultCapability)\n\
+        // Note that we've split the 'reaction' object into its two\n\
+        // components, \"capabilities\" and \"handler\"\n\
+        // \"capabilities\" is always equal to `resultCapability`\n\
+        var fulfillReactionHandler = ES.IsCallable(onFulfilled) ? onFulfilled : PROMISE_IDENTITY;\n\
+        var rejectReactionHandler = ES.IsCallable(onRejected) ? onRejected : PROMISE_THROWER;\n\
+        var _promise = promise._promise;\n\
+        var value;\n\
+        if (_promise.state === PROMISE_PENDING) {\n\
+          if (_promise.reactionLength === 0) {\n\
+            _promise.fulfillReactionHandler0 = fulfillReactionHandler;\n\
+            _promise.rejectReactionHandler0 = rejectReactionHandler;\n\
+            _promise.reactionCapability0 = resultCapability;\n\
+          } else {\n\
+            var idx = 3 * (_promise.reactionLength - 1);\n\
+            _promise[idx + PROMISE_FULFILL_OFFSET] = fulfillReactionHandler;\n\
+            _promise[idx + PROMISE_REJECT_OFFSET] = rejectReactionHandler;\n\
+            _promise[idx + PROMISE_CAPABILITY_OFFSET] = resultCapability;\n\
+          }\n\
+          _promise.reactionLength += 1;\n\
+        } else if (_promise.state === PROMISE_FULFILLED) {\n\
+          value = _promise.result;\n\
+          enqueuePromiseReactionJob(\n\
+            fulfillReactionHandler, resultCapability, value\n\
+          );\n\
+        } else if (_promise.state === PROMISE_REJECTED) {\n\
+          value = _promise.result;\n\
+          enqueuePromiseReactionJob(\n\
+            rejectReactionHandler, resultCapability, value\n\
+          );\n\
+        } else {\n\
+          throw new TypeError('unexpected Promise state');\n\
         }\n\
-        var resolutionHandler = promiseResolutionHandler(promise, onFulfilled, onRejected);\n\
-        var resolveReaction = { capability: capability, handler: resolutionHandler };\n\
-        var rejectReaction = { capability: capability, handler: onRejected };\n\
-        switch (promise._status) {\n\
-          case 'unresolved':\n\
-            promise._resolveReactions.push(resolveReaction);\n\
-            promise._rejectReactions.push(rejectReaction);\n\
-            break;\n\
-          case 'has-resolution':\n\
-            triggerPromiseReactions([resolveReaction], promise._result);\n\
-            break;\n\
-          case 'has-rejection':\n\
-            triggerPromiseReactions([rejectReaction], promise._result);\n\
-            break;\n\
-          default:\n\
-            throw new TypeError('unexpected');\n\
-        }\n\
-        return capability.promise;\n\
+        return resultCapability.promise;\n\
       }\n\
     });\n\
+    // This helps the optimizer by ensuring that methods which take\n\
+    // capabilities aren't polymorphic.\n\
+    PROMISE_FAKE_CAPABILITY = new PromiseCapability(Promise);\n\
+    Promise$prototype$then = Promise$prototype.then;\n\
 \n\
     return Promise;\n\
   }());\n\
@@ -6624,39 +7240,98 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
     delete globals.Promise.prototype.chain;\n\
   }\n\
 \n\
-  // export the Promise constructor.\n\
-  defineProperties(globals, { Promise: PromiseShim });\n\
-  // In Chrome 33 (and thereabouts) Promise is defined, but the\n\
-  // implementation is buggy in a number of ways.  Let's check subclassing\n\
-  // support to see if we have a buggy implementation.\n\
-  var promiseSupportsSubclassing = supportsSubclassing(globals.Promise, function (S) {\n\
-    return S.resolve(42) instanceof S;\n\
-  });\n\
-  var promiseIgnoresNonFunctionThenCallbacks = (function () {\n\
-    try {\n\
-      globals.Promise.reject(42).then(null, 5).then(null, noop);\n\
-      return true;\n\
-    } catch (ex) {\n\
-      return false;\n\
+  if (typeof PromiseShim === 'function') {\n\
+    // export the Promise constructor.\n\
+    defineProperties(globals, { Promise: PromiseShim });\n\
+    // In Chrome 33 (and thereabouts) Promise is defined, but the\n\
+    // implementation is buggy in a number of ways.  Let's check subclassing\n\
+    // support to see if we have a buggy implementation.\n\
+    var promiseSupportsSubclassing = supportsSubclassing(globals.Promise, function (S) {\n\
+      return S.resolve(42).then(function () {}) instanceof S;\n\
+    });\n\
+    var promiseIgnoresNonFunctionThenCallbacks = !throwsError(function () { globals.Promise.reject(42).then(null, 5).then(null, noop); });\n\
+    var promiseRequiresObjectContext = throwsError(function () { globals.Promise.call(3, noop); });\n\
+    // Promise.resolve() was errata'ed late in the ES6 process.\n\
+    // See: https://bugzilla.mozilla.org/show_bug.cgi?id=1170742\n\
+    //      https://code.google.com/p/v8/issues/detail?id=4161\n\
+    // It serves as a proxy for a number of other bugs in early Promise\n\
+    // implementations.\n\
+    var promiseResolveBroken = (function (Promise) {\n\
+      var p = Promise.resolve(5);\n\
+      p.constructor = {};\n\
+      var p2 = Promise.resolve(p);\n\
+      return (p === p2); // This *should* be false!\n\
+    }(globals.Promise));\n\
+\n\
+    // Chrome 46 (probably older too) does not retrieve a thenable's .then synchronously\n\
+    var getsThenSynchronously = supportsDescriptors && (function () {\n\
+      var count = 0;\n\
+      var thenable = Object.defineProperty({}, 'then', { get: function () { count += 1; } });\n\
+      Promise.resolve(thenable);\n\
+      return count === 1;\n\
+    }());\n\
+\n\
+    var BadResolverPromise = function BadResolverPromise(executor) {\n\
+      var p = new Promise(executor);\n\
+      executor(3, function () {});\n\
+      this.then = p.then;\n\
+      this.constructor = BadResolverPromise;\n\
+    };\n\
+    BadResolverPromise.prototype = Promise.prototype;\n\
+    BadResolverPromise.all = Promise.all;\n\
+    // Chrome Canary 49 (probably older too) has some implementation bugs\n\
+    var hasBadResolverPromise = valueOrFalseIfThrows(function () {\n\
+      return !!BadResolverPromise.all([1, 2]);\n\
+    });\n\
+\n\
+    if (!promiseSupportsSubclassing || !promiseIgnoresNonFunctionThenCallbacks ||\n\
+        !promiseRequiresObjectContext || promiseResolveBroken ||\n\
+        !getsThenSynchronously || hasBadResolverPromise) {\n\
+      /* globals Promise: true */\n\
+      /* eslint-disable no-undef */\n\
+      /* jshint -W020 */\n\
+      Promise = PromiseShim;\n\
+      /* jshint +W020 */\n\
+      /* eslint-enable no-undef */\n\
+      /* globals Promise: false */\n\
+      overrideNative(globals, 'Promise', PromiseShim);\n\
     }\n\
-  }());\n\
-  var promiseRequiresObjectContext = (function () {\n\
-    /*global Promise */\n\
-    try { Promise.call(3, noop); } catch (e) { return true; }\n\
-    return false;\n\
-  }());\n\
-  if (!promiseSupportsSubclassing || !promiseIgnoresNonFunctionThenCallbacks || !promiseRequiresObjectContext) {\n\
-    /*globals Promise: true */\n\
-    Promise = PromiseShim;\n\
-    /*globals Promise: false */\n\
-    defineProperty(globals, 'Promise', PromiseShim, true);\n\
+    if (Promise.all.length !== 1) {\n\
+      var origAll = Promise.all;\n\
+      overrideNative(Promise, 'all', function all(iterable) {\n\
+        return ES.Call(origAll, this, arguments);\n\
+      });\n\
+    }\n\
+    if (Promise.race.length !== 1) {\n\
+      var origRace = Promise.race;\n\
+      overrideNative(Promise, 'race', function race(iterable) {\n\
+        return ES.Call(origRace, this, arguments);\n\
+      });\n\
+    }\n\
+    if (Promise.resolve.length !== 1) {\n\
+      var origResolve = Promise.resolve;\n\
+      overrideNative(Promise, 'resolve', function resolve(x) {\n\
+        return ES.Call(origResolve, this, arguments);\n\
+      });\n\
+    }\n\
+    if (Promise.reject.length !== 1) {\n\
+      var origReject = Promise.reject;\n\
+      overrideNative(Promise, 'reject', function reject(r) {\n\
+        return ES.Call(origReject, this, arguments);\n\
+      });\n\
+    }\n\
+    ensureEnumerable(Promise, 'all');\n\
+    ensureEnumerable(Promise, 'race');\n\
+    ensureEnumerable(Promise, 'resolve');\n\
+    ensureEnumerable(Promise, 'reject');\n\
+    addDefaultSpecies(Promise);\n\
   }\n\
 \n\
   // Map and Set require a true ES5 environment\n\
   // Their fast path also requires that the environment preserve\n\
   // property insertion order, which is not guaranteed by the spec.\n\
   var testOrder = function (a) {\n\
-    var b = Object.keys(a.reduce(function (o, k) {\n\
+    var b = keys(_reduce(a, function (o, k) {\n\
       o[k] = true;\n\
       return o;\n\
     }, {}));\n\
@@ -6672,15 +7347,18 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
       if (!preservesInsertionOrder) {\n\
         return null;\n\
       }\n\
-      var type = typeof key;\n\
-      if (type === 'string') {\n\
+      if (typeof key === 'undefined' || key === null) {\n\
+        return '^' + ES.ToString(key);\n\
+      } else if (typeof key === 'string') {\n\
         return '$' + key;\n\
-      } else if (type === 'number') {\n\
+      } else if (typeof key === 'number') {\n\
         // note that -0 will get coerced to \"0\" when used as a property key\n\
         if (!preservesNumericInsertionOrder) {\n\
           return 'n' + key;\n\
         }\n\
         return key;\n\
+      } else if (typeof key === 'boolean') {\n\
+        return 'b' + key;\n\
       }\n\
       return null;\n\
     };\n\
@@ -6690,30 +7368,110 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
       return Object.create ? Object.create(null) : {};\n\
     };\n\
 \n\
+    var addIterableToMap = function addIterableToMap(MapConstructor, map, iterable) {\n\
+      if (isArray(iterable) || Type.string(iterable)) {\n\
+        _forEach(iterable, function (entry) {\n\
+          if (!ES.TypeIsObject(entry)) {\n\
+            throw new TypeError('Iterator value ' + entry + ' is not an entry object');\n\
+          }\n\
+          map.set(entry[0], entry[1]);\n\
+        });\n\
+      } else if (iterable instanceof MapConstructor) {\n\
+        _call(MapConstructor.prototype.forEach, iterable, function (value, key) {\n\
+          map.set(key, value);\n\
+        });\n\
+      } else {\n\
+        var iter, adder;\n\
+        if (iterable !== null && typeof iterable !== 'undefined') {\n\
+          adder = map.set;\n\
+          if (!ES.IsCallable(adder)) { throw new TypeError('bad map'); }\n\
+          iter = ES.GetIterator(iterable);\n\
+        }\n\
+        if (typeof iter !== 'undefined') {\n\
+          while (true) {\n\
+            var next = ES.IteratorStep(iter);\n\
+            if (next === false) { break; }\n\
+            var nextItem = next.value;\n\
+            try {\n\
+              if (!ES.TypeIsObject(nextItem)) {\n\
+                throw new TypeError('Iterator value ' + nextItem + ' is not an entry object');\n\
+              }\n\
+              _call(adder, map, nextItem[0], nextItem[1]);\n\
+            } catch (e) {\n\
+              ES.IteratorClose(iter, true);\n\
+              throw e;\n\
+            }\n\
+          }\n\
+        }\n\
+      }\n\
+    };\n\
+    var addIterableToSet = function addIterableToSet(SetConstructor, set, iterable) {\n\
+      if (isArray(iterable) || Type.string(iterable)) {\n\
+        _forEach(iterable, function (value) {\n\
+          set.add(value);\n\
+        });\n\
+      } else if (iterable instanceof SetConstructor) {\n\
+        _call(SetConstructor.prototype.forEach, iterable, function (value) {\n\
+          set.add(value);\n\
+        });\n\
+      } else {\n\
+        var iter, adder;\n\
+        if (iterable !== null && typeof iterable !== 'undefined') {\n\
+          adder = set.add;\n\
+          if (!ES.IsCallable(adder)) { throw new TypeError('bad set'); }\n\
+          iter = ES.GetIterator(iterable);\n\
+        }\n\
+        if (typeof iter !== 'undefined') {\n\
+          while (true) {\n\
+            var next = ES.IteratorStep(iter);\n\
+            if (next === false) { break; }\n\
+            var nextValue = next.value;\n\
+            try {\n\
+              _call(adder, set, nextValue);\n\
+            } catch (e) {\n\
+              ES.IteratorClose(iter, true);\n\
+              throw e;\n\
+            }\n\
+          }\n\
+        }\n\
+      }\n\
+    };\n\
+\n\
     var collectionShims = {\n\
       Map: (function () {\n\
 \n\
         var empty = {};\n\
 \n\
-        function MapEntry(key, value) {\n\
+        var MapEntry = function MapEntry(key, value) {\n\
           this.key = key;\n\
           this.value = value;\n\
           this.next = null;\n\
           this.prev = null;\n\
-        }\n\
+        };\n\
 \n\
-        MapEntry.prototype.isRemoved = function () {\n\
+        MapEntry.prototype.isRemoved = function isRemoved() {\n\
           return this.key === empty;\n\
         };\n\
 \n\
-        function MapIterator(map, kind) {\n\
+        var isMap = function isMap(map) {\n\
+          return !!map._es6map;\n\
+        };\n\
+\n\
+        var requireMapSlot = function requireMapSlot(map, method) {\n\
+          if (!ES.TypeIsObject(map) || !isMap(map)) {\n\
+            throw new TypeError('Method Map.prototype.' + method + ' called on incompatible receiver ' + ES.ToString(map));\n\
+          }\n\
+        };\n\
+\n\
+        var MapIterator = function MapIterator(map, kind) {\n\
+          requireMapSlot(map, '[[MapIterator]]');\n\
           this.head = map._head;\n\
           this.i = this.head;\n\
           this.kind = kind;\n\
-        }\n\
+        };\n\
 \n\
         MapIterator.prototype = {\n\
-          next: function () {\n\
+          next: function next() {\n\
             var i = this.i, kind = this.kind, head = this.head, result;\n\
             if (typeof this.i === 'undefined') {\n\
               return { value: void 0, done: true };\n\
@@ -6744,61 +7502,44 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
         };\n\
         addIterator(MapIterator.prototype);\n\
 \n\
-        function Map(iterable) {\n\
-          var map = this;\n\
-          if (!ES.TypeIsObject(map)) {\n\
-            throw new TypeError(\"Constructor Map requires 'new'\");\n\
+        var Map$prototype;\n\
+        var MapShim = function Map() {\n\
+          if (!(this instanceof Map)) {\n\
+            throw new TypeError('Constructor Map requires \"new\"');\n\
           }\n\
-          map = emulateES6construct(map);\n\
-          if (!map._es6map) {\n\
-            throw new TypeError('bad map');\n\
+          if (this && this._es6map) {\n\
+            throw new TypeError('Bad construction');\n\
           }\n\
-\n\
-          var head = new MapEntry(null, null);\n\
-          // circular doubly-linked list.\n\
-          head.next = head.prev = head;\n\
-\n\
-          defineProperties(map, {\n\
-            _head: head,\n\
+          var map = emulateES6construct(this, Map, Map$prototype, {\n\
+            _es6map: true,\n\
+            _head: null,\n\
             _storage: emptyObject(),\n\
             _size: 0\n\
           });\n\
 \n\
+          var head = new MapEntry(null, null);\n\
+          // circular doubly-linked list.\n\
+          head.next = head.prev = head;\n\
+          map._head = head;\n\
+\n\
           // Optionally initialize map from iterable\n\
-          if (typeof iterable !== 'undefined' && iterable !== null) {\n\
-            var it = ES.GetIterator(iterable);\n\
-            var adder = map.set;\n\
-            if (!ES.IsCallable(adder)) { throw new TypeError('bad map'); }\n\
-            while (true) {\n\
-              var next = ES.IteratorNext(it);\n\
-              if (next.done) { break; }\n\
-              var nextItem = next.value;\n\
-              if (!ES.TypeIsObject(nextItem)) {\n\
-                throw new TypeError('expected iterable of pairs');\n\
-              }\n\
-              adder.call(map, nextItem[0], nextItem[1]);\n\
-            }\n\
+          if (arguments.length > 0) {\n\
+            addIterableToMap(Map, map, arguments[0]);\n\
           }\n\
           return map;\n\
-        }\n\
-        var Map$prototype = Map.prototype;\n\
-        defineProperty(Map, symbolSpecies, function (obj) {\n\
-          var constructor = this;\n\
-          var prototype = constructor.prototype || Map$prototype;\n\
-          obj = obj || create(prototype);\n\
-          defineProperties(obj, { _es6map: true });\n\
-          return obj;\n\
-        });\n\
+        };\n\
+        Map$prototype = MapShim.prototype;\n\
 \n\
-        Value.getter(Map.prototype, 'size', function () {\n\
+        Value.getter(Map$prototype, 'size', function () {\n\
           if (typeof this._size === 'undefined') {\n\
             throw new TypeError('size method called on incompatible Map');\n\
           }\n\
           return this._size;\n\
         });\n\
 \n\
-        defineProperties(Map.prototype, {\n\
-          get: function (key) {\n\
+        defineProperties(Map$prototype, {\n\
+          get: function get(key) {\n\
+            requireMapSlot(this, 'get');\n\
             var fkey = fastkey(key);\n\
             if (fkey !== null) {\n\
               // fast O(1) path\n\
@@ -6817,7 +7558,8 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
             }\n\
           },\n\
 \n\
-          has: function (key) {\n\
+          has: function has(key) {\n\
+            requireMapSlot(this, 'has');\n\
             var fkey = fastkey(key);\n\
             if (fkey !== null) {\n\
               // fast O(1) path\n\
@@ -6832,7 +7574,8 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
             return false;\n\
           },\n\
 \n\
-          set: function (key, value) {\n\
+          set: function set(key, value) {\n\
+            requireMapSlot(this, 'set');\n\
             var head = this._head, i = head, entry;\n\
             var fkey = fastkey(key);\n\
             if (fkey !== null) {\n\
@@ -6865,6 +7608,7 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
           },\n\
 \n\
           'delete': function (key) {\n\
+            requireMapSlot(this, 'delete');\n\
             var head = this._head, i = head;\n\
             var fkey = fastkey(key);\n\
             if (fkey !== null) {\n\
@@ -6888,7 +7632,8 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
             return false;\n\
           },\n\
 \n\
-          clear: function () {\n\
+          clear: function clear() {\n\
+            requireMapSlot(this, 'clear');\n\
             this._size = 0;\n\
             this._storage = emptyObject();\n\
             var head = this._head, i = head, p = i.next;\n\
@@ -6900,108 +7645,122 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
             head.next = head.prev = head;\n\
           },\n\
 \n\
-          keys: function () {\n\
+          keys: function keys() {\n\
+            requireMapSlot(this, 'keys');\n\
             return new MapIterator(this, 'key');\n\
           },\n\
 \n\
-          values: function () {\n\
+          values: function values() {\n\
+            requireMapSlot(this, 'values');\n\
             return new MapIterator(this, 'value');\n\
           },\n\
 \n\
-          entries: function () {\n\
+          entries: function entries() {\n\
+            requireMapSlot(this, 'entries');\n\
             return new MapIterator(this, 'key+value');\n\
           },\n\
 \n\
-          forEach: function (callback) {\n\
+          forEach: function forEach(callback) {\n\
+            requireMapSlot(this, 'forEach');\n\
             var context = arguments.length > 1 ? arguments[1] : null;\n\
             var it = this.entries();\n\
             for (var entry = it.next(); !entry.done; entry = it.next()) {\n\
               if (context) {\n\
-                callback.call(context, entry.value[1], entry.value[0], this);\n\
+                _call(callback, context, entry.value[1], entry.value[0], this);\n\
               } else {\n\
                 callback(entry.value[1], entry.value[0], this);\n\
               }\n\
             }\n\
           }\n\
         });\n\
-        addIterator(Map.prototype, function () { return this.entries(); });\n\
+        addIterator(Map$prototype, Map$prototype.entries);\n\
 \n\
-        return Map;\n\
+        return MapShim;\n\
       }()),\n\
 \n\
       Set: (function () {\n\
+        var isSet = function isSet(set) {\n\
+          return set._es6set && typeof set._storage !== 'undefined';\n\
+        };\n\
+        var requireSetSlot = function requireSetSlot(set, method) {\n\
+          if (!ES.TypeIsObject(set) || !isSet(set)) {\n\
+            // https://github.com/paulmillr/es6-shim/issues/176\n\
+            throw new TypeError('Set.prototype.' + method + ' called on incompatible receiver ' + ES.ToString(set));\n\
+          }\n\
+        };\n\
+\n\
         // Creating a Map is expensive.  To speed up the common case of\n\
         // Sets containing only string or numeric keys, we use an object\n\
         // as backing storage and lazily create a full Map only when\n\
         // required.\n\
-        var SetShim = function Set(iterable) {\n\
-          var set = this;\n\
-          if (!ES.TypeIsObject(set)) {\n\
-            throw new TypeError(\"Constructor Set requires 'new'\");\n\
+        var Set$prototype;\n\
+        var SetShim = function Set() {\n\
+          if (!(this instanceof Set)) {\n\
+            throw new TypeError('Constructor Set requires \"new\"');\n\
           }\n\
-          set = emulateES6construct(set);\n\
+          if (this && this._es6set) {\n\
+            throw new TypeError('Bad construction');\n\
+          }\n\
+          var set = emulateES6construct(this, Set, Set$prototype, {\n\
+            _es6set: true,\n\
+            '[[SetData]]': null,\n\
+            _storage: emptyObject()\n\
+          });\n\
           if (!set._es6set) {\n\
             throw new TypeError('bad set');\n\
           }\n\
 \n\
-          defineProperties(set, {\n\
-            '[[SetData]]': null,\n\
-            _storage: emptyObject()\n\
-          });\n\
-\n\
-          // Optionally initialize map from iterable\n\
-          if (typeof iterable !== 'undefined' && iterable !== null) {\n\
-            var it = ES.GetIterator(iterable);\n\
-            var adder = set.add;\n\
-            if (!ES.IsCallable(adder)) { throw new TypeError('bad set'); }\n\
-            while (true) {\n\
-              var next = ES.IteratorNext(it);\n\
-              if (next.done) { break; }\n\
-              var nextItem = next.value;\n\
-              adder.call(set, nextItem);\n\
-            }\n\
+          // Optionally initialize Set from iterable\n\
+          if (arguments.length > 0) {\n\
+            addIterableToSet(Set, set, arguments[0]);\n\
           }\n\
           return set;\n\
         };\n\
-        var Set$prototype = SetShim.prototype;\n\
-        defineProperty(SetShim, symbolSpecies, function (obj) {\n\
-          var constructor = this;\n\
-          var prototype = constructor.prototype || Set$prototype;\n\
-          obj = obj || create(prototype);\n\
-          defineProperties(obj, { _es6set: true });\n\
-          return obj;\n\
-        });\n\
+        Set$prototype = SetShim.prototype;\n\
 \n\
+        var decodeKey = function (key) {\n\
+          var k = key;\n\
+          if (k === '^null') {\n\
+            return null;\n\
+          } else if (k === '^undefined') {\n\
+            return void 0;\n\
+          } else {\n\
+            var first = k.charAt(0);\n\
+            if (first === '$') {\n\
+              return _strSlice(k, 1);\n\
+            } else if (first === 'n') {\n\
+              return +_strSlice(k, 1);\n\
+            } else if (first === 'b') {\n\
+              return k === 'btrue';\n\
+            }\n\
+          }\n\
+          return +k;\n\
+        };\n\
         // Switch from the object backing storage to a full Map.\n\
         var ensureMap = function ensureMap(set) {\n\
           if (!set['[[SetData]]']) {\n\
             var m = set['[[SetData]]'] = new collectionShims.Map();\n\
-            Object.keys(set._storage).forEach(function (k) {\n\
-              // fast check for leading '$'\n\
-              if (k.charCodeAt(0) === 36) {\n\
-                k = k.slice(1);\n\
-              } else if (k.charAt(0) === 'n') {\n\
-                k = +k.slice(1);\n\
-              } else {\n\
-                k = +k;\n\
-              }\n\
+            _forEach(keys(set._storage), function (key) {\n\
+              var k = decodeKey(key);\n\
               m.set(k, k);\n\
             });\n\
-            set._storage = null; // free old backing storage\n\
+            set['[[SetData]]'] = m;\n\
           }\n\
+          set._storage = null; // free old backing storage\n\
         };\n\
 \n\
         Value.getter(SetShim.prototype, 'size', function () {\n\
-          if (typeof this._storage === 'undefined') {\n\
-            // https://github.com/paulmillr/es6-shim/issues/176\n\
-            throw new TypeError('size method called on incompatible Set');\n\
+          requireSetSlot(this, 'size');\n\
+          if (this._storage) {\n\
+            return keys(this._storage).length;\n\
           }\n\
           ensureMap(this);\n\
           return this['[[SetData]]'].size;\n\
         });\n\
 \n\
         defineProperties(SetShim.prototype, {\n\
-          has: function (key) {\n\
+          has: function has(key) {\n\
+            requireSetSlot(this, 'has');\n\
             var fkey;\n\
             if (this._storage && (fkey = fastkey(key)) !== null) {\n\
               return !!this._storage[fkey];\n\
@@ -7010,7 +7769,8 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
             return this['[[SetData]]'].has(key);\n\
           },\n\
 \n\
-          add: function (key) {\n\
+          add: function add(key) {\n\
+            requireSetSlot(this, 'add');\n\
             var fkey;\n\
             if (this._storage && (fkey = fastkey(key)) !== null) {\n\
               this._storage[fkey] = true;\n\
@@ -7022,6 +7782,7 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
           },\n\
 \n\
           'delete': function (key) {\n\
+            requireSetSlot(this, 'delete');\n\
             var fkey;\n\
             if (this._storage && (fkey = fastkey(key)) !== null) {\n\
               var hasFKey = _hasOwnProperty(this._storage, fkey);\n\
@@ -7031,46 +7792,193 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
             return this['[[SetData]]']['delete'](key);\n\
           },\n\
 \n\
-          clear: function () {\n\
+          clear: function clear() {\n\
+            requireSetSlot(this, 'clear');\n\
             if (this._storage) {\n\
               this._storage = emptyObject();\n\
-            } else {\n\
+            }\n\
+            if (this['[[SetData]]']) {\n\
               this['[[SetData]]'].clear();\n\
             }\n\
           },\n\
 \n\
-          values: function () {\n\
+          values: function values() {\n\
+            requireSetSlot(this, 'values');\n\
             ensureMap(this);\n\
             return this['[[SetData]]'].values();\n\
           },\n\
 \n\
-          entries: function () {\n\
+          entries: function entries() {\n\
+            requireSetSlot(this, 'entries');\n\
             ensureMap(this);\n\
             return this['[[SetData]]'].entries();\n\
           },\n\
 \n\
-          forEach: function (callback) {\n\
+          forEach: function forEach(callback) {\n\
+            requireSetSlot(this, 'forEach');\n\
             var context = arguments.length > 1 ? arguments[1] : null;\n\
             var entireSet = this;\n\
             ensureMap(entireSet);\n\
             this['[[SetData]]'].forEach(function (value, key) {\n\
               if (context) {\n\
-                callback.call(context, key, key, entireSet);\n\
+                _call(callback, context, key, key, entireSet);\n\
               } else {\n\
                 callback(key, key, entireSet);\n\
               }\n\
             });\n\
           }\n\
         });\n\
-        defineProperty(SetShim, 'keys', SetShim.values, true);\n\
-        addIterator(SetShim.prototype, function () { return this.values(); });\n\
+        defineProperty(SetShim.prototype, 'keys', SetShim.prototype.values, true);\n\
+        addIterator(SetShim.prototype, SetShim.prototype.values);\n\
 \n\
         return SetShim;\n\
       }())\n\
     };\n\
-    defineProperties(globals, collectionShims);\n\
 \n\
     if (globals.Map || globals.Set) {\n\
+      // Safari 8, for example, doesn't accept an iterable.\n\
+      var mapAcceptsArguments = valueOrFalseIfThrows(function () { return new Map([[1, 2]]).get(1) === 2; });\n\
+      if (!mapAcceptsArguments) {\n\
+        var OrigMapNoArgs = globals.Map;\n\
+        globals.Map = function Map() {\n\
+          if (!(this instanceof Map)) {\n\
+            throw new TypeError('Constructor Map requires \"new\"');\n\
+          }\n\
+          var m = new OrigMapNoArgs();\n\
+          if (arguments.length > 0) {\n\
+            addIterableToMap(Map, m, arguments[0]);\n\
+          }\n\
+          delete m.constructor;\n\
+          Object.setPrototypeOf(m, globals.Map.prototype);\n\
+          return m;\n\
+        };\n\
+        globals.Map.prototype = create(OrigMapNoArgs.prototype);\n\
+        defineProperty(globals.Map.prototype, 'constructor', globals.Map, true);\n\
+        Value.preserveToString(globals.Map, OrigMapNoArgs);\n\
+      }\n\
+      var testMap = new Map();\n\
+      var mapUsesSameValueZero = (function () {\n\
+        // Chrome 38-42, node 0.11/0.12, iojs 1/2 also have a bug when the Map has a size > 4\n\
+        var m = new Map([[1, 0], [2, 0], [3, 0], [4, 0]]);\n\
+        m.set(-0, m);\n\
+        return m.get(0) === m && m.get(-0) === m && m.has(0) && m.has(-0);\n\
+      }());\n\
+      var mapSupportsChaining = testMap.set(1, 2) === testMap;\n\
+      if (!mapUsesSameValueZero || !mapSupportsChaining) {\n\
+        var origMapSet = Map.prototype.set;\n\
+        overrideNative(Map.prototype, 'set', function set(k, v) {\n\
+          _call(origMapSet, this, k === 0 ? 0 : k, v);\n\
+          return this;\n\
+        });\n\
+      }\n\
+      if (!mapUsesSameValueZero) {\n\
+        var origMapGet = Map.prototype.get;\n\
+        var origMapHas = Map.prototype.has;\n\
+        defineProperties(Map.prototype, {\n\
+          get: function get(k) {\n\
+            return _call(origMapGet, this, k === 0 ? 0 : k);\n\
+          },\n\
+          has: function has(k) {\n\
+            return _call(origMapHas, this, k === 0 ? 0 : k);\n\
+          }\n\
+        }, true);\n\
+        Value.preserveToString(Map.prototype.get, origMapGet);\n\
+        Value.preserveToString(Map.prototype.has, origMapHas);\n\
+      }\n\
+      var testSet = new Set();\n\
+      var setUsesSameValueZero = (function (s) {\n\
+        s['delete'](0);\n\
+        s.add(-0);\n\
+        return !s.has(0);\n\
+      }(testSet));\n\
+      var setSupportsChaining = testSet.add(1) === testSet;\n\
+      if (!setUsesSameValueZero || !setSupportsChaining) {\n\
+        var origSetAdd = Set.prototype.add;\n\
+        Set.prototype.add = function add(v) {\n\
+          _call(origSetAdd, this, v === 0 ? 0 : v);\n\
+          return this;\n\
+        };\n\
+        Value.preserveToString(Set.prototype.add, origSetAdd);\n\
+      }\n\
+      if (!setUsesSameValueZero) {\n\
+        var origSetHas = Set.prototype.has;\n\
+        Set.prototype.has = function has(v) {\n\
+          return _call(origSetHas, this, v === 0 ? 0 : v);\n\
+        };\n\
+        Value.preserveToString(Set.prototype.has, origSetHas);\n\
+        var origSetDel = Set.prototype['delete'];\n\
+        Set.prototype['delete'] = function SetDelete(v) {\n\
+          return _call(origSetDel, this, v === 0 ? 0 : v);\n\
+        };\n\
+        Value.preserveToString(Set.prototype['delete'], origSetDel);\n\
+      }\n\
+      var mapSupportsSubclassing = supportsSubclassing(globals.Map, function (M) {\n\
+        var m = new M([]);\n\
+        // Firefox 32 is ok with the instantiating the subclass but will\n\
+        // throw when the map is used.\n\
+        m.set(42, 42);\n\
+        return m instanceof M;\n\
+      });\n\
+      var mapFailsToSupportSubclassing = Object.setPrototypeOf && !mapSupportsSubclassing; // without Object.setPrototypeOf, subclassing is not possible\n\
+      var mapRequiresNew = (function () {\n\
+        try {\n\
+          return !(globals.Map() instanceof globals.Map);\n\
+        } catch (e) {\n\
+          return e instanceof TypeError;\n\
+        }\n\
+      }());\n\
+      if (globals.Map.length !== 0 || mapFailsToSupportSubclassing || !mapRequiresNew) {\n\
+        var OrigMap = globals.Map;\n\
+        globals.Map = function Map() {\n\
+          if (!(this instanceof Map)) {\n\
+            throw new TypeError('Constructor Map requires \"new\"');\n\
+          }\n\
+          var m = new OrigMap();\n\
+          if (arguments.length > 0) {\n\
+            addIterableToMap(Map, m, arguments[0]);\n\
+          }\n\
+          delete m.constructor;\n\
+          Object.setPrototypeOf(m, Map.prototype);\n\
+          return m;\n\
+        };\n\
+        globals.Map.prototype = OrigMap.prototype;\n\
+        defineProperty(globals.Map.prototype, 'constructor', globals.Map, true);\n\
+        Value.preserveToString(globals.Map, OrigMap);\n\
+      }\n\
+      var setSupportsSubclassing = supportsSubclassing(globals.Set, function (S) {\n\
+        var s = new S([]);\n\
+        s.add(42, 42);\n\
+        return s instanceof S;\n\
+      });\n\
+      var setFailsToSupportSubclassing = Object.setPrototypeOf && !setSupportsSubclassing; // without Object.setPrototypeOf, subclassing is not possible\n\
+      var setRequiresNew = (function () {\n\
+        try {\n\
+          return !(globals.Set() instanceof globals.Set);\n\
+        } catch (e) {\n\
+          return e instanceof TypeError;\n\
+        }\n\
+      }());\n\
+      if (globals.Set.length !== 0 || setFailsToSupportSubclassing || !setRequiresNew) {\n\
+        var OrigSet = globals.Set;\n\
+        globals.Set = function Set() {\n\
+          if (!(this instanceof Set)) {\n\
+            throw new TypeError('Constructor Set requires \"new\"');\n\
+          }\n\
+          var s = new OrigSet();\n\
+          if (arguments.length > 0) {\n\
+            addIterableToSet(Set, s, arguments[0]);\n\
+          }\n\
+          delete s.constructor;\n\
+          Object.setPrototypeOf(s, Set.prototype);\n\
+          return s;\n\
+        };\n\
+        globals.Set.prototype = OrigSet.prototype;\n\
+        defineProperty(globals.Set.prototype, 'constructor', globals.Set, true);\n\
+        Value.preserveToString(globals.Set, OrigSet);\n\
+      }\n\
+      var mapIterationThrowsStopIterator = !valueOrFalseIfThrows(function () {\n\
+        return (new Map()).keys().next().done;\n\
+      });\n\
       /*\n\
         - In Firefox < 23, Map#size is a function.\n\
         - In all current Firefox, Set#entries/keys/values & Map#clear do not exist\n\
@@ -7088,31 +7996,37 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
         typeof globals.Set.prototype.forEach !== 'function' ||\n\
         isCallableWithoutNew(globals.Map) ||\n\
         isCallableWithoutNew(globals.Set) ||\n\
-        !supportsSubclassing(globals.Map, function (M) {\n\
-          var m = new M([]);\n\
-          // Firefox 32 is ok with the instantiating the subclass but will\n\
-          // throw when the map is used.\n\
-          m.set(42, 42);\n\
-          return m instanceof M;\n\
-        })\n\
+        typeof (new globals.Map().keys().next) !== 'function' || // Safari 8\n\
+        mapIterationThrowsStopIterator || // Firefox 25\n\
+        !mapSupportsSubclassing\n\
       ) {\n\
-        globals.Map = collectionShims.Map;\n\
-        globals.Set = collectionShims.Set;\n\
+        defineProperties(globals, {\n\
+          Map: collectionShims.Map,\n\
+          Set: collectionShims.Set\n\
+        }, true);\n\
+      }\n\
+\n\
+      if (globals.Set.prototype.keys !== globals.Set.prototype.values) {\n\
+        // Fixed in WebKit with https://bugs.webkit.org/show_bug.cgi?id=144190\n\
+        defineProperty(globals.Set.prototype, 'keys', globals.Set.prototype.values, true);\n\
+      }\n\
+\n\
+      // Shim incomplete iterator implementations.\n\
+      addIterator(Object.getPrototypeOf((new globals.Map()).keys()));\n\
+      addIterator(Object.getPrototypeOf((new globals.Set()).keys()));\n\
+\n\
+      if (functionsHaveNames && globals.Set.prototype.has.name !== 'has') {\n\
+        // Microsoft Edge v0.11.10074.0 is missing a name on Set#has\n\
+        var anonymousSetHas = globals.Set.prototype.has;\n\
+        overrideNative(globals.Set.prototype, 'has', function has(key) {\n\
+          return _call(anonymousSetHas, this, key);\n\
+        });\n\
       }\n\
     }\n\
-    if (globals.Set.prototype.keys !== globals.Set.prototype.values) {\n\
-      defineProperty(globals.Set.prototype, 'keys', globals.Set.prototype.values, true);\n\
-    }\n\
-    // Shim incomplete iterator implementations.\n\
-    addIterator(Object.getPrototypeOf((new globals.Map()).keys()));\n\
-    addIterator(Object.getPrototypeOf((new globals.Set()).keys()));\n\
+    defineProperties(globals, collectionShims);\n\
+    addDefaultSpecies(globals.Map);\n\
+    addDefaultSpecies(globals.Set);\n\
   }\n\
-\n\
-  // Reflect\n\
-  if (!globals.Reflect) {\n\
-    defineProperty(globals, 'Reflect', {});\n\
-  }\n\
-  var Reflect = globals.Reflect;\n\
 \n\
   var throwUnlessTargetIsObject = function throwUnlessTargetIsObject(target) {\n\
     if (!ES.TypeIsObject(target)) {\n\
@@ -7124,19 +8038,22 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
   // those on the Object global, except that a TypeError is thrown if\n\
   // target isn't an object. As well as returning a boolean indicating\n\
   // the success of the operation.\n\
-  defineProperties(globals.Reflect, {\n\
+  var ReflectShims = {\n\
     // Apply method in a functional form.\n\
     apply: function apply() {\n\
-      return ES.Call.apply(null, arguments);\n\
+      return ES.Call(ES.Call, null, arguments);\n\
     },\n\
 \n\
     // New operator in a functional form.\n\
     construct: function construct(constructor, args) {\n\
-      if (!ES.IsCallable(constructor)) {\n\
-        throw new TypeError('First argument must be callable.');\n\
+      if (!ES.IsConstructor(constructor)) {\n\
+        throw new TypeError('First argument must be a constructor.');\n\
       }\n\
-\n\
-      return ES.Construct(constructor, args);\n\
+      var newTarget = arguments.length > 2 ? arguments[2] : constructor;\n\
+      if (!ES.IsConstructor(newTarget)) {\n\
+        throw new TypeError('new.target must be a constructor.');\n\
+      }\n\
+      return ES.Construct(constructor, args, newTarget, 'internal');\n\
     },\n\
 \n\
     // When deleting a non-existent or configurable property,\n\
@@ -7166,10 +8083,10 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
       throwUnlessTargetIsObject(target);\n\
       return key in target;\n\
     }\n\
-  });\n\
+  };\n\
 \n\
   if (Object.getOwnPropertyNames) {\n\
-    defineProperties(globals.Reflect, {\n\
+    Object.assign(ReflectShims, {\n\
       // Basically the result of calling the internal [[OwnPropertyKeys]].\n\
       // Concatenating propertyNames and propertySymbols should do the trick.\n\
       // This should continue to work together with a Symbol shim\n\
@@ -7180,7 +8097,7 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
         var keys = Object.getOwnPropertyNames(target);\n\
 \n\
         if (ES.IsCallable(Object.getOwnPropertySymbols)) {\n\
-          keys.push.apply(keys, Object.getOwnPropertySymbols(target));\n\
+          _pushApply(keys, Object.getOwnPropertySymbols(target));\n\
         }\n\
 \n\
         return keys;\n\
@@ -7188,8 +8105,12 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
     });\n\
   }\n\
 \n\
+  var callAndCatchException = function ConvertExceptionToBoolean(func) {\n\
+    return !throwsError(func);\n\
+  };\n\
+\n\
   if (Object.preventExtensions) {\n\
-    defineProperties(globals.Reflect, {\n\
+    Object.assign(ReflectShims, {\n\
       isExtensible: function isExtensible(target) {\n\
         throwUnlessTargetIsObject(target);\n\
         return Object.isExtensible(target);\n\
@@ -7204,17 +8125,17 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
   }\n\
 \n\
   if (supportsDescriptors) {\n\
-    var internal_get = function get(target, key, receiver) {\n\
+    var internalGet = function get(target, key, receiver) {\n\
       var desc = Object.getOwnPropertyDescriptor(target, key);\n\
 \n\
       if (!desc) {\n\
         var parent = Object.getPrototypeOf(target);\n\
 \n\
         if (parent === null) {\n\
-          return undefined;\n\
+          return void 0;\n\
         }\n\
 \n\
-        return internal_get(parent, key, receiver);\n\
+        return internalGet(parent, key, receiver);\n\
       }\n\
 \n\
       if ('value' in desc) {\n\
@@ -7222,20 +8143,20 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
       }\n\
 \n\
       if (desc.get) {\n\
-        return desc.get.call(receiver);\n\
+        return ES.Call(desc.get, receiver);\n\
       }\n\
 \n\
-      return undefined;\n\
+      return void 0;\n\
     };\n\
 \n\
-    var internal_set = function set(target, key, value, receiver) {\n\
+    var internalSet = function set(target, key, value, receiver) {\n\
       var desc = Object.getOwnPropertyDescriptor(target, key);\n\
 \n\
       if (!desc) {\n\
         var parent = Object.getPrototypeOf(target);\n\
 \n\
         if (parent !== null) {\n\
-          return internal_set(parent, key, value, receiver);\n\
+          return internalSet(parent, key, value, receiver);\n\
         }\n\
 \n\
         desc = {\n\
@@ -7272,19 +8193,14 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
       }\n\
 \n\
       if (desc.set) {\n\
-        desc.set.call(receiver, value);\n\
+        _call(desc.set, receiver, value);\n\
         return true;\n\
       }\n\
 \n\
       return false;\n\
     };\n\
 \n\
-    var callAndCatchException = function ConvertExceptionToBoolean(func) {\n\
-      try { func(); } catch (_) { return false; }\n\
-      return true;\n\
-    };\n\
-\n\
-    defineProperties(globals.Reflect, {\n\
+    Object.assign(ReflectShims, {\n\
       defineProperty: function defineProperty(target, propertyKey, attributes) {\n\
         throwUnlessTargetIsObject(target);\n\
         return callAndCatchException(function () {\n\
@@ -7302,40 +8218,39 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
         throwUnlessTargetIsObject(target);\n\
         var receiver = arguments.length > 2 ? arguments[2] : target;\n\
 \n\
-        return internal_get(target, key, receiver);\n\
+        return internalGet(target, key, receiver);\n\
       },\n\
 \n\
       set: function set(target, key, value) {\n\
         throwUnlessTargetIsObject(target);\n\
         var receiver = arguments.length > 3 ? arguments[3] : target;\n\
 \n\
-        return internal_set(target, key, value, receiver);\n\
+        return internalSet(target, key, value, receiver);\n\
       }\n\
     });\n\
   }\n\
 \n\
   if (Object.getPrototypeOf) {\n\
     var objectDotGetPrototypeOf = Object.getPrototypeOf;\n\
-    defineProperties(globals.Reflect, {\n\
-      getPrototypeOf: function getPrototypeOf(target) {\n\
-        throwUnlessTargetIsObject(target);\n\
-        return objectDotGetPrototypeOf(target);\n\
-      }\n\
-    });\n\
+    ReflectShims.getPrototypeOf = function getPrototypeOf(target) {\n\
+      throwUnlessTargetIsObject(target);\n\
+      return objectDotGetPrototypeOf(target);\n\
+    };\n\
   }\n\
 \n\
-  if (Object.setPrototypeOf) {\n\
-    var willCreateCircularPrototype = function (object, proto) {\n\
+  if (Object.setPrototypeOf && ReflectShims.getPrototypeOf) {\n\
+    var willCreateCircularPrototype = function (object, lastProto) {\n\
+      var proto = lastProto;\n\
       while (proto) {\n\
         if (object === proto) {\n\
           return true;\n\
         }\n\
-        proto = Reflect.getPrototypeOf(proto);\n\
+        proto = ReflectShims.getPrototypeOf(proto);\n\
       }\n\
       return false;\n\
     };\n\
 \n\
-    defineProperties(globals.Reflect, {\n\
+    Object.assign(ReflectShims, {\n\
       // Sets the prototype of the given object.\n\
       // Returns true on success, otherwise false.\n\
       setPrototypeOf: function setPrototypeOf(object, proto) {\n\
@@ -7365,6 +8280,56 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
       }\n\
     });\n\
   }\n\
+  var defineOrOverrideReflectProperty = function (key, shim) {\n\
+    if (!ES.IsCallable(globals.Reflect[key])) {\n\
+      defineProperty(globals.Reflect, key, shim);\n\
+    } else {\n\
+      var acceptsPrimitives = valueOrFalseIfThrows(function () {\n\
+        globals.Reflect[key](1);\n\
+        globals.Reflect[key](NaN);\n\
+        globals.Reflect[key](true);\n\
+        return true;\n\
+      });\n\
+      if (acceptsPrimitives) {\n\
+        overrideNative(globals.Reflect, key, shim);\n\
+      }\n\
+    }\n\
+  };\n\
+  Object.keys(ReflectShims).forEach(function (key) {\n\
+    defineOrOverrideReflectProperty(key, ReflectShims[key]);\n\
+  });\n\
+  if (functionsHaveNames && globals.Reflect.getPrototypeOf.name !== 'getPrototypeOf') {\n\
+    var originalReflectGetProto = globals.Reflect.getPrototypeOf;\n\
+    overrideNative(globals.Reflect, 'getPrototypeOf', function getPrototypeOf(target) {\n\
+      return _call(originalReflectGetProto, globals.Reflect, target);\n\
+    });\n\
+  }\n\
+  if (globals.Reflect.setPrototypeOf) {\n\
+    if (valueOrFalseIfThrows(function () {\n\
+      globals.Reflect.setPrototypeOf(1, {});\n\
+      return true;\n\
+    })) {\n\
+      overrideNative(globals.Reflect, 'setPrototypeOf', ReflectShims.setPrototypeOf);\n\
+    }\n\
+  }\n\
+  if (globals.Reflect.defineProperty) {\n\
+    if (!valueOrFalseIfThrows(function () {\n\
+      var basic = !globals.Reflect.defineProperty(1, 'test', { value: 1 });\n\
+      // \"extensible\" fails on Edge 0.12\n\
+      var extensible = typeof Object.preventExtensions !== 'function' || !globals.Reflect.defineProperty(Object.preventExtensions({}), 'test', {});\n\
+      return basic && extensible;\n\
+    })) {\n\
+      overrideNative(globals.Reflect, 'defineProperty', ReflectShims.defineProperty);\n\
+    }\n\
+  }\n\
+  if (globals.Reflect.construct) {\n\
+    if (!valueOrFalseIfThrows(function () {\n\
+      var F = function F() {};\n\
+      return globals.Reflect.construct(function () {}, [], F) instanceof F;\n\
+    })) {\n\
+      overrideNative(globals.Reflect, 'construct', ReflectShims.construct);\n\
+    }\n\
+  }\n\
 \n\
   if (String(new Date(NaN)) !== 'Invalid Date') {\n\
     var dateToString = Date.prototype.toString;\n\
@@ -7373,10 +8338,9 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
       if (valueOf !== valueOf) {\n\
         return 'Invalid Date';\n\
       }\n\
-      return dateToString.call(this);\n\
+      return ES.Call(dateToString, this);\n\
     };\n\
-    defineProperty(shimmedDateToString, 'toString', dateToString.toString, true);\n\
-    defineProperty(Date.prototype, 'toString', shimmedDateToString, true);\n\
+    overrideNative(Date.prototype, 'toString', shimmedDateToString);\n\
   }\n\
 \n\
   // Annex B HTML methods\n\
@@ -7396,31 +8360,80 @@ require.register("es-shims~es6-shim@0.27.1", Function("exports, module",
     sub: function sub() { return ES.CreateHTML(this, 'sub', '', ''); },\n\
     sup: function sub() { return ES.CreateHTML(this, 'sup', '', ''); }\n\
   };\n\
-  defineProperties(String.prototype, stringHTMLshims);\n\
-  Object.keys(stringHTMLshims).forEach(function (key) {\n\
+  _forEach(Object.keys(stringHTMLshims), function (key) {\n\
     var method = String.prototype[key];\n\
     var shouldOverwrite = false;\n\
     if (ES.IsCallable(method)) {\n\
-      var output = method.call('', ' \" ');\n\
-      var quotesCount = [].concat(output.match(/\"/g)).length;\n\
+      var output = _call(method, '', ' \" ');\n\
+      var quotesCount = _concat([], output.match(/\"/g)).length;\n\
       shouldOverwrite = output !== output.toLowerCase() || quotesCount > 2;\n\
     } else {\n\
       shouldOverwrite = true;\n\
     }\n\
     if (shouldOverwrite) {\n\
-      defineProperty(String.prototype, key, stringHTMLshims[key], true);\n\
+      overrideNative(String.prototype, key, stringHTMLshims[key]);\n\
     }\n\
   });\n\
+\n\
+  var JSONstringifiesSymbols = (function () {\n\
+    // Microsoft Edge v0.12 stringifies Symbols incorrectly\n\
+    if (!hasSymbols) { return false; } // Symbols are not supported\n\
+    var stringify = typeof JSON === 'object' && typeof JSON.stringify === 'function' ? JSON.stringify : null;\n\
+    if (!stringify) { return false; } // JSON.stringify is not supported\n\
+    if (typeof stringify(Symbol()) !== 'undefined') { return true; } // Symbols should become `undefined`\n\
+    if (stringify([Symbol()]) !== '[null]') { return true; } // Symbols in arrays should become `null`\n\
+    var obj = { a: Symbol() };\n\
+    obj[Symbol()] = true;\n\
+    if (stringify(obj) !== '{}') { return true; } // Symbol-valued keys *and* Symbol-valued properties should be omitted\n\
+    return false;\n\
+  }());\n\
+  var JSONstringifyAcceptsObjectSymbol = valueOrFalseIfThrows(function () {\n\
+    // Chrome 45 throws on stringifying object symbols\n\
+    if (!hasSymbols) { return true; } // Symbols are not supported\n\
+    return JSON.stringify(Object(Symbol())) === '{}' && JSON.stringify([Object(Symbol())]) === '[{}]';\n\
+  });\n\
+  if (JSONstringifiesSymbols || !JSONstringifyAcceptsObjectSymbol) {\n\
+    var origStringify = JSON.stringify;\n\
+    overrideNative(JSON, 'stringify', function stringify(value) {\n\
+      if (typeof value === 'symbol') { return; }\n\
+      var replacer;\n\
+      if (arguments.length > 1) {\n\
+        replacer = arguments[1];\n\
+      }\n\
+      var args = [value];\n\
+      if (!isArray(replacer)) {\n\
+        var replaceFn = ES.IsCallable(replacer) ? replacer : null;\n\
+        var wrappedReplacer = function (key, val) {\n\
+          var parsedValue = replaceFn ? _call(replaceFn, this, key, val) : val;\n\
+          if (typeof parsedValue !== 'symbol') {\n\
+            if (Type.symbol(parsedValue)) {\n\
+              return assignTo({})(parsedValue);\n\
+            } else {\n\
+              return parsedValue;\n\
+            }\n\
+          }\n\
+        };\n\
+        args.push(wrappedReplacer);\n\
+      } else {\n\
+        // create wrapped replacer that handles an array replacer?\n\
+        args.push(replacer);\n\
+      }\n\
+      if (arguments.length > 2) {\n\
+        args.push(arguments[2]);\n\
+      }\n\
+      return origStringify.apply(this, args);\n\
+    });\n\
+  }\n\
 \n\
   return globals;\n\
 }));\n\
 \n\
-//# sourceURL=components/es-shims/es6-shim/0.27.1/es6-shim.js"
+//# sourceURL=components/es-shims/es6-shim/0.34.2/es6-shim.js"
 ));
 
-require.modules["es-shims-es6-shim"] = require.modules["es-shims~es6-shim@0.27.1"];
-require.modules["es-shims~es6-shim"] = require.modules["es-shims~es6-shim@0.27.1"];
-require.modules["es6-shim"] = require.modules["es-shims~es6-shim@0.27.1"];
+require.modules["es-shims-es6-shim"] = require.modules["es-shims~es6-shim@0.34.2"];
+require.modules["es-shims~es6-shim"] = require.modules["es-shims~es6-shim@0.34.2"];
+require.modules["es6-shim"] = require.modules["es-shims~es6-shim@0.34.2"];
 
 
 require.register("components~jquery@1.11.2", Function("exports, module",
@@ -23159,6 +24172,206 @@ require.modules["jashkenas~backbone"] = require.modules["jashkenas~backbone@1.1.
 require.modules["backbone"] = require.modules["jashkenas~backbone@1.1.2"];
 
 
+require.register("marionettejs~backbone.babysitter@v0.1.5", Function("exports, module",
+"// Backbone.BabySitter\n\
+// -------------------\n\
+// v0.1.5\n\
+//\n\
+// Copyright (c)2014 Derick Bailey, Muted Solutions, LLC.\n\
+// Distributed under MIT license\n\
+//\n\
+// http://github.com/marionettejs/backbone.babysitter\n\
+\n\
+(function(root, factory) {\n\
+\n\
+  if (typeof define === 'function' && define.amd) {\n\
+    define(['backbone', 'underscore'], function(Backbone, _) {\n\
+      return factory(Backbone, _);\n\
+    });\n\
+  } else if (typeof exports !== 'undefined') {\n\
+    var Backbone = require('jashkenas~backbone@1.1.2');\n\
+    var _ = require('jashkenas~underscore@1.7.0');\n\
+    module.exports = factory(Backbone, _);\n\
+  } else {\n\
+    factory(root.Backbone, root._);\n\
+  }\n\
+\n\
+}(this, function(Backbone, _) {\n\
+  'use strict';\n\
+\n\
+  var previousChildViewContainer = Backbone.ChildViewContainer;\n\
+\n\
+  // BabySitter.ChildViewContainer\n\
+  // -----------------------------\n\
+  //\n\
+  // Provide a container to store, retrieve and\n\
+  // shut down child views.\n\
+  \n\
+  Backbone.ChildViewContainer = (function (Backbone, _) {\n\
+  \n\
+    // Container Constructor\n\
+    // ---------------------\n\
+  \n\
+    var Container = function(views){\n\
+      this._views = {};\n\
+      this._indexByModel = {};\n\
+      this._indexByCustom = {};\n\
+      this._updateLength();\n\
+  \n\
+      _.each(views, this.add, this);\n\
+    };\n\
+  \n\
+    // Container Methods\n\
+    // -----------------\n\
+  \n\
+    _.extend(Container.prototype, {\n\
+  \n\
+      // Add a view to this container. Stores the view\n\
+      // by `cid` and makes it searchable by the model\n\
+      // cid (and model itself). Optionally specify\n\
+      // a custom key to store an retrieve the view.\n\
+      add: function(view, customIndex){\n\
+        var viewCid = view.cid;\n\
+  \n\
+        // store the view\n\
+        this._views[viewCid] = view;\n\
+  \n\
+        // index it by model\n\
+        if (view.model){\n\
+          this._indexByModel[view.model.cid] = viewCid;\n\
+        }\n\
+  \n\
+        // index by custom\n\
+        if (customIndex){\n\
+          this._indexByCustom[customIndex] = viewCid;\n\
+        }\n\
+  \n\
+        this._updateLength();\n\
+        return this;\n\
+      },\n\
+  \n\
+      // Find a view by the model that was attached to\n\
+      // it. Uses the model's `cid` to find it.\n\
+      findByModel: function(model){\n\
+        return this.findByModelCid(model.cid);\n\
+      },\n\
+  \n\
+      // Find a view by the `cid` of the model that was attached to\n\
+      // it. Uses the model's `cid` to find the view `cid` and\n\
+      // retrieve the view using it.\n\
+      findByModelCid: function(modelCid){\n\
+        var viewCid = this._indexByModel[modelCid];\n\
+        return this.findByCid(viewCid);\n\
+      },\n\
+  \n\
+      // Find a view by a custom indexer.\n\
+      findByCustom: function(index){\n\
+        var viewCid = this._indexByCustom[index];\n\
+        return this.findByCid(viewCid);\n\
+      },\n\
+  \n\
+      // Find by index. This is not guaranteed to be a\n\
+      // stable index.\n\
+      findByIndex: function(index){\n\
+        return _.values(this._views)[index];\n\
+      },\n\
+  \n\
+      // retrieve a view by its `cid` directly\n\
+      findByCid: function(cid){\n\
+        return this._views[cid];\n\
+      },\n\
+  \n\
+      // Remove a view\n\
+      remove: function(view){\n\
+        var viewCid = view.cid;\n\
+  \n\
+        // delete model index\n\
+        if (view.model){\n\
+          delete this._indexByModel[view.model.cid];\n\
+        }\n\
+  \n\
+        // delete custom index\n\
+        _.any(this._indexByCustom, function(cid, key) {\n\
+          if (cid === viewCid) {\n\
+            delete this._indexByCustom[key];\n\
+            return true;\n\
+          }\n\
+        }, this);\n\
+  \n\
+        // remove the view from the container\n\
+        delete this._views[viewCid];\n\
+  \n\
+        // update the length\n\
+        this._updateLength();\n\
+        return this;\n\
+      },\n\
+  \n\
+      // Call a method on every view in the container,\n\
+      // passing parameters to the call method one at a\n\
+      // time, like `function.call`.\n\
+      call: function(method){\n\
+        this.apply(method, _.tail(arguments));\n\
+      },\n\
+  \n\
+      // Apply a method on every view in the container,\n\
+      // passing parameters to the call method one at a\n\
+      // time, like `function.apply`.\n\
+      apply: function(method, args){\n\
+        _.each(this._views, function(view){\n\
+          if (_.isFunction(view[method])){\n\
+            view[method].apply(view, args || []);\n\
+          }\n\
+        });\n\
+      },\n\
+  \n\
+      // Update the `.length` attribute on this container\n\
+      _updateLength: function(){\n\
+        this.length = _.size(this._views);\n\
+      }\n\
+    });\n\
+  \n\
+    // Borrowing this code from Backbone.Collection:\n\
+    // http://backbonejs.org/docs/backbone.html#section-106\n\
+    //\n\
+    // Mix in methods from Underscore, for iteration, and other\n\
+    // collection related features.\n\
+    var methods = ['forEach', 'each', 'map', 'find', 'detect', 'filter',\n\
+      'select', 'reject', 'every', 'all', 'some', 'any', 'include',\n\
+      'contains', 'invoke', 'toArray', 'first', 'initial', 'rest',\n\
+      'last', 'without', 'isEmpty', 'pluck'];\n\
+  \n\
+    _.each(methods, function(method) {\n\
+      Container.prototype[method] = function() {\n\
+        var views = _.values(this._views);\n\
+        var args = [views].concat(_.toArray(arguments));\n\
+        return _[method].apply(_, args);\n\
+      };\n\
+    });\n\
+  \n\
+    // return the public API\n\
+    return Container;\n\
+  })(Backbone, _);\n\
+  \n\
+\n\
+  Backbone.ChildViewContainer.VERSION = '0.1.5';\n\
+\n\
+  Backbone.ChildViewContainer.noConflict = function () {\n\
+    Backbone.ChildViewContainer = previousChildViewContainer;\n\
+    return this;\n\
+  };\n\
+\n\
+  return Backbone.ChildViewContainer;\n\
+\n\
+}));\n\
+\n\
+//# sourceURL=components/marionettejs/backbone.babysitter/v0.1.5/lib/backbone.babysitter.js"
+));
+
+require.modules["marionettejs-backbone.babysitter"] = require.modules["marionettejs~backbone.babysitter@v0.1.5"];
+require.modules["marionettejs~backbone.babysitter"] = require.modules["marionettejs~backbone.babysitter@v0.1.5"];
+require.modules["backbone.babysitter"] = require.modules["marionettejs~backbone.babysitter@v0.1.5"];
+
+
 require.register("marionettejs~backbone.wreqr@v1.3.1", Function("exports, module",
 "// Backbone.Wreqr (Backbone.Marionette)\n\
 // ----------------------------------\n\
@@ -23609,210 +24822,10 @@ require.modules["marionettejs~backbone.wreqr"] = require.modules["marionettejs~b
 require.modules["backbone.wreqr"] = require.modules["marionettejs~backbone.wreqr@v1.3.1"];
 
 
-require.register("marionettejs~backbone.babysitter@v0.1.5", Function("exports, module",
-"// Backbone.BabySitter\n\
-// -------------------\n\
-// v0.1.5\n\
-//\n\
-// Copyright (c)2014 Derick Bailey, Muted Solutions, LLC.\n\
-// Distributed under MIT license\n\
-//\n\
-// http://github.com/marionettejs/backbone.babysitter\n\
-\n\
-(function(root, factory) {\n\
-\n\
-  if (typeof define === 'function' && define.amd) {\n\
-    define(['backbone', 'underscore'], function(Backbone, _) {\n\
-      return factory(Backbone, _);\n\
-    });\n\
-  } else if (typeof exports !== 'undefined') {\n\
-    var Backbone = require('jashkenas~backbone@1.1.2');\n\
-    var _ = require('jashkenas~underscore@1.7.0');\n\
-    module.exports = factory(Backbone, _);\n\
-  } else {\n\
-    factory(root.Backbone, root._);\n\
-  }\n\
-\n\
-}(this, function(Backbone, _) {\n\
-  'use strict';\n\
-\n\
-  var previousChildViewContainer = Backbone.ChildViewContainer;\n\
-\n\
-  // BabySitter.ChildViewContainer\n\
-  // -----------------------------\n\
-  //\n\
-  // Provide a container to store, retrieve and\n\
-  // shut down child views.\n\
-  \n\
-  Backbone.ChildViewContainer = (function (Backbone, _) {\n\
-  \n\
-    // Container Constructor\n\
-    // ---------------------\n\
-  \n\
-    var Container = function(views){\n\
-      this._views = {};\n\
-      this._indexByModel = {};\n\
-      this._indexByCustom = {};\n\
-      this._updateLength();\n\
-  \n\
-      _.each(views, this.add, this);\n\
-    };\n\
-  \n\
-    // Container Methods\n\
-    // -----------------\n\
-  \n\
-    _.extend(Container.prototype, {\n\
-  \n\
-      // Add a view to this container. Stores the view\n\
-      // by `cid` and makes it searchable by the model\n\
-      // cid (and model itself). Optionally specify\n\
-      // a custom key to store an retrieve the view.\n\
-      add: function(view, customIndex){\n\
-        var viewCid = view.cid;\n\
-  \n\
-        // store the view\n\
-        this._views[viewCid] = view;\n\
-  \n\
-        // index it by model\n\
-        if (view.model){\n\
-          this._indexByModel[view.model.cid] = viewCid;\n\
-        }\n\
-  \n\
-        // index by custom\n\
-        if (customIndex){\n\
-          this._indexByCustom[customIndex] = viewCid;\n\
-        }\n\
-  \n\
-        this._updateLength();\n\
-        return this;\n\
-      },\n\
-  \n\
-      // Find a view by the model that was attached to\n\
-      // it. Uses the model's `cid` to find it.\n\
-      findByModel: function(model){\n\
-        return this.findByModelCid(model.cid);\n\
-      },\n\
-  \n\
-      // Find a view by the `cid` of the model that was attached to\n\
-      // it. Uses the model's `cid` to find the view `cid` and\n\
-      // retrieve the view using it.\n\
-      findByModelCid: function(modelCid){\n\
-        var viewCid = this._indexByModel[modelCid];\n\
-        return this.findByCid(viewCid);\n\
-      },\n\
-  \n\
-      // Find a view by a custom indexer.\n\
-      findByCustom: function(index){\n\
-        var viewCid = this._indexByCustom[index];\n\
-        return this.findByCid(viewCid);\n\
-      },\n\
-  \n\
-      // Find by index. This is not guaranteed to be a\n\
-      // stable index.\n\
-      findByIndex: function(index){\n\
-        return _.values(this._views)[index];\n\
-      },\n\
-  \n\
-      // retrieve a view by its `cid` directly\n\
-      findByCid: function(cid){\n\
-        return this._views[cid];\n\
-      },\n\
-  \n\
-      // Remove a view\n\
-      remove: function(view){\n\
-        var viewCid = view.cid;\n\
-  \n\
-        // delete model index\n\
-        if (view.model){\n\
-          delete this._indexByModel[view.model.cid];\n\
-        }\n\
-  \n\
-        // delete custom index\n\
-        _.any(this._indexByCustom, function(cid, key) {\n\
-          if (cid === viewCid) {\n\
-            delete this._indexByCustom[key];\n\
-            return true;\n\
-          }\n\
-        }, this);\n\
-  \n\
-        // remove the view from the container\n\
-        delete this._views[viewCid];\n\
-  \n\
-        // update the length\n\
-        this._updateLength();\n\
-        return this;\n\
-      },\n\
-  \n\
-      // Call a method on every view in the container,\n\
-      // passing parameters to the call method one at a\n\
-      // time, like `function.call`.\n\
-      call: function(method){\n\
-        this.apply(method, _.tail(arguments));\n\
-      },\n\
-  \n\
-      // Apply a method on every view in the container,\n\
-      // passing parameters to the call method one at a\n\
-      // time, like `function.apply`.\n\
-      apply: function(method, args){\n\
-        _.each(this._views, function(view){\n\
-          if (_.isFunction(view[method])){\n\
-            view[method].apply(view, args || []);\n\
-          }\n\
-        });\n\
-      },\n\
-  \n\
-      // Update the `.length` attribute on this container\n\
-      _updateLength: function(){\n\
-        this.length = _.size(this._views);\n\
-      }\n\
-    });\n\
-  \n\
-    // Borrowing this code from Backbone.Collection:\n\
-    // http://backbonejs.org/docs/backbone.html#section-106\n\
-    //\n\
-    // Mix in methods from Underscore, for iteration, and other\n\
-    // collection related features.\n\
-    var methods = ['forEach', 'each', 'map', 'find', 'detect', 'filter',\n\
-      'select', 'reject', 'every', 'all', 'some', 'any', 'include',\n\
-      'contains', 'invoke', 'toArray', 'first', 'initial', 'rest',\n\
-      'last', 'without', 'isEmpty', 'pluck'];\n\
-  \n\
-    _.each(methods, function(method) {\n\
-      Container.prototype[method] = function() {\n\
-        var views = _.values(this._views);\n\
-        var args = [views].concat(_.toArray(arguments));\n\
-        return _[method].apply(_, args);\n\
-      };\n\
-    });\n\
-  \n\
-    // return the public API\n\
-    return Container;\n\
-  })(Backbone, _);\n\
-  \n\
-\n\
-  Backbone.ChildViewContainer.VERSION = '0.1.5';\n\
-\n\
-  Backbone.ChildViewContainer.noConflict = function () {\n\
-    Backbone.ChildViewContainer = previousChildViewContainer;\n\
-    return this;\n\
-  };\n\
-\n\
-  return Backbone.ChildViewContainer;\n\
-\n\
-}));\n\
-\n\
-//# sourceURL=components/marionettejs/backbone.babysitter/v0.1.5/lib/backbone.babysitter.js"
-));
-
-require.modules["marionettejs-backbone.babysitter"] = require.modules["marionettejs~backbone.babysitter@v0.1.5"];
-require.modules["marionettejs~backbone.babysitter"] = require.modules["marionettejs~backbone.babysitter@v0.1.5"];
-require.modules["backbone.babysitter"] = require.modules["marionettejs~backbone.babysitter@v0.1.5"];
-
-
-require.register("marionettejs~backbone.marionette@v2.2.1", Function("exports, module",
+require.register("marionettejs~backbone.marionette@v2.2.2", Function("exports, module",
 "// MarionetteJS (Backbone.Marionette)\n\
 // ----------------------------------\n\
-// v2.2.1\n\
+// v2.2.2\n\
 //\n\
 // Copyright (c)2014 Derick Bailey, Muted Solutions, LLC.\n\
 // Distributed under MIT license\n\
@@ -23842,7 +24855,7 @@ require.register("marionettejs~backbone.marionette@v2.2.1", Function("exports, m
 \n\
   var Marionette = Backbone.Marionette = {};\n\
 \n\
-  Marionette.VERSION = '2.2.1';\n\
+  Marionette.VERSION = '2.2.2';\n\
 \n\
   Marionette.noConflict = function() {\n\
     root.Marionette = previousMarionette;\n\
@@ -24190,7 +25203,7 @@ require.register("marionettejs~backbone.marionette@v2.2.1", Function("exports, m
   var errorProps = ['description', 'fileName', 'lineNumber', 'name', 'message', 'number'];\n\
   \n\
   Marionette.Error = Marionette.extend.call(Error, {\n\
-    urlRoot: 'http://marionettejs.com/docs/' + Marionette.VERSION + '/',\n\
+    urlRoot: 'http://marionettejs.com/docs/v' + Marionette.VERSION + '/',\n\
   \n\
     constructor: function(message, options) {\n\
       if (_.isObject(message)) {\n\
@@ -24492,18 +25505,21 @@ require.register("marionettejs~backbone.marionette@v2.2.1", Function("exports, m
     show: function(view, options){\n\
       this._ensureElement();\n\
   \n\
-      var showOptions = options || {};\n\
+      var showOptions     = options || {};\n\
       var isDifferentView = view !== this.currentView;\n\
-      var preventDestroy =  !!showOptions.preventDestroy;\n\
-      var forceShow = !!showOptions.forceShow;\n\
+      var preventDestroy  = !!showOptions.preventDestroy;\n\
+      var forceShow       = !!showOptions.forceShow;\n\
   \n\
-      // we are only changing the view if there is a view to change to begin with\n\
+      // We are only changing the view if there is a current view to change to begin with\n\
       var isChangingView = !!this.currentView;\n\
   \n\
-      // only destroy the view if we don't want to preventDestroy and the view is different\n\
-      var _shouldDestroyView = !preventDestroy && isDifferentView;\n\
+      // Only destroy the current view if we don't want to `preventDestroy` and if\n\
+      // the view given in the first argument is different than `currentView`\n\
+      var _shouldDestroyView = isDifferentView && !preventDestroy;\n\
   \n\
-      // show the view if the view is different or if you want to re-show the view\n\
+      // Only show the view given in the first argument if it is different than\n\
+      // the current view or if we want to re-show the view. Note that if\n\
+      // `_shouldDestroyView` is true, then `_shouldShowView` is also necessarily true.\n\
       var _shouldShowView = isDifferentView || forceShow;\n\
   \n\
       if (isChangingView) {\n\
@@ -24521,7 +25537,7 @@ require.register("marionettejs~backbone.marionette@v2.2.1", Function("exports, m
         // If this happens we need to remove the reference\n\
         // to the currentView since once a view has been destroyed\n\
         // we can not reuse it.\n\
-        view.once('destroy', _.bind(this.empty, this));\n\
+        view.once('destroy', this.empty, this);\n\
         view.render();\n\
   \n\
         if (isChangingView) {\n\
@@ -24531,11 +25547,12 @@ require.register("marionettejs~backbone.marionette@v2.2.1", Function("exports, m
         this.triggerMethod('before:show', view);\n\
         Marionette.triggerMethodOn(view, 'before:show');\n\
   \n\
+        this.attachHtml(view);\n\
+  \n\
         if (isChangingView) {\n\
           this.triggerMethod('swapOut', this.currentView);\n\
         }\n\
   \n\
-        this.attachHtml(view);\n\
         this.currentView = view;\n\
   \n\
         if (isChangingView) {\n\
@@ -24585,6 +25602,7 @@ require.register("marionettejs~backbone.marionette@v2.2.1", Function("exports, m
       // we should not remove anything\n\
       if (!view) { return; }\n\
   \n\
+      view.off('destroy', this.empty, this);\n\
       this.triggerMethod('before:empty', view);\n\
       this._destroyView();\n\
       this.triggerMethod('empty', view);\n\
@@ -26919,17 +27937,17 @@ require.register("marionettejs~backbone.marionette@v2.2.1", Function("exports, m
   return Marionette;\n\
 }));\n\
 \n\
-//# sourceURL=components/marionettejs/backbone.marionette/v2.2.1/lib/core/backbone.marionette.js"
+//# sourceURL=components/marionettejs/backbone.marionette/v2.2.2/lib/core/backbone.marionette.js"
 ));
 
-require.modules["marionettejs-backbone.marionette"] = require.modules["marionettejs~backbone.marionette@v2.2.1"];
-require.modules["marionettejs~backbone.marionette"] = require.modules["marionettejs~backbone.marionette@v2.2.1"];
-require.modules["backbone.marionette"] = require.modules["marionettejs~backbone.marionette@v2.2.1"];
+require.modules["marionettejs-backbone.marionette"] = require.modules["marionettejs~backbone.marionette@v2.2.2"];
+require.modules["marionettejs~backbone.marionette"] = require.modules["marionettejs~backbone.marionette@v2.2.2"];
+require.modules["backbone.marionette"] = require.modules["marionettejs~backbone.marionette@v2.2.2"];
 
 
-require.register("moment~moment@2.8.3", Function("exports, module",
+require.register("moment~moment@2.8.4", Function("exports, module",
 "//! moment.js\n\
-//! version : 2.8.3\n\
+//! version : 2.8.4\n\
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors\n\
 //! license : MIT\n\
 //! momentjs.com\n\
@@ -26940,7 +27958,7 @@ require.register("moment~moment@2.8.3", Function("exports, module",
     ************************************/\n\
 \n\
     var moment,\n\
-        VERSION = '2.8.3',\n\
+        VERSION = '2.8.4',\n\
         // the global-scope this is NOT the global object in Node.js\n\
         globalScope = typeof global !== 'undefined' ? global : this,\n\
         oldGlobalMoment,\n\
@@ -26963,7 +27981,7 @@ require.register("moment~moment@2.8.3", Function("exports, module",
         momentProperties = [],\n\
 \n\
         // check for nodeJS\n\
-        hasModule = (typeof module !== 'undefined' && module.exports),\n\
+        hasModule = (typeof module !== 'undefined' && module && module.exports),\n\
 \n\
         // ASP.NET json date format regex\n\
         aspNetJsonRegex = /^\\/?Date\\((\\-?\\d+)/i,\n\
@@ -26974,8 +27992,8 @@ require.register("moment~moment@2.8.3", Function("exports, module",
         isoDurationRegex = /^(-)?P(?:(?:([0-9,.]*)Y)?(?:([0-9,.]*)M)?(?:([0-9,.]*)D)?(?:T(?:([0-9,.]*)H)?(?:([0-9,.]*)M)?(?:([0-9,.]*)S)?)?|([0-9,.]*)W)$/,\n\
 \n\
         // format tokens\n\
-        formattingTokens = /(\\[[^\\[]*\\])|(\\\\)?(Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|Q|YYYYYY|YYYYY|YYYY|YY|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|mm?|ss?|S{1,4}|X|zz?|ZZ?|.)/g,\n\
-        localFormattingTokens = /(\\[[^\\[]*\\])|(\\\\)?(LT|LL?L?L?|l{1,4})/g,\n\
+        formattingTokens = /(\\[[^\\[]*\\])|(\\\\)?(Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|Q|YYYYYY|YYYYY|YYYY|YY|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|mm?|ss?|S{1,4}|x|X|zz?|ZZ?|.)/g,\n\
+        localFormattingTokens = /(\\[[^\\[]*\\])|(\\\\)?(LTS|LT|LL?L?L?|l{1,4})/g,\n\
 \n\
         // parsing token regexes\n\
         parseTokenOneOrTwoDigits = /\\d\\d?/, // 0 - 99\n\
@@ -26986,8 +28004,8 @@ require.register("moment~moment@2.8.3", Function("exports, module",
         parseTokenWord = /[0-9]*['a-z\\u00A0-\\u05FF\\u0700-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFEF]+|[\\u0600-\\u06FF\\/]+(\\s*?[\\u0600-\\u06FF]+){1,2}/i, // any word (or two) characters or numbers including two/three word month in arabic.\n\
         parseTokenTimezone = /Z|[\\+\\-]\\d\\d:?\\d\\d/gi, // +00:00 -00:00 +0000 -0000 or Z\n\
         parseTokenT = /T/i, // T (ISO separator)\n\
+        parseTokenOffsetMs = /[\\+\\-]?\\d+/, // 1234567890123\n\
         parseTokenTimestampMs = /[\\+\\-]?\\d+(\\.\\d{1,3})?/, // 123456789 123456789.123\n\
-        parseTokenOrdinal = /\\d{1,2}/,\n\
 \n\
         //strict parsing regexes\n\
         parseTokenOneDigit = /\\d/, // 0 - 9\n\
@@ -27201,6 +28219,9 @@ require.register("moment~moment@2.8.3", Function("exports, module",
             },\n\
             zz : function () {\n\
                 return this.zoneName();\n\
+            },\n\
+            x    : function () {\n\
+                return this.valueOf();\n\
             },\n\
             X    : function () {\n\
                 return this.unix();\n\
@@ -27628,7 +28649,10 @@ require.register("moment~moment@2.8.3", Function("exports, module",
             overflow =\n\
                 m._a[MONTH] < 0 || m._a[MONTH] > 11 ? MONTH :\n\
                 m._a[DATE] < 1 || m._a[DATE] > daysInMonth(m._a[YEAR], m._a[MONTH]) ? DATE :\n\
-                m._a[HOUR] < 0 || m._a[HOUR] > 23 ? HOUR :\n\
+                m._a[HOUR] < 0 || m._a[HOUR] > 24 ||\n\
+                    (m._a[HOUR] === 24 && (m._a[MINUTE] !== 0 ||\n\
+                                           m._a[SECOND] !== 0 ||\n\
+                                           m._a[MILLISECOND] !== 0)) ? HOUR :\n\
                 m._a[MINUTE] < 0 || m._a[MINUTE] > 59 ? MINUTE :\n\
                 m._a[SECOND] < 0 || m._a[SECOND] > 59 ? SECOND :\n\
                 m._a[MILLISECOND] < 0 || m._a[MILLISECOND] > 999 ? MILLISECOND :\n\
@@ -27655,7 +28679,8 @@ require.register("moment~moment@2.8.3", Function("exports, module",
             if (m._strict) {\n\
                 m._isValid = m._isValid &&\n\
                     m._pf.charsLeftOver === 0 &&\n\
-                    m._pf.unusedTokens.length === 0;\n\
+                    m._pf.unusedTokens.length === 0 &&\n\
+                    m._pf.bigHour === undefined;\n\
             }\n\
         }\n\
         return m._isValid;\n\
@@ -27707,8 +28732,18 @@ require.register("moment~moment@2.8.3", Function("exports, module",
 \n\
     // Return a moment from input, that is local/utc/zone equivalent to model.\n\
     function makeAs(input, model) {\n\
-        return model._isUTC ? moment(input).zone(model._offset || 0) :\n\
-            moment(input).local();\n\
+        var res, diff;\n\
+        if (model._isUTC) {\n\
+            res = model.clone();\n\
+            diff = (moment.isMoment(input) || isDate(input) ?\n\
+                    +input : +moment(input)) - (+res);\n\
+            // Use low-level api, because this fn is low-level api.\n\
+            res._d.setTime(+res._d + diff);\n\
+            moment.updateOffset(res, false);\n\
+            return res;\n\
+        } else {\n\
+            return moment(input).local();\n\
+        }\n\
     }\n\
 \n\
     /************************************\n\
@@ -27728,6 +28763,9 @@ require.register("moment~moment@2.8.3", Function("exports, module",
                     this['_' + i] = prop;\n\
                 }\n\
             }\n\
+            // Lenient ordinal parsing accepts just a number in addition to\n\
+            // number + (possibly) stuff coming from _ordinalParseLenient.\n\
+            this._ordinalParseLenient = new RegExp(this._ordinalParse.source + '|' + /\\d{1,2}/.source);\n\
         },\n\
 \n\
         _months : 'January_February_March_April_May_June_July_August_September_October_November_December'.split('_'),\n\
@@ -27740,22 +28778,32 @@ require.register("moment~moment@2.8.3", Function("exports, module",
             return this._monthsShort[m.month()];\n\
         },\n\
 \n\
-        monthsParse : function (monthName) {\n\
+        monthsParse : function (monthName, format, strict) {\n\
             var i, mom, regex;\n\
 \n\
             if (!this._monthsParse) {\n\
                 this._monthsParse = [];\n\
+                this._longMonthsParse = [];\n\
+                this._shortMonthsParse = [];\n\
             }\n\
 \n\
             for (i = 0; i < 12; i++) {\n\
                 // make the regex if we don't have it already\n\
-                if (!this._monthsParse[i]) {\n\
-                    mom = moment.utc([2000, i]);\n\
+                mom = moment.utc([2000, i]);\n\
+                if (strict && !this._longMonthsParse[i]) {\n\
+                    this._longMonthsParse[i] = new RegExp('^' + this.months(mom, '').replace('.', '') + '$', 'i');\n\
+                    this._shortMonthsParse[i] = new RegExp('^' + this.monthsShort(mom, '').replace('.', '') + '$', 'i');\n\
+                }\n\
+                if (!strict && !this._monthsParse[i]) {\n\
                     regex = '^' + this.months(mom, '') + '|^' + this.monthsShort(mom, '');\n\
                     this._monthsParse[i] = new RegExp(regex.replace('.', ''), 'i');\n\
                 }\n\
                 // test the regex\n\
-                if (this._monthsParse[i].test(monthName)) {\n\
+                if (strict && format === 'MMMM' && this._longMonthsParse[i].test(monthName)) {\n\
+                    return i;\n\
+                } else if (strict && format === 'MMM' && this._shortMonthsParse[i].test(monthName)) {\n\
+                    return i;\n\
+                } else if (!strict && this._monthsParse[i].test(monthName)) {\n\
                     return i;\n\
                 }\n\
             }\n\
@@ -27798,6 +28846,7 @@ require.register("moment~moment@2.8.3", Function("exports, module",
         },\n\
 \n\
         _longDateFormat : {\n\
+            LTS : 'h:mm:ss A',\n\
             LT : 'h:mm A',\n\
             L : 'MM/DD/YYYY',\n\
             LL : 'MMMM D, YYYY',\n\
@@ -27838,9 +28887,9 @@ require.register("moment~moment@2.8.3", Function("exports, module",
             lastWeek : '[Last] dddd [at] LT',\n\
             sameElse : 'L'\n\
         },\n\
-        calendar : function (key, mom) {\n\
+        calendar : function (key, mom, now) {\n\
             var output = this._calendar[key];\n\
-            return typeof output === 'function' ? output.apply(mom) : output;\n\
+            return typeof output === 'function' ? output.apply(mom, [now]) : output;\n\
         },\n\
 \n\
         _relativeTime : {\n\
@@ -27875,6 +28924,7 @@ require.register("moment~moment@2.8.3", Function("exports, module",
             return this._ordinal.replace('%d', number);\n\
         },\n\
         _ordinal : '%d',\n\
+        _ordinalParse : /\\d{1,2}/,\n\
 \n\
         preparse : function (string) {\n\
             return string;\n\
@@ -28016,6 +29066,8 @@ require.register("moment~moment@2.8.3", Function("exports, module",
         case 'a':\n\
         case 'A':\n\
             return config._locale._meridiemParse;\n\
+        case 'x':\n\
+            return parseTokenOffsetMs;\n\
         case 'X':\n\
             return parseTokenTimestampMs;\n\
         case 'Z':\n\
@@ -28050,7 +29102,7 @@ require.register("moment~moment@2.8.3", Function("exports, module",
         case 'E':\n\
             return parseTokenOneOrTwoDigits;\n\
         case 'Do':\n\
-            return parseTokenOrdinal;\n\
+            return strict ? config._locale._ordinalParse : config._locale._ordinalParseLenient;\n\
         default :\n\
             a = new RegExp(regexpEscape(unescapeFormat(token.replace('\\\\', '')), 'i'));\n\
             return a;\n\
@@ -28087,7 +29139,7 @@ require.register("moment~moment@2.8.3", Function("exports, module",
             break;\n\
         case 'MMM' : // fall through to MMMM\n\
         case 'MMMM' :\n\
-            a = config._locale.monthsParse(input);\n\
+            a = config._locale.monthsParse(input, token, config._strict);\n\
             // if we didn't find a month name, mark the date as invalid.\n\
             if (a != null) {\n\
                 datePartArray[MONTH] = a;\n\
@@ -28104,7 +29156,8 @@ require.register("moment~moment@2.8.3", Function("exports, module",
             break;\n\
         case 'Do' :\n\
             if (input != null) {\n\
-                datePartArray[DATE] = toInt(parseInt(input, 10));\n\
+                datePartArray[DATE] = toInt(parseInt(\n\
+                            input.match(/\\d{1,2}/)[0], 10));\n\
             }\n\
             break;\n\
         // DAY OF YEAR\n\
@@ -28129,11 +29182,13 @@ require.register("moment~moment@2.8.3", Function("exports, module",
         case 'A' :\n\
             config._isPm = config._locale.isPM(input);\n\
             break;\n\
-        // 24 HOUR\n\
-        case 'H' : // fall through to hh\n\
-        case 'HH' : // fall through to hh\n\
+        // HOUR\n\
         case 'h' : // fall through to hh\n\
         case 'hh' :\n\
+            config._pf.bigHour = true;\n\
+            /* falls through */\n\
+        case 'H' : // fall through to HH\n\
+        case 'HH' :\n\
             datePartArray[HOUR] = toInt(input);\n\
             break;\n\
         // MINUTE\n\
@@ -28152,6 +29207,10 @@ require.register("moment~moment@2.8.3", Function("exports, module",
         case 'SSS' :\n\
         case 'SSSS' :\n\
             datePartArray[MILLISECOND] = toInt(('0.' + input) * 1000);\n\
+            break;\n\
+        // UNIX OFFSET (MILLISECONDS)\n\
+        case 'x':\n\
+            config._d = new Date(toInt(input));\n\
             break;\n\
         // UNIX TIMESTAMP WITH MS\n\
         case 'X':\n\
@@ -28289,11 +29348,24 @@ require.register("moment~moment@2.8.3", Function("exports, module",
             config._a[i] = input[i] = (config._a[i] == null) ? (i === 2 ? 1 : 0) : config._a[i];\n\
         }\n\
 \n\
+        // Check for 24:00:00.000\n\
+        if (config._a[HOUR] === 24 &&\n\
+                config._a[MINUTE] === 0 &&\n\
+                config._a[SECOND] === 0 &&\n\
+                config._a[MILLISECOND] === 0) {\n\
+            config._nextDay = true;\n\
+            config._a[HOUR] = 0;\n\
+        }\n\
+\n\
         config._d = (config._useUTC ? makeUTCDate : makeDate).apply(null, input);\n\
         // Apply timezone offset from input. The actual zone can be changed\n\
         // with parseZone.\n\
         if (config._tzm != null) {\n\
             config._d.setUTCMinutes(config._d.getUTCMinutes() + config._tzm);\n\
+        }\n\
+\n\
+        if (config._nextDay) {\n\
+            config._a[HOUR] = 24;\n\
         }\n\
     }\n\
 \n\
@@ -28308,7 +29380,7 @@ require.register("moment~moment@2.8.3", Function("exports, module",
         config._a = [\n\
             normalizedInput.year,\n\
             normalizedInput.month,\n\
-            normalizedInput.day,\n\
+            normalizedInput.day || normalizedInput.date,\n\
             normalizedInput.hour,\n\
             normalizedInput.minute,\n\
             normalizedInput.second,\n\
@@ -28381,6 +29453,10 @@ require.register("moment~moment@2.8.3", Function("exports, module",
             config._pf.unusedInput.push(string);\n\
         }\n\
 \n\
+        // clear _12h flag if hour is <= 12\n\
+        if (config._pf.bigHour === true && config._a[HOUR] <= 12) {\n\
+            config._pf.bigHour = undefined;\n\
+        }\n\
         // handle am pm\n\
         if (config._isPm && config._a[HOUR] < 12) {\n\
             config._a[HOUR] += 12;\n\
@@ -28389,7 +29465,6 @@ require.register("moment~moment@2.8.3", Function("exports, module",
         if (config._isPm === false && config._a[HOUR] === 12) {\n\
             config._a[HOUR] = 0;\n\
         }\n\
-\n\
         dateFromConfig(config);\n\
         checkOverflow(config);\n\
     }\n\
@@ -28649,7 +29724,8 @@ require.register("moment~moment@2.8.3", Function("exports, module",
 \n\
     function makeMoment(config) {\n\
         var input = config._i,\n\
-            format = config._f;\n\
+            format = config._f,\n\
+            res;\n\
 \n\
         config._locale = config._locale || moment.localeData(config._l);\n\
 \n\
@@ -28673,7 +29749,14 @@ require.register("moment~moment@2.8.3", Function("exports, module",
             makeDateFromInput(config);\n\
         }\n\
 \n\
-        return new Moment(config);\n\
+        res = new Moment(config);\n\
+        if (res._nextDay) {\n\
+            // Adding is smart enough around DST\n\
+            res.add(1, 'd');\n\
+            res._nextDay = undefined;\n\
+        }\n\
+\n\
+        return res;\n\
     }\n\
 \n\
     moment = function (input, format, locale, strict) {\n\
@@ -28705,7 +29788,7 @@ require.register("moment~moment@2.8.3", Function("exports, module",
         'release. Please refer to ' +\n\
         'https://github.com/moment/moment/issues/1407 for more info.',\n\
         function (config) {\n\
-            config._d = new Date(config._i);\n\
+            config._d = new Date(config._i + (config._useUTC ? ' UTC' : ''));\n\
         }\n\
     );\n\
 \n\
@@ -29017,7 +30100,12 @@ require.register("moment~moment@2.8.3", Function("exports, module",
         toISOString : function () {\n\
             var m = moment(this).utc();\n\
             if (0 < m.year() && m.year() <= 9999) {\n\
-                return formatMoment(m, 'YYYY-MM-DD[T]HH:mm:ss.SSS[Z]');\n\
+                if ('function' === typeof Date.prototype.toISOString) {\n\
+                    // native implementation is ~50x faster, use it when we can\n\
+                    return this.toDate().toISOString();\n\
+                } else {\n\
+                    return formatMoment(m, 'YYYY-MM-DD[T]HH:mm:ss.SSS[Z]');\n\
+                }\n\
             } else {\n\
                 return formatMoment(m, 'YYYYYY-MM-DD[T]HH:mm:ss.SSS[Z]');\n\
             }\n\
@@ -29136,7 +30224,7 @@ require.register("moment~moment@2.8.3", Function("exports, module",
                     diff < 1 ? 'sameDay' :\n\
                     diff < 2 ? 'nextDay' :\n\
                     diff < 7 ? 'nextWeek' : 'sameElse';\n\
-            return this.format(this.localeData().calendar(format, this));\n\
+            return this.format(this.localeData().calendar(format, this, moment(now)));\n\
         },\n\
 \n\
         isLeapYear : function () {\n\
@@ -29205,36 +30293,45 @@ require.register("moment~moment@2.8.3", Function("exports, module",
 \n\
         endOf: function (units) {\n\
             units = normalizeUnits(units);\n\
+            if (units === undefined || units === 'millisecond') {\n\
+                return this;\n\
+            }\n\
             return this.startOf(units).add(1, (units === 'isoWeek' ? 'week' : units)).subtract(1, 'ms');\n\
         },\n\
 \n\
         isAfter: function (input, units) {\n\
+            var inputMs;\n\
             units = normalizeUnits(typeof units !== 'undefined' ? units : 'millisecond');\n\
             if (units === 'millisecond') {\n\
                 input = moment.isMoment(input) ? input : moment(input);\n\
                 return +this > +input;\n\
             } else {\n\
-                return +this.clone().startOf(units) > +moment(input).startOf(units);\n\
+                inputMs = moment.isMoment(input) ? +input : +moment(input);\n\
+                return inputMs < +this.clone().startOf(units);\n\
             }\n\
         },\n\
 \n\
         isBefore: function (input, units) {\n\
+            var inputMs;\n\
             units = normalizeUnits(typeof units !== 'undefined' ? units : 'millisecond');\n\
             if (units === 'millisecond') {\n\
                 input = moment.isMoment(input) ? input : moment(input);\n\
                 return +this < +input;\n\
             } else {\n\
-                return +this.clone().startOf(units) < +moment(input).startOf(units);\n\
+                inputMs = moment.isMoment(input) ? +input : +moment(input);\n\
+                return +this.clone().endOf(units) < inputMs;\n\
             }\n\
         },\n\
 \n\
         isSame: function (input, units) {\n\
+            var inputMs;\n\
             units = normalizeUnits(units || 'millisecond');\n\
             if (units === 'millisecond') {\n\
                 input = moment.isMoment(input) ? input : moment(input);\n\
                 return +this === +input;\n\
             } else {\n\
-                return +this.clone().startOf(units) === +makeAs(input, this).startOf(units);\n\
+                inputMs = +moment(input);\n\
+                return +(this.clone().startOf(units)) <= inputMs && inputMs <= +(this.clone().endOf(units));\n\
             }\n\
         },\n\
 \n\
@@ -29411,7 +30508,7 @@ require.register("moment~moment@2.8.3", Function("exports, module",
         },\n\
 \n\
         lang : deprecate(\n\
-            'moment().lang() is deprecated. Use moment().localeData() instead.',\n\
+            'moment().lang() is deprecated. Instead, use moment().localeData() to get the language configuration. Use moment().locale() to change languages.',\n\
             function (key) {\n\
                 if (key === undefined) {\n\
                     return this.localeData();\n\
@@ -29632,7 +30729,7 @@ require.register("moment~moment@2.8.3", Function("exports, module",
                 return units === 'month' ? months : months / 12;\n\
             } else {\n\
                 // handle milliseconds separately because of floating point math errors (issue #1867)\n\
-                days = this._days + yearsToDays(this._months / 12);\n\
+                days = this._days + Math.round(yearsToDays(this._months / 12));\n\
                 switch (units) {\n\
                     case 'week': return days / 7 + this._milliseconds / 6048e5;\n\
                     case 'day': return days + this._milliseconds / 864e5;\n\
@@ -29734,6 +30831,7 @@ require.register("moment~moment@2.8.3", Function("exports, module",
 \n\
     // Set default locale, other locale will inherit from English.\n\
     moment.locale('en', {\n\
+        ordinalParse: /\\d{1,2}(th|st|nd|rd)/,\n\
         ordinal : function (number) {\n\
             var b = number % 10,\n\
                 output = (toInt(number % 100 / 10) === 1) ? 'th' :\n\
@@ -29785,12 +30883,12 @@ require.register("moment~moment@2.8.3", Function("exports, module",
     }\n\
 }).call(this);\n\
 \n\
-//# sourceURL=components/moment/moment/2.8.3/moment.js"
+//# sourceURL=components/moment/moment/2.8.4/moment.js"
 ));
 
-require.modules["moment-moment"] = require.modules["moment~moment@2.8.3"];
-require.modules["moment~moment"] = require.modules["moment~moment@2.8.3"];
-require.modules["moment"] = require.modules["moment~moment@2.8.3"];
+require.modules["moment-moment"] = require.modules["moment~moment@2.8.4"];
+require.modules["moment~moment"] = require.modules["moment~moment@2.8.4"];
+require.modules["moment"] = require.modules["moment~moment@2.8.4"];
 
 
 require.register("ianstormtaylor~to-no-case@0.1.1", Function("exports, module",
@@ -34936,7 +36034,7 @@ require.register("./client/bb", Function("exports, module",
 "var Backbone = require('jashkenas~backbone@1.1.2');\n\
 \n\
 Backbone.$ = window.jQuery = window.$ = require('components~jquery@1.11.2');\n\
-Backbone.Marionette = require('marionettejs~backbone.marionette@v2.2.1');\n\
+Backbone.Marionette = require('marionettejs~backbone.marionette@v2.2.2');\n\
 \n\
 module.exports = Backbone;\n\
 \n\
@@ -34951,7 +36049,7 @@ require.register("./client/date-render-helper", Function("exports, module",
 // human can understand\n\
 \n\
 var Handlebars = require('components~handlebars.js@v2.0.0');\n\
-var moment = require('moment~moment@2.8.3');\n\
+var moment = require('moment~moment@2.8.4');\n\
 \n\
 /**\n\
  * Parameters: the date in milliseconds since epoch\n\
@@ -35259,7 +36357,7 @@ require.register("./client/application", Function("exports, module",
 var Bootstrap = require('components~bootstrap@3.3.2');\n\
 var Breadcrumb = require('./client/breadcrumb-nav');\n\
 var es5 = require('es-shims~es5-shim@v4.1.0');\n\
-var es6 = require('es-shims~es6-shim@0.27.1');\n\
+var es6 = require('es-shims~es6-shim@0.34.2');\n\
 var Handlebars = require('components~handlebars.js@v2.0.0');\n\
 \n\
 // register Handlebars helpers and partials\n\
