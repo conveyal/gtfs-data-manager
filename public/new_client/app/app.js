@@ -18,14 +18,14 @@ export default class App extends React.Component {
     super(props)
 
     this.state = {
-      profile : null
+      profile: null
     }
 
     // this.lock = new Auth0Lock(config.auth0ClientID, config.auth0Domain)
 
     // try {
     //   // Get the user token if we've saved it in localStorage before
-    //   var userToken = localStorage.getItem('userToken');
+    //   var userToken = localStorage.getItem('userToken')
 
     //   if (userToken) {
     //     this.getProfile(userToken)
@@ -38,45 +38,44 @@ export default class App extends React.Component {
 
   }
 
-  logIn () {
+  logIn() {
     this.lock.show((err, profile, token) => {
       if (err) {
-        console.log("There was an error :/", err)
+        console.log('There was an error :/', err)
         return
       }
 
       // save token to localStorage
-      localStorage.setItem('userToken', token);
+      localStorage.setItem('userToken', token)
 
       this.userLoggedIn(token, profile)
     })
   }
 
-  logOut () {
+  logOut() {
     localStorage.removeItem('userToken')
     window.location.replace('https://' + config.auth0Domain + '/v2/logout?returnTo=' + window.location.href)
   }
 
-  getProfile (token) {
+  getProfile(token) {
     // retreive the user profile from Auth0
-    $.post( "https://" + config.auth0Domain + "/tokeninfo", { id_token: token })
-      .done( (profile) => {
+    $.post('https://' + config.auth0Domain + '/tokeninfo', { id_token: token })
+      .done((profile) => {
         this.userLoggedIn(token, profile)
       })
   }
 
-  userLoggedIn (token, profile) {
-
+  userLoggedIn(token, profile) {
     this.permissionData = new PermissionData(profile.app_metadata.datatools)
 
     console.log('getting feed IDs')
     $.ajax({
-      url : config.dataManagerURL + "/api/feedsources",
-      data : {
+      url: config.dataManagerURL + '/api/feedsources',
+      data: {
         feedcollection: config.projectID
       },
       headers: {
-        'Authorization' : 'Bearer ' + token
+        'Authorization': 'Bearer ' + token
       },
       success: (data) => {
         console.log('got feed sources', data)
@@ -84,8 +83,8 @@ export default class App extends React.Component {
         // initialize the feed listing, including a catch-all entry at the beginning
         this.feeds = data
         this.feeds.unshift({
-          id: "*",
-          name: "All Agencies"
+          id: '*',
+          name: 'All Agencies'
         })
 
         this.setState({
@@ -99,22 +98,20 @@ export default class App extends React.Component {
     })
   }
 
-  isAdmin () {
+  isAdmin() {
     return this.permissionData && this.permissionData.isProjectAdmin(config.projectID)
   }
 
-  render () {
-
+  render() {
     return (
-      <div>
-        <NavigationBar
-          title = "MTC 511 Transit Data Manager"
-          logIn = {this.logIn.bind(this)}
-          logOut = {this.logOut.bind(this)}
-          profile = {this.state.profile}
-        />
-        <FeedList/>
-      </div>
+    <div>
+      <NavigationBar
+        title={config.title}
+        logIn={this.logIn.bind(this)}
+        logOut={this.logOut.bind(this)}
+        profile={this.state.profile} />
+      <FeedList/>
+    </div>
     )
   }
 }

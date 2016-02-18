@@ -4707,3735 +4707,6 @@ require.modules["es-shims~es5-shim"] = require.modules["es-shims~es5-shim@v4.1.0
 require.modules["es5-shim"] = require.modules["es-shims~es5-shim@v4.1.0"];
 
 
-require.register("es-shims~es6-shim@0.34.2", Function("exports, module",
-" /*!\n\
-  * https://github.com/paulmillr/es6-shim\n\
-  * @license es6-shim Copyright 2013-2016 by Paul Miller (http://paulmillr.com)\n\
-  *   and contributors,  MIT License\n\
-  * es6-shim: v0.34.2\n\
-  * see https://github.com/paulmillr/es6-shim/blob/0.34.2/LICENSE\n\
-  * Details and documentation:\n\
-  * https://github.com/paulmillr/es6-shim/\n\
-  */\n\
-\n\
-// UMD (Universal Module Definition)\n\
-// see https://github.com/umdjs/umd/blob/master/returnExports.js\n\
-(function (root, factory) {\n\
-  /*global define, module, exports */\n\
-  if (typeof define === 'function' && define.amd) {\n\
-    // AMD. Register as an anonymous module.\n\
-    define(factory);\n\
-  } else if (typeof exports === 'object') {\n\
-    // Node. Does not work with strict CommonJS, but\n\
-    // only CommonJS-like environments that support module.exports,\n\
-    // like Node.\n\
-    module.exports = factory();\n\
-  } else {\n\
-    // Browser globals (root is window)\n\
-    root.returnExports = factory();\n\
-  }\n\
-}(this, function () {\n\
-  'use strict';\n\
-\n\
-  var _apply = Function.call.bind(Function.apply);\n\
-  var _call = Function.call.bind(Function.call);\n\
-  var isArray = Array.isArray;\n\
-  var keys = Object.keys;\n\
-\n\
-  var not = function notThunker(func) {\n\
-    return function notThunk() { return !_apply(func, this, arguments); };\n\
-  };\n\
-  var throwsError = function (func) {\n\
-    try {\n\
-      func();\n\
-      return false;\n\
-    } catch (e) {\n\
-      return true;\n\
-    }\n\
-  };\n\
-  var valueOrFalseIfThrows = function valueOrFalseIfThrows(func) {\n\
-    try {\n\
-      return func();\n\
-    } catch (e) {\n\
-      return false;\n\
-    }\n\
-  };\n\
-\n\
-  var isCallableWithoutNew = not(throwsError);\n\
-  var arePropertyDescriptorsSupported = function () {\n\
-    // if Object.defineProperty exists but throws, it's IE 8\n\
-    return !throwsError(function () { Object.defineProperty({}, 'x', { get: function () {} }); });\n\
-  };\n\
-  var supportsDescriptors = !!Object.defineProperty && arePropertyDescriptorsSupported();\n\
-  var functionsHaveNames = (function foo() {}).name === 'foo';\n\
-\n\
-  var _forEach = Function.call.bind(Array.prototype.forEach);\n\
-  var _reduce = Function.call.bind(Array.prototype.reduce);\n\
-  var _filter = Function.call.bind(Array.prototype.filter);\n\
-  var _some = Function.call.bind(Array.prototype.some);\n\
-\n\
-  var defineProperty = function (object, name, value, force) {\n\
-    if (!force && name in object) { return; }\n\
-    if (supportsDescriptors) {\n\
-      Object.defineProperty(object, name, {\n\
-        configurable: true,\n\
-        enumerable: false,\n\
-        writable: true,\n\
-        value: value\n\
-      });\n\
-    } else {\n\
-      object[name] = value;\n\
-    }\n\
-  };\n\
-\n\
-  // Define configurable, writable and non-enumerable props\n\
-  // if they don’t exist.\n\
-  var defineProperties = function (object, map, forceOverride) {\n\
-    _forEach(keys(map), function (name) {\n\
-      var method = map[name];\n\
-      defineProperty(object, name, method, !!forceOverride);\n\
-    });\n\
-  };\n\
-\n\
-  var _toString = Function.call.bind(Object.prototype.toString);\n\
-  var isCallable = typeof /abc/ === 'function' ? function IsCallableSlow(x) {\n\
-    // Some old browsers (IE, FF) say that typeof /abc/ === 'function'\n\
-    return typeof x === 'function' && _toString(x) === '[object Function]';\n\
-  } : function IsCallableFast(x) { return typeof x === 'function'; };\n\
-\n\
-  var Value = {\n\
-    getter: function (object, name, getter) {\n\
-      if (!supportsDescriptors) {\n\
-        throw new TypeError('getters require true ES5 support');\n\
-      }\n\
-      Object.defineProperty(object, name, {\n\
-        configurable: true,\n\
-        enumerable: false,\n\
-        get: getter\n\
-      });\n\
-    },\n\
-    proxy: function (originalObject, key, targetObject) {\n\
-      if (!supportsDescriptors) {\n\
-        throw new TypeError('getters require true ES5 support');\n\
-      }\n\
-      var originalDescriptor = Object.getOwnPropertyDescriptor(originalObject, key);\n\
-      Object.defineProperty(targetObject, key, {\n\
-        configurable: originalDescriptor.configurable,\n\
-        enumerable: originalDescriptor.enumerable,\n\
-        get: function getKey() { return originalObject[key]; },\n\
-        set: function setKey(value) { originalObject[key] = value; }\n\
-      });\n\
-    },\n\
-    redefine: function (object, property, newValue) {\n\
-      if (supportsDescriptors) {\n\
-        var descriptor = Object.getOwnPropertyDescriptor(object, property);\n\
-        descriptor.value = newValue;\n\
-        Object.defineProperty(object, property, descriptor);\n\
-      } else {\n\
-        object[property] = newValue;\n\
-      }\n\
-    },\n\
-    defineByDescriptor: function (object, property, descriptor) {\n\
-      if (supportsDescriptors) {\n\
-        Object.defineProperty(object, property, descriptor);\n\
-      } else if ('value' in descriptor) {\n\
-        object[property] = descriptor.value;\n\
-      }\n\
-    },\n\
-    preserveToString: function (target, source) {\n\
-      if (source && isCallable(source.toString)) {\n\
-        defineProperty(target, 'toString', source.toString.bind(source), true);\n\
-      }\n\
-    }\n\
-  };\n\
-\n\
-  // Simple shim for Object.create on ES3 browsers\n\
-  // (unlike real shim, no attempt to support `prototype === null`)\n\
-  var create = Object.create || function (prototype, properties) {\n\
-    var Prototype = function Prototype() {};\n\
-    Prototype.prototype = prototype;\n\
-    var object = new Prototype();\n\
-    if (typeof properties !== 'undefined') {\n\
-      keys(properties).forEach(function (key) {\n\
-        Value.defineByDescriptor(object, key, properties[key]);\n\
-      });\n\
-    }\n\
-    return object;\n\
-  };\n\
-\n\
-  var supportsSubclassing = function (C, f) {\n\
-    if (!Object.setPrototypeOf) { return false; /* skip test on IE < 11 */ }\n\
-    return valueOrFalseIfThrows(function () {\n\
-      var Sub = function Subclass(arg) {\n\
-        var o = new C(arg);\n\
-        Object.setPrototypeOf(o, Subclass.prototype);\n\
-        return o;\n\
-      };\n\
-      Object.setPrototypeOf(Sub, C);\n\
-      Sub.prototype = create(C.prototype, {\n\
-        constructor: { value: Sub }\n\
-      });\n\
-      return f(Sub);\n\
-    });\n\
-  };\n\
-\n\
-  var getGlobal = function () {\n\
-    /* global self, window, global */\n\
-    // the only reliable means to get the global object is\n\
-    // `Function('return this')()`\n\
-    // However, this causes CSP violations in Chrome apps.\n\
-    if (typeof self !== 'undefined') { return self; }\n\
-    if (typeof window !== 'undefined') { return window; }\n\
-    if (typeof global !== 'undefined') { return global; }\n\
-    throw new Error('unable to locate global object');\n\
-  };\n\
-\n\
-  var globals = getGlobal();\n\
-  var globalIsFinite = globals.isFinite;\n\
-  var _indexOf = Function.call.bind(String.prototype.indexOf);\n\
-  var _concat = Function.call.bind(Array.prototype.concat);\n\
-  var _sort = Function.call.bind(Array.prototype.sort);\n\
-  var _strSlice = Function.call.bind(String.prototype.slice);\n\
-  var _push = Function.call.bind(Array.prototype.push);\n\
-  var _pushApply = Function.apply.bind(Array.prototype.push);\n\
-  var _shift = Function.call.bind(Array.prototype.shift);\n\
-  var _max = Math.max;\n\
-  var _min = Math.min;\n\
-  var _floor = Math.floor;\n\
-  var _abs = Math.abs;\n\
-  var _log = Math.log;\n\
-  var _sqrt = Math.sqrt;\n\
-  var _hasOwnProperty = Function.call.bind(Object.prototype.hasOwnProperty);\n\
-  var ArrayIterator; // make our implementation private\n\
-  var noop = function () {};\n\
-\n\
-  var Symbol = globals.Symbol || {};\n\
-  var symbolSpecies = Symbol.species || '@@species';\n\
-\n\
-  var numberIsNaN = Number.isNaN || function isNaN(value) {\n\
-    // NaN !== NaN, but they are identical.\n\
-    // NaNs are the only non-reflexive value, i.e., if x !== x,\n\
-    // then x is NaN.\n\
-    // isNaN is broken: it converts its argument to number, so\n\
-    // isNaN('foo') => true\n\
-    return value !== value;\n\
-  };\n\
-  var numberIsFinite = Number.isFinite || function isFinite(value) {\n\
-    return typeof value === 'number' && globalIsFinite(value);\n\
-  };\n\
-\n\
-  // taken directly from https://github.com/ljharb/is-arguments/blob/master/index.js\n\
-  // can be replaced with require('is-arguments') if we ever use a build process instead\n\
-  var isStandardArguments = function isArguments(value) {\n\
-    return _toString(value) === '[object Arguments]';\n\
-  };\n\
-  var isLegacyArguments = function isArguments(value) {\n\
-    return value !== null &&\n\
-      typeof value === 'object' &&\n\
-      typeof value.length === 'number' &&\n\
-      value.length >= 0 &&\n\
-      _toString(value) !== '[object Array]' &&\n\
-      _toString(value.callee) === '[object Function]';\n\
-  };\n\
-  var isArguments = isStandardArguments(arguments) ? isStandardArguments : isLegacyArguments;\n\
-\n\
-  var Type = {\n\
-    primitive: function (x) { return x === null || (typeof x !== 'function' && typeof x !== 'object'); },\n\
-    object: function (x) { return x !== null && typeof x === 'object'; },\n\
-    string: function (x) { return _toString(x) === '[object String]'; },\n\
-    regex: function (x) { return _toString(x) === '[object RegExp]'; },\n\
-    symbol: function (x) {\n\
-      return typeof globals.Symbol === 'function' && typeof x === 'symbol';\n\
-    }\n\
-  };\n\
-\n\
-  var overrideNative = function overrideNative(object, property, replacement) {\n\
-    var original = object[property];\n\
-    defineProperty(object, property, replacement, true);\n\
-    Value.preserveToString(object[property], original);\n\
-  };\n\
-\n\
-  var hasSymbols = typeof Symbol === 'function' && typeof Symbol['for'] === 'function' && Type.symbol(Symbol());\n\
-\n\
-  // This is a private name in the es6 spec, equal to '[Symbol.iterator]'\n\
-  // we're going to use an arbitrary _-prefixed name to make our shims\n\
-  // work properly with each other, even though we don't have full Iterator\n\
-  // support.  That is, `Array.from(map.keys())` will work, but we don't\n\
-  // pretend to export a \"real\" Iterator interface.\n\
-  var $iterator$ = Type.symbol(Symbol.iterator) ? Symbol.iterator : '_es6-shim iterator_';\n\
-  // Firefox ships a partial implementation using the name @@iterator.\n\
-  // https://bugzilla.mozilla.org/show_bug.cgi?id=907077#c14\n\
-  // So use that name if we detect it.\n\
-  if (globals.Set && typeof new globals.Set()['@@iterator'] === 'function') {\n\
-    $iterator$ = '@@iterator';\n\
-  }\n\
-\n\
-  // Reflect\n\
-  if (!globals.Reflect) {\n\
-    defineProperty(globals, 'Reflect', {});\n\
-  }\n\
-  var Reflect = globals.Reflect;\n\
-\n\
-  var $String = String;\n\
-\n\
-  var ES = {\n\
-    // https://people.mozilla.org/~jorendorff/es6-draft.html#sec-call-f-v-args\n\
-    Call: function Call(F, V) {\n\
-      var args = arguments.length > 2 ? arguments[2] : [];\n\
-      if (!ES.IsCallable(F)) {\n\
-        throw new TypeError(F + ' is not a function');\n\
-      }\n\
-      return _apply(F, V, args);\n\
-    },\n\
-\n\
-    RequireObjectCoercible: function (x, optMessage) {\n\
-      /* jshint eqnull:true */\n\
-      if (x == null) {\n\
-        throw new TypeError(optMessage || 'Cannot call method on ' + x);\n\
-      }\n\
-      return x;\n\
-    },\n\
-\n\
-    // This might miss the \"(non-standard exotic and does not implement\n\
-    // [[Call]])\" case from\n\
-    // http://www.ecma-international.org/ecma-262/6.0/#sec-typeof-operator-runtime-semantics-evaluation\n\
-    // but we can't find any evidence these objects exist in practice.\n\
-    // If we find some in the future, you could test `Object(x) === x`,\n\
-    // which is reliable according to\n\
-    // http://www.ecma-international.org/ecma-262/6.0/#sec-toobject\n\
-    // but is not well optimized by runtimes and creates an object\n\
-    // whenever it returns false, and thus is very slow.\n\
-    TypeIsObject: function (x) {\n\
-      if (x === void 0 || x === null || x === true || x === false) {\n\
-        return false;\n\
-      }\n\
-      return typeof x === 'function' || typeof x === 'object';\n\
-    },\n\
-\n\
-    ToObject: function (o, optMessage) {\n\
-      return Object(ES.RequireObjectCoercible(o, optMessage));\n\
-    },\n\
-\n\
-    IsCallable: isCallable,\n\
-\n\
-    IsConstructor: function (x) {\n\
-      // We can't tell callables from constructors in ES5\n\
-      return ES.IsCallable(x);\n\
-    },\n\
-\n\
-    ToInt32: function (x) {\n\
-      return ES.ToNumber(x) >> 0;\n\
-    },\n\
-\n\
-    ToUint32: function (x) {\n\
-      return ES.ToNumber(x) >>> 0;\n\
-    },\n\
-\n\
-    ToNumber: function (value) {\n\
-      if (_toString(value) === '[object Symbol]') {\n\
-        throw new TypeError('Cannot convert a Symbol value to a number');\n\
-      }\n\
-      return +value;\n\
-    },\n\
-\n\
-    ToInteger: function (value) {\n\
-      var number = ES.ToNumber(value);\n\
-      if (numberIsNaN(number)) { return 0; }\n\
-      if (number === 0 || !numberIsFinite(number)) { return number; }\n\
-      return (number > 0 ? 1 : -1) * _floor(_abs(number));\n\
-    },\n\
-\n\
-    ToLength: function (value) {\n\
-      var len = ES.ToInteger(value);\n\
-      if (len <= 0) { return 0; } // includes converting -0 to +0\n\
-      if (len > Number.MAX_SAFE_INTEGER) { return Number.MAX_SAFE_INTEGER; }\n\
-      return len;\n\
-    },\n\
-\n\
-    SameValue: function (a, b) {\n\
-      if (a === b) {\n\
-        // 0 === -0, but they are not identical.\n\
-        if (a === 0) { return 1 / a === 1 / b; }\n\
-        return true;\n\
-      }\n\
-      return numberIsNaN(a) && numberIsNaN(b);\n\
-    },\n\
-\n\
-    SameValueZero: function (a, b) {\n\
-      // same as SameValue except for SameValueZero(+0, -0) == true\n\
-      return (a === b) || (numberIsNaN(a) && numberIsNaN(b));\n\
-    },\n\
-\n\
-    IsIterable: function (o) {\n\
-      return ES.TypeIsObject(o) && (typeof o[$iterator$] !== 'undefined' || isArguments(o));\n\
-    },\n\
-\n\
-    GetIterator: function (o) {\n\
-      if (isArguments(o)) {\n\
-        // special case support for `arguments`\n\
-        return new ArrayIterator(o, 'value');\n\
-      }\n\
-      var itFn = ES.GetMethod(o, $iterator$);\n\
-      if (!ES.IsCallable(itFn)) {\n\
-        // Better diagnostics if itFn is null or undefined\n\
-        throw new TypeError('value is not an iterable');\n\
-      }\n\
-      var it = ES.Call(itFn, o);\n\
-      if (!ES.TypeIsObject(it)) {\n\
-        throw new TypeError('bad iterator');\n\
-      }\n\
-      return it;\n\
-    },\n\
-\n\
-    GetMethod: function (o, p) {\n\
-      var func = ES.ToObject(o)[p];\n\
-      if (func === void 0 || func === null) {\n\
-        return void 0;\n\
-      }\n\
-      if (!ES.IsCallable(func)) {\n\
-        throw new TypeError('Method not callable: ' + p);\n\
-      }\n\
-      return func;\n\
-    },\n\
-\n\
-    IteratorComplete: function (iterResult) {\n\
-      return !!(iterResult.done);\n\
-    },\n\
-\n\
-    IteratorClose: function (iterator, completionIsThrow) {\n\
-      var returnMethod = ES.GetMethod(iterator, 'return');\n\
-      if (returnMethod === void 0) {\n\
-        return;\n\
-      }\n\
-      var innerResult, innerException;\n\
-      try {\n\
-        innerResult = ES.Call(returnMethod, iterator);\n\
-      } catch (e) {\n\
-        innerException = e;\n\
-      }\n\
-      if (completionIsThrow) {\n\
-        return;\n\
-      }\n\
-      if (innerException) {\n\
-        throw innerException;\n\
-      }\n\
-      if (!ES.TypeIsObject(innerResult)) {\n\
-        throw new TypeError(\"Iterator's return method returned a non-object.\");\n\
-      }\n\
-    },\n\
-\n\
-    IteratorNext: function (it) {\n\
-      var result = arguments.length > 1 ? it.next(arguments[1]) : it.next();\n\
-      if (!ES.TypeIsObject(result)) {\n\
-        throw new TypeError('bad iterator');\n\
-      }\n\
-      return result;\n\
-    },\n\
-\n\
-    IteratorStep: function (it) {\n\
-      var result = ES.IteratorNext(it);\n\
-      var done = ES.IteratorComplete(result);\n\
-      return done ? false : result;\n\
-    },\n\
-\n\
-    Construct: function (C, args, newTarget, isES6internal) {\n\
-      var target = typeof newTarget === 'undefined' ? C : newTarget;\n\
-\n\
-      if (!isES6internal && Reflect.construct) {\n\
-        // Try to use Reflect.construct if available\n\
-        return Reflect.construct(C, args, target);\n\
-      }\n\
-      // OK, we have to fake it.  This will only work if the\n\
-      // C.[[ConstructorKind]] == \"base\" -- but that's the only\n\
-      // kind we can make in ES5 code anyway.\n\
-\n\
-      // OrdinaryCreateFromConstructor(target, \"%ObjectPrototype%\")\n\
-      var proto = target.prototype;\n\
-      if (!ES.TypeIsObject(proto)) {\n\
-        proto = Object.prototype;\n\
-      }\n\
-      var obj = create(proto);\n\
-      // Call the constructor.\n\
-      var result = ES.Call(C, obj, args);\n\
-      return ES.TypeIsObject(result) ? result : obj;\n\
-    },\n\
-\n\
-    SpeciesConstructor: function (O, defaultConstructor) {\n\
-      var C = O.constructor;\n\
-      if (C === void 0) {\n\
-        return defaultConstructor;\n\
-      }\n\
-      if (!ES.TypeIsObject(C)) {\n\
-        throw new TypeError('Bad constructor');\n\
-      }\n\
-      var S = C[symbolSpecies];\n\
-      if (S === void 0 || S === null) {\n\
-        return defaultConstructor;\n\
-      }\n\
-      if (!ES.IsConstructor(S)) {\n\
-        throw new TypeError('Bad @@species');\n\
-      }\n\
-      return S;\n\
-    },\n\
-\n\
-    CreateHTML: function (string, tag, attribute, value) {\n\
-      var S = ES.ToString(string);\n\
-      var p1 = '<' + tag;\n\
-      if (attribute !== '') {\n\
-        var V = ES.ToString(value);\n\
-        var escapedV = V.replace(/\"/g, '&quot;');\n\
-        p1 += ' ' + attribute + '=\"' + escapedV + '\"';\n\
-      }\n\
-      var p2 = p1 + '>';\n\
-      var p3 = p2 + S;\n\
-      return p3 + '</' + tag + '>';\n\
-    },\n\
-\n\
-    IsRegExp: function IsRegExp(argument) {\n\
-      if (!ES.TypeIsObject(argument)) {\n\
-        return false;\n\
-      }\n\
-      var isRegExp = argument[Symbol.match];\n\
-      if (typeof isRegExp !== 'undefined') {\n\
-        return !!isRegExp;\n\
-      }\n\
-      return Type.regex(argument);\n\
-    },\n\
-\n\
-    ToString: function ToString(string) {\n\
-      return $String(string);\n\
-    }\n\
-  };\n\
-\n\
-  // Well-known Symbol shims\n\
-  if (supportsDescriptors && hasSymbols) {\n\
-    var defineWellKnownSymbol = function defineWellKnownSymbol(name) {\n\
-      if (Type.symbol(Symbol[name])) {\n\
-        return Symbol[name];\n\
-      }\n\
-      var sym = Symbol['for']('Symbol.' + name);\n\
-      Object.defineProperty(Symbol, name, {\n\
-        configurable: false,\n\
-        enumerable: false,\n\
-        writable: false,\n\
-        value: sym\n\
-      });\n\
-      return sym;\n\
-    };\n\
-    if (!Type.symbol(Symbol.search)) {\n\
-      var symbolSearch = defineWellKnownSymbol('search');\n\
-      var originalSearch = String.prototype.search;\n\
-      defineProperty(RegExp.prototype, symbolSearch, function search(string) {\n\
-        return ES.Call(originalSearch, string, [this]);\n\
-      });\n\
-      var searchShim = function search(regexp) {\n\
-        var O = ES.RequireObjectCoercible(this);\n\
-        if (regexp !== null && typeof regexp !== 'undefined') {\n\
-          var searcher = ES.GetMethod(regexp, symbolSearch);\n\
-          if (typeof searcher !== 'undefined') {\n\
-            return ES.Call(searcher, regexp, [O]);\n\
-          }\n\
-        }\n\
-        return ES.Call(originalSearch, O, [ES.ToString(regexp)]);\n\
-      };\n\
-      overrideNative(String.prototype, 'search', searchShim);\n\
-    }\n\
-    if (!Type.symbol(Symbol.replace)) {\n\
-      var symbolReplace = defineWellKnownSymbol('replace');\n\
-      var originalReplace = String.prototype.replace;\n\
-      defineProperty(RegExp.prototype, symbolReplace, function replace(string, replaceValue) {\n\
-        return ES.Call(originalReplace, string, [this, replaceValue]);\n\
-      });\n\
-      var replaceShim = function replace(searchValue, replaceValue) {\n\
-        var O = ES.RequireObjectCoercible(this);\n\
-        if (searchValue !== null && typeof searchValue !== 'undefined') {\n\
-          var replacer = ES.GetMethod(searchValue, symbolReplace);\n\
-          if (typeof replacer !== 'undefined') {\n\
-            return ES.Call(replacer, searchValue, [O, replaceValue]);\n\
-          }\n\
-        }\n\
-        return ES.Call(originalReplace, O, [ES.ToString(searchValue), replaceValue]);\n\
-      };\n\
-      overrideNative(String.prototype, 'replace', replaceShim);\n\
-    }\n\
-    if (!Type.symbol(Symbol.split)) {\n\
-      var symbolSplit = defineWellKnownSymbol('split');\n\
-      var originalSplit = String.prototype.split;\n\
-      defineProperty(RegExp.prototype, symbolSplit, function split(string, limit) {\n\
-        return ES.Call(originalSplit, string, [this, limit]);\n\
-      });\n\
-      var splitShim = function split(separator, limit) {\n\
-        var O = ES.RequireObjectCoercible(this);\n\
-        if (separator !== null && typeof separator !== 'undefined') {\n\
-          var splitter = ES.GetMethod(separator, symbolSplit);\n\
-          if (typeof splitter !== 'undefined') {\n\
-            return ES.Call(splitter, separator, [O, limit]);\n\
-          }\n\
-        }\n\
-        return ES.Call(originalSplit, O, [ES.ToString(separator), limit]);\n\
-      };\n\
-      overrideNative(String.prototype, 'split', splitShim);\n\
-    }\n\
-    var symbolMatchExists = Type.symbol(Symbol.match);\n\
-    var stringMatchIgnoresSymbolMatch = symbolMatchExists && (function () {\n\
-      // Firefox 41, through Nightly 45 has Symbol.match, but String#match ignores it.\n\
-      // Firefox 40 and below have Symbol.match but String#match works fine.\n\
-      var o = {};\n\
-      o[Symbol.match] = function () { return 42; };\n\
-      return 'a'.match(o) !== 42;\n\
-    }());\n\
-    if (!symbolMatchExists || stringMatchIgnoresSymbolMatch) {\n\
-      var symbolMatch = defineWellKnownSymbol('match');\n\
-\n\
-      var originalMatch = String.prototype.match;\n\
-      defineProperty(RegExp.prototype, symbolMatch, function match(string) {\n\
-        return ES.Call(originalMatch, string, [this]);\n\
-      });\n\
-\n\
-      var matchShim = function match(regexp) {\n\
-        var O = ES.RequireObjectCoercible(this);\n\
-        if (regexp !== null && typeof regexp !== 'undefined') {\n\
-          var matcher = ES.GetMethod(regexp, symbolMatch);\n\
-          if (typeof matcher !== 'undefined') {\n\
-            return ES.Call(matcher, regexp, [O]);\n\
-          }\n\
-        }\n\
-        return ES.Call(originalMatch, O, [ES.ToString(regexp)]);\n\
-      };\n\
-      overrideNative(String.prototype, 'match', matchShim);\n\
-    }\n\
-  }\n\
-\n\
-  var wrapConstructor = function wrapConstructor(original, replacement, keysToSkip) {\n\
-    Value.preserveToString(replacement, original);\n\
-    if (Object.setPrototypeOf) {\n\
-      // sets up proper prototype chain where possible\n\
-      Object.setPrototypeOf(original, replacement);\n\
-    }\n\
-    if (supportsDescriptors) {\n\
-      _forEach(Object.getOwnPropertyNames(original), function (key) {\n\
-        if (key in noop || keysToSkip[key]) { return; }\n\
-        Value.proxy(original, key, replacement);\n\
-      });\n\
-    } else {\n\
-      _forEach(Object.keys(original), function (key) {\n\
-        if (key in noop || keysToSkip[key]) { return; }\n\
-        replacement[key] = original[key];\n\
-      });\n\
-    }\n\
-    replacement.prototype = original.prototype;\n\
-    Value.redefine(original.prototype, 'constructor', replacement);\n\
-  };\n\
-\n\
-  var defaultSpeciesGetter = function () { return this; };\n\
-  var addDefaultSpecies = function (C) {\n\
-    if (supportsDescriptors && !_hasOwnProperty(C, symbolSpecies)) {\n\
-      Value.getter(C, symbolSpecies, defaultSpeciesGetter);\n\
-    }\n\
-  };\n\
-\n\
-  var addIterator = function (prototype, impl) {\n\
-    var implementation = impl || function iterator() { return this; };\n\
-    defineProperty(prototype, $iterator$, implementation);\n\
-    if (!prototype[$iterator$] && Type.symbol($iterator$)) {\n\
-      // implementations are buggy when $iterator$ is a Symbol\n\
-      prototype[$iterator$] = implementation;\n\
-    }\n\
-  };\n\
-\n\
-  var createDataProperty = function createDataProperty(object, name, value) {\n\
-    if (supportsDescriptors) {\n\
-      Object.defineProperty(object, name, {\n\
-        configurable: true,\n\
-        enumerable: true,\n\
-        writable: true,\n\
-        value: value\n\
-      });\n\
-    } else {\n\
-      object[name] = value;\n\
-    }\n\
-  };\n\
-  var createDataPropertyOrThrow = function createDataPropertyOrThrow(object, name, value) {\n\
-    createDataProperty(object, name, value);\n\
-    if (!ES.SameValue(object[name], value)) {\n\
-      throw new TypeError('property is nonconfigurable');\n\
-    }\n\
-  };\n\
-\n\
-  var emulateES6construct = function (o, defaultNewTarget, defaultProto, slots) {\n\
-    // This is an es5 approximation to es6 construct semantics.  in es6,\n\
-    // 'new Foo' invokes Foo.[[Construct]] which (for almost all objects)\n\
-    // just sets the internal variable NewTarget (in es6 syntax `new.target`)\n\
-    // to Foo and then returns Foo().\n\
-\n\
-    // Many ES6 object then have constructors of the form:\n\
-    // 1. If NewTarget is undefined, throw a TypeError exception\n\
-    // 2. Let xxx by OrdinaryCreateFromConstructor(NewTarget, yyy, zzz)\n\
-\n\
-    // So we're going to emulate those first two steps.\n\
-    if (!ES.TypeIsObject(o)) {\n\
-      throw new TypeError('Constructor requires `new`: ' + defaultNewTarget.name);\n\
-    }\n\
-    var proto = defaultNewTarget.prototype;\n\
-    if (!ES.TypeIsObject(proto)) {\n\
-      proto = defaultProto;\n\
-    }\n\
-    var obj = create(proto);\n\
-    for (var name in slots) {\n\
-      if (_hasOwnProperty(slots, name)) {\n\
-        var value = slots[name];\n\
-        defineProperty(obj, name, value, true);\n\
-      }\n\
-    }\n\
-    return obj;\n\
-  };\n\
-\n\
-  // Firefox 31 reports this function's length as 0\n\
-  // https://bugzilla.mozilla.org/show_bug.cgi?id=1062484\n\
-  if (String.fromCodePoint && String.fromCodePoint.length !== 1) {\n\
-    var originalFromCodePoint = String.fromCodePoint;\n\
-    overrideNative(String, 'fromCodePoint', function fromCodePoint(codePoints) { return ES.Call(originalFromCodePoint, this, arguments); });\n\
-  }\n\
-\n\
-  var StringShims = {\n\
-    fromCodePoint: function fromCodePoint(codePoints) {\n\
-      var result = [];\n\
-      var next;\n\
-      for (var i = 0, length = arguments.length; i < length; i++) {\n\
-        next = Number(arguments[i]);\n\
-        if (!ES.SameValue(next, ES.ToInteger(next)) || next < 0 || next > 0x10FFFF) {\n\
-          throw new RangeError('Invalid code point ' + next);\n\
-        }\n\
-\n\
-        if (next < 0x10000) {\n\
-          _push(result, String.fromCharCode(next));\n\
-        } else {\n\
-          next -= 0x10000;\n\
-          _push(result, String.fromCharCode((next >> 10) + 0xD800));\n\
-          _push(result, String.fromCharCode((next % 0x400) + 0xDC00));\n\
-        }\n\
-      }\n\
-      return result.join('');\n\
-    },\n\
-\n\
-    raw: function raw(callSite) {\n\
-      var cooked = ES.ToObject(callSite, 'bad callSite');\n\
-      var rawString = ES.ToObject(cooked.raw, 'bad raw value');\n\
-      var len = rawString.length;\n\
-      var literalsegments = ES.ToLength(len);\n\
-      if (literalsegments <= 0) {\n\
-        return '';\n\
-      }\n\
-\n\
-      var stringElements = [];\n\
-      var nextIndex = 0;\n\
-      var nextKey, next, nextSeg, nextSub;\n\
-      while (nextIndex < literalsegments) {\n\
-        nextKey = ES.ToString(nextIndex);\n\
-        nextSeg = ES.ToString(rawString[nextKey]);\n\
-        _push(stringElements, nextSeg);\n\
-        if (nextIndex + 1 >= literalsegments) {\n\
-          break;\n\
-        }\n\
-        next = nextIndex + 1 < arguments.length ? arguments[nextIndex + 1] : '';\n\
-        nextSub = ES.ToString(next);\n\
-        _push(stringElements, nextSub);\n\
-        nextIndex += 1;\n\
-      }\n\
-      return stringElements.join('');\n\
-    }\n\
-  };\n\
-  if (String.raw && String.raw({ raw: { 0: 'x', 1: 'y', length: 2 } }) !== 'xy') {\n\
-    // IE 11 TP has a broken String.raw implementation\n\
-    overrideNative(String, 'raw', StringShims.raw);\n\
-  }\n\
-  defineProperties(String, StringShims);\n\
-\n\
-  // Fast repeat, uses the `Exponentiation by squaring` algorithm.\n\
-  // Perf: http://jsperf.com/string-repeat2/2\n\
-  var stringRepeat = function repeat(s, times) {\n\
-    if (times < 1) { return ''; }\n\
-    if (times % 2) { return repeat(s, times - 1) + s; }\n\
-    var half = repeat(s, times / 2);\n\
-    return half + half;\n\
-  };\n\
-  var stringMaxLength = Infinity;\n\
-\n\
-  var StringPrototypeShims = {\n\
-    repeat: function repeat(times) {\n\
-      var thisStr = ES.ToString(ES.RequireObjectCoercible(this));\n\
-      var numTimes = ES.ToInteger(times);\n\
-      if (numTimes < 0 || numTimes >= stringMaxLength) {\n\
-        throw new RangeError('repeat count must be less than infinity and not overflow maximum string size');\n\
-      }\n\
-      return stringRepeat(thisStr, numTimes);\n\
-    },\n\
-\n\
-    startsWith: function startsWith(searchString) {\n\
-      var S = ES.ToString(ES.RequireObjectCoercible(this));\n\
-      if (ES.IsRegExp(searchString)) {\n\
-        throw new TypeError('Cannot call method \"startsWith\" with a regex');\n\
-      }\n\
-      var searchStr = ES.ToString(searchString);\n\
-      var position;\n\
-      if (arguments.length > 1) {\n\
-        position = arguments[1];\n\
-      }\n\
-      var start = _max(ES.ToInteger(position), 0);\n\
-      return _strSlice(S, start, start + searchStr.length) === searchStr;\n\
-    },\n\
-\n\
-    endsWith: function endsWith(searchString) {\n\
-      var S = ES.ToString(ES.RequireObjectCoercible(this));\n\
-      if (ES.IsRegExp(searchString)) {\n\
-        throw new TypeError('Cannot call method \"endsWith\" with a regex');\n\
-      }\n\
-      var searchStr = ES.ToString(searchString);\n\
-      var len = S.length;\n\
-      var endPosition;\n\
-      if (arguments.length > 1) {\n\
-        endPosition = arguments[1];\n\
-      }\n\
-      var pos = typeof endPosition === 'undefined' ? len : ES.ToInteger(endPosition);\n\
-      var end = _min(_max(pos, 0), len);\n\
-      return _strSlice(S, end - searchStr.length, end) === searchStr;\n\
-    },\n\
-\n\
-    includes: function includes(searchString) {\n\
-      if (ES.IsRegExp(searchString)) {\n\
-        throw new TypeError('\"includes\" does not accept a RegExp');\n\
-      }\n\
-      var searchStr = ES.ToString(searchString);\n\
-      var position;\n\
-      if (arguments.length > 1) {\n\
-        position = arguments[1];\n\
-      }\n\
-      // Somehow this trick makes method 100% compat with the spec.\n\
-      return _indexOf(this, searchStr, position) !== -1;\n\
-    },\n\
-\n\
-    codePointAt: function codePointAt(pos) {\n\
-      var thisStr = ES.ToString(ES.RequireObjectCoercible(this));\n\
-      var position = ES.ToInteger(pos);\n\
-      var length = thisStr.length;\n\
-      if (position >= 0 && position < length) {\n\
-        var first = thisStr.charCodeAt(position);\n\
-        var isEnd = (position + 1 === length);\n\
-        if (first < 0xD800 || first > 0xDBFF || isEnd) { return first; }\n\
-        var second = thisStr.charCodeAt(position + 1);\n\
-        if (second < 0xDC00 || second > 0xDFFF) { return first; }\n\
-        return ((first - 0xD800) * 1024) + (second - 0xDC00) + 0x10000;\n\
-      }\n\
-    }\n\
-  };\n\
-  if (String.prototype.includes && 'a'.includes('a', Infinity) !== false) {\n\
-    overrideNative(String.prototype, 'includes', StringPrototypeShims.includes);\n\
-  }\n\
-\n\
-  if (String.prototype.startsWith && String.prototype.endsWith) {\n\
-    var startsWithRejectsRegex = throwsError(function () {\n\
-      /* throws if spec-compliant */\n\
-      '/a/'.startsWith(/a/);\n\
-    });\n\
-    var startsWithHandlesInfinity = 'abc'.startsWith('a', Infinity) === false;\n\
-    if (!startsWithRejectsRegex || !startsWithHandlesInfinity) {\n\
-      // Firefox (< 37?) and IE 11 TP have a noncompliant startsWith implementation\n\
-      overrideNative(String.prototype, 'startsWith', StringPrototypeShims.startsWith);\n\
-      overrideNative(String.prototype, 'endsWith', StringPrototypeShims.endsWith);\n\
-    }\n\
-  }\n\
-  if (hasSymbols) {\n\
-    var startsWithSupportsSymbolMatch = valueOrFalseIfThrows(function () {\n\
-      var re = /a/;\n\
-      re[Symbol.match] = false;\n\
-      return '/a/'.startsWith(re);\n\
-    });\n\
-    if (!startsWithSupportsSymbolMatch) {\n\
-      overrideNative(String.prototype, 'startsWith', StringPrototypeShims.startsWith);\n\
-    }\n\
-    var endsWithSupportsSymbolMatch = valueOrFalseIfThrows(function () {\n\
-      var re = /a/;\n\
-      re[Symbol.match] = false;\n\
-      return '/a/'.endsWith(re);\n\
-    });\n\
-    if (!endsWithSupportsSymbolMatch) {\n\
-      overrideNative(String.prototype, 'endsWith', StringPrototypeShims.endsWith);\n\
-    }\n\
-    var includesSupportsSymbolMatch = valueOrFalseIfThrows(function () {\n\
-      var re = /a/;\n\
-      re[Symbol.match] = false;\n\
-      return '/a/'.includes(re);\n\
-    });\n\
-    if (!includesSupportsSymbolMatch) {\n\
-      overrideNative(String.prototype, 'includes', StringPrototypeShims.includes);\n\
-    }\n\
-  }\n\
-\n\
-  defineProperties(String.prototype, StringPrototypeShims);\n\
-\n\
-  // whitespace from: http://es5.github.io/#x15.5.4.20\n\
-  // implementation from https://github.com/es-shims/es5-shim/blob/v3.4.0/es5-shim.js#L1304-L1324\n\
-  var ws = [\n\
-    '\\x09\\x0A\\x0B\\x0C\\x0D\\x20\\xA0\\u1680\\u180E\\u2000\\u2001\\u2002\\u2003',\n\
-    '\\u2004\\u2005\\u2006\\u2007\\u2008\\u2009\\u200A\\u202F\\u205F\\u3000\\u2028',\n\
-    '\\u2029\\uFEFF'\n\
-  ].join('');\n\
-  var trimRegexp = new RegExp('(^[' + ws + ']+)|([' + ws + ']+$)', 'g');\n\
-  var trimShim = function trim() {\n\
-    return ES.ToString(ES.RequireObjectCoercible(this)).replace(trimRegexp, '');\n\
-  };\n\
-  var nonWS = ['\\u0085', '\\u200b', '\\ufffe'].join('');\n\
-  var nonWSregex = new RegExp('[' + nonWS + ']', 'g');\n\
-  var isBadHexRegex = /^[\\-+]0x[0-9a-f]+$/i;\n\
-  var hasStringTrimBug = nonWS.trim().length !== nonWS.length;\n\
-  defineProperty(String.prototype, 'trim', trimShim, hasStringTrimBug);\n\
-\n\
-  // see https://people.mozilla.org/~jorendorff/es6-draft.html#sec-string.prototype-@@iterator\n\
-  var StringIterator = function (s) {\n\
-    ES.RequireObjectCoercible(s);\n\
-    this._s = ES.ToString(s);\n\
-    this._i = 0;\n\
-  };\n\
-  StringIterator.prototype.next = function () {\n\
-    var s = this._s, i = this._i;\n\
-    if (typeof s === 'undefined' || i >= s.length) {\n\
-      this._s = void 0;\n\
-      return { value: void 0, done: true };\n\
-    }\n\
-    var first = s.charCodeAt(i), second, len;\n\
-    if (first < 0xD800 || first > 0xDBFF || (i + 1) === s.length) {\n\
-      len = 1;\n\
-    } else {\n\
-      second = s.charCodeAt(i + 1);\n\
-      len = (second < 0xDC00 || second > 0xDFFF) ? 1 : 2;\n\
-    }\n\
-    this._i = i + len;\n\
-    return { value: s.substr(i, len), done: false };\n\
-  };\n\
-  addIterator(StringIterator.prototype);\n\
-  addIterator(String.prototype, function () {\n\
-    return new StringIterator(this);\n\
-  });\n\
-\n\
-  var ArrayShims = {\n\
-    from: function from(items) {\n\
-      var C = this;\n\
-      var mapFn;\n\
-      if (arguments.length > 1) {\n\
-        mapFn = arguments[1];\n\
-      }\n\
-      var mapping, T;\n\
-      if (typeof mapFn === 'undefined') {\n\
-        mapping = false;\n\
-      } else {\n\
-        if (!ES.IsCallable(mapFn)) {\n\
-          throw new TypeError('Array.from: when provided, the second argument must be a function');\n\
-        }\n\
-        if (arguments.length > 2) {\n\
-          T = arguments[2];\n\
-        }\n\
-        mapping = true;\n\
-      }\n\
-\n\
-      // Note that that Arrays will use ArrayIterator:\n\
-      // https://bugs.ecmascript.org/show_bug.cgi?id=2416\n\
-      var usingIterator = typeof (isArguments(items) || ES.GetMethod(items, $iterator$)) !== 'undefined';\n\
-\n\
-      var length, result, i;\n\
-      if (usingIterator) {\n\
-        result = ES.IsConstructor(C) ? Object(new C()) : [];\n\
-        var iterator = ES.GetIterator(items);\n\
-        var next, nextValue;\n\
-\n\
-        i = 0;\n\
-        while (true) {\n\
-          next = ES.IteratorStep(iterator);\n\
-          if (next === false) {\n\
-            break;\n\
-          }\n\
-          nextValue = next.value;\n\
-          try {\n\
-            if (mapping) {\n\
-              nextValue = typeof T === 'undefined' ? mapFn(nextValue, i) : _call(mapFn, T, nextValue, i);\n\
-            }\n\
-            result[i] = nextValue;\n\
-          } catch (e) {\n\
-            ES.IteratorClose(iterator, true);\n\
-            throw e;\n\
-          }\n\
-          i += 1;\n\
-        }\n\
-        length = i;\n\
-      } else {\n\
-        var arrayLike = ES.ToObject(items);\n\
-        length = ES.ToLength(arrayLike.length);\n\
-        result = ES.IsConstructor(C) ? Object(new C(length)) : new Array(length);\n\
-        var value;\n\
-        for (i = 0; i < length; ++i) {\n\
-          value = arrayLike[i];\n\
-          if (mapping) {\n\
-            value = typeof T === 'undefined' ? mapFn(value, i) : _call(mapFn, T, value, i);\n\
-          }\n\
-          result[i] = value;\n\
-        }\n\
-      }\n\
-\n\
-      result.length = length;\n\
-      return result;\n\
-    },\n\
-\n\
-    of: function of() {\n\
-      var len = arguments.length;\n\
-      var C = this;\n\
-      var A = isArray(C) || !ES.IsCallable(C) ? new Array(len) : ES.Construct(C, [len]);\n\
-      for (var k = 0; k < len; ++k) {\n\
-        createDataPropertyOrThrow(A, k, arguments[k]);\n\
-      }\n\
-      A.length = len;\n\
-      return A;\n\
-    }\n\
-  };\n\
-  defineProperties(Array, ArrayShims);\n\
-  addDefaultSpecies(Array);\n\
-\n\
-  // Given an argument x, it will return an IteratorResult object,\n\
-  // with value set to x and done to false.\n\
-  // Given no arguments, it will return an iterator completion object.\n\
-  var iteratorResult = function (x) {\n\
-    return { value: x, done: arguments.length === 0 };\n\
-  };\n\
-\n\
-  // Our ArrayIterator is private; see\n\
-  // https://github.com/paulmillr/es6-shim/issues/252\n\
-  ArrayIterator = function (array, kind) {\n\
-      this.i = 0;\n\
-      this.array = array;\n\
-      this.kind = kind;\n\
-  };\n\
-\n\
-  defineProperties(ArrayIterator.prototype, {\n\
-    next: function () {\n\
-      var i = this.i, array = this.array;\n\
-      if (!(this instanceof ArrayIterator)) {\n\
-        throw new TypeError('Not an ArrayIterator');\n\
-      }\n\
-      if (typeof array !== 'undefined') {\n\
-        var len = ES.ToLength(array.length);\n\
-        for (; i < len; i++) {\n\
-          var kind = this.kind;\n\
-          var retval;\n\
-          if (kind === 'key') {\n\
-            retval = i;\n\
-          } else if (kind === 'value') {\n\
-            retval = array[i];\n\
-          } else if (kind === 'entry') {\n\
-            retval = [i, array[i]];\n\
-          }\n\
-          this.i = i + 1;\n\
-          return { value: retval, done: false };\n\
-        }\n\
-      }\n\
-      this.array = void 0;\n\
-      return { value: void 0, done: true };\n\
-    }\n\
-  });\n\
-  addIterator(ArrayIterator.prototype);\n\
-\n\
-  var orderKeys = function orderKeys(a, b) {\n\
-    var aNumeric = String(ES.ToInteger(a)) === a;\n\
-    var bNumeric = String(ES.ToInteger(b)) === b;\n\
-    if (aNumeric && bNumeric) {\n\
-      return b - a;\n\
-    } else if (aNumeric && !bNumeric) {\n\
-      return -1;\n\
-    } else if (!aNumeric && bNumeric) {\n\
-      return 1;\n\
-    } else {\n\
-      return a.localeCompare(b);\n\
-    }\n\
-  };\n\
-  var getAllKeys = function getAllKeys(object) {\n\
-    var ownKeys = [];\n\
-    var keys = [];\n\
-\n\
-    for (var key in object) {\n\
-      _push(_hasOwnProperty(object, key) ? ownKeys : keys, key);\n\
-    }\n\
-    _sort(ownKeys, orderKeys);\n\
-    _sort(keys, orderKeys);\n\
-\n\
-    return _concat(ownKeys, keys);\n\
-  };\n\
-\n\
-  var ObjectIterator = function (object, kind) {\n\
-    defineProperties(this, {\n\
-      object: object,\n\
-      array: getAllKeys(object),\n\
-      kind: kind\n\
-    });\n\
-  };\n\
-\n\
-  defineProperties(ObjectIterator.prototype, {\n\
-    next: function next() {\n\
-      var key;\n\
-      var array = this.array;\n\
-\n\
-      if (!(this instanceof ObjectIterator)) {\n\
-        throw new TypeError('Not an ObjectIterator');\n\
-      }\n\
-\n\
-      // Find next key in the object\n\
-      while (array.length > 0) {\n\
-        key = _shift(array);\n\
-\n\
-        // The candidate key isn't defined on object.\n\
-        // Must have been deleted, or object[[Prototype]]\n\
-        // has been modified.\n\
-        if (!(key in this.object)) {\n\
-          continue;\n\
-        }\n\
-\n\
-        if (this.kind === 'key') {\n\
-          return iteratorResult(key);\n\
-        } else if (this.kind === 'value') {\n\
-          return iteratorResult(this.object[key]);\n\
-        } else {\n\
-          return iteratorResult([key, this.object[key]]);\n\
-        }\n\
-      }\n\
-\n\
-      return iteratorResult();\n\
-    }\n\
-  });\n\
-  addIterator(ObjectIterator.prototype);\n\
-\n\
-  // note: this is positioned here because it depends on ArrayIterator\n\
-  var arrayOfSupportsSubclassing = Array.of === ArrayShims.of || (function () {\n\
-    // Detects a bug in Webkit nightly r181886\n\
-    var Foo = function Foo(len) { this.length = len; };\n\
-    Foo.prototype = [];\n\
-    var fooArr = Array.of.apply(Foo, [1, 2]);\n\
-    return fooArr instanceof Foo && fooArr.length === 2;\n\
-  }());\n\
-  if (!arrayOfSupportsSubclassing) {\n\
-    overrideNative(Array, 'of', ArrayShims.of);\n\
-  }\n\
-\n\
-  var ArrayPrototypeShims = {\n\
-    copyWithin: function copyWithin(target, start) {\n\
-      var o = ES.ToObject(this);\n\
-      var len = ES.ToLength(o.length);\n\
-      var relativeTarget = ES.ToInteger(target);\n\
-      var relativeStart = ES.ToInteger(start);\n\
-      var to = relativeTarget < 0 ? _max(len + relativeTarget, 0) : _min(relativeTarget, len);\n\
-      var from = relativeStart < 0 ? _max(len + relativeStart, 0) : _min(relativeStart, len);\n\
-      var end;\n\
-      if (arguments.length > 2) {\n\
-        end = arguments[2];\n\
-      }\n\
-      var relativeEnd = typeof end === 'undefined' ? len : ES.ToInteger(end);\n\
-      var finalItem = relativeEnd < 0 ? _max(len + relativeEnd, 0) : _min(relativeEnd, len);\n\
-      var count = _min(finalItem - from, len - to);\n\
-      var direction = 1;\n\
-      if (from < to && to < (from + count)) {\n\
-        direction = -1;\n\
-        from += count - 1;\n\
-        to += count - 1;\n\
-      }\n\
-      while (count > 0) {\n\
-        if (from in o) {\n\
-          o[to] = o[from];\n\
-        } else {\n\
-          delete o[to];\n\
-        }\n\
-        from += direction;\n\
-        to += direction;\n\
-        count -= 1;\n\
-      }\n\
-      return o;\n\
-    },\n\
-\n\
-    fill: function fill(value) {\n\
-      var start;\n\
-      if (arguments.length > 1) {\n\
-        start = arguments[1];\n\
-      }\n\
-      var end;\n\
-      if (arguments.length > 2) {\n\
-        end = arguments[2];\n\
-      }\n\
-      var O = ES.ToObject(this);\n\
-      var len = ES.ToLength(O.length);\n\
-      start = ES.ToInteger(typeof start === 'undefined' ? 0 : start);\n\
-      end = ES.ToInteger(typeof end === 'undefined' ? len : end);\n\
-\n\
-      var relativeStart = start < 0 ? _max(len + start, 0) : _min(start, len);\n\
-      var relativeEnd = end < 0 ? len + end : end;\n\
-\n\
-      for (var i = relativeStart; i < len && i < relativeEnd; ++i) {\n\
-        O[i] = value;\n\
-      }\n\
-      return O;\n\
-    },\n\
-\n\
-    find: function find(predicate) {\n\
-      var list = ES.ToObject(this);\n\
-      var length = ES.ToLength(list.length);\n\
-      if (!ES.IsCallable(predicate)) {\n\
-        throw new TypeError('Array#find: predicate must be a function');\n\
-      }\n\
-      var thisArg = arguments.length > 1 ? arguments[1] : null;\n\
-      for (var i = 0, value; i < length; i++) {\n\
-        value = list[i];\n\
-        if (thisArg) {\n\
-          if (_call(predicate, thisArg, value, i, list)) { return value; }\n\
-        } else if (predicate(value, i, list)) {\n\
-          return value;\n\
-        }\n\
-      }\n\
-    },\n\
-\n\
-    findIndex: function findIndex(predicate) {\n\
-      var list = ES.ToObject(this);\n\
-      var length = ES.ToLength(list.length);\n\
-      if (!ES.IsCallable(predicate)) {\n\
-        throw new TypeError('Array#findIndex: predicate must be a function');\n\
-      }\n\
-      var thisArg = arguments.length > 1 ? arguments[1] : null;\n\
-      for (var i = 0; i < length; i++) {\n\
-        if (thisArg) {\n\
-          if (_call(predicate, thisArg, list[i], i, list)) { return i; }\n\
-        } else if (predicate(list[i], i, list)) {\n\
-          return i;\n\
-        }\n\
-      }\n\
-      return -1;\n\
-    },\n\
-\n\
-    keys: function keys() {\n\
-      return new ArrayIterator(this, 'key');\n\
-    },\n\
-\n\
-    values: function values() {\n\
-      return new ArrayIterator(this, 'value');\n\
-    },\n\
-\n\
-    entries: function entries() {\n\
-      return new ArrayIterator(this, 'entry');\n\
-    }\n\
-  };\n\
-  // Safari 7.1 defines Array#keys and Array#entries natively,\n\
-  // but the resulting ArrayIterator objects don't have a \"next\" method.\n\
-  if (Array.prototype.keys && !ES.IsCallable([1].keys().next)) {\n\
-    delete Array.prototype.keys;\n\
-  }\n\
-  if (Array.prototype.entries && !ES.IsCallable([1].entries().next)) {\n\
-    delete Array.prototype.entries;\n\
-  }\n\
-\n\
-  // Chrome 38 defines Array#keys and Array#entries, and Array#@@iterator, but not Array#values\n\
-  if (Array.prototype.keys && Array.prototype.entries && !Array.prototype.values && Array.prototype[$iterator$]) {\n\
-    defineProperties(Array.prototype, {\n\
-      values: Array.prototype[$iterator$]\n\
-    });\n\
-    if (Type.symbol(Symbol.unscopables)) {\n\
-      Array.prototype[Symbol.unscopables].values = true;\n\
-    }\n\
-  }\n\
-  // Chrome 40 defines Array#values with the incorrect name, although Array#{keys,entries} have the correct name\n\
-  if (functionsHaveNames && Array.prototype.values && Array.prototype.values.name !== 'values') {\n\
-    var originalArrayPrototypeValues = Array.prototype.values;\n\
-    overrideNative(Array.prototype, 'values', function values() { return ES.Call(originalArrayPrototypeValues, this, arguments); });\n\
-    defineProperty(Array.prototype, $iterator$, Array.prototype.values, true);\n\
-  }\n\
-  defineProperties(Array.prototype, ArrayPrototypeShims);\n\
-\n\
-  addIterator(Array.prototype, function () { return this.values(); });\n\
-  // Chrome defines keys/values/entries on Array, but doesn't give us\n\
-  // any way to identify its iterator.  So add our own shimmed field.\n\
-  if (Object.getPrototypeOf) {\n\
-    addIterator(Object.getPrototypeOf([].values()));\n\
-  }\n\
-\n\
-  // note: this is positioned here because it relies on Array#entries\n\
-  var arrayFromSwallowsNegativeLengths = (function () {\n\
-    // Detects a Firefox bug in v32\n\
-    // https://bugzilla.mozilla.org/show_bug.cgi?id=1063993\n\
-    return valueOrFalseIfThrows(function () { return Array.from({ length: -1 }).length === 0; });\n\
-  }());\n\
-  var arrayFromHandlesIterables = (function () {\n\
-    // Detects a bug in Webkit nightly r181886\n\
-    var arr = Array.from([0].entries());\n\
-    return arr.length === 1 && isArray(arr[0]) && arr[0][0] === 0 && arr[0][1] === 0;\n\
-  }());\n\
-  if (!arrayFromSwallowsNegativeLengths || !arrayFromHandlesIterables) {\n\
-    overrideNative(Array, 'from', ArrayShims.from);\n\
-  }\n\
-  var arrayFromHandlesUndefinedMapFunction = (function () {\n\
-    // Microsoft Edge v0.11 throws if the mapFn argument is *provided* but undefined,\n\
-    // but the spec doesn't care if it's provided or not - undefined doesn't throw.\n\
-    return valueOrFalseIfThrows(function () { return Array.from([0], void 0); });\n\
-  }());\n\
-  if (!arrayFromHandlesUndefinedMapFunction) {\n\
-    var origArrayFrom = Array.from;\n\
-    overrideNative(Array, 'from', function from(items) {\n\
-      if (arguments.length > 1 && typeof arguments[1] !== 'undefined') {\n\
-        return ES.Call(origArrayFrom, this, arguments);\n\
-      } else {\n\
-        return _call(origArrayFrom, this, items);\n\
-      }\n\
-    });\n\
-  }\n\
-\n\
-  var int32sAsOne = -(Math.pow(2, 32) - 1);\n\
-  var toLengthsCorrectly = function (method, reversed) {\n\
-    var obj = { length: int32sAsOne };\n\
-    obj[reversed ? ((obj.length >>> 0) - 1) : 0] = true;\n\
-    return valueOrFalseIfThrows(function () {\n\
-      _call(method, obj, function () {\n\
-        // note: in nonconforming browsers, this will be called\n\
-        // -1 >>> 0 times, which is 4294967295, so the throw matters.\n\
-        throw new RangeError('should not reach here');\n\
-      }, []);\n\
-      return true;\n\
-    });\n\
-  };\n\
-  if (!toLengthsCorrectly(Array.prototype.forEach)) {\n\
-    var originalForEach = Array.prototype.forEach;\n\
-    overrideNative(Array.prototype, 'forEach', function forEach(callbackFn) {\n\
-      return ES.Call(originalForEach, this.length >= 0 ? this : [], arguments);\n\
-    }, true);\n\
-  }\n\
-  if (!toLengthsCorrectly(Array.prototype.map)) {\n\
-    var originalMap = Array.prototype.map;\n\
-    overrideNative(Array.prototype, 'map', function map(callbackFn) {\n\
-      return ES.Call(originalMap, this.length >= 0 ? this : [], arguments);\n\
-    }, true);\n\
-  }\n\
-  if (!toLengthsCorrectly(Array.prototype.filter)) {\n\
-    var originalFilter = Array.prototype.filter;\n\
-    overrideNative(Array.prototype, 'filter', function filter(callbackFn) {\n\
-      return ES.Call(originalFilter, this.length >= 0 ? this : [], arguments);\n\
-    }, true);\n\
-  }\n\
-  if (!toLengthsCorrectly(Array.prototype.some)) {\n\
-    var originalSome = Array.prototype.some;\n\
-    overrideNative(Array.prototype, 'some', function some(callbackFn) {\n\
-      return ES.Call(originalSome, this.length >= 0 ? this : [], arguments);\n\
-    }, true);\n\
-  }\n\
-  if (!toLengthsCorrectly(Array.prototype.every)) {\n\
-    var originalEvery = Array.prototype.every;\n\
-    overrideNative(Array.prototype, 'every', function every(callbackFn) {\n\
-      return ES.Call(originalEvery, this.length >= 0 ? this : [], arguments);\n\
-    }, true);\n\
-  }\n\
-  if (!toLengthsCorrectly(Array.prototype.reduce)) {\n\
-    var originalReduce = Array.prototype.reduce;\n\
-    overrideNative(Array.prototype, 'reduce', function reduce(callbackFn) {\n\
-      return ES.Call(originalReduce, this.length >= 0 ? this : [], arguments);\n\
-    }, true);\n\
-  }\n\
-  if (!toLengthsCorrectly(Array.prototype.reduceRight, true)) {\n\
-    var originalReduceRight = Array.prototype.reduceRight;\n\
-    overrideNative(Array.prototype, 'reduceRight', function reduceRight(callbackFn) {\n\
-      return ES.Call(originalReduceRight, this.length >= 0 ? this : [], arguments);\n\
-    }, true);\n\
-  }\n\
-\n\
-  var lacksOctalSupport = Number('0o10') !== 8;\n\
-  var lacksBinarySupport = Number('0b10') !== 2;\n\
-  var trimsNonWhitespace = _some(nonWS, function (c) {\n\
-    return Number(c + 0 + c) === 0;\n\
-  });\n\
-  if (lacksOctalSupport || lacksBinarySupport || trimsNonWhitespace) {\n\
-    var OrigNumber = Number;\n\
-    var binaryRegex = /^0b[01]+$/i;\n\
-    var octalRegex = /^0o[0-7]+$/i;\n\
-    // Note that in IE 8, RegExp.prototype.test doesn't seem to exist: ie, \"test\" is an own property of regexes. wtf.\n\
-    var isBinary = binaryRegex.test.bind(binaryRegex);\n\
-    var isOctal = octalRegex.test.bind(octalRegex);\n\
-    var toPrimitive = function (O) { // need to replace this with `es-to-primitive/es6`\n\
-      var result;\n\
-      if (typeof O.valueOf === 'function') {\n\
-        result = O.valueOf();\n\
-        if (Type.primitive(result)) {\n\
-          return result;\n\
-        }\n\
-      }\n\
-      if (typeof O.toString === 'function') {\n\
-        result = O.toString();\n\
-        if (Type.primitive(result)) {\n\
-          return result;\n\
-        }\n\
-      }\n\
-      throw new TypeError('No default value');\n\
-    };\n\
-    var hasNonWS = nonWSregex.test.bind(nonWSregex);\n\
-    var isBadHex = isBadHexRegex.test.bind(isBadHexRegex);\n\
-    var NumberShim = (function () {\n\
-      // this is wrapped in an IIFE because of IE 6-8's wacky scoping issues with named function expressions.\n\
-      var NumberShim = function Number(value) {\n\
-        var primValue;\n\
-        if (arguments.length > 0) {\n\
-          primValue = Type.primitive(value) ? value : toPrimitive(value, 'number');\n\
-        } else {\n\
-          primValue = 0;\n\
-        }\n\
-        if (typeof primValue === 'string') {\n\
-          primValue = ES.Call(trimShim, primValue);\n\
-          if (isBinary(primValue)) {\n\
-            primValue = parseInt(_strSlice(primValue, 2), 2);\n\
-          } else if (isOctal(primValue)) {\n\
-            primValue = parseInt(_strSlice(primValue, 2), 8);\n\
-          } else if (hasNonWS(primValue) || isBadHex(primValue)) {\n\
-            primValue = NaN;\n\
-          }\n\
-        }\n\
-        var receiver = this;\n\
-        var valueOfSucceeds = valueOrFalseIfThrows(function () {\n\
-          OrigNumber.prototype.valueOf.call(receiver);\n\
-          return true;\n\
-        });\n\
-        if (receiver instanceof NumberShim && !valueOfSucceeds) {\n\
-          return new OrigNumber(primValue);\n\
-        }\n\
-        /* jshint newcap: false */\n\
-        return OrigNumber(primValue);\n\
-        /* jshint newcap: true */\n\
-      };\n\
-      return NumberShim;\n\
-    }());\n\
-    wrapConstructor(OrigNumber, NumberShim, {});\n\
-    /* globals Number: true */\n\
-    /* eslint-disable no-undef */\n\
-    /* jshint -W020 */\n\
-    Number = NumberShim;\n\
-    Value.redefine(globals, 'Number', NumberShim);\n\
-    /* jshint +W020 */\n\
-    /* eslint-enable no-undef */\n\
-    /* globals Number: false */\n\
-  }\n\
-\n\
-  var maxSafeInteger = Math.pow(2, 53) - 1;\n\
-  defineProperties(Number, {\n\
-    MAX_SAFE_INTEGER: maxSafeInteger,\n\
-    MIN_SAFE_INTEGER: -maxSafeInteger,\n\
-    EPSILON: 2.220446049250313e-16,\n\
-\n\
-    parseInt: globals.parseInt,\n\
-    parseFloat: globals.parseFloat,\n\
-\n\
-    isFinite: numberIsFinite,\n\
-\n\
-    isInteger: function isInteger(value) {\n\
-      return numberIsFinite(value) && ES.ToInteger(value) === value;\n\
-    },\n\
-\n\
-    isSafeInteger: function isSafeInteger(value) {\n\
-      return Number.isInteger(value) && _abs(value) <= Number.MAX_SAFE_INTEGER;\n\
-    },\n\
-\n\
-    isNaN: numberIsNaN\n\
-  });\n\
-  // Firefox 37 has a conforming Number.parseInt, but it's not === to the global parseInt (fixed in v40)\n\
-  defineProperty(Number, 'parseInt', globals.parseInt, Number.parseInt !== globals.parseInt);\n\
-\n\
-  // Work around bugs in Array#find and Array#findIndex -- early\n\
-  // implementations skipped holes in sparse arrays. (Note that the\n\
-  // implementations of find/findIndex indirectly use shimmed\n\
-  // methods of Number, so this test has to happen down here.)\n\
-  /*jshint elision: true */\n\
-  /* eslint-disable no-sparse-arrays */\n\
-  if (![, 1].find(function (item, idx) { return idx === 0; })) {\n\
-    overrideNative(Array.prototype, 'find', ArrayPrototypeShims.find);\n\
-  }\n\
-  if ([, 1].findIndex(function (item, idx) { return idx === 0; }) !== 0) {\n\
-    overrideNative(Array.prototype, 'findIndex', ArrayPrototypeShims.findIndex);\n\
-  }\n\
-  /* eslint-enable no-sparse-arrays */\n\
-  /*jshint elision: false */\n\
-\n\
-  var isEnumerableOn = Function.bind.call(Function.bind, Object.prototype.propertyIsEnumerable);\n\
-  var ensureEnumerable = function ensureEnumerable(obj, prop) {\n\
-    if (supportsDescriptors && isEnumerableOn(obj, prop)) {\n\
-      Object.defineProperty(obj, prop, { enumerable: false });\n\
-    }\n\
-  };\n\
-  var sliceArgs = function sliceArgs() {\n\
-    // per https://github.com/petkaantonov/bluebird/wiki/Optimization-killers#32-leaking-arguments\n\
-    // and https://gist.github.com/WebReflection/4327762cb87a8c634a29\n\
-    var initial = Number(this);\n\
-    var len = arguments.length;\n\
-    var desiredArgCount = len - initial;\n\
-    var args = new Array(desiredArgCount < 0 ? 0 : desiredArgCount);\n\
-    for (var i = initial; i < len; ++i) {\n\
-      args[i - initial] = arguments[i];\n\
-    }\n\
-    return args;\n\
-  };\n\
-  var assignTo = function assignTo(source) {\n\
-    return function assignToSource(target, key) {\n\
-      target[key] = source[key];\n\
-      return target;\n\
-    };\n\
-  };\n\
-  var assignReducer = function (target, source) {\n\
-    var sourceKeys = keys(Object(source));\n\
-    var symbols;\n\
-    if (ES.IsCallable(Object.getOwnPropertySymbols)) {\n\
-      symbols = _filter(Object.getOwnPropertySymbols(Object(source)), isEnumerableOn(source));\n\
-    }\n\
-    return _reduce(_concat(sourceKeys, symbols || []), assignTo(source), target);\n\
-  };\n\
-\n\
-  var ObjectShims = {\n\
-    // 19.1.3.1\n\
-    assign: function (target, source) {\n\
-      var to = ES.ToObject(target, 'Cannot convert undefined or null to object');\n\
-      return _reduce(ES.Call(sliceArgs, 1, arguments), assignReducer, to);\n\
-    },\n\
-\n\
-    // Added in WebKit in https://bugs.webkit.org/show_bug.cgi?id=143865\n\
-    is: function is(a, b) {\n\
-      return ES.SameValue(a, b);\n\
-    }\n\
-  };\n\
-  var assignHasPendingExceptions = Object.assign && Object.preventExtensions && (function () {\n\
-    // Firefox 37 still has \"pending exception\" logic in its Object.assign implementation,\n\
-    // which is 72% slower than our shim, and Firefox 40's native implementation.\n\
-    var thrower = Object.preventExtensions({ 1: 2 });\n\
-    try {\n\
-      Object.assign(thrower, 'xy');\n\
-    } catch (e) {\n\
-      return thrower[1] === 'y';\n\
-    }\n\
-  }());\n\
-  if (assignHasPendingExceptions) {\n\
-    overrideNative(Object, 'assign', ObjectShims.assign);\n\
-  }\n\
-  defineProperties(Object, ObjectShims);\n\
-\n\
-  if (supportsDescriptors) {\n\
-    var ES5ObjectShims = {\n\
-      // 19.1.3.9\n\
-      // shim from https://gist.github.com/WebReflection/5593554\n\
-      setPrototypeOf: (function (Object, magic) {\n\
-        var set;\n\
-\n\
-        var checkArgs = function (O, proto) {\n\
-          if (!ES.TypeIsObject(O)) {\n\
-            throw new TypeError('cannot set prototype on a non-object');\n\
-          }\n\
-          if (!(proto === null || ES.TypeIsObject(proto))) {\n\
-            throw new TypeError('can only set prototype to an object or null' + proto);\n\
-          }\n\
-        };\n\
-\n\
-        var setPrototypeOf = function (O, proto) {\n\
-          checkArgs(O, proto);\n\
-          _call(set, O, proto);\n\
-          return O;\n\
-        };\n\
-\n\
-        try {\n\
-          // this works already in Firefox and Safari\n\
-          set = Object.getOwnPropertyDescriptor(Object.prototype, magic).set;\n\
-          _call(set, {}, null);\n\
-        } catch (e) {\n\
-          if (Object.prototype !== {}[magic]) {\n\
-            // IE < 11 cannot be shimmed\n\
-            return;\n\
-          }\n\
-          // probably Chrome or some old Mobile stock browser\n\
-          set = function (proto) {\n\
-            this[magic] = proto;\n\
-          };\n\
-          // please note that this will **not** work\n\
-          // in those browsers that do not inherit\n\
-          // __proto__ by mistake from Object.prototype\n\
-          // in these cases we should probably throw an error\n\
-          // or at least be informed about the issue\n\
-          setPrototypeOf.polyfill = setPrototypeOf(\n\
-            setPrototypeOf({}, null),\n\
-            Object.prototype\n\
-          ) instanceof Object;\n\
-          // setPrototypeOf.polyfill === true means it works as meant\n\
-          // setPrototypeOf.polyfill === false means it's not 100% reliable\n\
-          // setPrototypeOf.polyfill === undefined\n\
-          // or\n\
-          // setPrototypeOf.polyfill ==  null means it's not a polyfill\n\
-          // which means it works as expected\n\
-          // we can even delete Object.prototype.__proto__;\n\
-        }\n\
-        return setPrototypeOf;\n\
-      }(Object, '__proto__'))\n\
-    };\n\
-\n\
-    defineProperties(Object, ES5ObjectShims);\n\
-  }\n\
-\n\
-  // Workaround bug in Opera 12 where setPrototypeOf(x, null) doesn't work,\n\
-  // but Object.create(null) does.\n\
-  if (Object.setPrototypeOf && Object.getPrototypeOf &&\n\
-      Object.getPrototypeOf(Object.setPrototypeOf({}, null)) !== null &&\n\
-      Object.getPrototypeOf(Object.create(null)) === null) {\n\
-    (function () {\n\
-      var FAKENULL = Object.create(null);\n\
-      var gpo = Object.getPrototypeOf, spo = Object.setPrototypeOf;\n\
-      Object.getPrototypeOf = function (o) {\n\
-        var result = gpo(o);\n\
-        return result === FAKENULL ? null : result;\n\
-      };\n\
-      Object.setPrototypeOf = function (o, p) {\n\
-        var proto = p === null ? FAKENULL : p;\n\
-        return spo(o, proto);\n\
-      };\n\
-      Object.setPrototypeOf.polyfill = false;\n\
-    }());\n\
-  }\n\
-\n\
-  var objectKeysAcceptsPrimitives = !throwsError(function () { Object.keys('foo'); });\n\
-  if (!objectKeysAcceptsPrimitives) {\n\
-    var originalObjectKeys = Object.keys;\n\
-    overrideNative(Object, 'keys', function keys(value) {\n\
-      return originalObjectKeys(ES.ToObject(value));\n\
-    });\n\
-    keys = Object.keys;\n\
-  }\n\
-\n\
-  if (Object.getOwnPropertyNames) {\n\
-    var objectGOPNAcceptsPrimitives = !throwsError(function () { Object.getOwnPropertyNames('foo'); });\n\
-    if (!objectGOPNAcceptsPrimitives) {\n\
-      var cachedWindowNames = typeof window === 'object' ? Object.getOwnPropertyNames(window) : [];\n\
-      var originalObjectGetOwnPropertyNames = Object.getOwnPropertyNames;\n\
-      overrideNative(Object, 'getOwnPropertyNames', function getOwnPropertyNames(value) {\n\
-        var val = ES.ToObject(value);\n\
-        if (_toString(val) === '[object Window]') {\n\
-          try {\n\
-            return originalObjectGetOwnPropertyNames(val);\n\
-          } catch (e) {\n\
-            // IE bug where layout engine calls userland gOPN for cross-domain `window` objects\n\
-            return _concat([], cachedWindowNames);\n\
-          }\n\
-        }\n\
-        return originalObjectGetOwnPropertyNames(val);\n\
-      });\n\
-    }\n\
-  }\n\
-  if (Object.getOwnPropertyDescriptor) {\n\
-    var objectGOPDAcceptsPrimitives = !throwsError(function () { Object.getOwnPropertyDescriptor('foo', 'bar'); });\n\
-    if (!objectGOPDAcceptsPrimitives) {\n\
-      var originalObjectGetOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;\n\
-      overrideNative(Object, 'getOwnPropertyDescriptor', function getOwnPropertyDescriptor(value, property) {\n\
-        return originalObjectGetOwnPropertyDescriptor(ES.ToObject(value), property);\n\
-      });\n\
-    }\n\
-  }\n\
-  if (Object.seal) {\n\
-    var objectSealAcceptsPrimitives = !throwsError(function () { Object.seal('foo'); });\n\
-    if (!objectSealAcceptsPrimitives) {\n\
-      var originalObjectSeal = Object.seal;\n\
-      overrideNative(Object, 'seal', function seal(value) {\n\
-        if (!Type.object(value)) { return value; }\n\
-        return originalObjectSeal(value);\n\
-      });\n\
-    }\n\
-  }\n\
-  if (Object.isSealed) {\n\
-    var objectIsSealedAcceptsPrimitives = !throwsError(function () { Object.isSealed('foo'); });\n\
-    if (!objectIsSealedAcceptsPrimitives) {\n\
-      var originalObjectIsSealed = Object.isSealed;\n\
-      overrideNative(Object, 'isSealed', function isSealed(value) {\n\
-        if (!Type.object(value)) { return true; }\n\
-        return originalObjectIsSealed(value);\n\
-      });\n\
-    }\n\
-  }\n\
-  if (Object.freeze) {\n\
-    var objectFreezeAcceptsPrimitives = !throwsError(function () { Object.freeze('foo'); });\n\
-    if (!objectFreezeAcceptsPrimitives) {\n\
-      var originalObjectFreeze = Object.freeze;\n\
-      overrideNative(Object, 'freeze', function freeze(value) {\n\
-        if (!Type.object(value)) { return value; }\n\
-        return originalObjectFreeze(value);\n\
-      });\n\
-    }\n\
-  }\n\
-  if (Object.isFrozen) {\n\
-    var objectIsFrozenAcceptsPrimitives = !throwsError(function () { Object.isFrozen('foo'); });\n\
-    if (!objectIsFrozenAcceptsPrimitives) {\n\
-      var originalObjectIsFrozen = Object.isFrozen;\n\
-      overrideNative(Object, 'isFrozen', function isFrozen(value) {\n\
-        if (!Type.object(value)) { return true; }\n\
-        return originalObjectIsFrozen(value);\n\
-      });\n\
-    }\n\
-  }\n\
-  if (Object.preventExtensions) {\n\
-    var objectPreventExtensionsAcceptsPrimitives = !throwsError(function () { Object.preventExtensions('foo'); });\n\
-    if (!objectPreventExtensionsAcceptsPrimitives) {\n\
-      var originalObjectPreventExtensions = Object.preventExtensions;\n\
-      overrideNative(Object, 'preventExtensions', function preventExtensions(value) {\n\
-        if (!Type.object(value)) { return value; }\n\
-        return originalObjectPreventExtensions(value);\n\
-      });\n\
-    }\n\
-  }\n\
-  if (Object.isExtensible) {\n\
-    var objectIsExtensibleAcceptsPrimitives = !throwsError(function () { Object.isExtensible('foo'); });\n\
-    if (!objectIsExtensibleAcceptsPrimitives) {\n\
-      var originalObjectIsExtensible = Object.isExtensible;\n\
-      overrideNative(Object, 'isExtensible', function isExtensible(value) {\n\
-        if (!Type.object(value)) { return false; }\n\
-        return originalObjectIsExtensible(value);\n\
-      });\n\
-    }\n\
-  }\n\
-  if (Object.getPrototypeOf) {\n\
-    var objectGetProtoAcceptsPrimitives = !throwsError(function () { Object.getPrototypeOf('foo'); });\n\
-    if (!objectGetProtoAcceptsPrimitives) {\n\
-      var originalGetProto = Object.getPrototypeOf;\n\
-      overrideNative(Object, 'getPrototypeOf', function getPrototypeOf(value) {\n\
-        return originalGetProto(ES.ToObject(value));\n\
-      });\n\
-    }\n\
-  }\n\
-\n\
-  var hasFlags = supportsDescriptors && (function () {\n\
-    var desc = Object.getOwnPropertyDescriptor(RegExp.prototype, 'flags');\n\
-    return desc && ES.IsCallable(desc.get);\n\
-  }());\n\
-  if (supportsDescriptors && !hasFlags) {\n\
-    var regExpFlagsGetter = function flags() {\n\
-      if (!ES.TypeIsObject(this)) {\n\
-        throw new TypeError('Method called on incompatible type: must be an object.');\n\
-      }\n\
-      var result = '';\n\
-      if (this.global) {\n\
-        result += 'g';\n\
-      }\n\
-      if (this.ignoreCase) {\n\
-        result += 'i';\n\
-      }\n\
-      if (this.multiline) {\n\
-        result += 'm';\n\
-      }\n\
-      if (this.unicode) {\n\
-        result += 'u';\n\
-      }\n\
-      if (this.sticky) {\n\
-        result += 'y';\n\
-      }\n\
-      return result;\n\
-    };\n\
-\n\
-    Value.getter(RegExp.prototype, 'flags', regExpFlagsGetter);\n\
-  }\n\
-\n\
-  var regExpSupportsFlagsWithRegex = supportsDescriptors && valueOrFalseIfThrows(function () {\n\
-    return String(new RegExp(/a/g, 'i')) === '/a/i';\n\
-  });\n\
-  var regExpNeedsToSupportSymbolMatch = hasSymbols && supportsDescriptors && (function () {\n\
-    // Edge 0.12 supports flags fully, but does not support Symbol.match\n\
-    var regex = /./;\n\
-    regex[Symbol.match] = false;\n\
-    return RegExp(regex) === regex;\n\
-  }());\n\
-\n\
-  if (supportsDescriptors && (!regExpSupportsFlagsWithRegex || regExpNeedsToSupportSymbolMatch)) {\n\
-    var flagsGetter = Object.getOwnPropertyDescriptor(RegExp.prototype, 'flags').get;\n\
-    var sourceDesc = Object.getOwnPropertyDescriptor(RegExp.prototype, 'source') || {};\n\
-    var legacySourceGetter = function () { return this.source; }; // prior to it being a getter, it's own + nonconfigurable\n\
-    var sourceGetter = ES.IsCallable(sourceDesc.get) ? sourceDesc.get : legacySourceGetter;\n\
-\n\
-    var OrigRegExp = RegExp;\n\
-    var RegExpShim = (function () {\n\
-      return function RegExp(pattern, flags) {\n\
-        var patternIsRegExp = ES.IsRegExp(pattern);\n\
-        var calledWithNew = this instanceof RegExp;\n\
-        if (!calledWithNew && patternIsRegExp && typeof flags === 'undefined' && pattern.constructor === RegExp) {\n\
-          return pattern;\n\
-        }\n\
-\n\
-        var P = pattern;\n\
-        var F = flags;\n\
-        if (Type.regex(pattern)) {\n\
-          P = ES.Call(sourceGetter, pattern);\n\
-          F = typeof flags === 'undefined' ? ES.Call(flagsGetter, pattern) : flags;\n\
-          return new RegExp(P, F);\n\
-        } else if (patternIsRegExp) {\n\
-          P = pattern.source;\n\
-          F = typeof flags === 'undefined' ? pattern.flags : flags;\n\
-        }\n\
-        return new OrigRegExp(pattern, flags);\n\
-      };\n\
-    }());\n\
-    wrapConstructor(OrigRegExp, RegExpShim, {\n\
-      $input: true // Chrome < v39 & Opera < 26 have a nonstandard \"$input\" property\n\
-    });\n\
-    /* globals RegExp: true */\n\
-    /* eslint-disable no-undef */\n\
-    /* jshint -W020 */\n\
-    RegExp = RegExpShim;\n\
-    Value.redefine(globals, 'RegExp', RegExpShim);\n\
-    /* jshint +W020 */\n\
-    /* eslint-enable no-undef */\n\
-    /* globals RegExp: false */\n\
-  }\n\
-\n\
-  if (supportsDescriptors) {\n\
-    var regexGlobals = {\n\
-      input: '$_',\n\
-      lastMatch: '$&',\n\
-      lastParen: '$+',\n\
-      leftContext: '$`',\n\
-      rightContext: '$\\''\n\
-    };\n\
-    _forEach(keys(regexGlobals), function (prop) {\n\
-      if (prop in RegExp && !(regexGlobals[prop] in RegExp)) {\n\
-        Value.getter(RegExp, regexGlobals[prop], function get() {\n\
-          return RegExp[prop];\n\
-        });\n\
-      }\n\
-    });\n\
-  }\n\
-  addDefaultSpecies(RegExp);\n\
-\n\
-  var inverseEpsilon = 1 / Number.EPSILON;\n\
-  var roundTiesToEven = function roundTiesToEven(n) {\n\
-    // Even though this reduces down to `return n`, it takes advantage of built-in rounding.\n\
-    return (n + inverseEpsilon) - inverseEpsilon;\n\
-  };\n\
-  var BINARY_32_EPSILON = Math.pow(2, -23);\n\
-  var BINARY_32_MAX_VALUE = Math.pow(2, 127) * (2 - BINARY_32_EPSILON);\n\
-  var BINARY_32_MIN_VALUE = Math.pow(2, -126);\n\
-  var numberCLZ = Number.prototype.clz;\n\
-  delete Number.prototype.clz; // Safari 8 has Number#clz\n\
-\n\
-  var MathShims = {\n\
-    acosh: function acosh(value) {\n\
-      var x = Number(value);\n\
-      if (Number.isNaN(x) || value < 1) { return NaN; }\n\
-      if (x === 1) { return 0; }\n\
-      if (x === Infinity) { return x; }\n\
-      return _log(x / Math.E + _sqrt(x + 1) * _sqrt(x - 1) / Math.E) + 1;\n\
-    },\n\
-\n\
-    asinh: function asinh(value) {\n\
-      var x = Number(value);\n\
-      if (x === 0 || !globalIsFinite(x)) {\n\
-        return x;\n\
-      }\n\
-      return x < 0 ? -Math.asinh(-x) : _log(x + _sqrt(x * x + 1));\n\
-    },\n\
-\n\
-    atanh: function atanh(value) {\n\
-      var x = Number(value);\n\
-      if (Number.isNaN(x) || x < -1 || x > 1) {\n\
-        return NaN;\n\
-      }\n\
-      if (x === -1) { return -Infinity; }\n\
-      if (x === 1) { return Infinity; }\n\
-      if (x === 0) { return x; }\n\
-      return 0.5 * _log((1 + x) / (1 - x));\n\
-    },\n\
-\n\
-    cbrt: function cbrt(value) {\n\
-      var x = Number(value);\n\
-      if (x === 0) { return x; }\n\
-      var negate = x < 0, result;\n\
-      if (negate) { x = -x; }\n\
-      if (x === Infinity) {\n\
-        result = Infinity;\n\
-      } else {\n\
-        result = Math.exp(_log(x) / 3);\n\
-        // from http://en.wikipedia.org/wiki/Cube_root#Numerical_methods\n\
-        result = (x / (result * result) + (2 * result)) / 3;\n\
-      }\n\
-      return negate ? -result : result;\n\
-    },\n\
-\n\
-    clz32: function clz32(value) {\n\
-      // See https://bugs.ecmascript.org/show_bug.cgi?id=2465\n\
-      var x = Number(value);\n\
-      var number = ES.ToUint32(x);\n\
-      if (number === 0) {\n\
-        return 32;\n\
-      }\n\
-      return numberCLZ ? ES.Call(numberCLZ, number) : 31 - _floor(_log(number + 0.5) * Math.LOG2E);\n\
-    },\n\
-\n\
-    cosh: function cosh(value) {\n\
-      var x = Number(value);\n\
-      if (x === 0) { return 1; } // +0 or -0\n\
-      if (Number.isNaN(x)) { return NaN; }\n\
-      if (!globalIsFinite(x)) { return Infinity; }\n\
-      if (x < 0) { x = -x; }\n\
-      if (x > 21) { return Math.exp(x) / 2; }\n\
-      return (Math.exp(x) + Math.exp(-x)) / 2;\n\
-    },\n\
-\n\
-    expm1: function expm1(value) {\n\
-      var x = Number(value);\n\
-      if (x === -Infinity) { return -1; }\n\
-      if (!globalIsFinite(x) || x === 0) { return x; }\n\
-      if (_abs(x) > 0.5) {\n\
-        return Math.exp(x) - 1;\n\
-      }\n\
-      // A more precise approximation using Taylor series expansion\n\
-      // from https://github.com/paulmillr/es6-shim/issues/314#issuecomment-70293986\n\
-      var t = x;\n\
-      var sum = 0;\n\
-      var n = 1;\n\
-      while (sum + t !== sum) {\n\
-        sum += t;\n\
-        n += 1;\n\
-        t *= x / n;\n\
-      }\n\
-      return sum;\n\
-    },\n\
-\n\
-    hypot: function hypot(x, y) {\n\
-      var result = 0;\n\
-      var largest = 0;\n\
-      for (var i = 0; i < arguments.length; ++i) {\n\
-        var value = _abs(Number(arguments[i]));\n\
-        if (largest < value) {\n\
-          result *= (largest / value) * (largest / value);\n\
-          result += 1;\n\
-          largest = value;\n\
-        } else {\n\
-          result += (value > 0 ? (value / largest) * (value / largest) : value);\n\
-        }\n\
-      }\n\
-      return largest === Infinity ? Infinity : largest * _sqrt(result);\n\
-    },\n\
-\n\
-    log2: function log2(value) {\n\
-      return _log(value) * Math.LOG2E;\n\
-    },\n\
-\n\
-    log10: function log10(value) {\n\
-      return _log(value) * Math.LOG10E;\n\
-    },\n\
-\n\
-    log1p: function log1p(value) {\n\
-      var x = Number(value);\n\
-      if (x < -1 || Number.isNaN(x)) { return NaN; }\n\
-      if (x === 0 || x === Infinity) { return x; }\n\
-      if (x === -1) { return -Infinity; }\n\
-\n\
-      return (1 + x) - 1 === 0 ? x : x * (_log(1 + x) / ((1 + x) - 1));\n\
-    },\n\
-\n\
-    sign: function sign(value) {\n\
-      var number = Number(value);\n\
-      if (number === 0) { return number; }\n\
-      if (Number.isNaN(number)) { return number; }\n\
-      return number < 0 ? -1 : 1;\n\
-    },\n\
-\n\
-    sinh: function sinh(value) {\n\
-      var x = Number(value);\n\
-      if (!globalIsFinite(x) || x === 0) { return x; }\n\
-\n\
-      if (_abs(x) < 1) {\n\
-        return (Math.expm1(x) - Math.expm1(-x)) / 2;\n\
-      }\n\
-      return (Math.exp(x - 1) - Math.exp(-x - 1)) * Math.E / 2;\n\
-    },\n\
-\n\
-    tanh: function tanh(value) {\n\
-      var x = Number(value);\n\
-      if (Number.isNaN(x) || x === 0) { return x; }\n\
-      if (x === Infinity) { return 1; }\n\
-      if (x === -Infinity) { return -1; }\n\
-      var a = Math.expm1(x);\n\
-      var b = Math.expm1(-x);\n\
-      if (a === Infinity) { return 1; }\n\
-      if (b === Infinity) { return -1; }\n\
-      return (a - b) / (Math.exp(x) + Math.exp(-x));\n\
-    },\n\
-\n\
-    trunc: function trunc(value) {\n\
-      var x = Number(value);\n\
-      return x < 0 ? -_floor(-x) : _floor(x);\n\
-    },\n\
-\n\
-    imul: function imul(x, y) {\n\
-      // taken from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/imul\n\
-      var a = ES.ToUint32(x);\n\
-      var b = ES.ToUint32(y);\n\
-      var ah = (a >>> 16) & 0xffff;\n\
-      var al = a & 0xffff;\n\
-      var bh = (b >>> 16) & 0xffff;\n\
-      var bl = b & 0xffff;\n\
-      // the shift by 0 fixes the sign on the high part\n\
-      // the final |0 converts the unsigned value into a signed value\n\
-      return ((al * bl) + (((ah * bl + al * bh) << 16) >>> 0) | 0);\n\
-    },\n\
-\n\
-    fround: function fround(x) {\n\
-      var v = Number(x);\n\
-      if (v === 0 || v === Infinity || v === -Infinity || numberIsNaN(v)) {\n\
-        return v;\n\
-      }\n\
-      var sign = Math.sign(v);\n\
-      var abs = _abs(v);\n\
-      if (abs < BINARY_32_MIN_VALUE) {\n\
-        return sign * roundTiesToEven(abs / BINARY_32_MIN_VALUE / BINARY_32_EPSILON) * BINARY_32_MIN_VALUE * BINARY_32_EPSILON;\n\
-      }\n\
-      // Veltkamp's splitting (?)\n\
-      var a = (1 + BINARY_32_EPSILON / Number.EPSILON) * abs;\n\
-      var result = a - (a - abs);\n\
-      if (result > BINARY_32_MAX_VALUE || numberIsNaN(result)) {\n\
-        return sign * Infinity;\n\
-      }\n\
-      return sign * result;\n\
-    }\n\
-  };\n\
-  defineProperties(Math, MathShims);\n\
-  // IE 11 TP has an imprecise log1p: reports Math.log1p(-1e-17) as 0\n\
-  defineProperty(Math, 'log1p', MathShims.log1p, Math.log1p(-1e-17) !== -1e-17);\n\
-  // IE 11 TP has an imprecise asinh: reports Math.asinh(-1e7) as not exactly equal to -Math.asinh(1e7)\n\
-  defineProperty(Math, 'asinh', MathShims.asinh, Math.asinh(-1e7) !== -Math.asinh(1e7));\n\
-  // Chrome 40 has an imprecise Math.tanh with very small numbers\n\
-  defineProperty(Math, 'tanh', MathShims.tanh, Math.tanh(-2e-17) !== -2e-17);\n\
-  // Chrome 40 loses Math.acosh precision with high numbers\n\
-  defineProperty(Math, 'acosh', MathShims.acosh, Math.acosh(Number.MAX_VALUE) === Infinity);\n\
-  // Firefox 38 on Windows\n\
-  defineProperty(Math, 'cbrt', MathShims.cbrt, Math.abs(1 - Math.cbrt(1e-300) / 1e-100) / Number.EPSILON > 8);\n\
-  // node 0.11 has an imprecise Math.sinh with very small numbers\n\
-  defineProperty(Math, 'sinh', MathShims.sinh, Math.sinh(-2e-17) !== -2e-17);\n\
-  // FF 35 on Linux reports 22025.465794806725 for Math.expm1(10)\n\
-  var expm1OfTen = Math.expm1(10);\n\
-  defineProperty(Math, 'expm1', MathShims.expm1, expm1OfTen > 22025.465794806719 || expm1OfTen < 22025.4657948067165168);\n\
-\n\
-  var origMathRound = Math.round;\n\
-  // breaks in e.g. Safari 8, Internet Explorer 11, Opera 12\n\
-  var roundHandlesBoundaryConditions = Math.round(0.5 - Number.EPSILON / 4) === 0 && Math.round(-0.5 + Number.EPSILON / 3.99) === 1;\n\
-\n\
-  // When engines use Math.floor(x + 0.5) internally, Math.round can be buggy for large integers.\n\
-  // This behavior should be governed by \"round to nearest, ties to even mode\"\n\
-  // see https://people.mozilla.org/~jorendorff/es6-draft.html#sec-ecmascript-language-types-number-type\n\
-  // These are the boundary cases where it breaks.\n\
-  var smallestPositiveNumberWhereRoundBreaks = inverseEpsilon + 1;\n\
-  var largestPositiveNumberWhereRoundBreaks = 2 * inverseEpsilon - 1;\n\
-  var roundDoesNotIncreaseIntegers = [smallestPositiveNumberWhereRoundBreaks, largestPositiveNumberWhereRoundBreaks].every(function (num) {\n\
-    return Math.round(num) === num;\n\
-  });\n\
-  defineProperty(Math, 'round', function round(x) {\n\
-    var floor = _floor(x);\n\
-    var ceil = floor === -1 ? -0 : floor + 1;\n\
-    return x - floor < 0.5 ? floor : ceil;\n\
-  }, !roundHandlesBoundaryConditions || !roundDoesNotIncreaseIntegers);\n\
-  Value.preserveToString(Math.round, origMathRound);\n\
-\n\
-  var origImul = Math.imul;\n\
-  if (Math.imul(0xffffffff, 5) !== -5) {\n\
-    // Safari 6.1, at least, reports \"0\" for this value\n\
-    Math.imul = MathShims.imul;\n\
-    Value.preserveToString(Math.imul, origImul);\n\
-  }\n\
-  if (Math.imul.length !== 2) {\n\
-    // Safari 8.0.4 has a length of 1\n\
-    // fixed in https://bugs.webkit.org/show_bug.cgi?id=143658\n\
-    overrideNative(Math, 'imul', function imul(x, y) {\n\
-      return ES.Call(origImul, Math, arguments);\n\
-    });\n\
-  }\n\
-\n\
-  // Promises\n\
-  // Simplest possible implementation; use a 3rd-party library if you\n\
-  // want the best possible speed and/or long stack traces.\n\
-  var PromiseShim = (function () {\n\
-    var setTimeout = globals.setTimeout;\n\
-    // some environments don't have setTimeout - no way to shim here.\n\
-    if (typeof setTimeout !== 'function' && typeof setTimeout !== 'object') { return; }\n\
-\n\
-    ES.IsPromise = function (promise) {\n\
-      if (!ES.TypeIsObject(promise)) {\n\
-        return false;\n\
-      }\n\
-      if (typeof promise._promise === 'undefined') {\n\
-        return false; // uninitialized, or missing our hidden field.\n\
-      }\n\
-      return true;\n\
-    };\n\
-\n\
-    // \"PromiseCapability\" in the spec is what most promise implementations\n\
-    // call a \"deferred\".\n\
-    var PromiseCapability = function (C) {\n\
-      if (!ES.IsConstructor(C)) {\n\
-        throw new TypeError('Bad promise constructor');\n\
-      }\n\
-      var capability = this;\n\
-      var resolver = function (resolve, reject) {\n\
-        if (capability.resolve !== void 0 || capability.reject !== void 0) {\n\
-          throw new TypeError('Bad Promise implementation!');\n\
-        }\n\
-        capability.resolve = resolve;\n\
-        capability.reject = reject;\n\
-      };\n\
-      // Initialize fields to inform optimizers about the object shape.\n\
-      capability.resolve = void 0;\n\
-      capability.reject = void 0;\n\
-      capability.promise = new C(resolver);\n\
-      if (!(ES.IsCallable(capability.resolve) && ES.IsCallable(capability.reject))) {\n\
-        throw new TypeError('Bad promise constructor');\n\
-      }\n\
-    };\n\
-\n\
-    // find an appropriate setImmediate-alike\n\
-    var makeZeroTimeout;\n\
-    /*global window */\n\
-    if (typeof window !== 'undefined' && ES.IsCallable(window.postMessage)) {\n\
-      makeZeroTimeout = function () {\n\
-        // from http://dbaron.org/log/20100309-faster-timeouts\n\
-        var timeouts = [];\n\
-        var messageName = 'zero-timeout-message';\n\
-        var setZeroTimeout = function (fn) {\n\
-          _push(timeouts, fn);\n\
-          window.postMessage(messageName, '*');\n\
-        };\n\
-        var handleMessage = function (event) {\n\
-          if (event.source === window && event.data === messageName) {\n\
-            event.stopPropagation();\n\
-            if (timeouts.length === 0) { return; }\n\
-            var fn = _shift(timeouts);\n\
-            fn();\n\
-          }\n\
-        };\n\
-        window.addEventListener('message', handleMessage, true);\n\
-        return setZeroTimeout;\n\
-      };\n\
-    }\n\
-    var makePromiseAsap = function () {\n\
-      // An efficient task-scheduler based on a pre-existing Promise\n\
-      // implementation, which we can use even if we override the\n\
-      // global Promise below (in order to workaround bugs)\n\
-      // https://github.com/Raynos/observ-hash/issues/2#issuecomment-35857671\n\
-      var P = globals.Promise;\n\
-      var pr = P && P.resolve && P.resolve();\n\
-      return pr && function (task) {\n\
-        return pr.then(task);\n\
-      };\n\
-    };\n\
-    /*global process */\n\
-    /* jscs:disable disallowMultiLineTernary */\n\
-    var enqueue = ES.IsCallable(globals.setImmediate) ?\n\
-      globals.setImmediate :\n\
-      typeof process === 'object' && process.nextTick ? process.nextTick :\n\
-      makePromiseAsap() ||\n\
-      (ES.IsCallable(makeZeroTimeout) ? makeZeroTimeout() :\n\
-      function (task) { setTimeout(task, 0); }); // fallback\n\
-    /* jscs:enable disallowMultiLineTernary */\n\
-\n\
-    // Constants for Promise implementation\n\
-    var PROMISE_IDENTITY = function (x) { return x; };\n\
-    var PROMISE_THROWER = function (e) { throw e; };\n\
-    var PROMISE_PENDING = 0;\n\
-    var PROMISE_FULFILLED = 1;\n\
-    var PROMISE_REJECTED = 2;\n\
-    // We store fulfill/reject handlers and capabilities in a single array.\n\
-    var PROMISE_FULFILL_OFFSET = 0;\n\
-    var PROMISE_REJECT_OFFSET = 1;\n\
-    var PROMISE_CAPABILITY_OFFSET = 2;\n\
-    // This is used in an optimization for chaining promises via then.\n\
-    var PROMISE_FAKE_CAPABILITY = {};\n\
-\n\
-    var enqueuePromiseReactionJob = function (handler, capability, argument) {\n\
-      enqueue(function () {\n\
-        promiseReactionJob(handler, capability, argument);\n\
-      });\n\
-    };\n\
-\n\
-    var promiseReactionJob = function (handler, promiseCapability, argument) {\n\
-      var handlerResult, f;\n\
-      if (promiseCapability === PROMISE_FAKE_CAPABILITY) {\n\
-        // Fast case, when we don't actually need to chain through to a\n\
-        // (real) promiseCapability.\n\
-        return handler(argument);\n\
-      }\n\
-      try {\n\
-        handlerResult = handler(argument);\n\
-        f = promiseCapability.resolve;\n\
-      } catch (e) {\n\
-        handlerResult = e;\n\
-        f = promiseCapability.reject;\n\
-      }\n\
-      f(handlerResult);\n\
-    };\n\
-\n\
-    var fulfillPromise = function (promise, value) {\n\
-      var _promise = promise._promise;\n\
-      var length = _promise.reactionLength;\n\
-      if (length > 0) {\n\
-        enqueuePromiseReactionJob(\n\
-          _promise.fulfillReactionHandler0,\n\
-          _promise.reactionCapability0,\n\
-          value\n\
-        );\n\
-        _promise.fulfillReactionHandler0 = void 0;\n\
-        _promise.rejectReactions0 = void 0;\n\
-        _promise.reactionCapability0 = void 0;\n\
-        if (length > 1) {\n\
-          for (var i = 1, idx = 0; i < length; i++, idx += 3) {\n\
-            enqueuePromiseReactionJob(\n\
-              _promise[idx + PROMISE_FULFILL_OFFSET],\n\
-              _promise[idx + PROMISE_CAPABILITY_OFFSET],\n\
-              value\n\
-            );\n\
-            promise[idx + PROMISE_FULFILL_OFFSET] = void 0;\n\
-            promise[idx + PROMISE_REJECT_OFFSET] = void 0;\n\
-            promise[idx + PROMISE_CAPABILITY_OFFSET] = void 0;\n\
-          }\n\
-        }\n\
-      }\n\
-      _promise.result = value;\n\
-      _promise.state = PROMISE_FULFILLED;\n\
-      _promise.reactionLength = 0;\n\
-    };\n\
-\n\
-    var rejectPromise = function (promise, reason) {\n\
-      var _promise = promise._promise;\n\
-      var length = _promise.reactionLength;\n\
-      if (length > 0) {\n\
-        enqueuePromiseReactionJob(\n\
-          _promise.rejectReactionHandler0,\n\
-          _promise.reactionCapability0,\n\
-          reason\n\
-        );\n\
-        _promise.fulfillReactionHandler0 = void 0;\n\
-        _promise.rejectReactions0 = void 0;\n\
-        _promise.reactionCapability0 = void 0;\n\
-        if (length > 1) {\n\
-          for (var i = 1, idx = 0; i < length; i++, idx += 3) {\n\
-            enqueuePromiseReactionJob(\n\
-              _promise[idx + PROMISE_REJECT_OFFSET],\n\
-              _promise[idx + PROMISE_CAPABILITY_OFFSET],\n\
-              reason\n\
-            );\n\
-            promise[idx + PROMISE_FULFILL_OFFSET] = void 0;\n\
-            promise[idx + PROMISE_REJECT_OFFSET] = void 0;\n\
-            promise[idx + PROMISE_CAPABILITY_OFFSET] = void 0;\n\
-          }\n\
-        }\n\
-      }\n\
-      _promise.result = reason;\n\
-      _promise.state = PROMISE_REJECTED;\n\
-      _promise.reactionLength = 0;\n\
-    };\n\
-\n\
-    var createResolvingFunctions = function (promise) {\n\
-      var alreadyResolved = false;\n\
-      var resolve = function (resolution) {\n\
-        var then;\n\
-        if (alreadyResolved) { return; }\n\
-        alreadyResolved = true;\n\
-        if (resolution === promise) {\n\
-          return rejectPromise(promise, new TypeError('Self resolution'));\n\
-        }\n\
-        if (!ES.TypeIsObject(resolution)) {\n\
-          return fulfillPromise(promise, resolution);\n\
-        }\n\
-        try {\n\
-          then = resolution.then;\n\
-        } catch (e) {\n\
-          return rejectPromise(promise, e);\n\
-        }\n\
-        if (!ES.IsCallable(then)) {\n\
-          return fulfillPromise(promise, resolution);\n\
-        }\n\
-        enqueue(function () {\n\
-          promiseResolveThenableJob(promise, resolution, then);\n\
-        });\n\
-      };\n\
-      var reject = function (reason) {\n\
-        if (alreadyResolved) { return; }\n\
-        alreadyResolved = true;\n\
-        return rejectPromise(promise, reason);\n\
-      };\n\
-      return { resolve: resolve, reject: reject };\n\
-    };\n\
-\n\
-    var optimizedThen = function (then, thenable, resolve, reject) {\n\
-      // Optimization: since we discard the result, we can pass our\n\
-      // own then implementation a special hint to let it know it\n\
-      // doesn't have to create it.  (The PROMISE_FAKE_CAPABILITY\n\
-      // object is local to this implementation and unforgeable outside.)\n\
-      if (then === Promise$prototype$then) {\n\
-        _call(then, thenable, resolve, reject, PROMISE_FAKE_CAPABILITY);\n\
-      } else {\n\
-        _call(then, thenable, resolve, reject);\n\
-      }\n\
-    };\n\
-    var promiseResolveThenableJob = function (promise, thenable, then) {\n\
-      var resolvingFunctions = createResolvingFunctions(promise);\n\
-      var resolve = resolvingFunctions.resolve;\n\
-      var reject = resolvingFunctions.reject;\n\
-      try {\n\
-        optimizedThen(then, thenable, resolve, reject);\n\
-      } catch (e) {\n\
-        reject(e);\n\
-      }\n\
-    };\n\
-\n\
-    var Promise$prototype, Promise$prototype$then;\n\
-    var Promise = (function () {\n\
-      var PromiseShim = function Promise(resolver) {\n\
-        if (!(this instanceof PromiseShim)) {\n\
-          throw new TypeError('Constructor Promise requires \"new\"');\n\
-        }\n\
-        if (this && this._promise) {\n\
-          throw new TypeError('Bad construction');\n\
-        }\n\
-        // see https://bugs.ecmascript.org/show_bug.cgi?id=2482\n\
-        if (!ES.IsCallable(resolver)) {\n\
-          throw new TypeError('not a valid resolver');\n\
-        }\n\
-        var promise = emulateES6construct(this, PromiseShim, Promise$prototype, {\n\
-          _promise: {\n\
-            result: void 0,\n\
-            state: PROMISE_PENDING,\n\
-            // The first member of the \"reactions\" array is inlined here,\n\
-            // since most promises only have one reaction.\n\
-            // We've also exploded the 'reaction' object to inline the\n\
-            // \"handler\" and \"capability\" fields, since both fulfill and\n\
-            // reject reactions share the same capability.\n\
-            reactionLength: 0,\n\
-            fulfillReactionHandler0: void 0,\n\
-            rejectReactionHandler0: void 0,\n\
-            reactionCapability0: void 0\n\
-          }\n\
-        });\n\
-        var resolvingFunctions = createResolvingFunctions(promise);\n\
-        var reject = resolvingFunctions.reject;\n\
-        try {\n\
-          resolver(resolvingFunctions.resolve, reject);\n\
-        } catch (e) {\n\
-          reject(e);\n\
-        }\n\
-        return promise;\n\
-      };\n\
-      return PromiseShim;\n\
-    }());\n\
-    Promise$prototype = Promise.prototype;\n\
-\n\
-    var _promiseAllResolver = function (index, values, capability, remaining) {\n\
-      var alreadyCalled = false;\n\
-      return function (x) {\n\
-        if (alreadyCalled) { return; }\n\
-        alreadyCalled = true;\n\
-        values[index] = x;\n\
-        if ((--remaining.count) === 0) {\n\
-          var resolve = capability.resolve;\n\
-          resolve(values); // call w/ this===undefined\n\
-        }\n\
-      };\n\
-    };\n\
-\n\
-    var performPromiseAll = function (iteratorRecord, C, resultCapability) {\n\
-      var it = iteratorRecord.iterator;\n\
-      var values = [], remaining = { count: 1 }, next, nextValue;\n\
-      var index = 0;\n\
-      while (true) {\n\
-        try {\n\
-          next = ES.IteratorStep(it);\n\
-          if (next === false) {\n\
-            iteratorRecord.done = true;\n\
-            break;\n\
-          }\n\
-          nextValue = next.value;\n\
-        } catch (e) {\n\
-          iteratorRecord.done = true;\n\
-          throw e;\n\
-        }\n\
-        values[index] = void 0;\n\
-        var nextPromise = C.resolve(nextValue);\n\
-        var resolveElement = _promiseAllResolver(\n\
-          index, values, resultCapability, remaining\n\
-        );\n\
-        remaining.count += 1;\n\
-        optimizedThen(nextPromise.then, nextPromise, resolveElement, resultCapability.reject);\n\
-        index += 1;\n\
-      }\n\
-      if ((--remaining.count) === 0) {\n\
-        var resolve = resultCapability.resolve;\n\
-        resolve(values); // call w/ this===undefined\n\
-      }\n\
-      return resultCapability.promise;\n\
-    };\n\
-\n\
-    var performPromiseRace = function (iteratorRecord, C, resultCapability) {\n\
-      var it = iteratorRecord.iterator, next, nextValue, nextPromise;\n\
-      while (true) {\n\
-        try {\n\
-          next = ES.IteratorStep(it);\n\
-          if (next === false) {\n\
-            // NOTE: If iterable has no items, resulting promise will never\n\
-            // resolve; see:\n\
-            // https://github.com/domenic/promises-unwrapping/issues/75\n\
-            // https://bugs.ecmascript.org/show_bug.cgi?id=2515\n\
-            iteratorRecord.done = true;\n\
-            break;\n\
-          }\n\
-          nextValue = next.value;\n\
-        } catch (e) {\n\
-          iteratorRecord.done = true;\n\
-          throw e;\n\
-        }\n\
-        nextPromise = C.resolve(nextValue);\n\
-        optimizedThen(nextPromise.then, nextPromise, resultCapability.resolve, resultCapability.reject);\n\
-      }\n\
-      return resultCapability.promise;\n\
-    };\n\
-\n\
-    defineProperties(Promise, {\n\
-      all: function all(iterable) {\n\
-        var C = this;\n\
-        if (!ES.TypeIsObject(C)) {\n\
-          throw new TypeError('Promise is not object');\n\
-        }\n\
-        var capability = new PromiseCapability(C);\n\
-        var iterator, iteratorRecord;\n\
-        try {\n\
-          iterator = ES.GetIterator(iterable);\n\
-          iteratorRecord = { iterator: iterator, done: false };\n\
-          return performPromiseAll(iteratorRecord, C, capability);\n\
-        } catch (e) {\n\
-          var exception = e;\n\
-          if (iteratorRecord && !iteratorRecord.done) {\n\
-            try {\n\
-              ES.IteratorClose(iterator, true);\n\
-            } catch (ee) {\n\
-              exception = ee;\n\
-            }\n\
-          }\n\
-          var reject = capability.reject;\n\
-          reject(exception);\n\
-          return capability.promise;\n\
-        }\n\
-      },\n\
-\n\
-      race: function race(iterable) {\n\
-        var C = this;\n\
-        if (!ES.TypeIsObject(C)) {\n\
-          throw new TypeError('Promise is not object');\n\
-        }\n\
-        var capability = new PromiseCapability(C);\n\
-        var iterator, iteratorRecord;\n\
-        try {\n\
-          iterator = ES.GetIterator(iterable);\n\
-          iteratorRecord = { iterator: iterator, done: false };\n\
-          return performPromiseRace(iteratorRecord, C, capability);\n\
-        } catch (e) {\n\
-          var exception = e;\n\
-          if (iteratorRecord && !iteratorRecord.done) {\n\
-            try {\n\
-              ES.IteratorClose(iterator, true);\n\
-            } catch (ee) {\n\
-              exception = ee;\n\
-            }\n\
-          }\n\
-          var reject = capability.reject;\n\
-          reject(exception);\n\
-          return capability.promise;\n\
-        }\n\
-      },\n\
-\n\
-      reject: function reject(reason) {\n\
-        var C = this;\n\
-        if (!ES.TypeIsObject(C)) {\n\
-          throw new TypeError('Bad promise constructor');\n\
-        }\n\
-        var capability = new PromiseCapability(C);\n\
-        var rejectFunc = capability.reject;\n\
-        rejectFunc(reason); // call with this===undefined\n\
-        return capability.promise;\n\
-      },\n\
-\n\
-      resolve: function resolve(v) {\n\
-        // See https://esdiscuss.org/topic/fixing-promise-resolve for spec\n\
-        var C = this;\n\
-        if (!ES.TypeIsObject(C)) {\n\
-          throw new TypeError('Bad promise constructor');\n\
-        }\n\
-        if (ES.IsPromise(v)) {\n\
-          var constructor = v.constructor;\n\
-          if (constructor === C) { return v; }\n\
-        }\n\
-        var capability = new PromiseCapability(C);\n\
-        var resolveFunc = capability.resolve;\n\
-        resolveFunc(v); // call with this===undefined\n\
-        return capability.promise;\n\
-      }\n\
-    });\n\
-\n\
-    defineProperties(Promise$prototype, {\n\
-      'catch': function (onRejected) {\n\
-        return this.then(null, onRejected);\n\
-      },\n\
-\n\
-      then: function then(onFulfilled, onRejected) {\n\
-        var promise = this;\n\
-        if (!ES.IsPromise(promise)) { throw new TypeError('not a promise'); }\n\
-        var C = ES.SpeciesConstructor(promise, Promise);\n\
-        var resultCapability;\n\
-        var returnValueIsIgnored = arguments.length > 2 && arguments[2] === PROMISE_FAKE_CAPABILITY;\n\
-        if (returnValueIsIgnored && C === Promise) {\n\
-          resultCapability = PROMISE_FAKE_CAPABILITY;\n\
-        } else {\n\
-          resultCapability = new PromiseCapability(C);\n\
-        }\n\
-        // PerformPromiseThen(promise, onFulfilled, onRejected, resultCapability)\n\
-        // Note that we've split the 'reaction' object into its two\n\
-        // components, \"capabilities\" and \"handler\"\n\
-        // \"capabilities\" is always equal to `resultCapability`\n\
-        var fulfillReactionHandler = ES.IsCallable(onFulfilled) ? onFulfilled : PROMISE_IDENTITY;\n\
-        var rejectReactionHandler = ES.IsCallable(onRejected) ? onRejected : PROMISE_THROWER;\n\
-        var _promise = promise._promise;\n\
-        var value;\n\
-        if (_promise.state === PROMISE_PENDING) {\n\
-          if (_promise.reactionLength === 0) {\n\
-            _promise.fulfillReactionHandler0 = fulfillReactionHandler;\n\
-            _promise.rejectReactionHandler0 = rejectReactionHandler;\n\
-            _promise.reactionCapability0 = resultCapability;\n\
-          } else {\n\
-            var idx = 3 * (_promise.reactionLength - 1);\n\
-            _promise[idx + PROMISE_FULFILL_OFFSET] = fulfillReactionHandler;\n\
-            _promise[idx + PROMISE_REJECT_OFFSET] = rejectReactionHandler;\n\
-            _promise[idx + PROMISE_CAPABILITY_OFFSET] = resultCapability;\n\
-          }\n\
-          _promise.reactionLength += 1;\n\
-        } else if (_promise.state === PROMISE_FULFILLED) {\n\
-          value = _promise.result;\n\
-          enqueuePromiseReactionJob(\n\
-            fulfillReactionHandler, resultCapability, value\n\
-          );\n\
-        } else if (_promise.state === PROMISE_REJECTED) {\n\
-          value = _promise.result;\n\
-          enqueuePromiseReactionJob(\n\
-            rejectReactionHandler, resultCapability, value\n\
-          );\n\
-        } else {\n\
-          throw new TypeError('unexpected Promise state');\n\
-        }\n\
-        return resultCapability.promise;\n\
-      }\n\
-    });\n\
-    // This helps the optimizer by ensuring that methods which take\n\
-    // capabilities aren't polymorphic.\n\
-    PROMISE_FAKE_CAPABILITY = new PromiseCapability(Promise);\n\
-    Promise$prototype$then = Promise$prototype.then;\n\
-\n\
-    return Promise;\n\
-  }());\n\
-\n\
-  // Chrome's native Promise has extra methods that it shouldn't have. Let's remove them.\n\
-  if (globals.Promise) {\n\
-    delete globals.Promise.accept;\n\
-    delete globals.Promise.defer;\n\
-    delete globals.Promise.prototype.chain;\n\
-  }\n\
-\n\
-  if (typeof PromiseShim === 'function') {\n\
-    // export the Promise constructor.\n\
-    defineProperties(globals, { Promise: PromiseShim });\n\
-    // In Chrome 33 (and thereabouts) Promise is defined, but the\n\
-    // implementation is buggy in a number of ways.  Let's check subclassing\n\
-    // support to see if we have a buggy implementation.\n\
-    var promiseSupportsSubclassing = supportsSubclassing(globals.Promise, function (S) {\n\
-      return S.resolve(42).then(function () {}) instanceof S;\n\
-    });\n\
-    var promiseIgnoresNonFunctionThenCallbacks = !throwsError(function () { globals.Promise.reject(42).then(null, 5).then(null, noop); });\n\
-    var promiseRequiresObjectContext = throwsError(function () { globals.Promise.call(3, noop); });\n\
-    // Promise.resolve() was errata'ed late in the ES6 process.\n\
-    // See: https://bugzilla.mozilla.org/show_bug.cgi?id=1170742\n\
-    //      https://code.google.com/p/v8/issues/detail?id=4161\n\
-    // It serves as a proxy for a number of other bugs in early Promise\n\
-    // implementations.\n\
-    var promiseResolveBroken = (function (Promise) {\n\
-      var p = Promise.resolve(5);\n\
-      p.constructor = {};\n\
-      var p2 = Promise.resolve(p);\n\
-      return (p === p2); // This *should* be false!\n\
-    }(globals.Promise));\n\
-\n\
-    // Chrome 46 (probably older too) does not retrieve a thenable's .then synchronously\n\
-    var getsThenSynchronously = supportsDescriptors && (function () {\n\
-      var count = 0;\n\
-      var thenable = Object.defineProperty({}, 'then', { get: function () { count += 1; } });\n\
-      Promise.resolve(thenable);\n\
-      return count === 1;\n\
-    }());\n\
-\n\
-    var BadResolverPromise = function BadResolverPromise(executor) {\n\
-      var p = new Promise(executor);\n\
-      executor(3, function () {});\n\
-      this.then = p.then;\n\
-      this.constructor = BadResolverPromise;\n\
-    };\n\
-    BadResolverPromise.prototype = Promise.prototype;\n\
-    BadResolverPromise.all = Promise.all;\n\
-    // Chrome Canary 49 (probably older too) has some implementation bugs\n\
-    var hasBadResolverPromise = valueOrFalseIfThrows(function () {\n\
-      return !!BadResolverPromise.all([1, 2]);\n\
-    });\n\
-\n\
-    if (!promiseSupportsSubclassing || !promiseIgnoresNonFunctionThenCallbacks ||\n\
-        !promiseRequiresObjectContext || promiseResolveBroken ||\n\
-        !getsThenSynchronously || hasBadResolverPromise) {\n\
-      /* globals Promise: true */\n\
-      /* eslint-disable no-undef */\n\
-      /* jshint -W020 */\n\
-      Promise = PromiseShim;\n\
-      /* jshint +W020 */\n\
-      /* eslint-enable no-undef */\n\
-      /* globals Promise: false */\n\
-      overrideNative(globals, 'Promise', PromiseShim);\n\
-    }\n\
-    if (Promise.all.length !== 1) {\n\
-      var origAll = Promise.all;\n\
-      overrideNative(Promise, 'all', function all(iterable) {\n\
-        return ES.Call(origAll, this, arguments);\n\
-      });\n\
-    }\n\
-    if (Promise.race.length !== 1) {\n\
-      var origRace = Promise.race;\n\
-      overrideNative(Promise, 'race', function race(iterable) {\n\
-        return ES.Call(origRace, this, arguments);\n\
-      });\n\
-    }\n\
-    if (Promise.resolve.length !== 1) {\n\
-      var origResolve = Promise.resolve;\n\
-      overrideNative(Promise, 'resolve', function resolve(x) {\n\
-        return ES.Call(origResolve, this, arguments);\n\
-      });\n\
-    }\n\
-    if (Promise.reject.length !== 1) {\n\
-      var origReject = Promise.reject;\n\
-      overrideNative(Promise, 'reject', function reject(r) {\n\
-        return ES.Call(origReject, this, arguments);\n\
-      });\n\
-    }\n\
-    ensureEnumerable(Promise, 'all');\n\
-    ensureEnumerable(Promise, 'race');\n\
-    ensureEnumerable(Promise, 'resolve');\n\
-    ensureEnumerable(Promise, 'reject');\n\
-    addDefaultSpecies(Promise);\n\
-  }\n\
-\n\
-  // Map and Set require a true ES5 environment\n\
-  // Their fast path also requires that the environment preserve\n\
-  // property insertion order, which is not guaranteed by the spec.\n\
-  var testOrder = function (a) {\n\
-    var b = keys(_reduce(a, function (o, k) {\n\
-      o[k] = true;\n\
-      return o;\n\
-    }, {}));\n\
-    return a.join(':') === b.join(':');\n\
-  };\n\
-  var preservesInsertionOrder = testOrder(['z', 'a', 'bb']);\n\
-  // some engines (eg, Chrome) only preserve insertion order for string keys\n\
-  var preservesNumericInsertionOrder = testOrder(['z', 1, 'a', '3', 2]);\n\
-\n\
-  if (supportsDescriptors) {\n\
-\n\
-    var fastkey = function fastkey(key) {\n\
-      if (!preservesInsertionOrder) {\n\
-        return null;\n\
-      }\n\
-      if (typeof key === 'undefined' || key === null) {\n\
-        return '^' + ES.ToString(key);\n\
-      } else if (typeof key === 'string') {\n\
-        return '$' + key;\n\
-      } else if (typeof key === 'number') {\n\
-        // note that -0 will get coerced to \"0\" when used as a property key\n\
-        if (!preservesNumericInsertionOrder) {\n\
-          return 'n' + key;\n\
-        }\n\
-        return key;\n\
-      } else if (typeof key === 'boolean') {\n\
-        return 'b' + key;\n\
-      }\n\
-      return null;\n\
-    };\n\
-\n\
-    var emptyObject = function emptyObject() {\n\
-      // accomodate some older not-quite-ES5 browsers\n\
-      return Object.create ? Object.create(null) : {};\n\
-    };\n\
-\n\
-    var addIterableToMap = function addIterableToMap(MapConstructor, map, iterable) {\n\
-      if (isArray(iterable) || Type.string(iterable)) {\n\
-        _forEach(iterable, function (entry) {\n\
-          if (!ES.TypeIsObject(entry)) {\n\
-            throw new TypeError('Iterator value ' + entry + ' is not an entry object');\n\
-          }\n\
-          map.set(entry[0], entry[1]);\n\
-        });\n\
-      } else if (iterable instanceof MapConstructor) {\n\
-        _call(MapConstructor.prototype.forEach, iterable, function (value, key) {\n\
-          map.set(key, value);\n\
-        });\n\
-      } else {\n\
-        var iter, adder;\n\
-        if (iterable !== null && typeof iterable !== 'undefined') {\n\
-          adder = map.set;\n\
-          if (!ES.IsCallable(adder)) { throw new TypeError('bad map'); }\n\
-          iter = ES.GetIterator(iterable);\n\
-        }\n\
-        if (typeof iter !== 'undefined') {\n\
-          while (true) {\n\
-            var next = ES.IteratorStep(iter);\n\
-            if (next === false) { break; }\n\
-            var nextItem = next.value;\n\
-            try {\n\
-              if (!ES.TypeIsObject(nextItem)) {\n\
-                throw new TypeError('Iterator value ' + nextItem + ' is not an entry object');\n\
-              }\n\
-              _call(adder, map, nextItem[0], nextItem[1]);\n\
-            } catch (e) {\n\
-              ES.IteratorClose(iter, true);\n\
-              throw e;\n\
-            }\n\
-          }\n\
-        }\n\
-      }\n\
-    };\n\
-    var addIterableToSet = function addIterableToSet(SetConstructor, set, iterable) {\n\
-      if (isArray(iterable) || Type.string(iterable)) {\n\
-        _forEach(iterable, function (value) {\n\
-          set.add(value);\n\
-        });\n\
-      } else if (iterable instanceof SetConstructor) {\n\
-        _call(SetConstructor.prototype.forEach, iterable, function (value) {\n\
-          set.add(value);\n\
-        });\n\
-      } else {\n\
-        var iter, adder;\n\
-        if (iterable !== null && typeof iterable !== 'undefined') {\n\
-          adder = set.add;\n\
-          if (!ES.IsCallable(adder)) { throw new TypeError('bad set'); }\n\
-          iter = ES.GetIterator(iterable);\n\
-        }\n\
-        if (typeof iter !== 'undefined') {\n\
-          while (true) {\n\
-            var next = ES.IteratorStep(iter);\n\
-            if (next === false) { break; }\n\
-            var nextValue = next.value;\n\
-            try {\n\
-              _call(adder, set, nextValue);\n\
-            } catch (e) {\n\
-              ES.IteratorClose(iter, true);\n\
-              throw e;\n\
-            }\n\
-          }\n\
-        }\n\
-      }\n\
-    };\n\
-\n\
-    var collectionShims = {\n\
-      Map: (function () {\n\
-\n\
-        var empty = {};\n\
-\n\
-        var MapEntry = function MapEntry(key, value) {\n\
-          this.key = key;\n\
-          this.value = value;\n\
-          this.next = null;\n\
-          this.prev = null;\n\
-        };\n\
-\n\
-        MapEntry.prototype.isRemoved = function isRemoved() {\n\
-          return this.key === empty;\n\
-        };\n\
-\n\
-        var isMap = function isMap(map) {\n\
-          return !!map._es6map;\n\
-        };\n\
-\n\
-        var requireMapSlot = function requireMapSlot(map, method) {\n\
-          if (!ES.TypeIsObject(map) || !isMap(map)) {\n\
-            throw new TypeError('Method Map.prototype.' + method + ' called on incompatible receiver ' + ES.ToString(map));\n\
-          }\n\
-        };\n\
-\n\
-        var MapIterator = function MapIterator(map, kind) {\n\
-          requireMapSlot(map, '[[MapIterator]]');\n\
-          this.head = map._head;\n\
-          this.i = this.head;\n\
-          this.kind = kind;\n\
-        };\n\
-\n\
-        MapIterator.prototype = {\n\
-          next: function next() {\n\
-            var i = this.i, kind = this.kind, head = this.head, result;\n\
-            if (typeof this.i === 'undefined') {\n\
-              return { value: void 0, done: true };\n\
-            }\n\
-            while (i.isRemoved() && i !== head) {\n\
-              // back up off of removed entries\n\
-              i = i.prev;\n\
-            }\n\
-            // advance to next unreturned element.\n\
-            while (i.next !== head) {\n\
-              i = i.next;\n\
-              if (!i.isRemoved()) {\n\
-                if (kind === 'key') {\n\
-                  result = i.key;\n\
-                } else if (kind === 'value') {\n\
-                  result = i.value;\n\
-                } else {\n\
-                  result = [i.key, i.value];\n\
-                }\n\
-                this.i = i;\n\
-                return { value: result, done: false };\n\
-              }\n\
-            }\n\
-            // once the iterator is done, it is done forever.\n\
-            this.i = void 0;\n\
-            return { value: void 0, done: true };\n\
-          }\n\
-        };\n\
-        addIterator(MapIterator.prototype);\n\
-\n\
-        var Map$prototype;\n\
-        var MapShim = function Map() {\n\
-          if (!(this instanceof Map)) {\n\
-            throw new TypeError('Constructor Map requires \"new\"');\n\
-          }\n\
-          if (this && this._es6map) {\n\
-            throw new TypeError('Bad construction');\n\
-          }\n\
-          var map = emulateES6construct(this, Map, Map$prototype, {\n\
-            _es6map: true,\n\
-            _head: null,\n\
-            _storage: emptyObject(),\n\
-            _size: 0\n\
-          });\n\
-\n\
-          var head = new MapEntry(null, null);\n\
-          // circular doubly-linked list.\n\
-          head.next = head.prev = head;\n\
-          map._head = head;\n\
-\n\
-          // Optionally initialize map from iterable\n\
-          if (arguments.length > 0) {\n\
-            addIterableToMap(Map, map, arguments[0]);\n\
-          }\n\
-          return map;\n\
-        };\n\
-        Map$prototype = MapShim.prototype;\n\
-\n\
-        Value.getter(Map$prototype, 'size', function () {\n\
-          if (typeof this._size === 'undefined') {\n\
-            throw new TypeError('size method called on incompatible Map');\n\
-          }\n\
-          return this._size;\n\
-        });\n\
-\n\
-        defineProperties(Map$prototype, {\n\
-          get: function get(key) {\n\
-            requireMapSlot(this, 'get');\n\
-            var fkey = fastkey(key);\n\
-            if (fkey !== null) {\n\
-              // fast O(1) path\n\
-              var entry = this._storage[fkey];\n\
-              if (entry) {\n\
-                return entry.value;\n\
-              } else {\n\
-                return;\n\
-              }\n\
-            }\n\
-            var head = this._head, i = head;\n\
-            while ((i = i.next) !== head) {\n\
-              if (ES.SameValueZero(i.key, key)) {\n\
-                return i.value;\n\
-              }\n\
-            }\n\
-          },\n\
-\n\
-          has: function has(key) {\n\
-            requireMapSlot(this, 'has');\n\
-            var fkey = fastkey(key);\n\
-            if (fkey !== null) {\n\
-              // fast O(1) path\n\
-              return typeof this._storage[fkey] !== 'undefined';\n\
-            }\n\
-            var head = this._head, i = head;\n\
-            while ((i = i.next) !== head) {\n\
-              if (ES.SameValueZero(i.key, key)) {\n\
-                return true;\n\
-              }\n\
-            }\n\
-            return false;\n\
-          },\n\
-\n\
-          set: function set(key, value) {\n\
-            requireMapSlot(this, 'set');\n\
-            var head = this._head, i = head, entry;\n\
-            var fkey = fastkey(key);\n\
-            if (fkey !== null) {\n\
-              // fast O(1) path\n\
-              if (typeof this._storage[fkey] !== 'undefined') {\n\
-                this._storage[fkey].value = value;\n\
-                return this;\n\
-              } else {\n\
-                entry = this._storage[fkey] = new MapEntry(key, value);\n\
-                i = head.prev;\n\
-                // fall through\n\
-              }\n\
-            }\n\
-            while ((i = i.next) !== head) {\n\
-              if (ES.SameValueZero(i.key, key)) {\n\
-                i.value = value;\n\
-                return this;\n\
-              }\n\
-            }\n\
-            entry = entry || new MapEntry(key, value);\n\
-            if (ES.SameValue(-0, key)) {\n\
-              entry.key = +0; // coerce -0 to +0 in entry\n\
-            }\n\
-            entry.next = this._head;\n\
-            entry.prev = this._head.prev;\n\
-            entry.prev.next = entry;\n\
-            entry.next.prev = entry;\n\
-            this._size += 1;\n\
-            return this;\n\
-          },\n\
-\n\
-          'delete': function (key) {\n\
-            requireMapSlot(this, 'delete');\n\
-            var head = this._head, i = head;\n\
-            var fkey = fastkey(key);\n\
-            if (fkey !== null) {\n\
-              // fast O(1) path\n\
-              if (typeof this._storage[fkey] === 'undefined') {\n\
-                return false;\n\
-              }\n\
-              i = this._storage[fkey].prev;\n\
-              delete this._storage[fkey];\n\
-              // fall through\n\
-            }\n\
-            while ((i = i.next) !== head) {\n\
-              if (ES.SameValueZero(i.key, key)) {\n\
-                i.key = i.value = empty;\n\
-                i.prev.next = i.next;\n\
-                i.next.prev = i.prev;\n\
-                this._size -= 1;\n\
-                return true;\n\
-              }\n\
-            }\n\
-            return false;\n\
-          },\n\
-\n\
-          clear: function clear() {\n\
-            requireMapSlot(this, 'clear');\n\
-            this._size = 0;\n\
-            this._storage = emptyObject();\n\
-            var head = this._head, i = head, p = i.next;\n\
-            while ((i = p) !== head) {\n\
-              i.key = i.value = empty;\n\
-              p = i.next;\n\
-              i.next = i.prev = head;\n\
-            }\n\
-            head.next = head.prev = head;\n\
-          },\n\
-\n\
-          keys: function keys() {\n\
-            requireMapSlot(this, 'keys');\n\
-            return new MapIterator(this, 'key');\n\
-          },\n\
-\n\
-          values: function values() {\n\
-            requireMapSlot(this, 'values');\n\
-            return new MapIterator(this, 'value');\n\
-          },\n\
-\n\
-          entries: function entries() {\n\
-            requireMapSlot(this, 'entries');\n\
-            return new MapIterator(this, 'key+value');\n\
-          },\n\
-\n\
-          forEach: function forEach(callback) {\n\
-            requireMapSlot(this, 'forEach');\n\
-            var context = arguments.length > 1 ? arguments[1] : null;\n\
-            var it = this.entries();\n\
-            for (var entry = it.next(); !entry.done; entry = it.next()) {\n\
-              if (context) {\n\
-                _call(callback, context, entry.value[1], entry.value[0], this);\n\
-              } else {\n\
-                callback(entry.value[1], entry.value[0], this);\n\
-              }\n\
-            }\n\
-          }\n\
-        });\n\
-        addIterator(Map$prototype, Map$prototype.entries);\n\
-\n\
-        return MapShim;\n\
-      }()),\n\
-\n\
-      Set: (function () {\n\
-        var isSet = function isSet(set) {\n\
-          return set._es6set && typeof set._storage !== 'undefined';\n\
-        };\n\
-        var requireSetSlot = function requireSetSlot(set, method) {\n\
-          if (!ES.TypeIsObject(set) || !isSet(set)) {\n\
-            // https://github.com/paulmillr/es6-shim/issues/176\n\
-            throw new TypeError('Set.prototype.' + method + ' called on incompatible receiver ' + ES.ToString(set));\n\
-          }\n\
-        };\n\
-\n\
-        // Creating a Map is expensive.  To speed up the common case of\n\
-        // Sets containing only string or numeric keys, we use an object\n\
-        // as backing storage and lazily create a full Map only when\n\
-        // required.\n\
-        var Set$prototype;\n\
-        var SetShim = function Set() {\n\
-          if (!(this instanceof Set)) {\n\
-            throw new TypeError('Constructor Set requires \"new\"');\n\
-          }\n\
-          if (this && this._es6set) {\n\
-            throw new TypeError('Bad construction');\n\
-          }\n\
-          var set = emulateES6construct(this, Set, Set$prototype, {\n\
-            _es6set: true,\n\
-            '[[SetData]]': null,\n\
-            _storage: emptyObject()\n\
-          });\n\
-          if (!set._es6set) {\n\
-            throw new TypeError('bad set');\n\
-          }\n\
-\n\
-          // Optionally initialize Set from iterable\n\
-          if (arguments.length > 0) {\n\
-            addIterableToSet(Set, set, arguments[0]);\n\
-          }\n\
-          return set;\n\
-        };\n\
-        Set$prototype = SetShim.prototype;\n\
-\n\
-        var decodeKey = function (key) {\n\
-          var k = key;\n\
-          if (k === '^null') {\n\
-            return null;\n\
-          } else if (k === '^undefined') {\n\
-            return void 0;\n\
-          } else {\n\
-            var first = k.charAt(0);\n\
-            if (first === '$') {\n\
-              return _strSlice(k, 1);\n\
-            } else if (first === 'n') {\n\
-              return +_strSlice(k, 1);\n\
-            } else if (first === 'b') {\n\
-              return k === 'btrue';\n\
-            }\n\
-          }\n\
-          return +k;\n\
-        };\n\
-        // Switch from the object backing storage to a full Map.\n\
-        var ensureMap = function ensureMap(set) {\n\
-          if (!set['[[SetData]]']) {\n\
-            var m = set['[[SetData]]'] = new collectionShims.Map();\n\
-            _forEach(keys(set._storage), function (key) {\n\
-              var k = decodeKey(key);\n\
-              m.set(k, k);\n\
-            });\n\
-            set['[[SetData]]'] = m;\n\
-          }\n\
-          set._storage = null; // free old backing storage\n\
-        };\n\
-\n\
-        Value.getter(SetShim.prototype, 'size', function () {\n\
-          requireSetSlot(this, 'size');\n\
-          if (this._storage) {\n\
-            return keys(this._storage).length;\n\
-          }\n\
-          ensureMap(this);\n\
-          return this['[[SetData]]'].size;\n\
-        });\n\
-\n\
-        defineProperties(SetShim.prototype, {\n\
-          has: function has(key) {\n\
-            requireSetSlot(this, 'has');\n\
-            var fkey;\n\
-            if (this._storage && (fkey = fastkey(key)) !== null) {\n\
-              return !!this._storage[fkey];\n\
-            }\n\
-            ensureMap(this);\n\
-            return this['[[SetData]]'].has(key);\n\
-          },\n\
-\n\
-          add: function add(key) {\n\
-            requireSetSlot(this, 'add');\n\
-            var fkey;\n\
-            if (this._storage && (fkey = fastkey(key)) !== null) {\n\
-              this._storage[fkey] = true;\n\
-              return this;\n\
-            }\n\
-            ensureMap(this);\n\
-            this['[[SetData]]'].set(key, key);\n\
-            return this;\n\
-          },\n\
-\n\
-          'delete': function (key) {\n\
-            requireSetSlot(this, 'delete');\n\
-            var fkey;\n\
-            if (this._storage && (fkey = fastkey(key)) !== null) {\n\
-              var hasFKey = _hasOwnProperty(this._storage, fkey);\n\
-              return (delete this._storage[fkey]) && hasFKey;\n\
-            }\n\
-            ensureMap(this);\n\
-            return this['[[SetData]]']['delete'](key);\n\
-          },\n\
-\n\
-          clear: function clear() {\n\
-            requireSetSlot(this, 'clear');\n\
-            if (this._storage) {\n\
-              this._storage = emptyObject();\n\
-            }\n\
-            if (this['[[SetData]]']) {\n\
-              this['[[SetData]]'].clear();\n\
-            }\n\
-          },\n\
-\n\
-          values: function values() {\n\
-            requireSetSlot(this, 'values');\n\
-            ensureMap(this);\n\
-            return this['[[SetData]]'].values();\n\
-          },\n\
-\n\
-          entries: function entries() {\n\
-            requireSetSlot(this, 'entries');\n\
-            ensureMap(this);\n\
-            return this['[[SetData]]'].entries();\n\
-          },\n\
-\n\
-          forEach: function forEach(callback) {\n\
-            requireSetSlot(this, 'forEach');\n\
-            var context = arguments.length > 1 ? arguments[1] : null;\n\
-            var entireSet = this;\n\
-            ensureMap(entireSet);\n\
-            this['[[SetData]]'].forEach(function (value, key) {\n\
-              if (context) {\n\
-                _call(callback, context, key, key, entireSet);\n\
-              } else {\n\
-                callback(key, key, entireSet);\n\
-              }\n\
-            });\n\
-          }\n\
-        });\n\
-        defineProperty(SetShim.prototype, 'keys', SetShim.prototype.values, true);\n\
-        addIterator(SetShim.prototype, SetShim.prototype.values);\n\
-\n\
-        return SetShim;\n\
-      }())\n\
-    };\n\
-\n\
-    if (globals.Map || globals.Set) {\n\
-      // Safari 8, for example, doesn't accept an iterable.\n\
-      var mapAcceptsArguments = valueOrFalseIfThrows(function () { return new Map([[1, 2]]).get(1) === 2; });\n\
-      if (!mapAcceptsArguments) {\n\
-        var OrigMapNoArgs = globals.Map;\n\
-        globals.Map = function Map() {\n\
-          if (!(this instanceof Map)) {\n\
-            throw new TypeError('Constructor Map requires \"new\"');\n\
-          }\n\
-          var m = new OrigMapNoArgs();\n\
-          if (arguments.length > 0) {\n\
-            addIterableToMap(Map, m, arguments[0]);\n\
-          }\n\
-          delete m.constructor;\n\
-          Object.setPrototypeOf(m, globals.Map.prototype);\n\
-          return m;\n\
-        };\n\
-        globals.Map.prototype = create(OrigMapNoArgs.prototype);\n\
-        defineProperty(globals.Map.prototype, 'constructor', globals.Map, true);\n\
-        Value.preserveToString(globals.Map, OrigMapNoArgs);\n\
-      }\n\
-      var testMap = new Map();\n\
-      var mapUsesSameValueZero = (function () {\n\
-        // Chrome 38-42, node 0.11/0.12, iojs 1/2 also have a bug when the Map has a size > 4\n\
-        var m = new Map([[1, 0], [2, 0], [3, 0], [4, 0]]);\n\
-        m.set(-0, m);\n\
-        return m.get(0) === m && m.get(-0) === m && m.has(0) && m.has(-0);\n\
-      }());\n\
-      var mapSupportsChaining = testMap.set(1, 2) === testMap;\n\
-      if (!mapUsesSameValueZero || !mapSupportsChaining) {\n\
-        var origMapSet = Map.prototype.set;\n\
-        overrideNative(Map.prototype, 'set', function set(k, v) {\n\
-          _call(origMapSet, this, k === 0 ? 0 : k, v);\n\
-          return this;\n\
-        });\n\
-      }\n\
-      if (!mapUsesSameValueZero) {\n\
-        var origMapGet = Map.prototype.get;\n\
-        var origMapHas = Map.prototype.has;\n\
-        defineProperties(Map.prototype, {\n\
-          get: function get(k) {\n\
-            return _call(origMapGet, this, k === 0 ? 0 : k);\n\
-          },\n\
-          has: function has(k) {\n\
-            return _call(origMapHas, this, k === 0 ? 0 : k);\n\
-          }\n\
-        }, true);\n\
-        Value.preserveToString(Map.prototype.get, origMapGet);\n\
-        Value.preserveToString(Map.prototype.has, origMapHas);\n\
-      }\n\
-      var testSet = new Set();\n\
-      var setUsesSameValueZero = (function (s) {\n\
-        s['delete'](0);\n\
-        s.add(-0);\n\
-        return !s.has(0);\n\
-      }(testSet));\n\
-      var setSupportsChaining = testSet.add(1) === testSet;\n\
-      if (!setUsesSameValueZero || !setSupportsChaining) {\n\
-        var origSetAdd = Set.prototype.add;\n\
-        Set.prototype.add = function add(v) {\n\
-          _call(origSetAdd, this, v === 0 ? 0 : v);\n\
-          return this;\n\
-        };\n\
-        Value.preserveToString(Set.prototype.add, origSetAdd);\n\
-      }\n\
-      if (!setUsesSameValueZero) {\n\
-        var origSetHas = Set.prototype.has;\n\
-        Set.prototype.has = function has(v) {\n\
-          return _call(origSetHas, this, v === 0 ? 0 : v);\n\
-        };\n\
-        Value.preserveToString(Set.prototype.has, origSetHas);\n\
-        var origSetDel = Set.prototype['delete'];\n\
-        Set.prototype['delete'] = function SetDelete(v) {\n\
-          return _call(origSetDel, this, v === 0 ? 0 : v);\n\
-        };\n\
-        Value.preserveToString(Set.prototype['delete'], origSetDel);\n\
-      }\n\
-      var mapSupportsSubclassing = supportsSubclassing(globals.Map, function (M) {\n\
-        var m = new M([]);\n\
-        // Firefox 32 is ok with the instantiating the subclass but will\n\
-        // throw when the map is used.\n\
-        m.set(42, 42);\n\
-        return m instanceof M;\n\
-      });\n\
-      var mapFailsToSupportSubclassing = Object.setPrototypeOf && !mapSupportsSubclassing; // without Object.setPrototypeOf, subclassing is not possible\n\
-      var mapRequiresNew = (function () {\n\
-        try {\n\
-          return !(globals.Map() instanceof globals.Map);\n\
-        } catch (e) {\n\
-          return e instanceof TypeError;\n\
-        }\n\
-      }());\n\
-      if (globals.Map.length !== 0 || mapFailsToSupportSubclassing || !mapRequiresNew) {\n\
-        var OrigMap = globals.Map;\n\
-        globals.Map = function Map() {\n\
-          if (!(this instanceof Map)) {\n\
-            throw new TypeError('Constructor Map requires \"new\"');\n\
-          }\n\
-          var m = new OrigMap();\n\
-          if (arguments.length > 0) {\n\
-            addIterableToMap(Map, m, arguments[0]);\n\
-          }\n\
-          delete m.constructor;\n\
-          Object.setPrototypeOf(m, Map.prototype);\n\
-          return m;\n\
-        };\n\
-        globals.Map.prototype = OrigMap.prototype;\n\
-        defineProperty(globals.Map.prototype, 'constructor', globals.Map, true);\n\
-        Value.preserveToString(globals.Map, OrigMap);\n\
-      }\n\
-      var setSupportsSubclassing = supportsSubclassing(globals.Set, function (S) {\n\
-        var s = new S([]);\n\
-        s.add(42, 42);\n\
-        return s instanceof S;\n\
-      });\n\
-      var setFailsToSupportSubclassing = Object.setPrototypeOf && !setSupportsSubclassing; // without Object.setPrototypeOf, subclassing is not possible\n\
-      var setRequiresNew = (function () {\n\
-        try {\n\
-          return !(globals.Set() instanceof globals.Set);\n\
-        } catch (e) {\n\
-          return e instanceof TypeError;\n\
-        }\n\
-      }());\n\
-      if (globals.Set.length !== 0 || setFailsToSupportSubclassing || !setRequiresNew) {\n\
-        var OrigSet = globals.Set;\n\
-        globals.Set = function Set() {\n\
-          if (!(this instanceof Set)) {\n\
-            throw new TypeError('Constructor Set requires \"new\"');\n\
-          }\n\
-          var s = new OrigSet();\n\
-          if (arguments.length > 0) {\n\
-            addIterableToSet(Set, s, arguments[0]);\n\
-          }\n\
-          delete s.constructor;\n\
-          Object.setPrototypeOf(s, Set.prototype);\n\
-          return s;\n\
-        };\n\
-        globals.Set.prototype = OrigSet.prototype;\n\
-        defineProperty(globals.Set.prototype, 'constructor', globals.Set, true);\n\
-        Value.preserveToString(globals.Set, OrigSet);\n\
-      }\n\
-      var mapIterationThrowsStopIterator = !valueOrFalseIfThrows(function () {\n\
-        return (new Map()).keys().next().done;\n\
-      });\n\
-      /*\n\
-        - In Firefox < 23, Map#size is a function.\n\
-        - In all current Firefox, Set#entries/keys/values & Map#clear do not exist\n\
-        - https://bugzilla.mozilla.org/show_bug.cgi?id=869996\n\
-        - In Firefox 24, Map and Set do not implement forEach\n\
-        - In Firefox 25 at least, Map and Set are callable without \"new\"\n\
-      */\n\
-      if (\n\
-        typeof globals.Map.prototype.clear !== 'function' ||\n\
-        new globals.Set().size !== 0 ||\n\
-        new globals.Map().size !== 0 ||\n\
-        typeof globals.Map.prototype.keys !== 'function' ||\n\
-        typeof globals.Set.prototype.keys !== 'function' ||\n\
-        typeof globals.Map.prototype.forEach !== 'function' ||\n\
-        typeof globals.Set.prototype.forEach !== 'function' ||\n\
-        isCallableWithoutNew(globals.Map) ||\n\
-        isCallableWithoutNew(globals.Set) ||\n\
-        typeof (new globals.Map().keys().next) !== 'function' || // Safari 8\n\
-        mapIterationThrowsStopIterator || // Firefox 25\n\
-        !mapSupportsSubclassing\n\
-      ) {\n\
-        defineProperties(globals, {\n\
-          Map: collectionShims.Map,\n\
-          Set: collectionShims.Set\n\
-        }, true);\n\
-      }\n\
-\n\
-      if (globals.Set.prototype.keys !== globals.Set.prototype.values) {\n\
-        // Fixed in WebKit with https://bugs.webkit.org/show_bug.cgi?id=144190\n\
-        defineProperty(globals.Set.prototype, 'keys', globals.Set.prototype.values, true);\n\
-      }\n\
-\n\
-      // Shim incomplete iterator implementations.\n\
-      addIterator(Object.getPrototypeOf((new globals.Map()).keys()));\n\
-      addIterator(Object.getPrototypeOf((new globals.Set()).keys()));\n\
-\n\
-      if (functionsHaveNames && globals.Set.prototype.has.name !== 'has') {\n\
-        // Microsoft Edge v0.11.10074.0 is missing a name on Set#has\n\
-        var anonymousSetHas = globals.Set.prototype.has;\n\
-        overrideNative(globals.Set.prototype, 'has', function has(key) {\n\
-          return _call(anonymousSetHas, this, key);\n\
-        });\n\
-      }\n\
-    }\n\
-    defineProperties(globals, collectionShims);\n\
-    addDefaultSpecies(globals.Map);\n\
-    addDefaultSpecies(globals.Set);\n\
-  }\n\
-\n\
-  var throwUnlessTargetIsObject = function throwUnlessTargetIsObject(target) {\n\
-    if (!ES.TypeIsObject(target)) {\n\
-      throw new TypeError('target must be an object');\n\
-    }\n\
-  };\n\
-\n\
-  // Some Reflect methods are basically the same as\n\
-  // those on the Object global, except that a TypeError is thrown if\n\
-  // target isn't an object. As well as returning a boolean indicating\n\
-  // the success of the operation.\n\
-  var ReflectShims = {\n\
-    // Apply method in a functional form.\n\
-    apply: function apply() {\n\
-      return ES.Call(ES.Call, null, arguments);\n\
-    },\n\
-\n\
-    // New operator in a functional form.\n\
-    construct: function construct(constructor, args) {\n\
-      if (!ES.IsConstructor(constructor)) {\n\
-        throw new TypeError('First argument must be a constructor.');\n\
-      }\n\
-      var newTarget = arguments.length > 2 ? arguments[2] : constructor;\n\
-      if (!ES.IsConstructor(newTarget)) {\n\
-        throw new TypeError('new.target must be a constructor.');\n\
-      }\n\
-      return ES.Construct(constructor, args, newTarget, 'internal');\n\
-    },\n\
-\n\
-    // When deleting a non-existent or configurable property,\n\
-    // true is returned.\n\
-    // When attempting to delete a non-configurable property,\n\
-    // it will return false.\n\
-    deleteProperty: function deleteProperty(target, key) {\n\
-      throwUnlessTargetIsObject(target);\n\
-      if (supportsDescriptors) {\n\
-        var desc = Object.getOwnPropertyDescriptor(target, key);\n\
-\n\
-        if (desc && !desc.configurable) {\n\
-          return false;\n\
-        }\n\
-      }\n\
-\n\
-      // Will return true.\n\
-      return delete target[key];\n\
-    },\n\
-\n\
-    enumerate: function enumerate(target) {\n\
-      throwUnlessTargetIsObject(target);\n\
-      return new ObjectIterator(target, 'key');\n\
-    },\n\
-\n\
-    has: function has(target, key) {\n\
-      throwUnlessTargetIsObject(target);\n\
-      return key in target;\n\
-    }\n\
-  };\n\
-\n\
-  if (Object.getOwnPropertyNames) {\n\
-    Object.assign(ReflectShims, {\n\
-      // Basically the result of calling the internal [[OwnPropertyKeys]].\n\
-      // Concatenating propertyNames and propertySymbols should do the trick.\n\
-      // This should continue to work together with a Symbol shim\n\
-      // which overrides Object.getOwnPropertyNames and implements\n\
-      // Object.getOwnPropertySymbols.\n\
-      ownKeys: function ownKeys(target) {\n\
-        throwUnlessTargetIsObject(target);\n\
-        var keys = Object.getOwnPropertyNames(target);\n\
-\n\
-        if (ES.IsCallable(Object.getOwnPropertySymbols)) {\n\
-          _pushApply(keys, Object.getOwnPropertySymbols(target));\n\
-        }\n\
-\n\
-        return keys;\n\
-      }\n\
-    });\n\
-  }\n\
-\n\
-  var callAndCatchException = function ConvertExceptionToBoolean(func) {\n\
-    return !throwsError(func);\n\
-  };\n\
-\n\
-  if (Object.preventExtensions) {\n\
-    Object.assign(ReflectShims, {\n\
-      isExtensible: function isExtensible(target) {\n\
-        throwUnlessTargetIsObject(target);\n\
-        return Object.isExtensible(target);\n\
-      },\n\
-      preventExtensions: function preventExtensions(target) {\n\
-        throwUnlessTargetIsObject(target);\n\
-        return callAndCatchException(function () {\n\
-          Object.preventExtensions(target);\n\
-        });\n\
-      }\n\
-    });\n\
-  }\n\
-\n\
-  if (supportsDescriptors) {\n\
-    var internalGet = function get(target, key, receiver) {\n\
-      var desc = Object.getOwnPropertyDescriptor(target, key);\n\
-\n\
-      if (!desc) {\n\
-        var parent = Object.getPrototypeOf(target);\n\
-\n\
-        if (parent === null) {\n\
-          return void 0;\n\
-        }\n\
-\n\
-        return internalGet(parent, key, receiver);\n\
-      }\n\
-\n\
-      if ('value' in desc) {\n\
-        return desc.value;\n\
-      }\n\
-\n\
-      if (desc.get) {\n\
-        return ES.Call(desc.get, receiver);\n\
-      }\n\
-\n\
-      return void 0;\n\
-    };\n\
-\n\
-    var internalSet = function set(target, key, value, receiver) {\n\
-      var desc = Object.getOwnPropertyDescriptor(target, key);\n\
-\n\
-      if (!desc) {\n\
-        var parent = Object.getPrototypeOf(target);\n\
-\n\
-        if (parent !== null) {\n\
-          return internalSet(parent, key, value, receiver);\n\
-        }\n\
-\n\
-        desc = {\n\
-          value: void 0,\n\
-          writable: true,\n\
-          enumerable: true,\n\
-          configurable: true\n\
-        };\n\
-      }\n\
-\n\
-      if ('value' in desc) {\n\
-        if (!desc.writable) {\n\
-          return false;\n\
-        }\n\
-\n\
-        if (!ES.TypeIsObject(receiver)) {\n\
-          return false;\n\
-        }\n\
-\n\
-        var existingDesc = Object.getOwnPropertyDescriptor(receiver, key);\n\
-\n\
-        if (existingDesc) {\n\
-          return Reflect.defineProperty(receiver, key, {\n\
-            value: value\n\
-          });\n\
-        } else {\n\
-          return Reflect.defineProperty(receiver, key, {\n\
-            value: value,\n\
-            writable: true,\n\
-            enumerable: true,\n\
-            configurable: true\n\
-          });\n\
-        }\n\
-      }\n\
-\n\
-      if (desc.set) {\n\
-        _call(desc.set, receiver, value);\n\
-        return true;\n\
-      }\n\
-\n\
-      return false;\n\
-    };\n\
-\n\
-    Object.assign(ReflectShims, {\n\
-      defineProperty: function defineProperty(target, propertyKey, attributes) {\n\
-        throwUnlessTargetIsObject(target);\n\
-        return callAndCatchException(function () {\n\
-          Object.defineProperty(target, propertyKey, attributes);\n\
-        });\n\
-      },\n\
-\n\
-      getOwnPropertyDescriptor: function getOwnPropertyDescriptor(target, propertyKey) {\n\
-        throwUnlessTargetIsObject(target);\n\
-        return Object.getOwnPropertyDescriptor(target, propertyKey);\n\
-      },\n\
-\n\
-      // Syntax in a functional form.\n\
-      get: function get(target, key) {\n\
-        throwUnlessTargetIsObject(target);\n\
-        var receiver = arguments.length > 2 ? arguments[2] : target;\n\
-\n\
-        return internalGet(target, key, receiver);\n\
-      },\n\
-\n\
-      set: function set(target, key, value) {\n\
-        throwUnlessTargetIsObject(target);\n\
-        var receiver = arguments.length > 3 ? arguments[3] : target;\n\
-\n\
-        return internalSet(target, key, value, receiver);\n\
-      }\n\
-    });\n\
-  }\n\
-\n\
-  if (Object.getPrototypeOf) {\n\
-    var objectDotGetPrototypeOf = Object.getPrototypeOf;\n\
-    ReflectShims.getPrototypeOf = function getPrototypeOf(target) {\n\
-      throwUnlessTargetIsObject(target);\n\
-      return objectDotGetPrototypeOf(target);\n\
-    };\n\
-  }\n\
-\n\
-  if (Object.setPrototypeOf && ReflectShims.getPrototypeOf) {\n\
-    var willCreateCircularPrototype = function (object, lastProto) {\n\
-      var proto = lastProto;\n\
-      while (proto) {\n\
-        if (object === proto) {\n\
-          return true;\n\
-        }\n\
-        proto = ReflectShims.getPrototypeOf(proto);\n\
-      }\n\
-      return false;\n\
-    };\n\
-\n\
-    Object.assign(ReflectShims, {\n\
-      // Sets the prototype of the given object.\n\
-      // Returns true on success, otherwise false.\n\
-      setPrototypeOf: function setPrototypeOf(object, proto) {\n\
-        throwUnlessTargetIsObject(object);\n\
-        if (proto !== null && !ES.TypeIsObject(proto)) {\n\
-          throw new TypeError('proto must be an object or null');\n\
-        }\n\
-\n\
-        // If they already are the same, we're done.\n\
-        if (proto === Reflect.getPrototypeOf(object)) {\n\
-          return true;\n\
-        }\n\
-\n\
-        // Cannot alter prototype if object not extensible.\n\
-        if (Reflect.isExtensible && !Reflect.isExtensible(object)) {\n\
-          return false;\n\
-        }\n\
-\n\
-        // Ensure that we do not create a circular prototype chain.\n\
-        if (willCreateCircularPrototype(object, proto)) {\n\
-          return false;\n\
-        }\n\
-\n\
-        Object.setPrototypeOf(object, proto);\n\
-\n\
-        return true;\n\
-      }\n\
-    });\n\
-  }\n\
-  var defineOrOverrideReflectProperty = function (key, shim) {\n\
-    if (!ES.IsCallable(globals.Reflect[key])) {\n\
-      defineProperty(globals.Reflect, key, shim);\n\
-    } else {\n\
-      var acceptsPrimitives = valueOrFalseIfThrows(function () {\n\
-        globals.Reflect[key](1);\n\
-        globals.Reflect[key](NaN);\n\
-        globals.Reflect[key](true);\n\
-        return true;\n\
-      });\n\
-      if (acceptsPrimitives) {\n\
-        overrideNative(globals.Reflect, key, shim);\n\
-      }\n\
-    }\n\
-  };\n\
-  Object.keys(ReflectShims).forEach(function (key) {\n\
-    defineOrOverrideReflectProperty(key, ReflectShims[key]);\n\
-  });\n\
-  if (functionsHaveNames && globals.Reflect.getPrototypeOf.name !== 'getPrototypeOf') {\n\
-    var originalReflectGetProto = globals.Reflect.getPrototypeOf;\n\
-    overrideNative(globals.Reflect, 'getPrototypeOf', function getPrototypeOf(target) {\n\
-      return _call(originalReflectGetProto, globals.Reflect, target);\n\
-    });\n\
-  }\n\
-  if (globals.Reflect.setPrototypeOf) {\n\
-    if (valueOrFalseIfThrows(function () {\n\
-      globals.Reflect.setPrototypeOf(1, {});\n\
-      return true;\n\
-    })) {\n\
-      overrideNative(globals.Reflect, 'setPrototypeOf', ReflectShims.setPrototypeOf);\n\
-    }\n\
-  }\n\
-  if (globals.Reflect.defineProperty) {\n\
-    if (!valueOrFalseIfThrows(function () {\n\
-      var basic = !globals.Reflect.defineProperty(1, 'test', { value: 1 });\n\
-      // \"extensible\" fails on Edge 0.12\n\
-      var extensible = typeof Object.preventExtensions !== 'function' || !globals.Reflect.defineProperty(Object.preventExtensions({}), 'test', {});\n\
-      return basic && extensible;\n\
-    })) {\n\
-      overrideNative(globals.Reflect, 'defineProperty', ReflectShims.defineProperty);\n\
-    }\n\
-  }\n\
-  if (globals.Reflect.construct) {\n\
-    if (!valueOrFalseIfThrows(function () {\n\
-      var F = function F() {};\n\
-      return globals.Reflect.construct(function () {}, [], F) instanceof F;\n\
-    })) {\n\
-      overrideNative(globals.Reflect, 'construct', ReflectShims.construct);\n\
-    }\n\
-  }\n\
-\n\
-  if (String(new Date(NaN)) !== 'Invalid Date') {\n\
-    var dateToString = Date.prototype.toString;\n\
-    var shimmedDateToString = function toString() {\n\
-      var valueOf = +this;\n\
-      if (valueOf !== valueOf) {\n\
-        return 'Invalid Date';\n\
-      }\n\
-      return ES.Call(dateToString, this);\n\
-    };\n\
-    overrideNative(Date.prototype, 'toString', shimmedDateToString);\n\
-  }\n\
-\n\
-  // Annex B HTML methods\n\
-  // https://people.mozilla.org/~jorendorff/es6-draft.html#sec-additional-properties-of-the-string.prototype-object\n\
-  var stringHTMLshims = {\n\
-    anchor: function anchor(name) { return ES.CreateHTML(this, 'a', 'name', name); },\n\
-    big: function big() { return ES.CreateHTML(this, 'big', '', ''); },\n\
-    blink: function blink() { return ES.CreateHTML(this, 'blink', '', ''); },\n\
-    bold: function bold() { return ES.CreateHTML(this, 'b', '', ''); },\n\
-    fixed: function fixed() { return ES.CreateHTML(this, 'tt', '', ''); },\n\
-    fontcolor: function fontcolor(color) { return ES.CreateHTML(this, 'font', 'color', color); },\n\
-    fontsize: function fontsize(size) { return ES.CreateHTML(this, 'font', 'size', size); },\n\
-    italics: function italics() { return ES.CreateHTML(this, 'i', '', ''); },\n\
-    link: function link(url) { return ES.CreateHTML(this, 'a', 'href', url); },\n\
-    small: function small() { return ES.CreateHTML(this, 'small', '', ''); },\n\
-    strike: function strike() { return ES.CreateHTML(this, 'strike', '', ''); },\n\
-    sub: function sub() { return ES.CreateHTML(this, 'sub', '', ''); },\n\
-    sup: function sub() { return ES.CreateHTML(this, 'sup', '', ''); }\n\
-  };\n\
-  _forEach(Object.keys(stringHTMLshims), function (key) {\n\
-    var method = String.prototype[key];\n\
-    var shouldOverwrite = false;\n\
-    if (ES.IsCallable(method)) {\n\
-      var output = _call(method, '', ' \" ');\n\
-      var quotesCount = _concat([], output.match(/\"/g)).length;\n\
-      shouldOverwrite = output !== output.toLowerCase() || quotesCount > 2;\n\
-    } else {\n\
-      shouldOverwrite = true;\n\
-    }\n\
-    if (shouldOverwrite) {\n\
-      overrideNative(String.prototype, key, stringHTMLshims[key]);\n\
-    }\n\
-  });\n\
-\n\
-  var JSONstringifiesSymbols = (function () {\n\
-    // Microsoft Edge v0.12 stringifies Symbols incorrectly\n\
-    if (!hasSymbols) { return false; } // Symbols are not supported\n\
-    var stringify = typeof JSON === 'object' && typeof JSON.stringify === 'function' ? JSON.stringify : null;\n\
-    if (!stringify) { return false; } // JSON.stringify is not supported\n\
-    if (typeof stringify(Symbol()) !== 'undefined') { return true; } // Symbols should become `undefined`\n\
-    if (stringify([Symbol()]) !== '[null]') { return true; } // Symbols in arrays should become `null`\n\
-    var obj = { a: Symbol() };\n\
-    obj[Symbol()] = true;\n\
-    if (stringify(obj) !== '{}') { return true; } // Symbol-valued keys *and* Symbol-valued properties should be omitted\n\
-    return false;\n\
-  }());\n\
-  var JSONstringifyAcceptsObjectSymbol = valueOrFalseIfThrows(function () {\n\
-    // Chrome 45 throws on stringifying object symbols\n\
-    if (!hasSymbols) { return true; } // Symbols are not supported\n\
-    return JSON.stringify(Object(Symbol())) === '{}' && JSON.stringify([Object(Symbol())]) === '[{}]';\n\
-  });\n\
-  if (JSONstringifiesSymbols || !JSONstringifyAcceptsObjectSymbol) {\n\
-    var origStringify = JSON.stringify;\n\
-    overrideNative(JSON, 'stringify', function stringify(value) {\n\
-      if (typeof value === 'symbol') { return; }\n\
-      var replacer;\n\
-      if (arguments.length > 1) {\n\
-        replacer = arguments[1];\n\
-      }\n\
-      var args = [value];\n\
-      if (!isArray(replacer)) {\n\
-        var replaceFn = ES.IsCallable(replacer) ? replacer : null;\n\
-        var wrappedReplacer = function (key, val) {\n\
-          var parsedValue = replaceFn ? _call(replaceFn, this, key, val) : val;\n\
-          if (typeof parsedValue !== 'symbol') {\n\
-            if (Type.symbol(parsedValue)) {\n\
-              return assignTo({})(parsedValue);\n\
-            } else {\n\
-              return parsedValue;\n\
-            }\n\
-          }\n\
-        };\n\
-        args.push(wrappedReplacer);\n\
-      } else {\n\
-        // create wrapped replacer that handles an array replacer?\n\
-        args.push(replacer);\n\
-      }\n\
-      if (arguments.length > 2) {\n\
-        args.push(arguments[2]);\n\
-      }\n\
-      return origStringify.apply(this, args);\n\
-    });\n\
-  }\n\
-\n\
-  return globals;\n\
-}));\n\
-\n\
-//# sourceURL=components/es-shims/es6-shim/0.34.2/es6-shim.js"
-));
-
-require.modules["es-shims-es6-shim"] = require.modules["es-shims~es6-shim@0.34.2"];
-require.modules["es-shims~es6-shim"] = require.modules["es-shims~es6-shim@0.34.2"];
-require.modules["es6-shim"] = require.modules["es-shims~es6-shim@0.34.2"];
-
-
 require.register("components~jquery@1.11.2", Function("exports, module",
 "/*!\n\
  * jQuery JavaScript Library v1.11.2\n\
@@ -21113,6 +17384,3735 @@ if (typeof jQuery === 'undefined') {\n\
 require.modules["components-bootstrap"] = require.modules["components~bootstrap@3.3.2"];
 require.modules["components~bootstrap"] = require.modules["components~bootstrap@3.3.2"];
 require.modules["bootstrap"] = require.modules["components~bootstrap@3.3.2"];
+
+
+require.register("es-shims~es6-shim@0.34.2", Function("exports, module",
+" /*!\n\
+  * https://github.com/paulmillr/es6-shim\n\
+  * @license es6-shim Copyright 2013-2016 by Paul Miller (http://paulmillr.com)\n\
+  *   and contributors,  MIT License\n\
+  * es6-shim: v0.34.2\n\
+  * see https://github.com/paulmillr/es6-shim/blob/0.34.2/LICENSE\n\
+  * Details and documentation:\n\
+  * https://github.com/paulmillr/es6-shim/\n\
+  */\n\
+\n\
+// UMD (Universal Module Definition)\n\
+// see https://github.com/umdjs/umd/blob/master/returnExports.js\n\
+(function (root, factory) {\n\
+  /*global define, module, exports */\n\
+  if (typeof define === 'function' && define.amd) {\n\
+    // AMD. Register as an anonymous module.\n\
+    define(factory);\n\
+  } else if (typeof exports === 'object') {\n\
+    // Node. Does not work with strict CommonJS, but\n\
+    // only CommonJS-like environments that support module.exports,\n\
+    // like Node.\n\
+    module.exports = factory();\n\
+  } else {\n\
+    // Browser globals (root is window)\n\
+    root.returnExports = factory();\n\
+  }\n\
+}(this, function () {\n\
+  'use strict';\n\
+\n\
+  var _apply = Function.call.bind(Function.apply);\n\
+  var _call = Function.call.bind(Function.call);\n\
+  var isArray = Array.isArray;\n\
+  var keys = Object.keys;\n\
+\n\
+  var not = function notThunker(func) {\n\
+    return function notThunk() { return !_apply(func, this, arguments); };\n\
+  };\n\
+  var throwsError = function (func) {\n\
+    try {\n\
+      func();\n\
+      return false;\n\
+    } catch (e) {\n\
+      return true;\n\
+    }\n\
+  };\n\
+  var valueOrFalseIfThrows = function valueOrFalseIfThrows(func) {\n\
+    try {\n\
+      return func();\n\
+    } catch (e) {\n\
+      return false;\n\
+    }\n\
+  };\n\
+\n\
+  var isCallableWithoutNew = not(throwsError);\n\
+  var arePropertyDescriptorsSupported = function () {\n\
+    // if Object.defineProperty exists but throws, it's IE 8\n\
+    return !throwsError(function () { Object.defineProperty({}, 'x', { get: function () {} }); });\n\
+  };\n\
+  var supportsDescriptors = !!Object.defineProperty && arePropertyDescriptorsSupported();\n\
+  var functionsHaveNames = (function foo() {}).name === 'foo';\n\
+\n\
+  var _forEach = Function.call.bind(Array.prototype.forEach);\n\
+  var _reduce = Function.call.bind(Array.prototype.reduce);\n\
+  var _filter = Function.call.bind(Array.prototype.filter);\n\
+  var _some = Function.call.bind(Array.prototype.some);\n\
+\n\
+  var defineProperty = function (object, name, value, force) {\n\
+    if (!force && name in object) { return; }\n\
+    if (supportsDescriptors) {\n\
+      Object.defineProperty(object, name, {\n\
+        configurable: true,\n\
+        enumerable: false,\n\
+        writable: true,\n\
+        value: value\n\
+      });\n\
+    } else {\n\
+      object[name] = value;\n\
+    }\n\
+  };\n\
+\n\
+  // Define configurable, writable and non-enumerable props\n\
+  // if they don’t exist.\n\
+  var defineProperties = function (object, map, forceOverride) {\n\
+    _forEach(keys(map), function (name) {\n\
+      var method = map[name];\n\
+      defineProperty(object, name, method, !!forceOverride);\n\
+    });\n\
+  };\n\
+\n\
+  var _toString = Function.call.bind(Object.prototype.toString);\n\
+  var isCallable = typeof /abc/ === 'function' ? function IsCallableSlow(x) {\n\
+    // Some old browsers (IE, FF) say that typeof /abc/ === 'function'\n\
+    return typeof x === 'function' && _toString(x) === '[object Function]';\n\
+  } : function IsCallableFast(x) { return typeof x === 'function'; };\n\
+\n\
+  var Value = {\n\
+    getter: function (object, name, getter) {\n\
+      if (!supportsDescriptors) {\n\
+        throw new TypeError('getters require true ES5 support');\n\
+      }\n\
+      Object.defineProperty(object, name, {\n\
+        configurable: true,\n\
+        enumerable: false,\n\
+        get: getter\n\
+      });\n\
+    },\n\
+    proxy: function (originalObject, key, targetObject) {\n\
+      if (!supportsDescriptors) {\n\
+        throw new TypeError('getters require true ES5 support');\n\
+      }\n\
+      var originalDescriptor = Object.getOwnPropertyDescriptor(originalObject, key);\n\
+      Object.defineProperty(targetObject, key, {\n\
+        configurable: originalDescriptor.configurable,\n\
+        enumerable: originalDescriptor.enumerable,\n\
+        get: function getKey() { return originalObject[key]; },\n\
+        set: function setKey(value) { originalObject[key] = value; }\n\
+      });\n\
+    },\n\
+    redefine: function (object, property, newValue) {\n\
+      if (supportsDescriptors) {\n\
+        var descriptor = Object.getOwnPropertyDescriptor(object, property);\n\
+        descriptor.value = newValue;\n\
+        Object.defineProperty(object, property, descriptor);\n\
+      } else {\n\
+        object[property] = newValue;\n\
+      }\n\
+    },\n\
+    defineByDescriptor: function (object, property, descriptor) {\n\
+      if (supportsDescriptors) {\n\
+        Object.defineProperty(object, property, descriptor);\n\
+      } else if ('value' in descriptor) {\n\
+        object[property] = descriptor.value;\n\
+      }\n\
+    },\n\
+    preserveToString: function (target, source) {\n\
+      if (source && isCallable(source.toString)) {\n\
+        defineProperty(target, 'toString', source.toString.bind(source), true);\n\
+      }\n\
+    }\n\
+  };\n\
+\n\
+  // Simple shim for Object.create on ES3 browsers\n\
+  // (unlike real shim, no attempt to support `prototype === null`)\n\
+  var create = Object.create || function (prototype, properties) {\n\
+    var Prototype = function Prototype() {};\n\
+    Prototype.prototype = prototype;\n\
+    var object = new Prototype();\n\
+    if (typeof properties !== 'undefined') {\n\
+      keys(properties).forEach(function (key) {\n\
+        Value.defineByDescriptor(object, key, properties[key]);\n\
+      });\n\
+    }\n\
+    return object;\n\
+  };\n\
+\n\
+  var supportsSubclassing = function (C, f) {\n\
+    if (!Object.setPrototypeOf) { return false; /* skip test on IE < 11 */ }\n\
+    return valueOrFalseIfThrows(function () {\n\
+      var Sub = function Subclass(arg) {\n\
+        var o = new C(arg);\n\
+        Object.setPrototypeOf(o, Subclass.prototype);\n\
+        return o;\n\
+      };\n\
+      Object.setPrototypeOf(Sub, C);\n\
+      Sub.prototype = create(C.prototype, {\n\
+        constructor: { value: Sub }\n\
+      });\n\
+      return f(Sub);\n\
+    });\n\
+  };\n\
+\n\
+  var getGlobal = function () {\n\
+    /* global self, window, global */\n\
+    // the only reliable means to get the global object is\n\
+    // `Function('return this')()`\n\
+    // However, this causes CSP violations in Chrome apps.\n\
+    if (typeof self !== 'undefined') { return self; }\n\
+    if (typeof window !== 'undefined') { return window; }\n\
+    if (typeof global !== 'undefined') { return global; }\n\
+    throw new Error('unable to locate global object');\n\
+  };\n\
+\n\
+  var globals = getGlobal();\n\
+  var globalIsFinite = globals.isFinite;\n\
+  var _indexOf = Function.call.bind(String.prototype.indexOf);\n\
+  var _concat = Function.call.bind(Array.prototype.concat);\n\
+  var _sort = Function.call.bind(Array.prototype.sort);\n\
+  var _strSlice = Function.call.bind(String.prototype.slice);\n\
+  var _push = Function.call.bind(Array.prototype.push);\n\
+  var _pushApply = Function.apply.bind(Array.prototype.push);\n\
+  var _shift = Function.call.bind(Array.prototype.shift);\n\
+  var _max = Math.max;\n\
+  var _min = Math.min;\n\
+  var _floor = Math.floor;\n\
+  var _abs = Math.abs;\n\
+  var _log = Math.log;\n\
+  var _sqrt = Math.sqrt;\n\
+  var _hasOwnProperty = Function.call.bind(Object.prototype.hasOwnProperty);\n\
+  var ArrayIterator; // make our implementation private\n\
+  var noop = function () {};\n\
+\n\
+  var Symbol = globals.Symbol || {};\n\
+  var symbolSpecies = Symbol.species || '@@species';\n\
+\n\
+  var numberIsNaN = Number.isNaN || function isNaN(value) {\n\
+    // NaN !== NaN, but they are identical.\n\
+    // NaNs are the only non-reflexive value, i.e., if x !== x,\n\
+    // then x is NaN.\n\
+    // isNaN is broken: it converts its argument to number, so\n\
+    // isNaN('foo') => true\n\
+    return value !== value;\n\
+  };\n\
+  var numberIsFinite = Number.isFinite || function isFinite(value) {\n\
+    return typeof value === 'number' && globalIsFinite(value);\n\
+  };\n\
+\n\
+  // taken directly from https://github.com/ljharb/is-arguments/blob/master/index.js\n\
+  // can be replaced with require('is-arguments') if we ever use a build process instead\n\
+  var isStandardArguments = function isArguments(value) {\n\
+    return _toString(value) === '[object Arguments]';\n\
+  };\n\
+  var isLegacyArguments = function isArguments(value) {\n\
+    return value !== null &&\n\
+      typeof value === 'object' &&\n\
+      typeof value.length === 'number' &&\n\
+      value.length >= 0 &&\n\
+      _toString(value) !== '[object Array]' &&\n\
+      _toString(value.callee) === '[object Function]';\n\
+  };\n\
+  var isArguments = isStandardArguments(arguments) ? isStandardArguments : isLegacyArguments;\n\
+\n\
+  var Type = {\n\
+    primitive: function (x) { return x === null || (typeof x !== 'function' && typeof x !== 'object'); },\n\
+    object: function (x) { return x !== null && typeof x === 'object'; },\n\
+    string: function (x) { return _toString(x) === '[object String]'; },\n\
+    regex: function (x) { return _toString(x) === '[object RegExp]'; },\n\
+    symbol: function (x) {\n\
+      return typeof globals.Symbol === 'function' && typeof x === 'symbol';\n\
+    }\n\
+  };\n\
+\n\
+  var overrideNative = function overrideNative(object, property, replacement) {\n\
+    var original = object[property];\n\
+    defineProperty(object, property, replacement, true);\n\
+    Value.preserveToString(object[property], original);\n\
+  };\n\
+\n\
+  var hasSymbols = typeof Symbol === 'function' && typeof Symbol['for'] === 'function' && Type.symbol(Symbol());\n\
+\n\
+  // This is a private name in the es6 spec, equal to '[Symbol.iterator]'\n\
+  // we're going to use an arbitrary _-prefixed name to make our shims\n\
+  // work properly with each other, even though we don't have full Iterator\n\
+  // support.  That is, `Array.from(map.keys())` will work, but we don't\n\
+  // pretend to export a \"real\" Iterator interface.\n\
+  var $iterator$ = Type.symbol(Symbol.iterator) ? Symbol.iterator : '_es6-shim iterator_';\n\
+  // Firefox ships a partial implementation using the name @@iterator.\n\
+  // https://bugzilla.mozilla.org/show_bug.cgi?id=907077#c14\n\
+  // So use that name if we detect it.\n\
+  if (globals.Set && typeof new globals.Set()['@@iterator'] === 'function') {\n\
+    $iterator$ = '@@iterator';\n\
+  }\n\
+\n\
+  // Reflect\n\
+  if (!globals.Reflect) {\n\
+    defineProperty(globals, 'Reflect', {});\n\
+  }\n\
+  var Reflect = globals.Reflect;\n\
+\n\
+  var $String = String;\n\
+\n\
+  var ES = {\n\
+    // https://people.mozilla.org/~jorendorff/es6-draft.html#sec-call-f-v-args\n\
+    Call: function Call(F, V) {\n\
+      var args = arguments.length > 2 ? arguments[2] : [];\n\
+      if (!ES.IsCallable(F)) {\n\
+        throw new TypeError(F + ' is not a function');\n\
+      }\n\
+      return _apply(F, V, args);\n\
+    },\n\
+\n\
+    RequireObjectCoercible: function (x, optMessage) {\n\
+      /* jshint eqnull:true */\n\
+      if (x == null) {\n\
+        throw new TypeError(optMessage || 'Cannot call method on ' + x);\n\
+      }\n\
+      return x;\n\
+    },\n\
+\n\
+    // This might miss the \"(non-standard exotic and does not implement\n\
+    // [[Call]])\" case from\n\
+    // http://www.ecma-international.org/ecma-262/6.0/#sec-typeof-operator-runtime-semantics-evaluation\n\
+    // but we can't find any evidence these objects exist in practice.\n\
+    // If we find some in the future, you could test `Object(x) === x`,\n\
+    // which is reliable according to\n\
+    // http://www.ecma-international.org/ecma-262/6.0/#sec-toobject\n\
+    // but is not well optimized by runtimes and creates an object\n\
+    // whenever it returns false, and thus is very slow.\n\
+    TypeIsObject: function (x) {\n\
+      if (x === void 0 || x === null || x === true || x === false) {\n\
+        return false;\n\
+      }\n\
+      return typeof x === 'function' || typeof x === 'object';\n\
+    },\n\
+\n\
+    ToObject: function (o, optMessage) {\n\
+      return Object(ES.RequireObjectCoercible(o, optMessage));\n\
+    },\n\
+\n\
+    IsCallable: isCallable,\n\
+\n\
+    IsConstructor: function (x) {\n\
+      // We can't tell callables from constructors in ES5\n\
+      return ES.IsCallable(x);\n\
+    },\n\
+\n\
+    ToInt32: function (x) {\n\
+      return ES.ToNumber(x) >> 0;\n\
+    },\n\
+\n\
+    ToUint32: function (x) {\n\
+      return ES.ToNumber(x) >>> 0;\n\
+    },\n\
+\n\
+    ToNumber: function (value) {\n\
+      if (_toString(value) === '[object Symbol]') {\n\
+        throw new TypeError('Cannot convert a Symbol value to a number');\n\
+      }\n\
+      return +value;\n\
+    },\n\
+\n\
+    ToInteger: function (value) {\n\
+      var number = ES.ToNumber(value);\n\
+      if (numberIsNaN(number)) { return 0; }\n\
+      if (number === 0 || !numberIsFinite(number)) { return number; }\n\
+      return (number > 0 ? 1 : -1) * _floor(_abs(number));\n\
+    },\n\
+\n\
+    ToLength: function (value) {\n\
+      var len = ES.ToInteger(value);\n\
+      if (len <= 0) { return 0; } // includes converting -0 to +0\n\
+      if (len > Number.MAX_SAFE_INTEGER) { return Number.MAX_SAFE_INTEGER; }\n\
+      return len;\n\
+    },\n\
+\n\
+    SameValue: function (a, b) {\n\
+      if (a === b) {\n\
+        // 0 === -0, but they are not identical.\n\
+        if (a === 0) { return 1 / a === 1 / b; }\n\
+        return true;\n\
+      }\n\
+      return numberIsNaN(a) && numberIsNaN(b);\n\
+    },\n\
+\n\
+    SameValueZero: function (a, b) {\n\
+      // same as SameValue except for SameValueZero(+0, -0) == true\n\
+      return (a === b) || (numberIsNaN(a) && numberIsNaN(b));\n\
+    },\n\
+\n\
+    IsIterable: function (o) {\n\
+      return ES.TypeIsObject(o) && (typeof o[$iterator$] !== 'undefined' || isArguments(o));\n\
+    },\n\
+\n\
+    GetIterator: function (o) {\n\
+      if (isArguments(o)) {\n\
+        // special case support for `arguments`\n\
+        return new ArrayIterator(o, 'value');\n\
+      }\n\
+      var itFn = ES.GetMethod(o, $iterator$);\n\
+      if (!ES.IsCallable(itFn)) {\n\
+        // Better diagnostics if itFn is null or undefined\n\
+        throw new TypeError('value is not an iterable');\n\
+      }\n\
+      var it = ES.Call(itFn, o);\n\
+      if (!ES.TypeIsObject(it)) {\n\
+        throw new TypeError('bad iterator');\n\
+      }\n\
+      return it;\n\
+    },\n\
+\n\
+    GetMethod: function (o, p) {\n\
+      var func = ES.ToObject(o)[p];\n\
+      if (func === void 0 || func === null) {\n\
+        return void 0;\n\
+      }\n\
+      if (!ES.IsCallable(func)) {\n\
+        throw new TypeError('Method not callable: ' + p);\n\
+      }\n\
+      return func;\n\
+    },\n\
+\n\
+    IteratorComplete: function (iterResult) {\n\
+      return !!(iterResult.done);\n\
+    },\n\
+\n\
+    IteratorClose: function (iterator, completionIsThrow) {\n\
+      var returnMethod = ES.GetMethod(iterator, 'return');\n\
+      if (returnMethod === void 0) {\n\
+        return;\n\
+      }\n\
+      var innerResult, innerException;\n\
+      try {\n\
+        innerResult = ES.Call(returnMethod, iterator);\n\
+      } catch (e) {\n\
+        innerException = e;\n\
+      }\n\
+      if (completionIsThrow) {\n\
+        return;\n\
+      }\n\
+      if (innerException) {\n\
+        throw innerException;\n\
+      }\n\
+      if (!ES.TypeIsObject(innerResult)) {\n\
+        throw new TypeError(\"Iterator's return method returned a non-object.\");\n\
+      }\n\
+    },\n\
+\n\
+    IteratorNext: function (it) {\n\
+      var result = arguments.length > 1 ? it.next(arguments[1]) : it.next();\n\
+      if (!ES.TypeIsObject(result)) {\n\
+        throw new TypeError('bad iterator');\n\
+      }\n\
+      return result;\n\
+    },\n\
+\n\
+    IteratorStep: function (it) {\n\
+      var result = ES.IteratorNext(it);\n\
+      var done = ES.IteratorComplete(result);\n\
+      return done ? false : result;\n\
+    },\n\
+\n\
+    Construct: function (C, args, newTarget, isES6internal) {\n\
+      var target = typeof newTarget === 'undefined' ? C : newTarget;\n\
+\n\
+      if (!isES6internal && Reflect.construct) {\n\
+        // Try to use Reflect.construct if available\n\
+        return Reflect.construct(C, args, target);\n\
+      }\n\
+      // OK, we have to fake it.  This will only work if the\n\
+      // C.[[ConstructorKind]] == \"base\" -- but that's the only\n\
+      // kind we can make in ES5 code anyway.\n\
+\n\
+      // OrdinaryCreateFromConstructor(target, \"%ObjectPrototype%\")\n\
+      var proto = target.prototype;\n\
+      if (!ES.TypeIsObject(proto)) {\n\
+        proto = Object.prototype;\n\
+      }\n\
+      var obj = create(proto);\n\
+      // Call the constructor.\n\
+      var result = ES.Call(C, obj, args);\n\
+      return ES.TypeIsObject(result) ? result : obj;\n\
+    },\n\
+\n\
+    SpeciesConstructor: function (O, defaultConstructor) {\n\
+      var C = O.constructor;\n\
+      if (C === void 0) {\n\
+        return defaultConstructor;\n\
+      }\n\
+      if (!ES.TypeIsObject(C)) {\n\
+        throw new TypeError('Bad constructor');\n\
+      }\n\
+      var S = C[symbolSpecies];\n\
+      if (S === void 0 || S === null) {\n\
+        return defaultConstructor;\n\
+      }\n\
+      if (!ES.IsConstructor(S)) {\n\
+        throw new TypeError('Bad @@species');\n\
+      }\n\
+      return S;\n\
+    },\n\
+\n\
+    CreateHTML: function (string, tag, attribute, value) {\n\
+      var S = ES.ToString(string);\n\
+      var p1 = '<' + tag;\n\
+      if (attribute !== '') {\n\
+        var V = ES.ToString(value);\n\
+        var escapedV = V.replace(/\"/g, '&quot;');\n\
+        p1 += ' ' + attribute + '=\"' + escapedV + '\"';\n\
+      }\n\
+      var p2 = p1 + '>';\n\
+      var p3 = p2 + S;\n\
+      return p3 + '</' + tag + '>';\n\
+    },\n\
+\n\
+    IsRegExp: function IsRegExp(argument) {\n\
+      if (!ES.TypeIsObject(argument)) {\n\
+        return false;\n\
+      }\n\
+      var isRegExp = argument[Symbol.match];\n\
+      if (typeof isRegExp !== 'undefined') {\n\
+        return !!isRegExp;\n\
+      }\n\
+      return Type.regex(argument);\n\
+    },\n\
+\n\
+    ToString: function ToString(string) {\n\
+      return $String(string);\n\
+    }\n\
+  };\n\
+\n\
+  // Well-known Symbol shims\n\
+  if (supportsDescriptors && hasSymbols) {\n\
+    var defineWellKnownSymbol = function defineWellKnownSymbol(name) {\n\
+      if (Type.symbol(Symbol[name])) {\n\
+        return Symbol[name];\n\
+      }\n\
+      var sym = Symbol['for']('Symbol.' + name);\n\
+      Object.defineProperty(Symbol, name, {\n\
+        configurable: false,\n\
+        enumerable: false,\n\
+        writable: false,\n\
+        value: sym\n\
+      });\n\
+      return sym;\n\
+    };\n\
+    if (!Type.symbol(Symbol.search)) {\n\
+      var symbolSearch = defineWellKnownSymbol('search');\n\
+      var originalSearch = String.prototype.search;\n\
+      defineProperty(RegExp.prototype, symbolSearch, function search(string) {\n\
+        return ES.Call(originalSearch, string, [this]);\n\
+      });\n\
+      var searchShim = function search(regexp) {\n\
+        var O = ES.RequireObjectCoercible(this);\n\
+        if (regexp !== null && typeof regexp !== 'undefined') {\n\
+          var searcher = ES.GetMethod(regexp, symbolSearch);\n\
+          if (typeof searcher !== 'undefined') {\n\
+            return ES.Call(searcher, regexp, [O]);\n\
+          }\n\
+        }\n\
+        return ES.Call(originalSearch, O, [ES.ToString(regexp)]);\n\
+      };\n\
+      overrideNative(String.prototype, 'search', searchShim);\n\
+    }\n\
+    if (!Type.symbol(Symbol.replace)) {\n\
+      var symbolReplace = defineWellKnownSymbol('replace');\n\
+      var originalReplace = String.prototype.replace;\n\
+      defineProperty(RegExp.prototype, symbolReplace, function replace(string, replaceValue) {\n\
+        return ES.Call(originalReplace, string, [this, replaceValue]);\n\
+      });\n\
+      var replaceShim = function replace(searchValue, replaceValue) {\n\
+        var O = ES.RequireObjectCoercible(this);\n\
+        if (searchValue !== null && typeof searchValue !== 'undefined') {\n\
+          var replacer = ES.GetMethod(searchValue, symbolReplace);\n\
+          if (typeof replacer !== 'undefined') {\n\
+            return ES.Call(replacer, searchValue, [O, replaceValue]);\n\
+          }\n\
+        }\n\
+        return ES.Call(originalReplace, O, [ES.ToString(searchValue), replaceValue]);\n\
+      };\n\
+      overrideNative(String.prototype, 'replace', replaceShim);\n\
+    }\n\
+    if (!Type.symbol(Symbol.split)) {\n\
+      var symbolSplit = defineWellKnownSymbol('split');\n\
+      var originalSplit = String.prototype.split;\n\
+      defineProperty(RegExp.prototype, symbolSplit, function split(string, limit) {\n\
+        return ES.Call(originalSplit, string, [this, limit]);\n\
+      });\n\
+      var splitShim = function split(separator, limit) {\n\
+        var O = ES.RequireObjectCoercible(this);\n\
+        if (separator !== null && typeof separator !== 'undefined') {\n\
+          var splitter = ES.GetMethod(separator, symbolSplit);\n\
+          if (typeof splitter !== 'undefined') {\n\
+            return ES.Call(splitter, separator, [O, limit]);\n\
+          }\n\
+        }\n\
+        return ES.Call(originalSplit, O, [ES.ToString(separator), limit]);\n\
+      };\n\
+      overrideNative(String.prototype, 'split', splitShim);\n\
+    }\n\
+    var symbolMatchExists = Type.symbol(Symbol.match);\n\
+    var stringMatchIgnoresSymbolMatch = symbolMatchExists && (function () {\n\
+      // Firefox 41, through Nightly 45 has Symbol.match, but String#match ignores it.\n\
+      // Firefox 40 and below have Symbol.match but String#match works fine.\n\
+      var o = {};\n\
+      o[Symbol.match] = function () { return 42; };\n\
+      return 'a'.match(o) !== 42;\n\
+    }());\n\
+    if (!symbolMatchExists || stringMatchIgnoresSymbolMatch) {\n\
+      var symbolMatch = defineWellKnownSymbol('match');\n\
+\n\
+      var originalMatch = String.prototype.match;\n\
+      defineProperty(RegExp.prototype, symbolMatch, function match(string) {\n\
+        return ES.Call(originalMatch, string, [this]);\n\
+      });\n\
+\n\
+      var matchShim = function match(regexp) {\n\
+        var O = ES.RequireObjectCoercible(this);\n\
+        if (regexp !== null && typeof regexp !== 'undefined') {\n\
+          var matcher = ES.GetMethod(regexp, symbolMatch);\n\
+          if (typeof matcher !== 'undefined') {\n\
+            return ES.Call(matcher, regexp, [O]);\n\
+          }\n\
+        }\n\
+        return ES.Call(originalMatch, O, [ES.ToString(regexp)]);\n\
+      };\n\
+      overrideNative(String.prototype, 'match', matchShim);\n\
+    }\n\
+  }\n\
+\n\
+  var wrapConstructor = function wrapConstructor(original, replacement, keysToSkip) {\n\
+    Value.preserveToString(replacement, original);\n\
+    if (Object.setPrototypeOf) {\n\
+      // sets up proper prototype chain where possible\n\
+      Object.setPrototypeOf(original, replacement);\n\
+    }\n\
+    if (supportsDescriptors) {\n\
+      _forEach(Object.getOwnPropertyNames(original), function (key) {\n\
+        if (key in noop || keysToSkip[key]) { return; }\n\
+        Value.proxy(original, key, replacement);\n\
+      });\n\
+    } else {\n\
+      _forEach(Object.keys(original), function (key) {\n\
+        if (key in noop || keysToSkip[key]) { return; }\n\
+        replacement[key] = original[key];\n\
+      });\n\
+    }\n\
+    replacement.prototype = original.prototype;\n\
+    Value.redefine(original.prototype, 'constructor', replacement);\n\
+  };\n\
+\n\
+  var defaultSpeciesGetter = function () { return this; };\n\
+  var addDefaultSpecies = function (C) {\n\
+    if (supportsDescriptors && !_hasOwnProperty(C, symbolSpecies)) {\n\
+      Value.getter(C, symbolSpecies, defaultSpeciesGetter);\n\
+    }\n\
+  };\n\
+\n\
+  var addIterator = function (prototype, impl) {\n\
+    var implementation = impl || function iterator() { return this; };\n\
+    defineProperty(prototype, $iterator$, implementation);\n\
+    if (!prototype[$iterator$] && Type.symbol($iterator$)) {\n\
+      // implementations are buggy when $iterator$ is a Symbol\n\
+      prototype[$iterator$] = implementation;\n\
+    }\n\
+  };\n\
+\n\
+  var createDataProperty = function createDataProperty(object, name, value) {\n\
+    if (supportsDescriptors) {\n\
+      Object.defineProperty(object, name, {\n\
+        configurable: true,\n\
+        enumerable: true,\n\
+        writable: true,\n\
+        value: value\n\
+      });\n\
+    } else {\n\
+      object[name] = value;\n\
+    }\n\
+  };\n\
+  var createDataPropertyOrThrow = function createDataPropertyOrThrow(object, name, value) {\n\
+    createDataProperty(object, name, value);\n\
+    if (!ES.SameValue(object[name], value)) {\n\
+      throw new TypeError('property is nonconfigurable');\n\
+    }\n\
+  };\n\
+\n\
+  var emulateES6construct = function (o, defaultNewTarget, defaultProto, slots) {\n\
+    // This is an es5 approximation to es6 construct semantics.  in es6,\n\
+    // 'new Foo' invokes Foo.[[Construct]] which (for almost all objects)\n\
+    // just sets the internal variable NewTarget (in es6 syntax `new.target`)\n\
+    // to Foo and then returns Foo().\n\
+\n\
+    // Many ES6 object then have constructors of the form:\n\
+    // 1. If NewTarget is undefined, throw a TypeError exception\n\
+    // 2. Let xxx by OrdinaryCreateFromConstructor(NewTarget, yyy, zzz)\n\
+\n\
+    // So we're going to emulate those first two steps.\n\
+    if (!ES.TypeIsObject(o)) {\n\
+      throw new TypeError('Constructor requires `new`: ' + defaultNewTarget.name);\n\
+    }\n\
+    var proto = defaultNewTarget.prototype;\n\
+    if (!ES.TypeIsObject(proto)) {\n\
+      proto = defaultProto;\n\
+    }\n\
+    var obj = create(proto);\n\
+    for (var name in slots) {\n\
+      if (_hasOwnProperty(slots, name)) {\n\
+        var value = slots[name];\n\
+        defineProperty(obj, name, value, true);\n\
+      }\n\
+    }\n\
+    return obj;\n\
+  };\n\
+\n\
+  // Firefox 31 reports this function's length as 0\n\
+  // https://bugzilla.mozilla.org/show_bug.cgi?id=1062484\n\
+  if (String.fromCodePoint && String.fromCodePoint.length !== 1) {\n\
+    var originalFromCodePoint = String.fromCodePoint;\n\
+    overrideNative(String, 'fromCodePoint', function fromCodePoint(codePoints) { return ES.Call(originalFromCodePoint, this, arguments); });\n\
+  }\n\
+\n\
+  var StringShims = {\n\
+    fromCodePoint: function fromCodePoint(codePoints) {\n\
+      var result = [];\n\
+      var next;\n\
+      for (var i = 0, length = arguments.length; i < length; i++) {\n\
+        next = Number(arguments[i]);\n\
+        if (!ES.SameValue(next, ES.ToInteger(next)) || next < 0 || next > 0x10FFFF) {\n\
+          throw new RangeError('Invalid code point ' + next);\n\
+        }\n\
+\n\
+        if (next < 0x10000) {\n\
+          _push(result, String.fromCharCode(next));\n\
+        } else {\n\
+          next -= 0x10000;\n\
+          _push(result, String.fromCharCode((next >> 10) + 0xD800));\n\
+          _push(result, String.fromCharCode((next % 0x400) + 0xDC00));\n\
+        }\n\
+      }\n\
+      return result.join('');\n\
+    },\n\
+\n\
+    raw: function raw(callSite) {\n\
+      var cooked = ES.ToObject(callSite, 'bad callSite');\n\
+      var rawString = ES.ToObject(cooked.raw, 'bad raw value');\n\
+      var len = rawString.length;\n\
+      var literalsegments = ES.ToLength(len);\n\
+      if (literalsegments <= 0) {\n\
+        return '';\n\
+      }\n\
+\n\
+      var stringElements = [];\n\
+      var nextIndex = 0;\n\
+      var nextKey, next, nextSeg, nextSub;\n\
+      while (nextIndex < literalsegments) {\n\
+        nextKey = ES.ToString(nextIndex);\n\
+        nextSeg = ES.ToString(rawString[nextKey]);\n\
+        _push(stringElements, nextSeg);\n\
+        if (nextIndex + 1 >= literalsegments) {\n\
+          break;\n\
+        }\n\
+        next = nextIndex + 1 < arguments.length ? arguments[nextIndex + 1] : '';\n\
+        nextSub = ES.ToString(next);\n\
+        _push(stringElements, nextSub);\n\
+        nextIndex += 1;\n\
+      }\n\
+      return stringElements.join('');\n\
+    }\n\
+  };\n\
+  if (String.raw && String.raw({ raw: { 0: 'x', 1: 'y', length: 2 } }) !== 'xy') {\n\
+    // IE 11 TP has a broken String.raw implementation\n\
+    overrideNative(String, 'raw', StringShims.raw);\n\
+  }\n\
+  defineProperties(String, StringShims);\n\
+\n\
+  // Fast repeat, uses the `Exponentiation by squaring` algorithm.\n\
+  // Perf: http://jsperf.com/string-repeat2/2\n\
+  var stringRepeat = function repeat(s, times) {\n\
+    if (times < 1) { return ''; }\n\
+    if (times % 2) { return repeat(s, times - 1) + s; }\n\
+    var half = repeat(s, times / 2);\n\
+    return half + half;\n\
+  };\n\
+  var stringMaxLength = Infinity;\n\
+\n\
+  var StringPrototypeShims = {\n\
+    repeat: function repeat(times) {\n\
+      var thisStr = ES.ToString(ES.RequireObjectCoercible(this));\n\
+      var numTimes = ES.ToInteger(times);\n\
+      if (numTimes < 0 || numTimes >= stringMaxLength) {\n\
+        throw new RangeError('repeat count must be less than infinity and not overflow maximum string size');\n\
+      }\n\
+      return stringRepeat(thisStr, numTimes);\n\
+    },\n\
+\n\
+    startsWith: function startsWith(searchString) {\n\
+      var S = ES.ToString(ES.RequireObjectCoercible(this));\n\
+      if (ES.IsRegExp(searchString)) {\n\
+        throw new TypeError('Cannot call method \"startsWith\" with a regex');\n\
+      }\n\
+      var searchStr = ES.ToString(searchString);\n\
+      var position;\n\
+      if (arguments.length > 1) {\n\
+        position = arguments[1];\n\
+      }\n\
+      var start = _max(ES.ToInteger(position), 0);\n\
+      return _strSlice(S, start, start + searchStr.length) === searchStr;\n\
+    },\n\
+\n\
+    endsWith: function endsWith(searchString) {\n\
+      var S = ES.ToString(ES.RequireObjectCoercible(this));\n\
+      if (ES.IsRegExp(searchString)) {\n\
+        throw new TypeError('Cannot call method \"endsWith\" with a regex');\n\
+      }\n\
+      var searchStr = ES.ToString(searchString);\n\
+      var len = S.length;\n\
+      var endPosition;\n\
+      if (arguments.length > 1) {\n\
+        endPosition = arguments[1];\n\
+      }\n\
+      var pos = typeof endPosition === 'undefined' ? len : ES.ToInteger(endPosition);\n\
+      var end = _min(_max(pos, 0), len);\n\
+      return _strSlice(S, end - searchStr.length, end) === searchStr;\n\
+    },\n\
+\n\
+    includes: function includes(searchString) {\n\
+      if (ES.IsRegExp(searchString)) {\n\
+        throw new TypeError('\"includes\" does not accept a RegExp');\n\
+      }\n\
+      var searchStr = ES.ToString(searchString);\n\
+      var position;\n\
+      if (arguments.length > 1) {\n\
+        position = arguments[1];\n\
+      }\n\
+      // Somehow this trick makes method 100% compat with the spec.\n\
+      return _indexOf(this, searchStr, position) !== -1;\n\
+    },\n\
+\n\
+    codePointAt: function codePointAt(pos) {\n\
+      var thisStr = ES.ToString(ES.RequireObjectCoercible(this));\n\
+      var position = ES.ToInteger(pos);\n\
+      var length = thisStr.length;\n\
+      if (position >= 0 && position < length) {\n\
+        var first = thisStr.charCodeAt(position);\n\
+        var isEnd = (position + 1 === length);\n\
+        if (first < 0xD800 || first > 0xDBFF || isEnd) { return first; }\n\
+        var second = thisStr.charCodeAt(position + 1);\n\
+        if (second < 0xDC00 || second > 0xDFFF) { return first; }\n\
+        return ((first - 0xD800) * 1024) + (second - 0xDC00) + 0x10000;\n\
+      }\n\
+    }\n\
+  };\n\
+  if (String.prototype.includes && 'a'.includes('a', Infinity) !== false) {\n\
+    overrideNative(String.prototype, 'includes', StringPrototypeShims.includes);\n\
+  }\n\
+\n\
+  if (String.prototype.startsWith && String.prototype.endsWith) {\n\
+    var startsWithRejectsRegex = throwsError(function () {\n\
+      /* throws if spec-compliant */\n\
+      '/a/'.startsWith(/a/);\n\
+    });\n\
+    var startsWithHandlesInfinity = 'abc'.startsWith('a', Infinity) === false;\n\
+    if (!startsWithRejectsRegex || !startsWithHandlesInfinity) {\n\
+      // Firefox (< 37?) and IE 11 TP have a noncompliant startsWith implementation\n\
+      overrideNative(String.prototype, 'startsWith', StringPrototypeShims.startsWith);\n\
+      overrideNative(String.prototype, 'endsWith', StringPrototypeShims.endsWith);\n\
+    }\n\
+  }\n\
+  if (hasSymbols) {\n\
+    var startsWithSupportsSymbolMatch = valueOrFalseIfThrows(function () {\n\
+      var re = /a/;\n\
+      re[Symbol.match] = false;\n\
+      return '/a/'.startsWith(re);\n\
+    });\n\
+    if (!startsWithSupportsSymbolMatch) {\n\
+      overrideNative(String.prototype, 'startsWith', StringPrototypeShims.startsWith);\n\
+    }\n\
+    var endsWithSupportsSymbolMatch = valueOrFalseIfThrows(function () {\n\
+      var re = /a/;\n\
+      re[Symbol.match] = false;\n\
+      return '/a/'.endsWith(re);\n\
+    });\n\
+    if (!endsWithSupportsSymbolMatch) {\n\
+      overrideNative(String.prototype, 'endsWith', StringPrototypeShims.endsWith);\n\
+    }\n\
+    var includesSupportsSymbolMatch = valueOrFalseIfThrows(function () {\n\
+      var re = /a/;\n\
+      re[Symbol.match] = false;\n\
+      return '/a/'.includes(re);\n\
+    });\n\
+    if (!includesSupportsSymbolMatch) {\n\
+      overrideNative(String.prototype, 'includes', StringPrototypeShims.includes);\n\
+    }\n\
+  }\n\
+\n\
+  defineProperties(String.prototype, StringPrototypeShims);\n\
+\n\
+  // whitespace from: http://es5.github.io/#x15.5.4.20\n\
+  // implementation from https://github.com/es-shims/es5-shim/blob/v3.4.0/es5-shim.js#L1304-L1324\n\
+  var ws = [\n\
+    '\\x09\\x0A\\x0B\\x0C\\x0D\\x20\\xA0\\u1680\\u180E\\u2000\\u2001\\u2002\\u2003',\n\
+    '\\u2004\\u2005\\u2006\\u2007\\u2008\\u2009\\u200A\\u202F\\u205F\\u3000\\u2028',\n\
+    '\\u2029\\uFEFF'\n\
+  ].join('');\n\
+  var trimRegexp = new RegExp('(^[' + ws + ']+)|([' + ws + ']+$)', 'g');\n\
+  var trimShim = function trim() {\n\
+    return ES.ToString(ES.RequireObjectCoercible(this)).replace(trimRegexp, '');\n\
+  };\n\
+  var nonWS = ['\\u0085', '\\u200b', '\\ufffe'].join('');\n\
+  var nonWSregex = new RegExp('[' + nonWS + ']', 'g');\n\
+  var isBadHexRegex = /^[\\-+]0x[0-9a-f]+$/i;\n\
+  var hasStringTrimBug = nonWS.trim().length !== nonWS.length;\n\
+  defineProperty(String.prototype, 'trim', trimShim, hasStringTrimBug);\n\
+\n\
+  // see https://people.mozilla.org/~jorendorff/es6-draft.html#sec-string.prototype-@@iterator\n\
+  var StringIterator = function (s) {\n\
+    ES.RequireObjectCoercible(s);\n\
+    this._s = ES.ToString(s);\n\
+    this._i = 0;\n\
+  };\n\
+  StringIterator.prototype.next = function () {\n\
+    var s = this._s, i = this._i;\n\
+    if (typeof s === 'undefined' || i >= s.length) {\n\
+      this._s = void 0;\n\
+      return { value: void 0, done: true };\n\
+    }\n\
+    var first = s.charCodeAt(i), second, len;\n\
+    if (first < 0xD800 || first > 0xDBFF || (i + 1) === s.length) {\n\
+      len = 1;\n\
+    } else {\n\
+      second = s.charCodeAt(i + 1);\n\
+      len = (second < 0xDC00 || second > 0xDFFF) ? 1 : 2;\n\
+    }\n\
+    this._i = i + len;\n\
+    return { value: s.substr(i, len), done: false };\n\
+  };\n\
+  addIterator(StringIterator.prototype);\n\
+  addIterator(String.prototype, function () {\n\
+    return new StringIterator(this);\n\
+  });\n\
+\n\
+  var ArrayShims = {\n\
+    from: function from(items) {\n\
+      var C = this;\n\
+      var mapFn;\n\
+      if (arguments.length > 1) {\n\
+        mapFn = arguments[1];\n\
+      }\n\
+      var mapping, T;\n\
+      if (typeof mapFn === 'undefined') {\n\
+        mapping = false;\n\
+      } else {\n\
+        if (!ES.IsCallable(mapFn)) {\n\
+          throw new TypeError('Array.from: when provided, the second argument must be a function');\n\
+        }\n\
+        if (arguments.length > 2) {\n\
+          T = arguments[2];\n\
+        }\n\
+        mapping = true;\n\
+      }\n\
+\n\
+      // Note that that Arrays will use ArrayIterator:\n\
+      // https://bugs.ecmascript.org/show_bug.cgi?id=2416\n\
+      var usingIterator = typeof (isArguments(items) || ES.GetMethod(items, $iterator$)) !== 'undefined';\n\
+\n\
+      var length, result, i;\n\
+      if (usingIterator) {\n\
+        result = ES.IsConstructor(C) ? Object(new C()) : [];\n\
+        var iterator = ES.GetIterator(items);\n\
+        var next, nextValue;\n\
+\n\
+        i = 0;\n\
+        while (true) {\n\
+          next = ES.IteratorStep(iterator);\n\
+          if (next === false) {\n\
+            break;\n\
+          }\n\
+          nextValue = next.value;\n\
+          try {\n\
+            if (mapping) {\n\
+              nextValue = typeof T === 'undefined' ? mapFn(nextValue, i) : _call(mapFn, T, nextValue, i);\n\
+            }\n\
+            result[i] = nextValue;\n\
+          } catch (e) {\n\
+            ES.IteratorClose(iterator, true);\n\
+            throw e;\n\
+          }\n\
+          i += 1;\n\
+        }\n\
+        length = i;\n\
+      } else {\n\
+        var arrayLike = ES.ToObject(items);\n\
+        length = ES.ToLength(arrayLike.length);\n\
+        result = ES.IsConstructor(C) ? Object(new C(length)) : new Array(length);\n\
+        var value;\n\
+        for (i = 0; i < length; ++i) {\n\
+          value = arrayLike[i];\n\
+          if (mapping) {\n\
+            value = typeof T === 'undefined' ? mapFn(value, i) : _call(mapFn, T, value, i);\n\
+          }\n\
+          result[i] = value;\n\
+        }\n\
+      }\n\
+\n\
+      result.length = length;\n\
+      return result;\n\
+    },\n\
+\n\
+    of: function of() {\n\
+      var len = arguments.length;\n\
+      var C = this;\n\
+      var A = isArray(C) || !ES.IsCallable(C) ? new Array(len) : ES.Construct(C, [len]);\n\
+      for (var k = 0; k < len; ++k) {\n\
+        createDataPropertyOrThrow(A, k, arguments[k]);\n\
+      }\n\
+      A.length = len;\n\
+      return A;\n\
+    }\n\
+  };\n\
+  defineProperties(Array, ArrayShims);\n\
+  addDefaultSpecies(Array);\n\
+\n\
+  // Given an argument x, it will return an IteratorResult object,\n\
+  // with value set to x and done to false.\n\
+  // Given no arguments, it will return an iterator completion object.\n\
+  var iteratorResult = function (x) {\n\
+    return { value: x, done: arguments.length === 0 };\n\
+  };\n\
+\n\
+  // Our ArrayIterator is private; see\n\
+  // https://github.com/paulmillr/es6-shim/issues/252\n\
+  ArrayIterator = function (array, kind) {\n\
+      this.i = 0;\n\
+      this.array = array;\n\
+      this.kind = kind;\n\
+  };\n\
+\n\
+  defineProperties(ArrayIterator.prototype, {\n\
+    next: function () {\n\
+      var i = this.i, array = this.array;\n\
+      if (!(this instanceof ArrayIterator)) {\n\
+        throw new TypeError('Not an ArrayIterator');\n\
+      }\n\
+      if (typeof array !== 'undefined') {\n\
+        var len = ES.ToLength(array.length);\n\
+        for (; i < len; i++) {\n\
+          var kind = this.kind;\n\
+          var retval;\n\
+          if (kind === 'key') {\n\
+            retval = i;\n\
+          } else if (kind === 'value') {\n\
+            retval = array[i];\n\
+          } else if (kind === 'entry') {\n\
+            retval = [i, array[i]];\n\
+          }\n\
+          this.i = i + 1;\n\
+          return { value: retval, done: false };\n\
+        }\n\
+      }\n\
+      this.array = void 0;\n\
+      return { value: void 0, done: true };\n\
+    }\n\
+  });\n\
+  addIterator(ArrayIterator.prototype);\n\
+\n\
+  var orderKeys = function orderKeys(a, b) {\n\
+    var aNumeric = String(ES.ToInteger(a)) === a;\n\
+    var bNumeric = String(ES.ToInteger(b)) === b;\n\
+    if (aNumeric && bNumeric) {\n\
+      return b - a;\n\
+    } else if (aNumeric && !bNumeric) {\n\
+      return -1;\n\
+    } else if (!aNumeric && bNumeric) {\n\
+      return 1;\n\
+    } else {\n\
+      return a.localeCompare(b);\n\
+    }\n\
+  };\n\
+  var getAllKeys = function getAllKeys(object) {\n\
+    var ownKeys = [];\n\
+    var keys = [];\n\
+\n\
+    for (var key in object) {\n\
+      _push(_hasOwnProperty(object, key) ? ownKeys : keys, key);\n\
+    }\n\
+    _sort(ownKeys, orderKeys);\n\
+    _sort(keys, orderKeys);\n\
+\n\
+    return _concat(ownKeys, keys);\n\
+  };\n\
+\n\
+  var ObjectIterator = function (object, kind) {\n\
+    defineProperties(this, {\n\
+      object: object,\n\
+      array: getAllKeys(object),\n\
+      kind: kind\n\
+    });\n\
+  };\n\
+\n\
+  defineProperties(ObjectIterator.prototype, {\n\
+    next: function next() {\n\
+      var key;\n\
+      var array = this.array;\n\
+\n\
+      if (!(this instanceof ObjectIterator)) {\n\
+        throw new TypeError('Not an ObjectIterator');\n\
+      }\n\
+\n\
+      // Find next key in the object\n\
+      while (array.length > 0) {\n\
+        key = _shift(array);\n\
+\n\
+        // The candidate key isn't defined on object.\n\
+        // Must have been deleted, or object[[Prototype]]\n\
+        // has been modified.\n\
+        if (!(key in this.object)) {\n\
+          continue;\n\
+        }\n\
+\n\
+        if (this.kind === 'key') {\n\
+          return iteratorResult(key);\n\
+        } else if (this.kind === 'value') {\n\
+          return iteratorResult(this.object[key]);\n\
+        } else {\n\
+          return iteratorResult([key, this.object[key]]);\n\
+        }\n\
+      }\n\
+\n\
+      return iteratorResult();\n\
+    }\n\
+  });\n\
+  addIterator(ObjectIterator.prototype);\n\
+\n\
+  // note: this is positioned here because it depends on ArrayIterator\n\
+  var arrayOfSupportsSubclassing = Array.of === ArrayShims.of || (function () {\n\
+    // Detects a bug in Webkit nightly r181886\n\
+    var Foo = function Foo(len) { this.length = len; };\n\
+    Foo.prototype = [];\n\
+    var fooArr = Array.of.apply(Foo, [1, 2]);\n\
+    return fooArr instanceof Foo && fooArr.length === 2;\n\
+  }());\n\
+  if (!arrayOfSupportsSubclassing) {\n\
+    overrideNative(Array, 'of', ArrayShims.of);\n\
+  }\n\
+\n\
+  var ArrayPrototypeShims = {\n\
+    copyWithin: function copyWithin(target, start) {\n\
+      var o = ES.ToObject(this);\n\
+      var len = ES.ToLength(o.length);\n\
+      var relativeTarget = ES.ToInteger(target);\n\
+      var relativeStart = ES.ToInteger(start);\n\
+      var to = relativeTarget < 0 ? _max(len + relativeTarget, 0) : _min(relativeTarget, len);\n\
+      var from = relativeStart < 0 ? _max(len + relativeStart, 0) : _min(relativeStart, len);\n\
+      var end;\n\
+      if (arguments.length > 2) {\n\
+        end = arguments[2];\n\
+      }\n\
+      var relativeEnd = typeof end === 'undefined' ? len : ES.ToInteger(end);\n\
+      var finalItem = relativeEnd < 0 ? _max(len + relativeEnd, 0) : _min(relativeEnd, len);\n\
+      var count = _min(finalItem - from, len - to);\n\
+      var direction = 1;\n\
+      if (from < to && to < (from + count)) {\n\
+        direction = -1;\n\
+        from += count - 1;\n\
+        to += count - 1;\n\
+      }\n\
+      while (count > 0) {\n\
+        if (from in o) {\n\
+          o[to] = o[from];\n\
+        } else {\n\
+          delete o[to];\n\
+        }\n\
+        from += direction;\n\
+        to += direction;\n\
+        count -= 1;\n\
+      }\n\
+      return o;\n\
+    },\n\
+\n\
+    fill: function fill(value) {\n\
+      var start;\n\
+      if (arguments.length > 1) {\n\
+        start = arguments[1];\n\
+      }\n\
+      var end;\n\
+      if (arguments.length > 2) {\n\
+        end = arguments[2];\n\
+      }\n\
+      var O = ES.ToObject(this);\n\
+      var len = ES.ToLength(O.length);\n\
+      start = ES.ToInteger(typeof start === 'undefined' ? 0 : start);\n\
+      end = ES.ToInteger(typeof end === 'undefined' ? len : end);\n\
+\n\
+      var relativeStart = start < 0 ? _max(len + start, 0) : _min(start, len);\n\
+      var relativeEnd = end < 0 ? len + end : end;\n\
+\n\
+      for (var i = relativeStart; i < len && i < relativeEnd; ++i) {\n\
+        O[i] = value;\n\
+      }\n\
+      return O;\n\
+    },\n\
+\n\
+    find: function find(predicate) {\n\
+      var list = ES.ToObject(this);\n\
+      var length = ES.ToLength(list.length);\n\
+      if (!ES.IsCallable(predicate)) {\n\
+        throw new TypeError('Array#find: predicate must be a function');\n\
+      }\n\
+      var thisArg = arguments.length > 1 ? arguments[1] : null;\n\
+      for (var i = 0, value; i < length; i++) {\n\
+        value = list[i];\n\
+        if (thisArg) {\n\
+          if (_call(predicate, thisArg, value, i, list)) { return value; }\n\
+        } else if (predicate(value, i, list)) {\n\
+          return value;\n\
+        }\n\
+      }\n\
+    },\n\
+\n\
+    findIndex: function findIndex(predicate) {\n\
+      var list = ES.ToObject(this);\n\
+      var length = ES.ToLength(list.length);\n\
+      if (!ES.IsCallable(predicate)) {\n\
+        throw new TypeError('Array#findIndex: predicate must be a function');\n\
+      }\n\
+      var thisArg = arguments.length > 1 ? arguments[1] : null;\n\
+      for (var i = 0; i < length; i++) {\n\
+        if (thisArg) {\n\
+          if (_call(predicate, thisArg, list[i], i, list)) { return i; }\n\
+        } else if (predicate(list[i], i, list)) {\n\
+          return i;\n\
+        }\n\
+      }\n\
+      return -1;\n\
+    },\n\
+\n\
+    keys: function keys() {\n\
+      return new ArrayIterator(this, 'key');\n\
+    },\n\
+\n\
+    values: function values() {\n\
+      return new ArrayIterator(this, 'value');\n\
+    },\n\
+\n\
+    entries: function entries() {\n\
+      return new ArrayIterator(this, 'entry');\n\
+    }\n\
+  };\n\
+  // Safari 7.1 defines Array#keys and Array#entries natively,\n\
+  // but the resulting ArrayIterator objects don't have a \"next\" method.\n\
+  if (Array.prototype.keys && !ES.IsCallable([1].keys().next)) {\n\
+    delete Array.prototype.keys;\n\
+  }\n\
+  if (Array.prototype.entries && !ES.IsCallable([1].entries().next)) {\n\
+    delete Array.prototype.entries;\n\
+  }\n\
+\n\
+  // Chrome 38 defines Array#keys and Array#entries, and Array#@@iterator, but not Array#values\n\
+  if (Array.prototype.keys && Array.prototype.entries && !Array.prototype.values && Array.prototype[$iterator$]) {\n\
+    defineProperties(Array.prototype, {\n\
+      values: Array.prototype[$iterator$]\n\
+    });\n\
+    if (Type.symbol(Symbol.unscopables)) {\n\
+      Array.prototype[Symbol.unscopables].values = true;\n\
+    }\n\
+  }\n\
+  // Chrome 40 defines Array#values with the incorrect name, although Array#{keys,entries} have the correct name\n\
+  if (functionsHaveNames && Array.prototype.values && Array.prototype.values.name !== 'values') {\n\
+    var originalArrayPrototypeValues = Array.prototype.values;\n\
+    overrideNative(Array.prototype, 'values', function values() { return ES.Call(originalArrayPrototypeValues, this, arguments); });\n\
+    defineProperty(Array.prototype, $iterator$, Array.prototype.values, true);\n\
+  }\n\
+  defineProperties(Array.prototype, ArrayPrototypeShims);\n\
+\n\
+  addIterator(Array.prototype, function () { return this.values(); });\n\
+  // Chrome defines keys/values/entries on Array, but doesn't give us\n\
+  // any way to identify its iterator.  So add our own shimmed field.\n\
+  if (Object.getPrototypeOf) {\n\
+    addIterator(Object.getPrototypeOf([].values()));\n\
+  }\n\
+\n\
+  // note: this is positioned here because it relies on Array#entries\n\
+  var arrayFromSwallowsNegativeLengths = (function () {\n\
+    // Detects a Firefox bug in v32\n\
+    // https://bugzilla.mozilla.org/show_bug.cgi?id=1063993\n\
+    return valueOrFalseIfThrows(function () { return Array.from({ length: -1 }).length === 0; });\n\
+  }());\n\
+  var arrayFromHandlesIterables = (function () {\n\
+    // Detects a bug in Webkit nightly r181886\n\
+    var arr = Array.from([0].entries());\n\
+    return arr.length === 1 && isArray(arr[0]) && arr[0][0] === 0 && arr[0][1] === 0;\n\
+  }());\n\
+  if (!arrayFromSwallowsNegativeLengths || !arrayFromHandlesIterables) {\n\
+    overrideNative(Array, 'from', ArrayShims.from);\n\
+  }\n\
+  var arrayFromHandlesUndefinedMapFunction = (function () {\n\
+    // Microsoft Edge v0.11 throws if the mapFn argument is *provided* but undefined,\n\
+    // but the spec doesn't care if it's provided or not - undefined doesn't throw.\n\
+    return valueOrFalseIfThrows(function () { return Array.from([0], void 0); });\n\
+  }());\n\
+  if (!arrayFromHandlesUndefinedMapFunction) {\n\
+    var origArrayFrom = Array.from;\n\
+    overrideNative(Array, 'from', function from(items) {\n\
+      if (arguments.length > 1 && typeof arguments[1] !== 'undefined') {\n\
+        return ES.Call(origArrayFrom, this, arguments);\n\
+      } else {\n\
+        return _call(origArrayFrom, this, items);\n\
+      }\n\
+    });\n\
+  }\n\
+\n\
+  var int32sAsOne = -(Math.pow(2, 32) - 1);\n\
+  var toLengthsCorrectly = function (method, reversed) {\n\
+    var obj = { length: int32sAsOne };\n\
+    obj[reversed ? ((obj.length >>> 0) - 1) : 0] = true;\n\
+    return valueOrFalseIfThrows(function () {\n\
+      _call(method, obj, function () {\n\
+        // note: in nonconforming browsers, this will be called\n\
+        // -1 >>> 0 times, which is 4294967295, so the throw matters.\n\
+        throw new RangeError('should not reach here');\n\
+      }, []);\n\
+      return true;\n\
+    });\n\
+  };\n\
+  if (!toLengthsCorrectly(Array.prototype.forEach)) {\n\
+    var originalForEach = Array.prototype.forEach;\n\
+    overrideNative(Array.prototype, 'forEach', function forEach(callbackFn) {\n\
+      return ES.Call(originalForEach, this.length >= 0 ? this : [], arguments);\n\
+    }, true);\n\
+  }\n\
+  if (!toLengthsCorrectly(Array.prototype.map)) {\n\
+    var originalMap = Array.prototype.map;\n\
+    overrideNative(Array.prototype, 'map', function map(callbackFn) {\n\
+      return ES.Call(originalMap, this.length >= 0 ? this : [], arguments);\n\
+    }, true);\n\
+  }\n\
+  if (!toLengthsCorrectly(Array.prototype.filter)) {\n\
+    var originalFilter = Array.prototype.filter;\n\
+    overrideNative(Array.prototype, 'filter', function filter(callbackFn) {\n\
+      return ES.Call(originalFilter, this.length >= 0 ? this : [], arguments);\n\
+    }, true);\n\
+  }\n\
+  if (!toLengthsCorrectly(Array.prototype.some)) {\n\
+    var originalSome = Array.prototype.some;\n\
+    overrideNative(Array.prototype, 'some', function some(callbackFn) {\n\
+      return ES.Call(originalSome, this.length >= 0 ? this : [], arguments);\n\
+    }, true);\n\
+  }\n\
+  if (!toLengthsCorrectly(Array.prototype.every)) {\n\
+    var originalEvery = Array.prototype.every;\n\
+    overrideNative(Array.prototype, 'every', function every(callbackFn) {\n\
+      return ES.Call(originalEvery, this.length >= 0 ? this : [], arguments);\n\
+    }, true);\n\
+  }\n\
+  if (!toLengthsCorrectly(Array.prototype.reduce)) {\n\
+    var originalReduce = Array.prototype.reduce;\n\
+    overrideNative(Array.prototype, 'reduce', function reduce(callbackFn) {\n\
+      return ES.Call(originalReduce, this.length >= 0 ? this : [], arguments);\n\
+    }, true);\n\
+  }\n\
+  if (!toLengthsCorrectly(Array.prototype.reduceRight, true)) {\n\
+    var originalReduceRight = Array.prototype.reduceRight;\n\
+    overrideNative(Array.prototype, 'reduceRight', function reduceRight(callbackFn) {\n\
+      return ES.Call(originalReduceRight, this.length >= 0 ? this : [], arguments);\n\
+    }, true);\n\
+  }\n\
+\n\
+  var lacksOctalSupport = Number('0o10') !== 8;\n\
+  var lacksBinarySupport = Number('0b10') !== 2;\n\
+  var trimsNonWhitespace = _some(nonWS, function (c) {\n\
+    return Number(c + 0 + c) === 0;\n\
+  });\n\
+  if (lacksOctalSupport || lacksBinarySupport || trimsNonWhitespace) {\n\
+    var OrigNumber = Number;\n\
+    var binaryRegex = /^0b[01]+$/i;\n\
+    var octalRegex = /^0o[0-7]+$/i;\n\
+    // Note that in IE 8, RegExp.prototype.test doesn't seem to exist: ie, \"test\" is an own property of regexes. wtf.\n\
+    var isBinary = binaryRegex.test.bind(binaryRegex);\n\
+    var isOctal = octalRegex.test.bind(octalRegex);\n\
+    var toPrimitive = function (O) { // need to replace this with `es-to-primitive/es6`\n\
+      var result;\n\
+      if (typeof O.valueOf === 'function') {\n\
+        result = O.valueOf();\n\
+        if (Type.primitive(result)) {\n\
+          return result;\n\
+        }\n\
+      }\n\
+      if (typeof O.toString === 'function') {\n\
+        result = O.toString();\n\
+        if (Type.primitive(result)) {\n\
+          return result;\n\
+        }\n\
+      }\n\
+      throw new TypeError('No default value');\n\
+    };\n\
+    var hasNonWS = nonWSregex.test.bind(nonWSregex);\n\
+    var isBadHex = isBadHexRegex.test.bind(isBadHexRegex);\n\
+    var NumberShim = (function () {\n\
+      // this is wrapped in an IIFE because of IE 6-8's wacky scoping issues with named function expressions.\n\
+      var NumberShim = function Number(value) {\n\
+        var primValue;\n\
+        if (arguments.length > 0) {\n\
+          primValue = Type.primitive(value) ? value : toPrimitive(value, 'number');\n\
+        } else {\n\
+          primValue = 0;\n\
+        }\n\
+        if (typeof primValue === 'string') {\n\
+          primValue = ES.Call(trimShim, primValue);\n\
+          if (isBinary(primValue)) {\n\
+            primValue = parseInt(_strSlice(primValue, 2), 2);\n\
+          } else if (isOctal(primValue)) {\n\
+            primValue = parseInt(_strSlice(primValue, 2), 8);\n\
+          } else if (hasNonWS(primValue) || isBadHex(primValue)) {\n\
+            primValue = NaN;\n\
+          }\n\
+        }\n\
+        var receiver = this;\n\
+        var valueOfSucceeds = valueOrFalseIfThrows(function () {\n\
+          OrigNumber.prototype.valueOf.call(receiver);\n\
+          return true;\n\
+        });\n\
+        if (receiver instanceof NumberShim && !valueOfSucceeds) {\n\
+          return new OrigNumber(primValue);\n\
+        }\n\
+        /* jshint newcap: false */\n\
+        return OrigNumber(primValue);\n\
+        /* jshint newcap: true */\n\
+      };\n\
+      return NumberShim;\n\
+    }());\n\
+    wrapConstructor(OrigNumber, NumberShim, {});\n\
+    /* globals Number: true */\n\
+    /* eslint-disable no-undef */\n\
+    /* jshint -W020 */\n\
+    Number = NumberShim;\n\
+    Value.redefine(globals, 'Number', NumberShim);\n\
+    /* jshint +W020 */\n\
+    /* eslint-enable no-undef */\n\
+    /* globals Number: false */\n\
+  }\n\
+\n\
+  var maxSafeInteger = Math.pow(2, 53) - 1;\n\
+  defineProperties(Number, {\n\
+    MAX_SAFE_INTEGER: maxSafeInteger,\n\
+    MIN_SAFE_INTEGER: -maxSafeInteger,\n\
+    EPSILON: 2.220446049250313e-16,\n\
+\n\
+    parseInt: globals.parseInt,\n\
+    parseFloat: globals.parseFloat,\n\
+\n\
+    isFinite: numberIsFinite,\n\
+\n\
+    isInteger: function isInteger(value) {\n\
+      return numberIsFinite(value) && ES.ToInteger(value) === value;\n\
+    },\n\
+\n\
+    isSafeInteger: function isSafeInteger(value) {\n\
+      return Number.isInteger(value) && _abs(value) <= Number.MAX_SAFE_INTEGER;\n\
+    },\n\
+\n\
+    isNaN: numberIsNaN\n\
+  });\n\
+  // Firefox 37 has a conforming Number.parseInt, but it's not === to the global parseInt (fixed in v40)\n\
+  defineProperty(Number, 'parseInt', globals.parseInt, Number.parseInt !== globals.parseInt);\n\
+\n\
+  // Work around bugs in Array#find and Array#findIndex -- early\n\
+  // implementations skipped holes in sparse arrays. (Note that the\n\
+  // implementations of find/findIndex indirectly use shimmed\n\
+  // methods of Number, so this test has to happen down here.)\n\
+  /*jshint elision: true */\n\
+  /* eslint-disable no-sparse-arrays */\n\
+  if (![, 1].find(function (item, idx) { return idx === 0; })) {\n\
+    overrideNative(Array.prototype, 'find', ArrayPrototypeShims.find);\n\
+  }\n\
+  if ([, 1].findIndex(function (item, idx) { return idx === 0; }) !== 0) {\n\
+    overrideNative(Array.prototype, 'findIndex', ArrayPrototypeShims.findIndex);\n\
+  }\n\
+  /* eslint-enable no-sparse-arrays */\n\
+  /*jshint elision: false */\n\
+\n\
+  var isEnumerableOn = Function.bind.call(Function.bind, Object.prototype.propertyIsEnumerable);\n\
+  var ensureEnumerable = function ensureEnumerable(obj, prop) {\n\
+    if (supportsDescriptors && isEnumerableOn(obj, prop)) {\n\
+      Object.defineProperty(obj, prop, { enumerable: false });\n\
+    }\n\
+  };\n\
+  var sliceArgs = function sliceArgs() {\n\
+    // per https://github.com/petkaantonov/bluebird/wiki/Optimization-killers#32-leaking-arguments\n\
+    // and https://gist.github.com/WebReflection/4327762cb87a8c634a29\n\
+    var initial = Number(this);\n\
+    var len = arguments.length;\n\
+    var desiredArgCount = len - initial;\n\
+    var args = new Array(desiredArgCount < 0 ? 0 : desiredArgCount);\n\
+    for (var i = initial; i < len; ++i) {\n\
+      args[i - initial] = arguments[i];\n\
+    }\n\
+    return args;\n\
+  };\n\
+  var assignTo = function assignTo(source) {\n\
+    return function assignToSource(target, key) {\n\
+      target[key] = source[key];\n\
+      return target;\n\
+    };\n\
+  };\n\
+  var assignReducer = function (target, source) {\n\
+    var sourceKeys = keys(Object(source));\n\
+    var symbols;\n\
+    if (ES.IsCallable(Object.getOwnPropertySymbols)) {\n\
+      symbols = _filter(Object.getOwnPropertySymbols(Object(source)), isEnumerableOn(source));\n\
+    }\n\
+    return _reduce(_concat(sourceKeys, symbols || []), assignTo(source), target);\n\
+  };\n\
+\n\
+  var ObjectShims = {\n\
+    // 19.1.3.1\n\
+    assign: function (target, source) {\n\
+      var to = ES.ToObject(target, 'Cannot convert undefined or null to object');\n\
+      return _reduce(ES.Call(sliceArgs, 1, arguments), assignReducer, to);\n\
+    },\n\
+\n\
+    // Added in WebKit in https://bugs.webkit.org/show_bug.cgi?id=143865\n\
+    is: function is(a, b) {\n\
+      return ES.SameValue(a, b);\n\
+    }\n\
+  };\n\
+  var assignHasPendingExceptions = Object.assign && Object.preventExtensions && (function () {\n\
+    // Firefox 37 still has \"pending exception\" logic in its Object.assign implementation,\n\
+    // which is 72% slower than our shim, and Firefox 40's native implementation.\n\
+    var thrower = Object.preventExtensions({ 1: 2 });\n\
+    try {\n\
+      Object.assign(thrower, 'xy');\n\
+    } catch (e) {\n\
+      return thrower[1] === 'y';\n\
+    }\n\
+  }());\n\
+  if (assignHasPendingExceptions) {\n\
+    overrideNative(Object, 'assign', ObjectShims.assign);\n\
+  }\n\
+  defineProperties(Object, ObjectShims);\n\
+\n\
+  if (supportsDescriptors) {\n\
+    var ES5ObjectShims = {\n\
+      // 19.1.3.9\n\
+      // shim from https://gist.github.com/WebReflection/5593554\n\
+      setPrototypeOf: (function (Object, magic) {\n\
+        var set;\n\
+\n\
+        var checkArgs = function (O, proto) {\n\
+          if (!ES.TypeIsObject(O)) {\n\
+            throw new TypeError('cannot set prototype on a non-object');\n\
+          }\n\
+          if (!(proto === null || ES.TypeIsObject(proto))) {\n\
+            throw new TypeError('can only set prototype to an object or null' + proto);\n\
+          }\n\
+        };\n\
+\n\
+        var setPrototypeOf = function (O, proto) {\n\
+          checkArgs(O, proto);\n\
+          _call(set, O, proto);\n\
+          return O;\n\
+        };\n\
+\n\
+        try {\n\
+          // this works already in Firefox and Safari\n\
+          set = Object.getOwnPropertyDescriptor(Object.prototype, magic).set;\n\
+          _call(set, {}, null);\n\
+        } catch (e) {\n\
+          if (Object.prototype !== {}[magic]) {\n\
+            // IE < 11 cannot be shimmed\n\
+            return;\n\
+          }\n\
+          // probably Chrome or some old Mobile stock browser\n\
+          set = function (proto) {\n\
+            this[magic] = proto;\n\
+          };\n\
+          // please note that this will **not** work\n\
+          // in those browsers that do not inherit\n\
+          // __proto__ by mistake from Object.prototype\n\
+          // in these cases we should probably throw an error\n\
+          // or at least be informed about the issue\n\
+          setPrototypeOf.polyfill = setPrototypeOf(\n\
+            setPrototypeOf({}, null),\n\
+            Object.prototype\n\
+          ) instanceof Object;\n\
+          // setPrototypeOf.polyfill === true means it works as meant\n\
+          // setPrototypeOf.polyfill === false means it's not 100% reliable\n\
+          // setPrototypeOf.polyfill === undefined\n\
+          // or\n\
+          // setPrototypeOf.polyfill ==  null means it's not a polyfill\n\
+          // which means it works as expected\n\
+          // we can even delete Object.prototype.__proto__;\n\
+        }\n\
+        return setPrototypeOf;\n\
+      }(Object, '__proto__'))\n\
+    };\n\
+\n\
+    defineProperties(Object, ES5ObjectShims);\n\
+  }\n\
+\n\
+  // Workaround bug in Opera 12 where setPrototypeOf(x, null) doesn't work,\n\
+  // but Object.create(null) does.\n\
+  if (Object.setPrototypeOf && Object.getPrototypeOf &&\n\
+      Object.getPrototypeOf(Object.setPrototypeOf({}, null)) !== null &&\n\
+      Object.getPrototypeOf(Object.create(null)) === null) {\n\
+    (function () {\n\
+      var FAKENULL = Object.create(null);\n\
+      var gpo = Object.getPrototypeOf, spo = Object.setPrototypeOf;\n\
+      Object.getPrototypeOf = function (o) {\n\
+        var result = gpo(o);\n\
+        return result === FAKENULL ? null : result;\n\
+      };\n\
+      Object.setPrototypeOf = function (o, p) {\n\
+        var proto = p === null ? FAKENULL : p;\n\
+        return spo(o, proto);\n\
+      };\n\
+      Object.setPrototypeOf.polyfill = false;\n\
+    }());\n\
+  }\n\
+\n\
+  var objectKeysAcceptsPrimitives = !throwsError(function () { Object.keys('foo'); });\n\
+  if (!objectKeysAcceptsPrimitives) {\n\
+    var originalObjectKeys = Object.keys;\n\
+    overrideNative(Object, 'keys', function keys(value) {\n\
+      return originalObjectKeys(ES.ToObject(value));\n\
+    });\n\
+    keys = Object.keys;\n\
+  }\n\
+\n\
+  if (Object.getOwnPropertyNames) {\n\
+    var objectGOPNAcceptsPrimitives = !throwsError(function () { Object.getOwnPropertyNames('foo'); });\n\
+    if (!objectGOPNAcceptsPrimitives) {\n\
+      var cachedWindowNames = typeof window === 'object' ? Object.getOwnPropertyNames(window) : [];\n\
+      var originalObjectGetOwnPropertyNames = Object.getOwnPropertyNames;\n\
+      overrideNative(Object, 'getOwnPropertyNames', function getOwnPropertyNames(value) {\n\
+        var val = ES.ToObject(value);\n\
+        if (_toString(val) === '[object Window]') {\n\
+          try {\n\
+            return originalObjectGetOwnPropertyNames(val);\n\
+          } catch (e) {\n\
+            // IE bug where layout engine calls userland gOPN for cross-domain `window` objects\n\
+            return _concat([], cachedWindowNames);\n\
+          }\n\
+        }\n\
+        return originalObjectGetOwnPropertyNames(val);\n\
+      });\n\
+    }\n\
+  }\n\
+  if (Object.getOwnPropertyDescriptor) {\n\
+    var objectGOPDAcceptsPrimitives = !throwsError(function () { Object.getOwnPropertyDescriptor('foo', 'bar'); });\n\
+    if (!objectGOPDAcceptsPrimitives) {\n\
+      var originalObjectGetOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;\n\
+      overrideNative(Object, 'getOwnPropertyDescriptor', function getOwnPropertyDescriptor(value, property) {\n\
+        return originalObjectGetOwnPropertyDescriptor(ES.ToObject(value), property);\n\
+      });\n\
+    }\n\
+  }\n\
+  if (Object.seal) {\n\
+    var objectSealAcceptsPrimitives = !throwsError(function () { Object.seal('foo'); });\n\
+    if (!objectSealAcceptsPrimitives) {\n\
+      var originalObjectSeal = Object.seal;\n\
+      overrideNative(Object, 'seal', function seal(value) {\n\
+        if (!Type.object(value)) { return value; }\n\
+        return originalObjectSeal(value);\n\
+      });\n\
+    }\n\
+  }\n\
+  if (Object.isSealed) {\n\
+    var objectIsSealedAcceptsPrimitives = !throwsError(function () { Object.isSealed('foo'); });\n\
+    if (!objectIsSealedAcceptsPrimitives) {\n\
+      var originalObjectIsSealed = Object.isSealed;\n\
+      overrideNative(Object, 'isSealed', function isSealed(value) {\n\
+        if (!Type.object(value)) { return true; }\n\
+        return originalObjectIsSealed(value);\n\
+      });\n\
+    }\n\
+  }\n\
+  if (Object.freeze) {\n\
+    var objectFreezeAcceptsPrimitives = !throwsError(function () { Object.freeze('foo'); });\n\
+    if (!objectFreezeAcceptsPrimitives) {\n\
+      var originalObjectFreeze = Object.freeze;\n\
+      overrideNative(Object, 'freeze', function freeze(value) {\n\
+        if (!Type.object(value)) { return value; }\n\
+        return originalObjectFreeze(value);\n\
+      });\n\
+    }\n\
+  }\n\
+  if (Object.isFrozen) {\n\
+    var objectIsFrozenAcceptsPrimitives = !throwsError(function () { Object.isFrozen('foo'); });\n\
+    if (!objectIsFrozenAcceptsPrimitives) {\n\
+      var originalObjectIsFrozen = Object.isFrozen;\n\
+      overrideNative(Object, 'isFrozen', function isFrozen(value) {\n\
+        if (!Type.object(value)) { return true; }\n\
+        return originalObjectIsFrozen(value);\n\
+      });\n\
+    }\n\
+  }\n\
+  if (Object.preventExtensions) {\n\
+    var objectPreventExtensionsAcceptsPrimitives = !throwsError(function () { Object.preventExtensions('foo'); });\n\
+    if (!objectPreventExtensionsAcceptsPrimitives) {\n\
+      var originalObjectPreventExtensions = Object.preventExtensions;\n\
+      overrideNative(Object, 'preventExtensions', function preventExtensions(value) {\n\
+        if (!Type.object(value)) { return value; }\n\
+        return originalObjectPreventExtensions(value);\n\
+      });\n\
+    }\n\
+  }\n\
+  if (Object.isExtensible) {\n\
+    var objectIsExtensibleAcceptsPrimitives = !throwsError(function () { Object.isExtensible('foo'); });\n\
+    if (!objectIsExtensibleAcceptsPrimitives) {\n\
+      var originalObjectIsExtensible = Object.isExtensible;\n\
+      overrideNative(Object, 'isExtensible', function isExtensible(value) {\n\
+        if (!Type.object(value)) { return false; }\n\
+        return originalObjectIsExtensible(value);\n\
+      });\n\
+    }\n\
+  }\n\
+  if (Object.getPrototypeOf) {\n\
+    var objectGetProtoAcceptsPrimitives = !throwsError(function () { Object.getPrototypeOf('foo'); });\n\
+    if (!objectGetProtoAcceptsPrimitives) {\n\
+      var originalGetProto = Object.getPrototypeOf;\n\
+      overrideNative(Object, 'getPrototypeOf', function getPrototypeOf(value) {\n\
+        return originalGetProto(ES.ToObject(value));\n\
+      });\n\
+    }\n\
+  }\n\
+\n\
+  var hasFlags = supportsDescriptors && (function () {\n\
+    var desc = Object.getOwnPropertyDescriptor(RegExp.prototype, 'flags');\n\
+    return desc && ES.IsCallable(desc.get);\n\
+  }());\n\
+  if (supportsDescriptors && !hasFlags) {\n\
+    var regExpFlagsGetter = function flags() {\n\
+      if (!ES.TypeIsObject(this)) {\n\
+        throw new TypeError('Method called on incompatible type: must be an object.');\n\
+      }\n\
+      var result = '';\n\
+      if (this.global) {\n\
+        result += 'g';\n\
+      }\n\
+      if (this.ignoreCase) {\n\
+        result += 'i';\n\
+      }\n\
+      if (this.multiline) {\n\
+        result += 'm';\n\
+      }\n\
+      if (this.unicode) {\n\
+        result += 'u';\n\
+      }\n\
+      if (this.sticky) {\n\
+        result += 'y';\n\
+      }\n\
+      return result;\n\
+    };\n\
+\n\
+    Value.getter(RegExp.prototype, 'flags', regExpFlagsGetter);\n\
+  }\n\
+\n\
+  var regExpSupportsFlagsWithRegex = supportsDescriptors && valueOrFalseIfThrows(function () {\n\
+    return String(new RegExp(/a/g, 'i')) === '/a/i';\n\
+  });\n\
+  var regExpNeedsToSupportSymbolMatch = hasSymbols && supportsDescriptors && (function () {\n\
+    // Edge 0.12 supports flags fully, but does not support Symbol.match\n\
+    var regex = /./;\n\
+    regex[Symbol.match] = false;\n\
+    return RegExp(regex) === regex;\n\
+  }());\n\
+\n\
+  if (supportsDescriptors && (!regExpSupportsFlagsWithRegex || regExpNeedsToSupportSymbolMatch)) {\n\
+    var flagsGetter = Object.getOwnPropertyDescriptor(RegExp.prototype, 'flags').get;\n\
+    var sourceDesc = Object.getOwnPropertyDescriptor(RegExp.prototype, 'source') || {};\n\
+    var legacySourceGetter = function () { return this.source; }; // prior to it being a getter, it's own + nonconfigurable\n\
+    var sourceGetter = ES.IsCallable(sourceDesc.get) ? sourceDesc.get : legacySourceGetter;\n\
+\n\
+    var OrigRegExp = RegExp;\n\
+    var RegExpShim = (function () {\n\
+      return function RegExp(pattern, flags) {\n\
+        var patternIsRegExp = ES.IsRegExp(pattern);\n\
+        var calledWithNew = this instanceof RegExp;\n\
+        if (!calledWithNew && patternIsRegExp && typeof flags === 'undefined' && pattern.constructor === RegExp) {\n\
+          return pattern;\n\
+        }\n\
+\n\
+        var P = pattern;\n\
+        var F = flags;\n\
+        if (Type.regex(pattern)) {\n\
+          P = ES.Call(sourceGetter, pattern);\n\
+          F = typeof flags === 'undefined' ? ES.Call(flagsGetter, pattern) : flags;\n\
+          return new RegExp(P, F);\n\
+        } else if (patternIsRegExp) {\n\
+          P = pattern.source;\n\
+          F = typeof flags === 'undefined' ? pattern.flags : flags;\n\
+        }\n\
+        return new OrigRegExp(pattern, flags);\n\
+      };\n\
+    }());\n\
+    wrapConstructor(OrigRegExp, RegExpShim, {\n\
+      $input: true // Chrome < v39 & Opera < 26 have a nonstandard \"$input\" property\n\
+    });\n\
+    /* globals RegExp: true */\n\
+    /* eslint-disable no-undef */\n\
+    /* jshint -W020 */\n\
+    RegExp = RegExpShim;\n\
+    Value.redefine(globals, 'RegExp', RegExpShim);\n\
+    /* jshint +W020 */\n\
+    /* eslint-enable no-undef */\n\
+    /* globals RegExp: false */\n\
+  }\n\
+\n\
+  if (supportsDescriptors) {\n\
+    var regexGlobals = {\n\
+      input: '$_',\n\
+      lastMatch: '$&',\n\
+      lastParen: '$+',\n\
+      leftContext: '$`',\n\
+      rightContext: '$\\''\n\
+    };\n\
+    _forEach(keys(regexGlobals), function (prop) {\n\
+      if (prop in RegExp && !(regexGlobals[prop] in RegExp)) {\n\
+        Value.getter(RegExp, regexGlobals[prop], function get() {\n\
+          return RegExp[prop];\n\
+        });\n\
+      }\n\
+    });\n\
+  }\n\
+  addDefaultSpecies(RegExp);\n\
+\n\
+  var inverseEpsilon = 1 / Number.EPSILON;\n\
+  var roundTiesToEven = function roundTiesToEven(n) {\n\
+    // Even though this reduces down to `return n`, it takes advantage of built-in rounding.\n\
+    return (n + inverseEpsilon) - inverseEpsilon;\n\
+  };\n\
+  var BINARY_32_EPSILON = Math.pow(2, -23);\n\
+  var BINARY_32_MAX_VALUE = Math.pow(2, 127) * (2 - BINARY_32_EPSILON);\n\
+  var BINARY_32_MIN_VALUE = Math.pow(2, -126);\n\
+  var numberCLZ = Number.prototype.clz;\n\
+  delete Number.prototype.clz; // Safari 8 has Number#clz\n\
+\n\
+  var MathShims = {\n\
+    acosh: function acosh(value) {\n\
+      var x = Number(value);\n\
+      if (Number.isNaN(x) || value < 1) { return NaN; }\n\
+      if (x === 1) { return 0; }\n\
+      if (x === Infinity) { return x; }\n\
+      return _log(x / Math.E + _sqrt(x + 1) * _sqrt(x - 1) / Math.E) + 1;\n\
+    },\n\
+\n\
+    asinh: function asinh(value) {\n\
+      var x = Number(value);\n\
+      if (x === 0 || !globalIsFinite(x)) {\n\
+        return x;\n\
+      }\n\
+      return x < 0 ? -Math.asinh(-x) : _log(x + _sqrt(x * x + 1));\n\
+    },\n\
+\n\
+    atanh: function atanh(value) {\n\
+      var x = Number(value);\n\
+      if (Number.isNaN(x) || x < -1 || x > 1) {\n\
+        return NaN;\n\
+      }\n\
+      if (x === -1) { return -Infinity; }\n\
+      if (x === 1) { return Infinity; }\n\
+      if (x === 0) { return x; }\n\
+      return 0.5 * _log((1 + x) / (1 - x));\n\
+    },\n\
+\n\
+    cbrt: function cbrt(value) {\n\
+      var x = Number(value);\n\
+      if (x === 0) { return x; }\n\
+      var negate = x < 0, result;\n\
+      if (negate) { x = -x; }\n\
+      if (x === Infinity) {\n\
+        result = Infinity;\n\
+      } else {\n\
+        result = Math.exp(_log(x) / 3);\n\
+        // from http://en.wikipedia.org/wiki/Cube_root#Numerical_methods\n\
+        result = (x / (result * result) + (2 * result)) / 3;\n\
+      }\n\
+      return negate ? -result : result;\n\
+    },\n\
+\n\
+    clz32: function clz32(value) {\n\
+      // See https://bugs.ecmascript.org/show_bug.cgi?id=2465\n\
+      var x = Number(value);\n\
+      var number = ES.ToUint32(x);\n\
+      if (number === 0) {\n\
+        return 32;\n\
+      }\n\
+      return numberCLZ ? ES.Call(numberCLZ, number) : 31 - _floor(_log(number + 0.5) * Math.LOG2E);\n\
+    },\n\
+\n\
+    cosh: function cosh(value) {\n\
+      var x = Number(value);\n\
+      if (x === 0) { return 1; } // +0 or -0\n\
+      if (Number.isNaN(x)) { return NaN; }\n\
+      if (!globalIsFinite(x)) { return Infinity; }\n\
+      if (x < 0) { x = -x; }\n\
+      if (x > 21) { return Math.exp(x) / 2; }\n\
+      return (Math.exp(x) + Math.exp(-x)) / 2;\n\
+    },\n\
+\n\
+    expm1: function expm1(value) {\n\
+      var x = Number(value);\n\
+      if (x === -Infinity) { return -1; }\n\
+      if (!globalIsFinite(x) || x === 0) { return x; }\n\
+      if (_abs(x) > 0.5) {\n\
+        return Math.exp(x) - 1;\n\
+      }\n\
+      // A more precise approximation using Taylor series expansion\n\
+      // from https://github.com/paulmillr/es6-shim/issues/314#issuecomment-70293986\n\
+      var t = x;\n\
+      var sum = 0;\n\
+      var n = 1;\n\
+      while (sum + t !== sum) {\n\
+        sum += t;\n\
+        n += 1;\n\
+        t *= x / n;\n\
+      }\n\
+      return sum;\n\
+    },\n\
+\n\
+    hypot: function hypot(x, y) {\n\
+      var result = 0;\n\
+      var largest = 0;\n\
+      for (var i = 0; i < arguments.length; ++i) {\n\
+        var value = _abs(Number(arguments[i]));\n\
+        if (largest < value) {\n\
+          result *= (largest / value) * (largest / value);\n\
+          result += 1;\n\
+          largest = value;\n\
+        } else {\n\
+          result += (value > 0 ? (value / largest) * (value / largest) : value);\n\
+        }\n\
+      }\n\
+      return largest === Infinity ? Infinity : largest * _sqrt(result);\n\
+    },\n\
+\n\
+    log2: function log2(value) {\n\
+      return _log(value) * Math.LOG2E;\n\
+    },\n\
+\n\
+    log10: function log10(value) {\n\
+      return _log(value) * Math.LOG10E;\n\
+    },\n\
+\n\
+    log1p: function log1p(value) {\n\
+      var x = Number(value);\n\
+      if (x < -1 || Number.isNaN(x)) { return NaN; }\n\
+      if (x === 0 || x === Infinity) { return x; }\n\
+      if (x === -1) { return -Infinity; }\n\
+\n\
+      return (1 + x) - 1 === 0 ? x : x * (_log(1 + x) / ((1 + x) - 1));\n\
+    },\n\
+\n\
+    sign: function sign(value) {\n\
+      var number = Number(value);\n\
+      if (number === 0) { return number; }\n\
+      if (Number.isNaN(number)) { return number; }\n\
+      return number < 0 ? -1 : 1;\n\
+    },\n\
+\n\
+    sinh: function sinh(value) {\n\
+      var x = Number(value);\n\
+      if (!globalIsFinite(x) || x === 0) { return x; }\n\
+\n\
+      if (_abs(x) < 1) {\n\
+        return (Math.expm1(x) - Math.expm1(-x)) / 2;\n\
+      }\n\
+      return (Math.exp(x - 1) - Math.exp(-x - 1)) * Math.E / 2;\n\
+    },\n\
+\n\
+    tanh: function tanh(value) {\n\
+      var x = Number(value);\n\
+      if (Number.isNaN(x) || x === 0) { return x; }\n\
+      if (x === Infinity) { return 1; }\n\
+      if (x === -Infinity) { return -1; }\n\
+      var a = Math.expm1(x);\n\
+      var b = Math.expm1(-x);\n\
+      if (a === Infinity) { return 1; }\n\
+      if (b === Infinity) { return -1; }\n\
+      return (a - b) / (Math.exp(x) + Math.exp(-x));\n\
+    },\n\
+\n\
+    trunc: function trunc(value) {\n\
+      var x = Number(value);\n\
+      return x < 0 ? -_floor(-x) : _floor(x);\n\
+    },\n\
+\n\
+    imul: function imul(x, y) {\n\
+      // taken from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/imul\n\
+      var a = ES.ToUint32(x);\n\
+      var b = ES.ToUint32(y);\n\
+      var ah = (a >>> 16) & 0xffff;\n\
+      var al = a & 0xffff;\n\
+      var bh = (b >>> 16) & 0xffff;\n\
+      var bl = b & 0xffff;\n\
+      // the shift by 0 fixes the sign on the high part\n\
+      // the final |0 converts the unsigned value into a signed value\n\
+      return ((al * bl) + (((ah * bl + al * bh) << 16) >>> 0) | 0);\n\
+    },\n\
+\n\
+    fround: function fround(x) {\n\
+      var v = Number(x);\n\
+      if (v === 0 || v === Infinity || v === -Infinity || numberIsNaN(v)) {\n\
+        return v;\n\
+      }\n\
+      var sign = Math.sign(v);\n\
+      var abs = _abs(v);\n\
+      if (abs < BINARY_32_MIN_VALUE) {\n\
+        return sign * roundTiesToEven(abs / BINARY_32_MIN_VALUE / BINARY_32_EPSILON) * BINARY_32_MIN_VALUE * BINARY_32_EPSILON;\n\
+      }\n\
+      // Veltkamp's splitting (?)\n\
+      var a = (1 + BINARY_32_EPSILON / Number.EPSILON) * abs;\n\
+      var result = a - (a - abs);\n\
+      if (result > BINARY_32_MAX_VALUE || numberIsNaN(result)) {\n\
+        return sign * Infinity;\n\
+      }\n\
+      return sign * result;\n\
+    }\n\
+  };\n\
+  defineProperties(Math, MathShims);\n\
+  // IE 11 TP has an imprecise log1p: reports Math.log1p(-1e-17) as 0\n\
+  defineProperty(Math, 'log1p', MathShims.log1p, Math.log1p(-1e-17) !== -1e-17);\n\
+  // IE 11 TP has an imprecise asinh: reports Math.asinh(-1e7) as not exactly equal to -Math.asinh(1e7)\n\
+  defineProperty(Math, 'asinh', MathShims.asinh, Math.asinh(-1e7) !== -Math.asinh(1e7));\n\
+  // Chrome 40 has an imprecise Math.tanh with very small numbers\n\
+  defineProperty(Math, 'tanh', MathShims.tanh, Math.tanh(-2e-17) !== -2e-17);\n\
+  // Chrome 40 loses Math.acosh precision with high numbers\n\
+  defineProperty(Math, 'acosh', MathShims.acosh, Math.acosh(Number.MAX_VALUE) === Infinity);\n\
+  // Firefox 38 on Windows\n\
+  defineProperty(Math, 'cbrt', MathShims.cbrt, Math.abs(1 - Math.cbrt(1e-300) / 1e-100) / Number.EPSILON > 8);\n\
+  // node 0.11 has an imprecise Math.sinh with very small numbers\n\
+  defineProperty(Math, 'sinh', MathShims.sinh, Math.sinh(-2e-17) !== -2e-17);\n\
+  // FF 35 on Linux reports 22025.465794806725 for Math.expm1(10)\n\
+  var expm1OfTen = Math.expm1(10);\n\
+  defineProperty(Math, 'expm1', MathShims.expm1, expm1OfTen > 22025.465794806719 || expm1OfTen < 22025.4657948067165168);\n\
+\n\
+  var origMathRound = Math.round;\n\
+  // breaks in e.g. Safari 8, Internet Explorer 11, Opera 12\n\
+  var roundHandlesBoundaryConditions = Math.round(0.5 - Number.EPSILON / 4) === 0 && Math.round(-0.5 + Number.EPSILON / 3.99) === 1;\n\
+\n\
+  // When engines use Math.floor(x + 0.5) internally, Math.round can be buggy for large integers.\n\
+  // This behavior should be governed by \"round to nearest, ties to even mode\"\n\
+  // see https://people.mozilla.org/~jorendorff/es6-draft.html#sec-ecmascript-language-types-number-type\n\
+  // These are the boundary cases where it breaks.\n\
+  var smallestPositiveNumberWhereRoundBreaks = inverseEpsilon + 1;\n\
+  var largestPositiveNumberWhereRoundBreaks = 2 * inverseEpsilon - 1;\n\
+  var roundDoesNotIncreaseIntegers = [smallestPositiveNumberWhereRoundBreaks, largestPositiveNumberWhereRoundBreaks].every(function (num) {\n\
+    return Math.round(num) === num;\n\
+  });\n\
+  defineProperty(Math, 'round', function round(x) {\n\
+    var floor = _floor(x);\n\
+    var ceil = floor === -1 ? -0 : floor + 1;\n\
+    return x - floor < 0.5 ? floor : ceil;\n\
+  }, !roundHandlesBoundaryConditions || !roundDoesNotIncreaseIntegers);\n\
+  Value.preserveToString(Math.round, origMathRound);\n\
+\n\
+  var origImul = Math.imul;\n\
+  if (Math.imul(0xffffffff, 5) !== -5) {\n\
+    // Safari 6.1, at least, reports \"0\" for this value\n\
+    Math.imul = MathShims.imul;\n\
+    Value.preserveToString(Math.imul, origImul);\n\
+  }\n\
+  if (Math.imul.length !== 2) {\n\
+    // Safari 8.0.4 has a length of 1\n\
+    // fixed in https://bugs.webkit.org/show_bug.cgi?id=143658\n\
+    overrideNative(Math, 'imul', function imul(x, y) {\n\
+      return ES.Call(origImul, Math, arguments);\n\
+    });\n\
+  }\n\
+\n\
+  // Promises\n\
+  // Simplest possible implementation; use a 3rd-party library if you\n\
+  // want the best possible speed and/or long stack traces.\n\
+  var PromiseShim = (function () {\n\
+    var setTimeout = globals.setTimeout;\n\
+    // some environments don't have setTimeout - no way to shim here.\n\
+    if (typeof setTimeout !== 'function' && typeof setTimeout !== 'object') { return; }\n\
+\n\
+    ES.IsPromise = function (promise) {\n\
+      if (!ES.TypeIsObject(promise)) {\n\
+        return false;\n\
+      }\n\
+      if (typeof promise._promise === 'undefined') {\n\
+        return false; // uninitialized, or missing our hidden field.\n\
+      }\n\
+      return true;\n\
+    };\n\
+\n\
+    // \"PromiseCapability\" in the spec is what most promise implementations\n\
+    // call a \"deferred\".\n\
+    var PromiseCapability = function (C) {\n\
+      if (!ES.IsConstructor(C)) {\n\
+        throw new TypeError('Bad promise constructor');\n\
+      }\n\
+      var capability = this;\n\
+      var resolver = function (resolve, reject) {\n\
+        if (capability.resolve !== void 0 || capability.reject !== void 0) {\n\
+          throw new TypeError('Bad Promise implementation!');\n\
+        }\n\
+        capability.resolve = resolve;\n\
+        capability.reject = reject;\n\
+      };\n\
+      // Initialize fields to inform optimizers about the object shape.\n\
+      capability.resolve = void 0;\n\
+      capability.reject = void 0;\n\
+      capability.promise = new C(resolver);\n\
+      if (!(ES.IsCallable(capability.resolve) && ES.IsCallable(capability.reject))) {\n\
+        throw new TypeError('Bad promise constructor');\n\
+      }\n\
+    };\n\
+\n\
+    // find an appropriate setImmediate-alike\n\
+    var makeZeroTimeout;\n\
+    /*global window */\n\
+    if (typeof window !== 'undefined' && ES.IsCallable(window.postMessage)) {\n\
+      makeZeroTimeout = function () {\n\
+        // from http://dbaron.org/log/20100309-faster-timeouts\n\
+        var timeouts = [];\n\
+        var messageName = 'zero-timeout-message';\n\
+        var setZeroTimeout = function (fn) {\n\
+          _push(timeouts, fn);\n\
+          window.postMessage(messageName, '*');\n\
+        };\n\
+        var handleMessage = function (event) {\n\
+          if (event.source === window && event.data === messageName) {\n\
+            event.stopPropagation();\n\
+            if (timeouts.length === 0) { return; }\n\
+            var fn = _shift(timeouts);\n\
+            fn();\n\
+          }\n\
+        };\n\
+        window.addEventListener('message', handleMessage, true);\n\
+        return setZeroTimeout;\n\
+      };\n\
+    }\n\
+    var makePromiseAsap = function () {\n\
+      // An efficient task-scheduler based on a pre-existing Promise\n\
+      // implementation, which we can use even if we override the\n\
+      // global Promise below (in order to workaround bugs)\n\
+      // https://github.com/Raynos/observ-hash/issues/2#issuecomment-35857671\n\
+      var P = globals.Promise;\n\
+      var pr = P && P.resolve && P.resolve();\n\
+      return pr && function (task) {\n\
+        return pr.then(task);\n\
+      };\n\
+    };\n\
+    /*global process */\n\
+    /* jscs:disable disallowMultiLineTernary */\n\
+    var enqueue = ES.IsCallable(globals.setImmediate) ?\n\
+      globals.setImmediate :\n\
+      typeof process === 'object' && process.nextTick ? process.nextTick :\n\
+      makePromiseAsap() ||\n\
+      (ES.IsCallable(makeZeroTimeout) ? makeZeroTimeout() :\n\
+      function (task) { setTimeout(task, 0); }); // fallback\n\
+    /* jscs:enable disallowMultiLineTernary */\n\
+\n\
+    // Constants for Promise implementation\n\
+    var PROMISE_IDENTITY = function (x) { return x; };\n\
+    var PROMISE_THROWER = function (e) { throw e; };\n\
+    var PROMISE_PENDING = 0;\n\
+    var PROMISE_FULFILLED = 1;\n\
+    var PROMISE_REJECTED = 2;\n\
+    // We store fulfill/reject handlers and capabilities in a single array.\n\
+    var PROMISE_FULFILL_OFFSET = 0;\n\
+    var PROMISE_REJECT_OFFSET = 1;\n\
+    var PROMISE_CAPABILITY_OFFSET = 2;\n\
+    // This is used in an optimization for chaining promises via then.\n\
+    var PROMISE_FAKE_CAPABILITY = {};\n\
+\n\
+    var enqueuePromiseReactionJob = function (handler, capability, argument) {\n\
+      enqueue(function () {\n\
+        promiseReactionJob(handler, capability, argument);\n\
+      });\n\
+    };\n\
+\n\
+    var promiseReactionJob = function (handler, promiseCapability, argument) {\n\
+      var handlerResult, f;\n\
+      if (promiseCapability === PROMISE_FAKE_CAPABILITY) {\n\
+        // Fast case, when we don't actually need to chain through to a\n\
+        // (real) promiseCapability.\n\
+        return handler(argument);\n\
+      }\n\
+      try {\n\
+        handlerResult = handler(argument);\n\
+        f = promiseCapability.resolve;\n\
+      } catch (e) {\n\
+        handlerResult = e;\n\
+        f = promiseCapability.reject;\n\
+      }\n\
+      f(handlerResult);\n\
+    };\n\
+\n\
+    var fulfillPromise = function (promise, value) {\n\
+      var _promise = promise._promise;\n\
+      var length = _promise.reactionLength;\n\
+      if (length > 0) {\n\
+        enqueuePromiseReactionJob(\n\
+          _promise.fulfillReactionHandler0,\n\
+          _promise.reactionCapability0,\n\
+          value\n\
+        );\n\
+        _promise.fulfillReactionHandler0 = void 0;\n\
+        _promise.rejectReactions0 = void 0;\n\
+        _promise.reactionCapability0 = void 0;\n\
+        if (length > 1) {\n\
+          for (var i = 1, idx = 0; i < length; i++, idx += 3) {\n\
+            enqueuePromiseReactionJob(\n\
+              _promise[idx + PROMISE_FULFILL_OFFSET],\n\
+              _promise[idx + PROMISE_CAPABILITY_OFFSET],\n\
+              value\n\
+            );\n\
+            promise[idx + PROMISE_FULFILL_OFFSET] = void 0;\n\
+            promise[idx + PROMISE_REJECT_OFFSET] = void 0;\n\
+            promise[idx + PROMISE_CAPABILITY_OFFSET] = void 0;\n\
+          }\n\
+        }\n\
+      }\n\
+      _promise.result = value;\n\
+      _promise.state = PROMISE_FULFILLED;\n\
+      _promise.reactionLength = 0;\n\
+    };\n\
+\n\
+    var rejectPromise = function (promise, reason) {\n\
+      var _promise = promise._promise;\n\
+      var length = _promise.reactionLength;\n\
+      if (length > 0) {\n\
+        enqueuePromiseReactionJob(\n\
+          _promise.rejectReactionHandler0,\n\
+          _promise.reactionCapability0,\n\
+          reason\n\
+        );\n\
+        _promise.fulfillReactionHandler0 = void 0;\n\
+        _promise.rejectReactions0 = void 0;\n\
+        _promise.reactionCapability0 = void 0;\n\
+        if (length > 1) {\n\
+          for (var i = 1, idx = 0; i < length; i++, idx += 3) {\n\
+            enqueuePromiseReactionJob(\n\
+              _promise[idx + PROMISE_REJECT_OFFSET],\n\
+              _promise[idx + PROMISE_CAPABILITY_OFFSET],\n\
+              reason\n\
+            );\n\
+            promise[idx + PROMISE_FULFILL_OFFSET] = void 0;\n\
+            promise[idx + PROMISE_REJECT_OFFSET] = void 0;\n\
+            promise[idx + PROMISE_CAPABILITY_OFFSET] = void 0;\n\
+          }\n\
+        }\n\
+      }\n\
+      _promise.result = reason;\n\
+      _promise.state = PROMISE_REJECTED;\n\
+      _promise.reactionLength = 0;\n\
+    };\n\
+\n\
+    var createResolvingFunctions = function (promise) {\n\
+      var alreadyResolved = false;\n\
+      var resolve = function (resolution) {\n\
+        var then;\n\
+        if (alreadyResolved) { return; }\n\
+        alreadyResolved = true;\n\
+        if (resolution === promise) {\n\
+          return rejectPromise(promise, new TypeError('Self resolution'));\n\
+        }\n\
+        if (!ES.TypeIsObject(resolution)) {\n\
+          return fulfillPromise(promise, resolution);\n\
+        }\n\
+        try {\n\
+          then = resolution.then;\n\
+        } catch (e) {\n\
+          return rejectPromise(promise, e);\n\
+        }\n\
+        if (!ES.IsCallable(then)) {\n\
+          return fulfillPromise(promise, resolution);\n\
+        }\n\
+        enqueue(function () {\n\
+          promiseResolveThenableJob(promise, resolution, then);\n\
+        });\n\
+      };\n\
+      var reject = function (reason) {\n\
+        if (alreadyResolved) { return; }\n\
+        alreadyResolved = true;\n\
+        return rejectPromise(promise, reason);\n\
+      };\n\
+      return { resolve: resolve, reject: reject };\n\
+    };\n\
+\n\
+    var optimizedThen = function (then, thenable, resolve, reject) {\n\
+      // Optimization: since we discard the result, we can pass our\n\
+      // own then implementation a special hint to let it know it\n\
+      // doesn't have to create it.  (The PROMISE_FAKE_CAPABILITY\n\
+      // object is local to this implementation and unforgeable outside.)\n\
+      if (then === Promise$prototype$then) {\n\
+        _call(then, thenable, resolve, reject, PROMISE_FAKE_CAPABILITY);\n\
+      } else {\n\
+        _call(then, thenable, resolve, reject);\n\
+      }\n\
+    };\n\
+    var promiseResolveThenableJob = function (promise, thenable, then) {\n\
+      var resolvingFunctions = createResolvingFunctions(promise);\n\
+      var resolve = resolvingFunctions.resolve;\n\
+      var reject = resolvingFunctions.reject;\n\
+      try {\n\
+        optimizedThen(then, thenable, resolve, reject);\n\
+      } catch (e) {\n\
+        reject(e);\n\
+      }\n\
+    };\n\
+\n\
+    var Promise$prototype, Promise$prototype$then;\n\
+    var Promise = (function () {\n\
+      var PromiseShim = function Promise(resolver) {\n\
+        if (!(this instanceof PromiseShim)) {\n\
+          throw new TypeError('Constructor Promise requires \"new\"');\n\
+        }\n\
+        if (this && this._promise) {\n\
+          throw new TypeError('Bad construction');\n\
+        }\n\
+        // see https://bugs.ecmascript.org/show_bug.cgi?id=2482\n\
+        if (!ES.IsCallable(resolver)) {\n\
+          throw new TypeError('not a valid resolver');\n\
+        }\n\
+        var promise = emulateES6construct(this, PromiseShim, Promise$prototype, {\n\
+          _promise: {\n\
+            result: void 0,\n\
+            state: PROMISE_PENDING,\n\
+            // The first member of the \"reactions\" array is inlined here,\n\
+            // since most promises only have one reaction.\n\
+            // We've also exploded the 'reaction' object to inline the\n\
+            // \"handler\" and \"capability\" fields, since both fulfill and\n\
+            // reject reactions share the same capability.\n\
+            reactionLength: 0,\n\
+            fulfillReactionHandler0: void 0,\n\
+            rejectReactionHandler0: void 0,\n\
+            reactionCapability0: void 0\n\
+          }\n\
+        });\n\
+        var resolvingFunctions = createResolvingFunctions(promise);\n\
+        var reject = resolvingFunctions.reject;\n\
+        try {\n\
+          resolver(resolvingFunctions.resolve, reject);\n\
+        } catch (e) {\n\
+          reject(e);\n\
+        }\n\
+        return promise;\n\
+      };\n\
+      return PromiseShim;\n\
+    }());\n\
+    Promise$prototype = Promise.prototype;\n\
+\n\
+    var _promiseAllResolver = function (index, values, capability, remaining) {\n\
+      var alreadyCalled = false;\n\
+      return function (x) {\n\
+        if (alreadyCalled) { return; }\n\
+        alreadyCalled = true;\n\
+        values[index] = x;\n\
+        if ((--remaining.count) === 0) {\n\
+          var resolve = capability.resolve;\n\
+          resolve(values); // call w/ this===undefined\n\
+        }\n\
+      };\n\
+    };\n\
+\n\
+    var performPromiseAll = function (iteratorRecord, C, resultCapability) {\n\
+      var it = iteratorRecord.iterator;\n\
+      var values = [], remaining = { count: 1 }, next, nextValue;\n\
+      var index = 0;\n\
+      while (true) {\n\
+        try {\n\
+          next = ES.IteratorStep(it);\n\
+          if (next === false) {\n\
+            iteratorRecord.done = true;\n\
+            break;\n\
+          }\n\
+          nextValue = next.value;\n\
+        } catch (e) {\n\
+          iteratorRecord.done = true;\n\
+          throw e;\n\
+        }\n\
+        values[index] = void 0;\n\
+        var nextPromise = C.resolve(nextValue);\n\
+        var resolveElement = _promiseAllResolver(\n\
+          index, values, resultCapability, remaining\n\
+        );\n\
+        remaining.count += 1;\n\
+        optimizedThen(nextPromise.then, nextPromise, resolveElement, resultCapability.reject);\n\
+        index += 1;\n\
+      }\n\
+      if ((--remaining.count) === 0) {\n\
+        var resolve = resultCapability.resolve;\n\
+        resolve(values); // call w/ this===undefined\n\
+      }\n\
+      return resultCapability.promise;\n\
+    };\n\
+\n\
+    var performPromiseRace = function (iteratorRecord, C, resultCapability) {\n\
+      var it = iteratorRecord.iterator, next, nextValue, nextPromise;\n\
+      while (true) {\n\
+        try {\n\
+          next = ES.IteratorStep(it);\n\
+          if (next === false) {\n\
+            // NOTE: If iterable has no items, resulting promise will never\n\
+            // resolve; see:\n\
+            // https://github.com/domenic/promises-unwrapping/issues/75\n\
+            // https://bugs.ecmascript.org/show_bug.cgi?id=2515\n\
+            iteratorRecord.done = true;\n\
+            break;\n\
+          }\n\
+          nextValue = next.value;\n\
+        } catch (e) {\n\
+          iteratorRecord.done = true;\n\
+          throw e;\n\
+        }\n\
+        nextPromise = C.resolve(nextValue);\n\
+        optimizedThen(nextPromise.then, nextPromise, resultCapability.resolve, resultCapability.reject);\n\
+      }\n\
+      return resultCapability.promise;\n\
+    };\n\
+\n\
+    defineProperties(Promise, {\n\
+      all: function all(iterable) {\n\
+        var C = this;\n\
+        if (!ES.TypeIsObject(C)) {\n\
+          throw new TypeError('Promise is not object');\n\
+        }\n\
+        var capability = new PromiseCapability(C);\n\
+        var iterator, iteratorRecord;\n\
+        try {\n\
+          iterator = ES.GetIterator(iterable);\n\
+          iteratorRecord = { iterator: iterator, done: false };\n\
+          return performPromiseAll(iteratorRecord, C, capability);\n\
+        } catch (e) {\n\
+          var exception = e;\n\
+          if (iteratorRecord && !iteratorRecord.done) {\n\
+            try {\n\
+              ES.IteratorClose(iterator, true);\n\
+            } catch (ee) {\n\
+              exception = ee;\n\
+            }\n\
+          }\n\
+          var reject = capability.reject;\n\
+          reject(exception);\n\
+          return capability.promise;\n\
+        }\n\
+      },\n\
+\n\
+      race: function race(iterable) {\n\
+        var C = this;\n\
+        if (!ES.TypeIsObject(C)) {\n\
+          throw new TypeError('Promise is not object');\n\
+        }\n\
+        var capability = new PromiseCapability(C);\n\
+        var iterator, iteratorRecord;\n\
+        try {\n\
+          iterator = ES.GetIterator(iterable);\n\
+          iteratorRecord = { iterator: iterator, done: false };\n\
+          return performPromiseRace(iteratorRecord, C, capability);\n\
+        } catch (e) {\n\
+          var exception = e;\n\
+          if (iteratorRecord && !iteratorRecord.done) {\n\
+            try {\n\
+              ES.IteratorClose(iterator, true);\n\
+            } catch (ee) {\n\
+              exception = ee;\n\
+            }\n\
+          }\n\
+          var reject = capability.reject;\n\
+          reject(exception);\n\
+          return capability.promise;\n\
+        }\n\
+      },\n\
+\n\
+      reject: function reject(reason) {\n\
+        var C = this;\n\
+        if (!ES.TypeIsObject(C)) {\n\
+          throw new TypeError('Bad promise constructor');\n\
+        }\n\
+        var capability = new PromiseCapability(C);\n\
+        var rejectFunc = capability.reject;\n\
+        rejectFunc(reason); // call with this===undefined\n\
+        return capability.promise;\n\
+      },\n\
+\n\
+      resolve: function resolve(v) {\n\
+        // See https://esdiscuss.org/topic/fixing-promise-resolve for spec\n\
+        var C = this;\n\
+        if (!ES.TypeIsObject(C)) {\n\
+          throw new TypeError('Bad promise constructor');\n\
+        }\n\
+        if (ES.IsPromise(v)) {\n\
+          var constructor = v.constructor;\n\
+          if (constructor === C) { return v; }\n\
+        }\n\
+        var capability = new PromiseCapability(C);\n\
+        var resolveFunc = capability.resolve;\n\
+        resolveFunc(v); // call with this===undefined\n\
+        return capability.promise;\n\
+      }\n\
+    });\n\
+\n\
+    defineProperties(Promise$prototype, {\n\
+      'catch': function (onRejected) {\n\
+        return this.then(null, onRejected);\n\
+      },\n\
+\n\
+      then: function then(onFulfilled, onRejected) {\n\
+        var promise = this;\n\
+        if (!ES.IsPromise(promise)) { throw new TypeError('not a promise'); }\n\
+        var C = ES.SpeciesConstructor(promise, Promise);\n\
+        var resultCapability;\n\
+        var returnValueIsIgnored = arguments.length > 2 && arguments[2] === PROMISE_FAKE_CAPABILITY;\n\
+        if (returnValueIsIgnored && C === Promise) {\n\
+          resultCapability = PROMISE_FAKE_CAPABILITY;\n\
+        } else {\n\
+          resultCapability = new PromiseCapability(C);\n\
+        }\n\
+        // PerformPromiseThen(promise, onFulfilled, onRejected, resultCapability)\n\
+        // Note that we've split the 'reaction' object into its two\n\
+        // components, \"capabilities\" and \"handler\"\n\
+        // \"capabilities\" is always equal to `resultCapability`\n\
+        var fulfillReactionHandler = ES.IsCallable(onFulfilled) ? onFulfilled : PROMISE_IDENTITY;\n\
+        var rejectReactionHandler = ES.IsCallable(onRejected) ? onRejected : PROMISE_THROWER;\n\
+        var _promise = promise._promise;\n\
+        var value;\n\
+        if (_promise.state === PROMISE_PENDING) {\n\
+          if (_promise.reactionLength === 0) {\n\
+            _promise.fulfillReactionHandler0 = fulfillReactionHandler;\n\
+            _promise.rejectReactionHandler0 = rejectReactionHandler;\n\
+            _promise.reactionCapability0 = resultCapability;\n\
+          } else {\n\
+            var idx = 3 * (_promise.reactionLength - 1);\n\
+            _promise[idx + PROMISE_FULFILL_OFFSET] = fulfillReactionHandler;\n\
+            _promise[idx + PROMISE_REJECT_OFFSET] = rejectReactionHandler;\n\
+            _promise[idx + PROMISE_CAPABILITY_OFFSET] = resultCapability;\n\
+          }\n\
+          _promise.reactionLength += 1;\n\
+        } else if (_promise.state === PROMISE_FULFILLED) {\n\
+          value = _promise.result;\n\
+          enqueuePromiseReactionJob(\n\
+            fulfillReactionHandler, resultCapability, value\n\
+          );\n\
+        } else if (_promise.state === PROMISE_REJECTED) {\n\
+          value = _promise.result;\n\
+          enqueuePromiseReactionJob(\n\
+            rejectReactionHandler, resultCapability, value\n\
+          );\n\
+        } else {\n\
+          throw new TypeError('unexpected Promise state');\n\
+        }\n\
+        return resultCapability.promise;\n\
+      }\n\
+    });\n\
+    // This helps the optimizer by ensuring that methods which take\n\
+    // capabilities aren't polymorphic.\n\
+    PROMISE_FAKE_CAPABILITY = new PromiseCapability(Promise);\n\
+    Promise$prototype$then = Promise$prototype.then;\n\
+\n\
+    return Promise;\n\
+  }());\n\
+\n\
+  // Chrome's native Promise has extra methods that it shouldn't have. Let's remove them.\n\
+  if (globals.Promise) {\n\
+    delete globals.Promise.accept;\n\
+    delete globals.Promise.defer;\n\
+    delete globals.Promise.prototype.chain;\n\
+  }\n\
+\n\
+  if (typeof PromiseShim === 'function') {\n\
+    // export the Promise constructor.\n\
+    defineProperties(globals, { Promise: PromiseShim });\n\
+    // In Chrome 33 (and thereabouts) Promise is defined, but the\n\
+    // implementation is buggy in a number of ways.  Let's check subclassing\n\
+    // support to see if we have a buggy implementation.\n\
+    var promiseSupportsSubclassing = supportsSubclassing(globals.Promise, function (S) {\n\
+      return S.resolve(42).then(function () {}) instanceof S;\n\
+    });\n\
+    var promiseIgnoresNonFunctionThenCallbacks = !throwsError(function () { globals.Promise.reject(42).then(null, 5).then(null, noop); });\n\
+    var promiseRequiresObjectContext = throwsError(function () { globals.Promise.call(3, noop); });\n\
+    // Promise.resolve() was errata'ed late in the ES6 process.\n\
+    // See: https://bugzilla.mozilla.org/show_bug.cgi?id=1170742\n\
+    //      https://code.google.com/p/v8/issues/detail?id=4161\n\
+    // It serves as a proxy for a number of other bugs in early Promise\n\
+    // implementations.\n\
+    var promiseResolveBroken = (function (Promise) {\n\
+      var p = Promise.resolve(5);\n\
+      p.constructor = {};\n\
+      var p2 = Promise.resolve(p);\n\
+      return (p === p2); // This *should* be false!\n\
+    }(globals.Promise));\n\
+\n\
+    // Chrome 46 (probably older too) does not retrieve a thenable's .then synchronously\n\
+    var getsThenSynchronously = supportsDescriptors && (function () {\n\
+      var count = 0;\n\
+      var thenable = Object.defineProperty({}, 'then', { get: function () { count += 1; } });\n\
+      Promise.resolve(thenable);\n\
+      return count === 1;\n\
+    }());\n\
+\n\
+    var BadResolverPromise = function BadResolverPromise(executor) {\n\
+      var p = new Promise(executor);\n\
+      executor(3, function () {});\n\
+      this.then = p.then;\n\
+      this.constructor = BadResolverPromise;\n\
+    };\n\
+    BadResolverPromise.prototype = Promise.prototype;\n\
+    BadResolverPromise.all = Promise.all;\n\
+    // Chrome Canary 49 (probably older too) has some implementation bugs\n\
+    var hasBadResolverPromise = valueOrFalseIfThrows(function () {\n\
+      return !!BadResolverPromise.all([1, 2]);\n\
+    });\n\
+\n\
+    if (!promiseSupportsSubclassing || !promiseIgnoresNonFunctionThenCallbacks ||\n\
+        !promiseRequiresObjectContext || promiseResolveBroken ||\n\
+        !getsThenSynchronously || hasBadResolverPromise) {\n\
+      /* globals Promise: true */\n\
+      /* eslint-disable no-undef */\n\
+      /* jshint -W020 */\n\
+      Promise = PromiseShim;\n\
+      /* jshint +W020 */\n\
+      /* eslint-enable no-undef */\n\
+      /* globals Promise: false */\n\
+      overrideNative(globals, 'Promise', PromiseShim);\n\
+    }\n\
+    if (Promise.all.length !== 1) {\n\
+      var origAll = Promise.all;\n\
+      overrideNative(Promise, 'all', function all(iterable) {\n\
+        return ES.Call(origAll, this, arguments);\n\
+      });\n\
+    }\n\
+    if (Promise.race.length !== 1) {\n\
+      var origRace = Promise.race;\n\
+      overrideNative(Promise, 'race', function race(iterable) {\n\
+        return ES.Call(origRace, this, arguments);\n\
+      });\n\
+    }\n\
+    if (Promise.resolve.length !== 1) {\n\
+      var origResolve = Promise.resolve;\n\
+      overrideNative(Promise, 'resolve', function resolve(x) {\n\
+        return ES.Call(origResolve, this, arguments);\n\
+      });\n\
+    }\n\
+    if (Promise.reject.length !== 1) {\n\
+      var origReject = Promise.reject;\n\
+      overrideNative(Promise, 'reject', function reject(r) {\n\
+        return ES.Call(origReject, this, arguments);\n\
+      });\n\
+    }\n\
+    ensureEnumerable(Promise, 'all');\n\
+    ensureEnumerable(Promise, 'race');\n\
+    ensureEnumerable(Promise, 'resolve');\n\
+    ensureEnumerable(Promise, 'reject');\n\
+    addDefaultSpecies(Promise);\n\
+  }\n\
+\n\
+  // Map and Set require a true ES5 environment\n\
+  // Their fast path also requires that the environment preserve\n\
+  // property insertion order, which is not guaranteed by the spec.\n\
+  var testOrder = function (a) {\n\
+    var b = keys(_reduce(a, function (o, k) {\n\
+      o[k] = true;\n\
+      return o;\n\
+    }, {}));\n\
+    return a.join(':') === b.join(':');\n\
+  };\n\
+  var preservesInsertionOrder = testOrder(['z', 'a', 'bb']);\n\
+  // some engines (eg, Chrome) only preserve insertion order for string keys\n\
+  var preservesNumericInsertionOrder = testOrder(['z', 1, 'a', '3', 2]);\n\
+\n\
+  if (supportsDescriptors) {\n\
+\n\
+    var fastkey = function fastkey(key) {\n\
+      if (!preservesInsertionOrder) {\n\
+        return null;\n\
+      }\n\
+      if (typeof key === 'undefined' || key === null) {\n\
+        return '^' + ES.ToString(key);\n\
+      } else if (typeof key === 'string') {\n\
+        return '$' + key;\n\
+      } else if (typeof key === 'number') {\n\
+        // note that -0 will get coerced to \"0\" when used as a property key\n\
+        if (!preservesNumericInsertionOrder) {\n\
+          return 'n' + key;\n\
+        }\n\
+        return key;\n\
+      } else if (typeof key === 'boolean') {\n\
+        return 'b' + key;\n\
+      }\n\
+      return null;\n\
+    };\n\
+\n\
+    var emptyObject = function emptyObject() {\n\
+      // accomodate some older not-quite-ES5 browsers\n\
+      return Object.create ? Object.create(null) : {};\n\
+    };\n\
+\n\
+    var addIterableToMap = function addIterableToMap(MapConstructor, map, iterable) {\n\
+      if (isArray(iterable) || Type.string(iterable)) {\n\
+        _forEach(iterable, function (entry) {\n\
+          if (!ES.TypeIsObject(entry)) {\n\
+            throw new TypeError('Iterator value ' + entry + ' is not an entry object');\n\
+          }\n\
+          map.set(entry[0], entry[1]);\n\
+        });\n\
+      } else if (iterable instanceof MapConstructor) {\n\
+        _call(MapConstructor.prototype.forEach, iterable, function (value, key) {\n\
+          map.set(key, value);\n\
+        });\n\
+      } else {\n\
+        var iter, adder;\n\
+        if (iterable !== null && typeof iterable !== 'undefined') {\n\
+          adder = map.set;\n\
+          if (!ES.IsCallable(adder)) { throw new TypeError('bad map'); }\n\
+          iter = ES.GetIterator(iterable);\n\
+        }\n\
+        if (typeof iter !== 'undefined') {\n\
+          while (true) {\n\
+            var next = ES.IteratorStep(iter);\n\
+            if (next === false) { break; }\n\
+            var nextItem = next.value;\n\
+            try {\n\
+              if (!ES.TypeIsObject(nextItem)) {\n\
+                throw new TypeError('Iterator value ' + nextItem + ' is not an entry object');\n\
+              }\n\
+              _call(adder, map, nextItem[0], nextItem[1]);\n\
+            } catch (e) {\n\
+              ES.IteratorClose(iter, true);\n\
+              throw e;\n\
+            }\n\
+          }\n\
+        }\n\
+      }\n\
+    };\n\
+    var addIterableToSet = function addIterableToSet(SetConstructor, set, iterable) {\n\
+      if (isArray(iterable) || Type.string(iterable)) {\n\
+        _forEach(iterable, function (value) {\n\
+          set.add(value);\n\
+        });\n\
+      } else if (iterable instanceof SetConstructor) {\n\
+        _call(SetConstructor.prototype.forEach, iterable, function (value) {\n\
+          set.add(value);\n\
+        });\n\
+      } else {\n\
+        var iter, adder;\n\
+        if (iterable !== null && typeof iterable !== 'undefined') {\n\
+          adder = set.add;\n\
+          if (!ES.IsCallable(adder)) { throw new TypeError('bad set'); }\n\
+          iter = ES.GetIterator(iterable);\n\
+        }\n\
+        if (typeof iter !== 'undefined') {\n\
+          while (true) {\n\
+            var next = ES.IteratorStep(iter);\n\
+            if (next === false) { break; }\n\
+            var nextValue = next.value;\n\
+            try {\n\
+              _call(adder, set, nextValue);\n\
+            } catch (e) {\n\
+              ES.IteratorClose(iter, true);\n\
+              throw e;\n\
+            }\n\
+          }\n\
+        }\n\
+      }\n\
+    };\n\
+\n\
+    var collectionShims = {\n\
+      Map: (function () {\n\
+\n\
+        var empty = {};\n\
+\n\
+        var MapEntry = function MapEntry(key, value) {\n\
+          this.key = key;\n\
+          this.value = value;\n\
+          this.next = null;\n\
+          this.prev = null;\n\
+        };\n\
+\n\
+        MapEntry.prototype.isRemoved = function isRemoved() {\n\
+          return this.key === empty;\n\
+        };\n\
+\n\
+        var isMap = function isMap(map) {\n\
+          return !!map._es6map;\n\
+        };\n\
+\n\
+        var requireMapSlot = function requireMapSlot(map, method) {\n\
+          if (!ES.TypeIsObject(map) || !isMap(map)) {\n\
+            throw new TypeError('Method Map.prototype.' + method + ' called on incompatible receiver ' + ES.ToString(map));\n\
+          }\n\
+        };\n\
+\n\
+        var MapIterator = function MapIterator(map, kind) {\n\
+          requireMapSlot(map, '[[MapIterator]]');\n\
+          this.head = map._head;\n\
+          this.i = this.head;\n\
+          this.kind = kind;\n\
+        };\n\
+\n\
+        MapIterator.prototype = {\n\
+          next: function next() {\n\
+            var i = this.i, kind = this.kind, head = this.head, result;\n\
+            if (typeof this.i === 'undefined') {\n\
+              return { value: void 0, done: true };\n\
+            }\n\
+            while (i.isRemoved() && i !== head) {\n\
+              // back up off of removed entries\n\
+              i = i.prev;\n\
+            }\n\
+            // advance to next unreturned element.\n\
+            while (i.next !== head) {\n\
+              i = i.next;\n\
+              if (!i.isRemoved()) {\n\
+                if (kind === 'key') {\n\
+                  result = i.key;\n\
+                } else if (kind === 'value') {\n\
+                  result = i.value;\n\
+                } else {\n\
+                  result = [i.key, i.value];\n\
+                }\n\
+                this.i = i;\n\
+                return { value: result, done: false };\n\
+              }\n\
+            }\n\
+            // once the iterator is done, it is done forever.\n\
+            this.i = void 0;\n\
+            return { value: void 0, done: true };\n\
+          }\n\
+        };\n\
+        addIterator(MapIterator.prototype);\n\
+\n\
+        var Map$prototype;\n\
+        var MapShim = function Map() {\n\
+          if (!(this instanceof Map)) {\n\
+            throw new TypeError('Constructor Map requires \"new\"');\n\
+          }\n\
+          if (this && this._es6map) {\n\
+            throw new TypeError('Bad construction');\n\
+          }\n\
+          var map = emulateES6construct(this, Map, Map$prototype, {\n\
+            _es6map: true,\n\
+            _head: null,\n\
+            _storage: emptyObject(),\n\
+            _size: 0\n\
+          });\n\
+\n\
+          var head = new MapEntry(null, null);\n\
+          // circular doubly-linked list.\n\
+          head.next = head.prev = head;\n\
+          map._head = head;\n\
+\n\
+          // Optionally initialize map from iterable\n\
+          if (arguments.length > 0) {\n\
+            addIterableToMap(Map, map, arguments[0]);\n\
+          }\n\
+          return map;\n\
+        };\n\
+        Map$prototype = MapShim.prototype;\n\
+\n\
+        Value.getter(Map$prototype, 'size', function () {\n\
+          if (typeof this._size === 'undefined') {\n\
+            throw new TypeError('size method called on incompatible Map');\n\
+          }\n\
+          return this._size;\n\
+        });\n\
+\n\
+        defineProperties(Map$prototype, {\n\
+          get: function get(key) {\n\
+            requireMapSlot(this, 'get');\n\
+            var fkey = fastkey(key);\n\
+            if (fkey !== null) {\n\
+              // fast O(1) path\n\
+              var entry = this._storage[fkey];\n\
+              if (entry) {\n\
+                return entry.value;\n\
+              } else {\n\
+                return;\n\
+              }\n\
+            }\n\
+            var head = this._head, i = head;\n\
+            while ((i = i.next) !== head) {\n\
+              if (ES.SameValueZero(i.key, key)) {\n\
+                return i.value;\n\
+              }\n\
+            }\n\
+          },\n\
+\n\
+          has: function has(key) {\n\
+            requireMapSlot(this, 'has');\n\
+            var fkey = fastkey(key);\n\
+            if (fkey !== null) {\n\
+              // fast O(1) path\n\
+              return typeof this._storage[fkey] !== 'undefined';\n\
+            }\n\
+            var head = this._head, i = head;\n\
+            while ((i = i.next) !== head) {\n\
+              if (ES.SameValueZero(i.key, key)) {\n\
+                return true;\n\
+              }\n\
+            }\n\
+            return false;\n\
+          },\n\
+\n\
+          set: function set(key, value) {\n\
+            requireMapSlot(this, 'set');\n\
+            var head = this._head, i = head, entry;\n\
+            var fkey = fastkey(key);\n\
+            if (fkey !== null) {\n\
+              // fast O(1) path\n\
+              if (typeof this._storage[fkey] !== 'undefined') {\n\
+                this._storage[fkey].value = value;\n\
+                return this;\n\
+              } else {\n\
+                entry = this._storage[fkey] = new MapEntry(key, value);\n\
+                i = head.prev;\n\
+                // fall through\n\
+              }\n\
+            }\n\
+            while ((i = i.next) !== head) {\n\
+              if (ES.SameValueZero(i.key, key)) {\n\
+                i.value = value;\n\
+                return this;\n\
+              }\n\
+            }\n\
+            entry = entry || new MapEntry(key, value);\n\
+            if (ES.SameValue(-0, key)) {\n\
+              entry.key = +0; // coerce -0 to +0 in entry\n\
+            }\n\
+            entry.next = this._head;\n\
+            entry.prev = this._head.prev;\n\
+            entry.prev.next = entry;\n\
+            entry.next.prev = entry;\n\
+            this._size += 1;\n\
+            return this;\n\
+          },\n\
+\n\
+          'delete': function (key) {\n\
+            requireMapSlot(this, 'delete');\n\
+            var head = this._head, i = head;\n\
+            var fkey = fastkey(key);\n\
+            if (fkey !== null) {\n\
+              // fast O(1) path\n\
+              if (typeof this._storage[fkey] === 'undefined') {\n\
+                return false;\n\
+              }\n\
+              i = this._storage[fkey].prev;\n\
+              delete this._storage[fkey];\n\
+              // fall through\n\
+            }\n\
+            while ((i = i.next) !== head) {\n\
+              if (ES.SameValueZero(i.key, key)) {\n\
+                i.key = i.value = empty;\n\
+                i.prev.next = i.next;\n\
+                i.next.prev = i.prev;\n\
+                this._size -= 1;\n\
+                return true;\n\
+              }\n\
+            }\n\
+            return false;\n\
+          },\n\
+\n\
+          clear: function clear() {\n\
+            requireMapSlot(this, 'clear');\n\
+            this._size = 0;\n\
+            this._storage = emptyObject();\n\
+            var head = this._head, i = head, p = i.next;\n\
+            while ((i = p) !== head) {\n\
+              i.key = i.value = empty;\n\
+              p = i.next;\n\
+              i.next = i.prev = head;\n\
+            }\n\
+            head.next = head.prev = head;\n\
+          },\n\
+\n\
+          keys: function keys() {\n\
+            requireMapSlot(this, 'keys');\n\
+            return new MapIterator(this, 'key');\n\
+          },\n\
+\n\
+          values: function values() {\n\
+            requireMapSlot(this, 'values');\n\
+            return new MapIterator(this, 'value');\n\
+          },\n\
+\n\
+          entries: function entries() {\n\
+            requireMapSlot(this, 'entries');\n\
+            return new MapIterator(this, 'key+value');\n\
+          },\n\
+\n\
+          forEach: function forEach(callback) {\n\
+            requireMapSlot(this, 'forEach');\n\
+            var context = arguments.length > 1 ? arguments[1] : null;\n\
+            var it = this.entries();\n\
+            for (var entry = it.next(); !entry.done; entry = it.next()) {\n\
+              if (context) {\n\
+                _call(callback, context, entry.value[1], entry.value[0], this);\n\
+              } else {\n\
+                callback(entry.value[1], entry.value[0], this);\n\
+              }\n\
+            }\n\
+          }\n\
+        });\n\
+        addIterator(Map$prototype, Map$prototype.entries);\n\
+\n\
+        return MapShim;\n\
+      }()),\n\
+\n\
+      Set: (function () {\n\
+        var isSet = function isSet(set) {\n\
+          return set._es6set && typeof set._storage !== 'undefined';\n\
+        };\n\
+        var requireSetSlot = function requireSetSlot(set, method) {\n\
+          if (!ES.TypeIsObject(set) || !isSet(set)) {\n\
+            // https://github.com/paulmillr/es6-shim/issues/176\n\
+            throw new TypeError('Set.prototype.' + method + ' called on incompatible receiver ' + ES.ToString(set));\n\
+          }\n\
+        };\n\
+\n\
+        // Creating a Map is expensive.  To speed up the common case of\n\
+        // Sets containing only string or numeric keys, we use an object\n\
+        // as backing storage and lazily create a full Map only when\n\
+        // required.\n\
+        var Set$prototype;\n\
+        var SetShim = function Set() {\n\
+          if (!(this instanceof Set)) {\n\
+            throw new TypeError('Constructor Set requires \"new\"');\n\
+          }\n\
+          if (this && this._es6set) {\n\
+            throw new TypeError('Bad construction');\n\
+          }\n\
+          var set = emulateES6construct(this, Set, Set$prototype, {\n\
+            _es6set: true,\n\
+            '[[SetData]]': null,\n\
+            _storage: emptyObject()\n\
+          });\n\
+          if (!set._es6set) {\n\
+            throw new TypeError('bad set');\n\
+          }\n\
+\n\
+          // Optionally initialize Set from iterable\n\
+          if (arguments.length > 0) {\n\
+            addIterableToSet(Set, set, arguments[0]);\n\
+          }\n\
+          return set;\n\
+        };\n\
+        Set$prototype = SetShim.prototype;\n\
+\n\
+        var decodeKey = function (key) {\n\
+          var k = key;\n\
+          if (k === '^null') {\n\
+            return null;\n\
+          } else if (k === '^undefined') {\n\
+            return void 0;\n\
+          } else {\n\
+            var first = k.charAt(0);\n\
+            if (first === '$') {\n\
+              return _strSlice(k, 1);\n\
+            } else if (first === 'n') {\n\
+              return +_strSlice(k, 1);\n\
+            } else if (first === 'b') {\n\
+              return k === 'btrue';\n\
+            }\n\
+          }\n\
+          return +k;\n\
+        };\n\
+        // Switch from the object backing storage to a full Map.\n\
+        var ensureMap = function ensureMap(set) {\n\
+          if (!set['[[SetData]]']) {\n\
+            var m = set['[[SetData]]'] = new collectionShims.Map();\n\
+            _forEach(keys(set._storage), function (key) {\n\
+              var k = decodeKey(key);\n\
+              m.set(k, k);\n\
+            });\n\
+            set['[[SetData]]'] = m;\n\
+          }\n\
+          set._storage = null; // free old backing storage\n\
+        };\n\
+\n\
+        Value.getter(SetShim.prototype, 'size', function () {\n\
+          requireSetSlot(this, 'size');\n\
+          if (this._storage) {\n\
+            return keys(this._storage).length;\n\
+          }\n\
+          ensureMap(this);\n\
+          return this['[[SetData]]'].size;\n\
+        });\n\
+\n\
+        defineProperties(SetShim.prototype, {\n\
+          has: function has(key) {\n\
+            requireSetSlot(this, 'has');\n\
+            var fkey;\n\
+            if (this._storage && (fkey = fastkey(key)) !== null) {\n\
+              return !!this._storage[fkey];\n\
+            }\n\
+            ensureMap(this);\n\
+            return this['[[SetData]]'].has(key);\n\
+          },\n\
+\n\
+          add: function add(key) {\n\
+            requireSetSlot(this, 'add');\n\
+            var fkey;\n\
+            if (this._storage && (fkey = fastkey(key)) !== null) {\n\
+              this._storage[fkey] = true;\n\
+              return this;\n\
+            }\n\
+            ensureMap(this);\n\
+            this['[[SetData]]'].set(key, key);\n\
+            return this;\n\
+          },\n\
+\n\
+          'delete': function (key) {\n\
+            requireSetSlot(this, 'delete');\n\
+            var fkey;\n\
+            if (this._storage && (fkey = fastkey(key)) !== null) {\n\
+              var hasFKey = _hasOwnProperty(this._storage, fkey);\n\
+              return (delete this._storage[fkey]) && hasFKey;\n\
+            }\n\
+            ensureMap(this);\n\
+            return this['[[SetData]]']['delete'](key);\n\
+          },\n\
+\n\
+          clear: function clear() {\n\
+            requireSetSlot(this, 'clear');\n\
+            if (this._storage) {\n\
+              this._storage = emptyObject();\n\
+            }\n\
+            if (this['[[SetData]]']) {\n\
+              this['[[SetData]]'].clear();\n\
+            }\n\
+          },\n\
+\n\
+          values: function values() {\n\
+            requireSetSlot(this, 'values');\n\
+            ensureMap(this);\n\
+            return this['[[SetData]]'].values();\n\
+          },\n\
+\n\
+          entries: function entries() {\n\
+            requireSetSlot(this, 'entries');\n\
+            ensureMap(this);\n\
+            return this['[[SetData]]'].entries();\n\
+          },\n\
+\n\
+          forEach: function forEach(callback) {\n\
+            requireSetSlot(this, 'forEach');\n\
+            var context = arguments.length > 1 ? arguments[1] : null;\n\
+            var entireSet = this;\n\
+            ensureMap(entireSet);\n\
+            this['[[SetData]]'].forEach(function (value, key) {\n\
+              if (context) {\n\
+                _call(callback, context, key, key, entireSet);\n\
+              } else {\n\
+                callback(key, key, entireSet);\n\
+              }\n\
+            });\n\
+          }\n\
+        });\n\
+        defineProperty(SetShim.prototype, 'keys', SetShim.prototype.values, true);\n\
+        addIterator(SetShim.prototype, SetShim.prototype.values);\n\
+\n\
+        return SetShim;\n\
+      }())\n\
+    };\n\
+\n\
+    if (globals.Map || globals.Set) {\n\
+      // Safari 8, for example, doesn't accept an iterable.\n\
+      var mapAcceptsArguments = valueOrFalseIfThrows(function () { return new Map([[1, 2]]).get(1) === 2; });\n\
+      if (!mapAcceptsArguments) {\n\
+        var OrigMapNoArgs = globals.Map;\n\
+        globals.Map = function Map() {\n\
+          if (!(this instanceof Map)) {\n\
+            throw new TypeError('Constructor Map requires \"new\"');\n\
+          }\n\
+          var m = new OrigMapNoArgs();\n\
+          if (arguments.length > 0) {\n\
+            addIterableToMap(Map, m, arguments[0]);\n\
+          }\n\
+          delete m.constructor;\n\
+          Object.setPrototypeOf(m, globals.Map.prototype);\n\
+          return m;\n\
+        };\n\
+        globals.Map.prototype = create(OrigMapNoArgs.prototype);\n\
+        defineProperty(globals.Map.prototype, 'constructor', globals.Map, true);\n\
+        Value.preserveToString(globals.Map, OrigMapNoArgs);\n\
+      }\n\
+      var testMap = new Map();\n\
+      var mapUsesSameValueZero = (function () {\n\
+        // Chrome 38-42, node 0.11/0.12, iojs 1/2 also have a bug when the Map has a size > 4\n\
+        var m = new Map([[1, 0], [2, 0], [3, 0], [4, 0]]);\n\
+        m.set(-0, m);\n\
+        return m.get(0) === m && m.get(-0) === m && m.has(0) && m.has(-0);\n\
+      }());\n\
+      var mapSupportsChaining = testMap.set(1, 2) === testMap;\n\
+      if (!mapUsesSameValueZero || !mapSupportsChaining) {\n\
+        var origMapSet = Map.prototype.set;\n\
+        overrideNative(Map.prototype, 'set', function set(k, v) {\n\
+          _call(origMapSet, this, k === 0 ? 0 : k, v);\n\
+          return this;\n\
+        });\n\
+      }\n\
+      if (!mapUsesSameValueZero) {\n\
+        var origMapGet = Map.prototype.get;\n\
+        var origMapHas = Map.prototype.has;\n\
+        defineProperties(Map.prototype, {\n\
+          get: function get(k) {\n\
+            return _call(origMapGet, this, k === 0 ? 0 : k);\n\
+          },\n\
+          has: function has(k) {\n\
+            return _call(origMapHas, this, k === 0 ? 0 : k);\n\
+          }\n\
+        }, true);\n\
+        Value.preserveToString(Map.prototype.get, origMapGet);\n\
+        Value.preserveToString(Map.prototype.has, origMapHas);\n\
+      }\n\
+      var testSet = new Set();\n\
+      var setUsesSameValueZero = (function (s) {\n\
+        s['delete'](0);\n\
+        s.add(-0);\n\
+        return !s.has(0);\n\
+      }(testSet));\n\
+      var setSupportsChaining = testSet.add(1) === testSet;\n\
+      if (!setUsesSameValueZero || !setSupportsChaining) {\n\
+        var origSetAdd = Set.prototype.add;\n\
+        Set.prototype.add = function add(v) {\n\
+          _call(origSetAdd, this, v === 0 ? 0 : v);\n\
+          return this;\n\
+        };\n\
+        Value.preserveToString(Set.prototype.add, origSetAdd);\n\
+      }\n\
+      if (!setUsesSameValueZero) {\n\
+        var origSetHas = Set.prototype.has;\n\
+        Set.prototype.has = function has(v) {\n\
+          return _call(origSetHas, this, v === 0 ? 0 : v);\n\
+        };\n\
+        Value.preserveToString(Set.prototype.has, origSetHas);\n\
+        var origSetDel = Set.prototype['delete'];\n\
+        Set.prototype['delete'] = function SetDelete(v) {\n\
+          return _call(origSetDel, this, v === 0 ? 0 : v);\n\
+        };\n\
+        Value.preserveToString(Set.prototype['delete'], origSetDel);\n\
+      }\n\
+      var mapSupportsSubclassing = supportsSubclassing(globals.Map, function (M) {\n\
+        var m = new M([]);\n\
+        // Firefox 32 is ok with the instantiating the subclass but will\n\
+        // throw when the map is used.\n\
+        m.set(42, 42);\n\
+        return m instanceof M;\n\
+      });\n\
+      var mapFailsToSupportSubclassing = Object.setPrototypeOf && !mapSupportsSubclassing; // without Object.setPrototypeOf, subclassing is not possible\n\
+      var mapRequiresNew = (function () {\n\
+        try {\n\
+          return !(globals.Map() instanceof globals.Map);\n\
+        } catch (e) {\n\
+          return e instanceof TypeError;\n\
+        }\n\
+      }());\n\
+      if (globals.Map.length !== 0 || mapFailsToSupportSubclassing || !mapRequiresNew) {\n\
+        var OrigMap = globals.Map;\n\
+        globals.Map = function Map() {\n\
+          if (!(this instanceof Map)) {\n\
+            throw new TypeError('Constructor Map requires \"new\"');\n\
+          }\n\
+          var m = new OrigMap();\n\
+          if (arguments.length > 0) {\n\
+            addIterableToMap(Map, m, arguments[0]);\n\
+          }\n\
+          delete m.constructor;\n\
+          Object.setPrototypeOf(m, Map.prototype);\n\
+          return m;\n\
+        };\n\
+        globals.Map.prototype = OrigMap.prototype;\n\
+        defineProperty(globals.Map.prototype, 'constructor', globals.Map, true);\n\
+        Value.preserveToString(globals.Map, OrigMap);\n\
+      }\n\
+      var setSupportsSubclassing = supportsSubclassing(globals.Set, function (S) {\n\
+        var s = new S([]);\n\
+        s.add(42, 42);\n\
+        return s instanceof S;\n\
+      });\n\
+      var setFailsToSupportSubclassing = Object.setPrototypeOf && !setSupportsSubclassing; // without Object.setPrototypeOf, subclassing is not possible\n\
+      var setRequiresNew = (function () {\n\
+        try {\n\
+          return !(globals.Set() instanceof globals.Set);\n\
+        } catch (e) {\n\
+          return e instanceof TypeError;\n\
+        }\n\
+      }());\n\
+      if (globals.Set.length !== 0 || setFailsToSupportSubclassing || !setRequiresNew) {\n\
+        var OrigSet = globals.Set;\n\
+        globals.Set = function Set() {\n\
+          if (!(this instanceof Set)) {\n\
+            throw new TypeError('Constructor Set requires \"new\"');\n\
+          }\n\
+          var s = new OrigSet();\n\
+          if (arguments.length > 0) {\n\
+            addIterableToSet(Set, s, arguments[0]);\n\
+          }\n\
+          delete s.constructor;\n\
+          Object.setPrototypeOf(s, Set.prototype);\n\
+          return s;\n\
+        };\n\
+        globals.Set.prototype = OrigSet.prototype;\n\
+        defineProperty(globals.Set.prototype, 'constructor', globals.Set, true);\n\
+        Value.preserveToString(globals.Set, OrigSet);\n\
+      }\n\
+      var mapIterationThrowsStopIterator = !valueOrFalseIfThrows(function () {\n\
+        return (new Map()).keys().next().done;\n\
+      });\n\
+      /*\n\
+        - In Firefox < 23, Map#size is a function.\n\
+        - In all current Firefox, Set#entries/keys/values & Map#clear do not exist\n\
+        - https://bugzilla.mozilla.org/show_bug.cgi?id=869996\n\
+        - In Firefox 24, Map and Set do not implement forEach\n\
+        - In Firefox 25 at least, Map and Set are callable without \"new\"\n\
+      */\n\
+      if (\n\
+        typeof globals.Map.prototype.clear !== 'function' ||\n\
+        new globals.Set().size !== 0 ||\n\
+        new globals.Map().size !== 0 ||\n\
+        typeof globals.Map.prototype.keys !== 'function' ||\n\
+        typeof globals.Set.prototype.keys !== 'function' ||\n\
+        typeof globals.Map.prototype.forEach !== 'function' ||\n\
+        typeof globals.Set.prototype.forEach !== 'function' ||\n\
+        isCallableWithoutNew(globals.Map) ||\n\
+        isCallableWithoutNew(globals.Set) ||\n\
+        typeof (new globals.Map().keys().next) !== 'function' || // Safari 8\n\
+        mapIterationThrowsStopIterator || // Firefox 25\n\
+        !mapSupportsSubclassing\n\
+      ) {\n\
+        defineProperties(globals, {\n\
+          Map: collectionShims.Map,\n\
+          Set: collectionShims.Set\n\
+        }, true);\n\
+      }\n\
+\n\
+      if (globals.Set.prototype.keys !== globals.Set.prototype.values) {\n\
+        // Fixed in WebKit with https://bugs.webkit.org/show_bug.cgi?id=144190\n\
+        defineProperty(globals.Set.prototype, 'keys', globals.Set.prototype.values, true);\n\
+      }\n\
+\n\
+      // Shim incomplete iterator implementations.\n\
+      addIterator(Object.getPrototypeOf((new globals.Map()).keys()));\n\
+      addIterator(Object.getPrototypeOf((new globals.Set()).keys()));\n\
+\n\
+      if (functionsHaveNames && globals.Set.prototype.has.name !== 'has') {\n\
+        // Microsoft Edge v0.11.10074.0 is missing a name on Set#has\n\
+        var anonymousSetHas = globals.Set.prototype.has;\n\
+        overrideNative(globals.Set.prototype, 'has', function has(key) {\n\
+          return _call(anonymousSetHas, this, key);\n\
+        });\n\
+      }\n\
+    }\n\
+    defineProperties(globals, collectionShims);\n\
+    addDefaultSpecies(globals.Map);\n\
+    addDefaultSpecies(globals.Set);\n\
+  }\n\
+\n\
+  var throwUnlessTargetIsObject = function throwUnlessTargetIsObject(target) {\n\
+    if (!ES.TypeIsObject(target)) {\n\
+      throw new TypeError('target must be an object');\n\
+    }\n\
+  };\n\
+\n\
+  // Some Reflect methods are basically the same as\n\
+  // those on the Object global, except that a TypeError is thrown if\n\
+  // target isn't an object. As well as returning a boolean indicating\n\
+  // the success of the operation.\n\
+  var ReflectShims = {\n\
+    // Apply method in a functional form.\n\
+    apply: function apply() {\n\
+      return ES.Call(ES.Call, null, arguments);\n\
+    },\n\
+\n\
+    // New operator in a functional form.\n\
+    construct: function construct(constructor, args) {\n\
+      if (!ES.IsConstructor(constructor)) {\n\
+        throw new TypeError('First argument must be a constructor.');\n\
+      }\n\
+      var newTarget = arguments.length > 2 ? arguments[2] : constructor;\n\
+      if (!ES.IsConstructor(newTarget)) {\n\
+        throw new TypeError('new.target must be a constructor.');\n\
+      }\n\
+      return ES.Construct(constructor, args, newTarget, 'internal');\n\
+    },\n\
+\n\
+    // When deleting a non-existent or configurable property,\n\
+    // true is returned.\n\
+    // When attempting to delete a non-configurable property,\n\
+    // it will return false.\n\
+    deleteProperty: function deleteProperty(target, key) {\n\
+      throwUnlessTargetIsObject(target);\n\
+      if (supportsDescriptors) {\n\
+        var desc = Object.getOwnPropertyDescriptor(target, key);\n\
+\n\
+        if (desc && !desc.configurable) {\n\
+          return false;\n\
+        }\n\
+      }\n\
+\n\
+      // Will return true.\n\
+      return delete target[key];\n\
+    },\n\
+\n\
+    enumerate: function enumerate(target) {\n\
+      throwUnlessTargetIsObject(target);\n\
+      return new ObjectIterator(target, 'key');\n\
+    },\n\
+\n\
+    has: function has(target, key) {\n\
+      throwUnlessTargetIsObject(target);\n\
+      return key in target;\n\
+    }\n\
+  };\n\
+\n\
+  if (Object.getOwnPropertyNames) {\n\
+    Object.assign(ReflectShims, {\n\
+      // Basically the result of calling the internal [[OwnPropertyKeys]].\n\
+      // Concatenating propertyNames and propertySymbols should do the trick.\n\
+      // This should continue to work together with a Symbol shim\n\
+      // which overrides Object.getOwnPropertyNames and implements\n\
+      // Object.getOwnPropertySymbols.\n\
+      ownKeys: function ownKeys(target) {\n\
+        throwUnlessTargetIsObject(target);\n\
+        var keys = Object.getOwnPropertyNames(target);\n\
+\n\
+        if (ES.IsCallable(Object.getOwnPropertySymbols)) {\n\
+          _pushApply(keys, Object.getOwnPropertySymbols(target));\n\
+        }\n\
+\n\
+        return keys;\n\
+      }\n\
+    });\n\
+  }\n\
+\n\
+  var callAndCatchException = function ConvertExceptionToBoolean(func) {\n\
+    return !throwsError(func);\n\
+  };\n\
+\n\
+  if (Object.preventExtensions) {\n\
+    Object.assign(ReflectShims, {\n\
+      isExtensible: function isExtensible(target) {\n\
+        throwUnlessTargetIsObject(target);\n\
+        return Object.isExtensible(target);\n\
+      },\n\
+      preventExtensions: function preventExtensions(target) {\n\
+        throwUnlessTargetIsObject(target);\n\
+        return callAndCatchException(function () {\n\
+          Object.preventExtensions(target);\n\
+        });\n\
+      }\n\
+    });\n\
+  }\n\
+\n\
+  if (supportsDescriptors) {\n\
+    var internalGet = function get(target, key, receiver) {\n\
+      var desc = Object.getOwnPropertyDescriptor(target, key);\n\
+\n\
+      if (!desc) {\n\
+        var parent = Object.getPrototypeOf(target);\n\
+\n\
+        if (parent === null) {\n\
+          return void 0;\n\
+        }\n\
+\n\
+        return internalGet(parent, key, receiver);\n\
+      }\n\
+\n\
+      if ('value' in desc) {\n\
+        return desc.value;\n\
+      }\n\
+\n\
+      if (desc.get) {\n\
+        return ES.Call(desc.get, receiver);\n\
+      }\n\
+\n\
+      return void 0;\n\
+    };\n\
+\n\
+    var internalSet = function set(target, key, value, receiver) {\n\
+      var desc = Object.getOwnPropertyDescriptor(target, key);\n\
+\n\
+      if (!desc) {\n\
+        var parent = Object.getPrototypeOf(target);\n\
+\n\
+        if (parent !== null) {\n\
+          return internalSet(parent, key, value, receiver);\n\
+        }\n\
+\n\
+        desc = {\n\
+          value: void 0,\n\
+          writable: true,\n\
+          enumerable: true,\n\
+          configurable: true\n\
+        };\n\
+      }\n\
+\n\
+      if ('value' in desc) {\n\
+        if (!desc.writable) {\n\
+          return false;\n\
+        }\n\
+\n\
+        if (!ES.TypeIsObject(receiver)) {\n\
+          return false;\n\
+        }\n\
+\n\
+        var existingDesc = Object.getOwnPropertyDescriptor(receiver, key);\n\
+\n\
+        if (existingDesc) {\n\
+          return Reflect.defineProperty(receiver, key, {\n\
+            value: value\n\
+          });\n\
+        } else {\n\
+          return Reflect.defineProperty(receiver, key, {\n\
+            value: value,\n\
+            writable: true,\n\
+            enumerable: true,\n\
+            configurable: true\n\
+          });\n\
+        }\n\
+      }\n\
+\n\
+      if (desc.set) {\n\
+        _call(desc.set, receiver, value);\n\
+        return true;\n\
+      }\n\
+\n\
+      return false;\n\
+    };\n\
+\n\
+    Object.assign(ReflectShims, {\n\
+      defineProperty: function defineProperty(target, propertyKey, attributes) {\n\
+        throwUnlessTargetIsObject(target);\n\
+        return callAndCatchException(function () {\n\
+          Object.defineProperty(target, propertyKey, attributes);\n\
+        });\n\
+      },\n\
+\n\
+      getOwnPropertyDescriptor: function getOwnPropertyDescriptor(target, propertyKey) {\n\
+        throwUnlessTargetIsObject(target);\n\
+        return Object.getOwnPropertyDescriptor(target, propertyKey);\n\
+      },\n\
+\n\
+      // Syntax in a functional form.\n\
+      get: function get(target, key) {\n\
+        throwUnlessTargetIsObject(target);\n\
+        var receiver = arguments.length > 2 ? arguments[2] : target;\n\
+\n\
+        return internalGet(target, key, receiver);\n\
+      },\n\
+\n\
+      set: function set(target, key, value) {\n\
+        throwUnlessTargetIsObject(target);\n\
+        var receiver = arguments.length > 3 ? arguments[3] : target;\n\
+\n\
+        return internalSet(target, key, value, receiver);\n\
+      }\n\
+    });\n\
+  }\n\
+\n\
+  if (Object.getPrototypeOf) {\n\
+    var objectDotGetPrototypeOf = Object.getPrototypeOf;\n\
+    ReflectShims.getPrototypeOf = function getPrototypeOf(target) {\n\
+      throwUnlessTargetIsObject(target);\n\
+      return objectDotGetPrototypeOf(target);\n\
+    };\n\
+  }\n\
+\n\
+  if (Object.setPrototypeOf && ReflectShims.getPrototypeOf) {\n\
+    var willCreateCircularPrototype = function (object, lastProto) {\n\
+      var proto = lastProto;\n\
+      while (proto) {\n\
+        if (object === proto) {\n\
+          return true;\n\
+        }\n\
+        proto = ReflectShims.getPrototypeOf(proto);\n\
+      }\n\
+      return false;\n\
+    };\n\
+\n\
+    Object.assign(ReflectShims, {\n\
+      // Sets the prototype of the given object.\n\
+      // Returns true on success, otherwise false.\n\
+      setPrototypeOf: function setPrototypeOf(object, proto) {\n\
+        throwUnlessTargetIsObject(object);\n\
+        if (proto !== null && !ES.TypeIsObject(proto)) {\n\
+          throw new TypeError('proto must be an object or null');\n\
+        }\n\
+\n\
+        // If they already are the same, we're done.\n\
+        if (proto === Reflect.getPrototypeOf(object)) {\n\
+          return true;\n\
+        }\n\
+\n\
+        // Cannot alter prototype if object not extensible.\n\
+        if (Reflect.isExtensible && !Reflect.isExtensible(object)) {\n\
+          return false;\n\
+        }\n\
+\n\
+        // Ensure that we do not create a circular prototype chain.\n\
+        if (willCreateCircularPrototype(object, proto)) {\n\
+          return false;\n\
+        }\n\
+\n\
+        Object.setPrototypeOf(object, proto);\n\
+\n\
+        return true;\n\
+      }\n\
+    });\n\
+  }\n\
+  var defineOrOverrideReflectProperty = function (key, shim) {\n\
+    if (!ES.IsCallable(globals.Reflect[key])) {\n\
+      defineProperty(globals.Reflect, key, shim);\n\
+    } else {\n\
+      var acceptsPrimitives = valueOrFalseIfThrows(function () {\n\
+        globals.Reflect[key](1);\n\
+        globals.Reflect[key](NaN);\n\
+        globals.Reflect[key](true);\n\
+        return true;\n\
+      });\n\
+      if (acceptsPrimitives) {\n\
+        overrideNative(globals.Reflect, key, shim);\n\
+      }\n\
+    }\n\
+  };\n\
+  Object.keys(ReflectShims).forEach(function (key) {\n\
+    defineOrOverrideReflectProperty(key, ReflectShims[key]);\n\
+  });\n\
+  if (functionsHaveNames && globals.Reflect.getPrototypeOf.name !== 'getPrototypeOf') {\n\
+    var originalReflectGetProto = globals.Reflect.getPrototypeOf;\n\
+    overrideNative(globals.Reflect, 'getPrototypeOf', function getPrototypeOf(target) {\n\
+      return _call(originalReflectGetProto, globals.Reflect, target);\n\
+    });\n\
+  }\n\
+  if (globals.Reflect.setPrototypeOf) {\n\
+    if (valueOrFalseIfThrows(function () {\n\
+      globals.Reflect.setPrototypeOf(1, {});\n\
+      return true;\n\
+    })) {\n\
+      overrideNative(globals.Reflect, 'setPrototypeOf', ReflectShims.setPrototypeOf);\n\
+    }\n\
+  }\n\
+  if (globals.Reflect.defineProperty) {\n\
+    if (!valueOrFalseIfThrows(function () {\n\
+      var basic = !globals.Reflect.defineProperty(1, 'test', { value: 1 });\n\
+      // \"extensible\" fails on Edge 0.12\n\
+      var extensible = typeof Object.preventExtensions !== 'function' || !globals.Reflect.defineProperty(Object.preventExtensions({}), 'test', {});\n\
+      return basic && extensible;\n\
+    })) {\n\
+      overrideNative(globals.Reflect, 'defineProperty', ReflectShims.defineProperty);\n\
+    }\n\
+  }\n\
+  if (globals.Reflect.construct) {\n\
+    if (!valueOrFalseIfThrows(function () {\n\
+      var F = function F() {};\n\
+      return globals.Reflect.construct(function () {}, [], F) instanceof F;\n\
+    })) {\n\
+      overrideNative(globals.Reflect, 'construct', ReflectShims.construct);\n\
+    }\n\
+  }\n\
+\n\
+  if (String(new Date(NaN)) !== 'Invalid Date') {\n\
+    var dateToString = Date.prototype.toString;\n\
+    var shimmedDateToString = function toString() {\n\
+      var valueOf = +this;\n\
+      if (valueOf !== valueOf) {\n\
+        return 'Invalid Date';\n\
+      }\n\
+      return ES.Call(dateToString, this);\n\
+    };\n\
+    overrideNative(Date.prototype, 'toString', shimmedDateToString);\n\
+  }\n\
+\n\
+  // Annex B HTML methods\n\
+  // https://people.mozilla.org/~jorendorff/es6-draft.html#sec-additional-properties-of-the-string.prototype-object\n\
+  var stringHTMLshims = {\n\
+    anchor: function anchor(name) { return ES.CreateHTML(this, 'a', 'name', name); },\n\
+    big: function big() { return ES.CreateHTML(this, 'big', '', ''); },\n\
+    blink: function blink() { return ES.CreateHTML(this, 'blink', '', ''); },\n\
+    bold: function bold() { return ES.CreateHTML(this, 'b', '', ''); },\n\
+    fixed: function fixed() { return ES.CreateHTML(this, 'tt', '', ''); },\n\
+    fontcolor: function fontcolor(color) { return ES.CreateHTML(this, 'font', 'color', color); },\n\
+    fontsize: function fontsize(size) { return ES.CreateHTML(this, 'font', 'size', size); },\n\
+    italics: function italics() { return ES.CreateHTML(this, 'i', '', ''); },\n\
+    link: function link(url) { return ES.CreateHTML(this, 'a', 'href', url); },\n\
+    small: function small() { return ES.CreateHTML(this, 'small', '', ''); },\n\
+    strike: function strike() { return ES.CreateHTML(this, 'strike', '', ''); },\n\
+    sub: function sub() { return ES.CreateHTML(this, 'sub', '', ''); },\n\
+    sup: function sub() { return ES.CreateHTML(this, 'sup', '', ''); }\n\
+  };\n\
+  _forEach(Object.keys(stringHTMLshims), function (key) {\n\
+    var method = String.prototype[key];\n\
+    var shouldOverwrite = false;\n\
+    if (ES.IsCallable(method)) {\n\
+      var output = _call(method, '', ' \" ');\n\
+      var quotesCount = _concat([], output.match(/\"/g)).length;\n\
+      shouldOverwrite = output !== output.toLowerCase() || quotesCount > 2;\n\
+    } else {\n\
+      shouldOverwrite = true;\n\
+    }\n\
+    if (shouldOverwrite) {\n\
+      overrideNative(String.prototype, key, stringHTMLshims[key]);\n\
+    }\n\
+  });\n\
+\n\
+  var JSONstringifiesSymbols = (function () {\n\
+    // Microsoft Edge v0.12 stringifies Symbols incorrectly\n\
+    if (!hasSymbols) { return false; } // Symbols are not supported\n\
+    var stringify = typeof JSON === 'object' && typeof JSON.stringify === 'function' ? JSON.stringify : null;\n\
+    if (!stringify) { return false; } // JSON.stringify is not supported\n\
+    if (typeof stringify(Symbol()) !== 'undefined') { return true; } // Symbols should become `undefined`\n\
+    if (stringify([Symbol()]) !== '[null]') { return true; } // Symbols in arrays should become `null`\n\
+    var obj = { a: Symbol() };\n\
+    obj[Symbol()] = true;\n\
+    if (stringify(obj) !== '{}') { return true; } // Symbol-valued keys *and* Symbol-valued properties should be omitted\n\
+    return false;\n\
+  }());\n\
+  var JSONstringifyAcceptsObjectSymbol = valueOrFalseIfThrows(function () {\n\
+    // Chrome 45 throws on stringifying object symbols\n\
+    if (!hasSymbols) { return true; } // Symbols are not supported\n\
+    return JSON.stringify(Object(Symbol())) === '{}' && JSON.stringify([Object(Symbol())]) === '[{}]';\n\
+  });\n\
+  if (JSONstringifiesSymbols || !JSONstringifyAcceptsObjectSymbol) {\n\
+    var origStringify = JSON.stringify;\n\
+    overrideNative(JSON, 'stringify', function stringify(value) {\n\
+      if (typeof value === 'symbol') { return; }\n\
+      var replacer;\n\
+      if (arguments.length > 1) {\n\
+        replacer = arguments[1];\n\
+      }\n\
+      var args = [value];\n\
+      if (!isArray(replacer)) {\n\
+        var replaceFn = ES.IsCallable(replacer) ? replacer : null;\n\
+        var wrappedReplacer = function (key, val) {\n\
+          var parsedValue = replaceFn ? _call(replaceFn, this, key, val) : val;\n\
+          if (typeof parsedValue !== 'symbol') {\n\
+            if (Type.symbol(parsedValue)) {\n\
+              return assignTo({})(parsedValue);\n\
+            } else {\n\
+              return parsedValue;\n\
+            }\n\
+          }\n\
+        };\n\
+        args.push(wrappedReplacer);\n\
+      } else {\n\
+        // create wrapped replacer that handles an array replacer?\n\
+        args.push(replacer);\n\
+      }\n\
+      if (arguments.length > 2) {\n\
+        args.push(arguments[2]);\n\
+      }\n\
+      return origStringify.apply(this, args);\n\
+    });\n\
+  }\n\
+\n\
+  return globals;\n\
+}));\n\
+\n\
+//# sourceURL=components/es-shims/es6-shim/0.34.2/es6-shim.js"
+));
+
+require.modules["es-shims-es6-shim"] = require.modules["es-shims~es6-shim@0.34.2"];
+require.modules["es-shims~es6-shim"] = require.modules["es-shims~es6-shim@0.34.2"];
+require.modules["es6-shim"] = require.modules["es-shims~es6-shim@0.34.2"];
 
 
 require.register("jashkenas~underscore@1.7.0", Function("exports, module",
@@ -36030,6 +36030,72 @@ require.modules["kpwebb~select2"] = require.modules["kpwebb~select2@3.4.8"];
 require.modules["select2"] = require.modules["kpwebb~select2@3.4.8"];
 
 
+require.register("./client/auth0-user", Function("exports, module",
+"function Auth0User (profile) {\n\
+  this.profile = profile;\n\
+  this.dt = this.profile.app_metadata.datatools;\n\
+}\n\
+\n\
+Auth0User.prototype.getEmail = function () {\n\
+  return this.profile.email;\n\
+};\n\
+\n\
+Auth0User.prototype.canAdminsterProject = function (projectID) {\n\
+  if(this.canAdministerApp()) return true;\n\
+  if(this.dt && this.dt.projects) {\n\
+    for(var i=0; i< this.dt.projects.length; i++) {\n\
+      var project = this.dt.projects[i];\n\
+      if(project.project_id === projectID) {\n\
+        for(var j=0; j<project.permissions.length; j++) {\n\
+          if(project.permissions[j].type === \"administer-project\") return true;\n\
+        }\n\
+      }\n\
+    }\n\
+  }\n\
+  return false;\n\
+};\n\
+\n\
+Auth0User.prototype.canManageFeed = function (projectID, feedID) {\n\
+  if(this.canAdministerApp()) return true;\n\
+  if(this.dt && this.dt.projects) {\n\
+    for(var i=0; i< this.dt.projects.length; i++) {\n\
+      var project = this.dt.projects[i];\n\
+      if(project.project_id === projectID) {\n\
+        for(var j=0; j<project.permissions.length; j++) {\n\
+          var permission = project.permissions[j];\n\
+          if(permission.type === \"administer-project\") return true;\n\
+          if(permission.type === \"manage-feed\") {\n\
+            for (var k = 0; k < permission.feeds.length; k++) {\n\
+              if (permission.feeds[k] === feedID || permission.feeds[k] === \"*\") {\n\
+                return true;\n\
+              }\n\
+            }\n\
+          }\n\
+        }\n\
+      }\n\
+    }\n\
+  }\n\
+  return false;\n\
+};\n\
+\n\
+Auth0User.prototype.canAdministerApp = function () {\n\
+  if(this.dt && this.dt.permissions) {\n\
+    for(var i=0; i<this.dt.permissions.length; i++) {\n\
+      var permission = this.dt.permissions[i];\n\
+      if(permission.type === \"administer-application\") return true;\n\
+    }\n\
+  }\n\
+  return false;\n\
+};\n\
+\n\
+module.exports = Auth0User;\n\
+\n\
+//# sourceURL=client/auth0-user/auth0-user.js"
+));
+
+require.modules["auth0-user"] = require.modules["./client/auth0-user"];
+
+
 require.register("./client/bb", Function("exports, module",
 "var Backbone = require('jashkenas~backbone@1.1.2');\n\
 \n\
@@ -36359,6 +36425,7 @@ var Breadcrumb = require('./client/breadcrumb-nav');\n\
 var es5 = require('es-shims~es5-shim@v4.1.0');\n\
 var es6 = require('es-shims~es6-shim@0.34.2');\n\
 var Handlebars = require('components~handlebars.js@v2.0.0');\n\
+var Auth0User = require('./client/auth0-user');\n\
 \n\
 // register Handlebars helpers and partials\n\
 require('./client/date-render-helper');\n\
@@ -36366,10 +36433,73 @@ require('./client/class-helper');\n\
 require('./client/logic-helper');\n\
 require('./client/translate-helper');\n\
 require('./client/text-helper');\n\
-require('./client/admin-helper');\n\
+//require('admin-helper');\n\
 require('./client/validation-partial');\n\
 \n\
-var app = new BB.Marionette.Application();\n\
+//var app = new BB.Marionette.Application();\n\
+\n\
+var App = BB.Marionette.Application.extend({\n\
+\n\
+  userLoggedIn: function(token, profile, lock) {\n\
+\n\
+    this.auth0User = new Auth0User(profile);\n\
+\n\
+    $('#logged-in-user').text(window.Messages('app.account.logged_in_as', this.auth0User.getEmail()));\n\
+    $('#logout').removeClass('hidden');\n\
+    $('#myAccount').removeClass('hidden');\n\
+\n\
+    this.initBB(token);\n\
+\n\
+    // set up single logout\n\
+    var self = this;\n\
+    setInterval(function() {\n\
+      // if the token is not in local storage, there is nothing to check (i.e. the user is already logged out)\n\
+      if (!localStorage.getItem('userToken')) return;\n\
+\n\
+      lock.$auth0.getSSOData(function(err, data) {\n\
+        // if there is still a session, do nothing\n\
+        if (err || (data && data.sso)) return;\n\
+\n\
+        // if we get here, it means there is no session on Auth0,\n\
+        // then remove the token and redirect to #login\n\
+        self.logout();\n\
+      });\n\
+    }, 5000)\n\
+  },\n\
+\n\
+  initBB: function(token) {\n\
+    BB.$.ajaxSetup({\n\
+      beforeSend(jqXHR) {\n\
+        jqXHR.setRequestHeader('Authorization', 'Bearer ' + token);\n\
+        return true;\n\
+      }\n\
+    });\n\
+  },\n\
+\n\
+  logout: function() {\n\
+    localStorage.removeItem('userToken')\n\
+\n\
+    var self = this;\n\
+    // logout from the data manager server\n\
+    $.ajax('logout').done(function(data) {\n\
+      // logout from Auth0, redirecting to the manager home page\n\
+      var loc = window.location;\n\
+      var redirect = loc.protocol + \"//\" + loc.hostname + (loc.port ? ':' + loc.port: '');\n\
+      window.location.replace('https://' + self.config.auth0Domain + '/v2/logout?returnTo=' + redirect);\n\
+    });\n\
+  },\n\
+\n\
+  resetPassword: function() {\n\
+    console.log('resetPassword');\n\
+    var lock = new Auth0Lock(this.config.auth0ClientId, this.config.auth0Domain);\n\
+    lock.showReset(function(err) {\n\
+      if (!err) lock.hide();\n\
+    });\n\
+  }\n\
+\n\
+});\n\
+\n\
+var app = new App();\n\
 \n\
 app.user = null;\n\
 \n\
@@ -36383,29 +36513,18 @@ app.addRegions({\n\
 app.nav = new Breadcrumb();\n\
 \n\
 app.on('before:start', function() {\n\
+  RenderDatatoolsNavbar({\n\
+    elementId: 'navbar',\n\
+    title: Messages('app.name'),\n\
+    managerUrl: '#',\n\
+    editorUrl: app.config.editorUrl,\n\
+    userAdminUrl: app.config.userAdminUrl,\n\
+    username: this.auth0User ? this.auth0User.getEmail() : null,\n\
+    logoutHandler: app.logout.bind(app),\n\
+    resetPasswordHandler: app.resetPassword.bind(app)\n\
+  });\n\
+\n\
   app.navRegion.show(app.nav);\n\
-\n\
-  // set up the name\n\
-  $('#appName').text(Messages('app.name'));\n\
-\n\
-  $('#logout').text(Messages('app.logout'))\n\
-    .click(function(e) {\n\
-      e.preventDefault();\n\
-      $.ajax({\n\
-        url: 'logout',\n\
-      }).done(function(data) {\n\
-        if (data.status == 'logged_out') {\n\
-          $('#logout').addClass(\"hidden\");\n\
-          $('#logged-in-user').text('');\n\
-          $('#manageUsers').addClass('hidden');\n\
-          $('#myAccount').addClass('hidden');\n\
-          window.location.hash = '#login';\n\
-        }\n\
-      });\n\
-    });\n\
-\n\
-  $('#manageUsers').text(window.Messages(\"app.user.manage-users\"));\n\
-  $('#myAccount').text(window.Messages(\"app.user.my-account\"));\n\
 });\n\
 \n\
 module.exports = app;\n\
@@ -36476,34 +36595,7 @@ var Login = LayoutView.extend({\n\
   initialize: function(attr) {\n\
     this.returnTo = attr.returnTo\n\
       // bind it so context is layout not a DOM object\n\
-    _.bindAll(this, 'doLogin');\n\
-  },\n\
-\n\
-  doLogin: function() {\n\
-    var instance = this;\n\
-    $.post('/authenticate', {\n\
-        username: this.$('input[name=\"username\"]').val(),\n\
-        password: this.$('input[name=\"password\"]').val()\n\
-      })\n\
-      .then(function(data) {\n\
-        $('#logged-in-user').text(window.Messages('app.account.logged_in_as', data.username));\n\
-        $('#logout').removeClass('hidden');\n\
-        $('#myAccount').removeClass('hidden').attr('href', '#user/' + data.id);\n\
-\n\
-        if (data.admin)\n\
-          $('#manageUsers').removeClass('hidden');\n\
-\n\
-        // note: log out is handled in application.js\n\
-\n\
-        app.user = data;\n\
-\n\
-        window.location.hash = instance.returnTo ? instance.returnTo : '#admin';\n\
-      })\n\
-      .fail(function() {\n\
-        window.alert('Log in failed');\n\
-      });\n\
-\n\
-    return false;\n\
+    //_.bindAll(this, 'doLogin');\n\
   },\n\
 \n\
   onShow: function() {\n\
@@ -36512,6 +36604,27 @@ var Login = LayoutView.extend({\n\
       name: Messages('app.location.login'),\n\
       href: '#login'\n\
     }]);\n\
+\n\
+    var lock = new Auth0Lock(app.config.auth0ClientId, app.config.auth0Domain);\n\
+    var lockOptions = {\n\
+      connections: ['Username-Password-Authentication'],\n\
+      closable: false\n\
+    };\n\
+    if (app.config.logo) lockOptions.icon = app.config.logo;\n\
+\n\
+    lock.show(lockOptions, function (err, profile, token) {\n\
+      if(err) {\n\
+        console.log(err)\n\
+      } else {\n\
+        // save profile and token to localStorage\n\
+        localStorage.setItem('userToken', token);\n\
+\n\
+        app.userLoggedIn(token, profile, lock);\n\
+        document.location.hash = ''\n\
+      }\n\
+    }, {\n\
+      container: 'auth0login'\n\
+    });\n\
   }\n\
 });\n\
 \n\
@@ -36525,7 +36638,7 @@ module.exports = function(returnTo) {\n\
 //# sourceURL=client/login-route/login-route.js"
 ));
 
-require.define("./client/login-route/login-route.html", "<div class=\"row\">\n  <div class=\"col-sm-4 col-sm-offset-4\">\n    <img src=\"images/login_logo.png\" style=\"padding: 25px; width:100%;\">\n    <form role=\"form\">\n      <div class=\"form-group\">\n        <label for=\"login-username\" class=\"sr-only\">{{ app.username }}</label>\n        <input type=\"text\" name=\"username\" placeholder=\"{{ t 'app.username' }}\" class=\"form-control\">\n      </div>\n\n      <div class=\"form-group\">\n        <label for=\"login-password\" class=\"sr-only\">{{ t 'app.password' }}</label>\n        <input type=\"password\" name=\"password\" placeholder=\"{{ t 'app.password' }}\" class=\"form-control\">\n      </div>\n\n      <input class=\"btn btn-block btn-primary login\" type=\"submit\" value=\"Log in\">\n    </form>\n  </div>\n</div>\n");
+require.define("./client/login-route/login-route.html", "<div class=\"row\">\n  <div class=\"col-sm-4 col-sm-offset-4\">\n    <div id=\"auth0login\"></div>\n  </div>\n</div>\n");
 
 require.modules["login-route"] = require.modules["./client/login-route"];
 
@@ -36581,7 +36694,12 @@ module.exports = BB.Model.extend({\n\
     osmEast: null,\n\
     osmNorth: null,\n\
     buildConfig: null,\n\
-    routerConfig: null\n\
+    routerConfig: null,\n\
+    defaultTimeZone: null,\n\
+    defaultLanguage: null,\n\
+    defaultLocationLat: null,\n\
+    defaultLocationLon: null,\n\
+    autoFetchFeeds: null\n\
   },\n\
   urlRoot: 'api/feedcollections/'\n\
 });\n\
@@ -36800,6 +36918,7 @@ module.exports = ItemView.extend({\n\
   initialize: function(attr) {\n\
     this.attribute = attr.attribute || this.attribute;\n\
     this.maxWidth = attr.maxWidth;\n\
+    this.disabled = attr.disabled\n\
     this.href = attr.href || this.href;\n\
 \n\
     _.bindAll(this, 'edit');\n\
@@ -36860,7 +36979,8 @@ module.exports = ItemView.extend({\n\
       displayText: text,\n\
       value: value,\n\
       placeholder: text,\n\
-      href: href\n\
+      href: href,\n\
+      disabled: this.disabled\n\
     };\n\
   }\n\
 });\n\
@@ -36868,7 +36988,7 @@ module.exports = ItemView.extend({\n\
 //# sourceURL=client/editable-text-widget/editable-text-widget.js"
 ));
 
-require.define("./client/editable-text-widget/editable-text-widget.html", "{{!-- TODO: 508 --}}\n<a href=\"{{ href }}\" class=\"input\">{{ displayText }}</a>\n<input type=\"text\" class=\"input form-control hidden\" style=\"display: inline; width: auto\" name=\"name\" value=\"{{ value }}\" placeholder=\"{{ placeholder }}\" />\n<button role=\"button\" class=\"toggle-edit\">\n  <span class=\"glyphicon glyphicon-pencil\"></span><span class=\"sr-only label\">{{ t 'app.edit' }}</span>\n</button>\n");
+require.define("./client/editable-text-widget/editable-text-widget.html", "{{!-- TODO: 508 --}}\n<a href=\"{{ href }}\" class=\"input\">{{ displayText }}</a>\n<input type=\"text\" class=\"input form-control hidden\" style=\"display: inline; width: auto\" name=\"name\" value=\"{{ value }}\" placeholder=\"{{ placeholder }}\" />\n{{#unless disabled}}\n  <button role=\"button\" class=\"toggle-edit\">\n    <span class=\"glyphicon glyphicon-pencil\"></span><span class=\"sr-only label\">{{ t 'app.edit' }}</span>\n  </button>\n{{/unless}}\n");
 
 require.modules["editable-text-widget"] = require.modules["./client/editable-text-widget"];
 
@@ -36901,13 +37021,14 @@ module.exports = ItemView.extend({\n\
 \n\
   onShow: function() {\n\
     this.$el.find('.modal').modal();\n\
+    if(this.options.onShow) this.options.onShow.call(this);\n\
   }\n\
 });\n\
 \n\
 //# sourceURL=client/confirm-view/confirm-view.js"
 ));
 
-require.define("./client/confirm-view/confirm-view.html", "<div class=\"modal\" role=\"dialog\" aria-labelledby=\"confirm-title\">\n  <div class=\"modal-dialog\">\n    <div class=\"modal-content\">\n      <div class=\"modal-header\">\n        <button type=\"button\" class=\"close cancel-action\" data-dismiss=\"modal\">\n          <span aria-hidden=\"true\">&times;</span><span class=\"sr-only\">{{ t 'app.close' }}</span>\n        </button>\n        <h4 class=\"modal-title\" id=\"confirm-title\">{{ title }}</h4>\n      </div>\n\n      <div class=\"modal-body\">\n        <p>{{ body }}</p>\n      </div>\n      <div class=\"modal-footer\">\n        <button role=\"button\" data-dismiss=\"modal\" class=\"btn btn-default cancel-action\">{{ t 'app.cancel' }}</button>\n        <button role=\"button\" data-dismiss=\"modal\" class=\"btn btn-primary proceed-action\">{{ t 'app.proceed' }}</button>\n      </div>\n    </div>\n  </div>\n</div>\n");
+require.define("./client/confirm-view/confirm-view.html", "<div class=\"modal\" role=\"dialog\" aria-labelledby=\"confirm-title\">\n  <div class=\"modal-dialog\">\n    <div class=\"modal-content\">\n      <div class=\"modal-header\">\n        <button type=\"button\" class=\"close cancel-action\" data-dismiss=\"modal\">\n          <span aria-hidden=\"true\">&times;</span><span class=\"sr-only\">{{ t 'app.close' }}</span>\n        </button>\n        <h4 class=\"modal-title\" id=\"confirm-title\">{{ title }}</h4>\n      </div>\n\n      <div class=\"modal-body\">\n        <p>{{{ body }}}</p>\n      </div>\n      <div class=\"modal-footer\">\n        <button role=\"button\" data-dismiss=\"modal\" class=\"btn btn-default cancel-action\">{{ t 'app.cancel' }}</button>\n        <button role=\"button\" data-dismiss=\"modal\" class=\"btn btn-primary proceed-action\">{{ t 'app.proceed' }}</button>\n      </div>\n    </div>\n  </div>\n</div>\n");
 
 require.modules["confirm-view"] = require.modules["./client/confirm-view"];
 
@@ -37001,6 +37122,14 @@ module.exports = LayoutView.extend({\n\
 \n\
   initialize: function() {\n\
     _.bindAll(this, 'editBool', 'editSource', 'removeSource', 'handleUrlRegion');\n\
+\n\
+    var canAdminsterProject = app.auth0User.canAdminsterProject(this.model.get('feedCollection').id);\n\
+    this.model.set('canAdminsterProject', canAdminsterProject);\n\
+\n\
+    var canManageFeed = app.auth0User.canManageFeed(this.model.get('feedCollection').id, this.model.get('id'));\n\
+    this.model.set('canManageFeed', canManageFeed);\n\
+\n\
+    console.log(this.model)\n\
   },\n\
 \n\
   // edit a boolean value\n\
@@ -37035,9 +37164,12 @@ module.exports = LayoutView.extend({\n\
   },\n\
 \n\
   onShow: function() {\n\
+    var canManageFeed = app.auth0User.canManageFeed(this.model.get('feedCollection').id, this.model.get('id'));\n\
+\n\
     var nameField = new EditableTextWidget({\n\
       model: this.model,\n\
       attribute: 'name',\n\
+      disabled: !canManageFeed,\n\
       href: function() {\n\
         if (this.model.id === null) {\n\
           // make it a no-op until saved\n\
@@ -37059,12 +37191,15 @@ module.exports = LayoutView.extend({\n\
 \n\
   // figure out what belongs in the URL region: a URL editor, a GTFS Editor selector, or nothing\n\
   handleUrlRegion: function() {\n\
+    var canManageFeed = app.auth0User.canManageFeed(this.model.get('feedCollection').id, this.model.get('id'));\n\
+\n\
     var retrievalMethod = this.model.get('retrievalMethod');\n\
     if (retrievalMethod == 'FETCHED_AUTOMATICALLY') {\n\
       this.urlRegion.show(new EditableTextWidget({\n\
         model: this.model,\n\
         maxWidth: 35,\n\
         attribute: 'url',\n\
+        disabled: !canManageFeed,\n\
         href: function() {\n\
           return this.model.get('url');\n\
         }\n\
@@ -37082,7 +37217,7 @@ module.exports = LayoutView.extend({\n\
 //# sourceURL=client/feed-source-item-view/feed-source-item-view.js"
 ));
 
-require.define("./client/feed-source-item-view/feed-source-item-view.html", "<td class=\"name\"></td>\n<td><input class=\"edit-bool\" type=\"checkbox\" name=\"isPublic\" {{ ? isPublic 'checked' '' }} /></td>\n<td><input class=\"edit-bool\" type=\"checkbox\" name=\"deployable\" {{ ? deployable 'checked' '' }} /></td>\n<td>\n  <select class=\"feed-source\" name=\"retrievalMethod\">\n    <option value=\"FETCHED_AUTOMATICALLY\" {{ ? (eq retrievalMethod 'FETCHED_AUTOMATICALLY') 'selected' '' }}>{{ t 'app.feed_source.retrieval_method.FETCHED_AUTOMATICALLY' }}</option>\n    <option value=\"MANUALLY_UPLOADED\" {{ ? (eq retrievalMethod 'MANUALLY_UPLOADED') 'selected' '' }}>{{ t 'app.feed_source.retrieval_method.MANUALLY_UPLOADED' }}</option>\n    <option value=\"PRODUCED_IN_HOUSE\" {{ ? (eq retrievalMethod 'PRODUCED_IN_HOUSE') 'selected' '' }}>{{ t 'app.feed_source.retrieval_method.PRODUCED_IN_HOUSE' }}</option>\n  </select>\n</td>\n<td class=\"url\"></td>\n<td>{{ dateRender lastUpdated true }}</td>\n\n{{#if (neq latestValidation null)}}\n  {{#with latestValidation}}\n    {{> validationResult }}\n  {{/with}}\n{{else}}\n    <td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td>\n{{/if}}\n\n<td>\n  <button role=\"button\" class=\"btn btn-danger btn-sm remove-feed\">\n    <span class=\"glyphicon glyphicon-remove\"></span>\n    <span class=\"sr-only\">{{ t 'app.feed_source.delete' }}</span>\n  </button>\n</td>\n");
+require.define("./client/feed-source-item-view/feed-source-item-view.html", "<td class=\"name\"></td>\n<td><input class=\"edit-bool\" type=\"checkbox\" name=\"isPublic\" {{ ? isPublic 'checked' '' }} {{ ? canManageFeed '' 'disabled' }}/></td>\n<td><input class=\"edit-bool\" type=\"checkbox\" name=\"deployable\" {{ ? deployable 'checked' '' }} {{ ? canManageFeed '' 'disabled' }}/></td>\n<td>\n  <select class=\"feed-source\" name=\"retrievalMethod\" {{ ? canManageFeed '' 'disabled' }}>\n    <option value=\"FETCHED_AUTOMATICALLY\" {{ ? (eq retrievalMethod 'FETCHED_AUTOMATICALLY') 'selected' '' }}>{{ t 'app.feed_source.retrieval_method.FETCHED_AUTOMATICALLY' }}</option>\n    <option value=\"MANUALLY_UPLOADED\" {{ ? (eq retrievalMethod 'MANUALLY_UPLOADED') 'selected' '' }}>{{ t 'app.feed_source.retrieval_method.MANUALLY_UPLOADED' }}</option>\n    <option value=\"PRODUCED_IN_HOUSE\" {{ ? (eq retrievalMethod 'PRODUCED_IN_HOUSE') 'selected' '' }}>{{ t 'app.feed_source.retrieval_method.PRODUCED_IN_HOUSE' }}</option>\n  </select>\n</td>\n<td class=\"url\"></td>\n<td>{{ dateRender lastUpdated true }}</td>\n\n{{#if (neq latestValidation null)}}\n  {{#with latestValidation}}\n    {{> validationResult }}\n  {{/with}}\n{{else}}\n    <td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td>\n{{/if}}\n\n<td>\n  {{#if canAdminsterProject}}\n    <button role=\"button\" class=\"btn btn-danger btn-sm remove-feed\">\n      <span class=\"glyphicon glyphicon-remove\"></span>\n      <span class=\"sr-only\">{{ t 'app.feed_source.delete' }}</span>\n    </button>\n  {{/if}}\n</td>\n");
 
 require.modules["feed-source-item-view"] = require.modules["./client/feed-source-item-view"];
 
@@ -37130,6 +37265,7 @@ require.register("./client/feed-source-collection-view", Function("exports, modu
 "var app = require('./client/application');\n\
 var BB = require('./client/bb');\n\
 var CompositeView = require('./client/composite-view');\n\
+var FeedCollection = require('./client/feed-collection');\n\
 var FeedSource = require('./client/feed-source');\n\
 var FeedSourceItemView = require('./client/feed-source-item-view');\n\
 var OkDialogView = require('./client/ok-dialog-view');\n\
@@ -37149,6 +37285,7 @@ module.exports = CompositeView.extend({\n\
     'click .newfeedsource': 'add',\n\
     'click .deploy-public': 'deployPublic',\n\
     'click .fetch-all-feeds': 'fetchAllFeeds',\n\
+    'click .project-settings': 'projectSettings',\n\
     'click .sort-by': 'sortBy'\n\
   },\n\
 \n\
@@ -37217,9 +37354,9 @@ module.exports = CompositeView.extend({\n\
     var showNewFeedButton = _.isUndefined(attr.showNewFeedButton) ? true : attr.showNewFeedButton;\n\
     var showDeployPublicButton = showNewFeedButton;\n\
     var showDownloadButton = true;\n\
-    var showDeploymentButton = !(app.user && !app.user.admin);\n\
+    var showDeploymentButton = false; //!(app.user && !app.user.admin);\n\
 \n\
-    if (app.user && !app.user.admin || !app.user) {\n\
+    if (app.auth0User && !app.auth0User.canAdminsterProject(this.feedCollectionId) || !app.auth0User) {\n\
       showNewFeedButton = false;\n\
       showDeployPublicButton = false;\n\
       showDownloadButton = false;\n\
@@ -37335,15 +37472,71 @@ module.exports = CompositeView.extend({\n\
         }));\n\
       }\n\
     });\n\
+  },\n\
+\n\
+  projectSettings: function() {\n\
+    var dialogTemplate = Handlebars.compile(require('./client/feed-source-collection-view/project-settings.html'));\n\
+\n\
+    var view = this;\n\
+\n\
+    var fc = new FeedCollection({\n\
+      id: this.feedCollectionId\n\
+    });\n\
+    var fcDf = fc.fetch();\n\
+\n\
+    $.when(fcDf).done(function() {\n\
+      app.modalRegion.show(new ConfirmView({\n\
+        title: window.Messages('app.project_settings'),\n\
+        body: dialogTemplate(),\n\
+        onProceed : function() {\n\
+          var timezone = this.$el.find('.timezone').val();\n\
+          var language = this.$el.find('.language').val();\n\
+          var locationLat = this.$el.find('.location-lat').val();\n\
+          var locationLon = this.$el.find('.location-lon').val();\n\
+          var autoFetchFeeds = this.$el.find('.auto-fetch').is(\":checked\");\n\
+          var autoFetchAM = +this.$el.find('.fetch-time-am').val();\n\
+          var rawHour = +this.$el.find('.fetch-time-hr').val();\n\
+          var autoFetchHour = !autoFetchAM   ?  rawHour + 12 : rawHour;\n\
+          var autoFetchMinute = +this.$el.find('.fetch-time-min').val();\n\
+          var autoFetchTime = autoFetchHour * 100 + autoFetchMinute;\n\
+\n\
+          fc.set('defaultTimeZone', timezone);\n\
+          fc.set('defaultLanguage', language);\n\
+          fc.set('defaultLocationLat', locationLat);\n\
+          fc.set('defaultLocationLon', locationLon);\n\
+          fc.set('autoFetchFeeds', autoFetchFeeds);\n\
+          fc.set('autoFetchHour', autoFetchHour);\n\
+          fc.set('autoFetchMinute', autoFetchMinute);\n\
+\n\
+          fc.save().done(function() {\n\
+            })\n\
+            .fail(function() {\n\
+              window.alert('Error saving OSM settings'); // is this the right error message??\n\
+            });\n\
+        },\n\
+        onShow: function() {\n\
+          this.$el.find('.timezone').val(fc.get('defaultTimeZone'))\n\
+          this.$el.find('.language').val(fc.get('defaultLanguage'))\n\
+          this.$el.find('.location-lat').val(fc.get('defaultLocationLat'))\n\
+          this.$el.find('.location-lon').val(fc.get('defaultLocationLon'))\n\
+          this.$el.find('.auto-fetch').prop('checked', fc.get('autoFetchFeeds'))\n\
+          this.$el.find('.fetch-time-hr').val(fc.get('autoFetchHour') % 12) // modulus division by 12 to get 12 hour value\n\
+          this.$el.find('.fetch-time-min').val(fc.get('autoFetchMinute'))\n\
+          this.$el.find('.fetch-time-am').val(fc.get('autoFetchHour') > 12 ? \"0\" : \"1\") // set value based on fetch hour\n\
+        }\n\
+      }));\n\
+    });\n\
   }\n\
 });\n\
 \n\
 //# sourceURL=client/feed-source-collection-view/feed-source-collection-view.js"
 ));
 
-require.define("./client/feed-source-collection-view/feed-source-collection-view.html", "<p>\n  {{#if showNewFeedButton}}\n    <button type=\"button\" class=\"btn btn-success newfeedsource\">\n      <span class=\"glyphicon glyphicon-plus\"></span> {{ t \"app.add_feed_source\" }}\n    </button>\n  {{/if}}\n\n  <button type=\"button\" class=\"btn btn-primary fetch-all-feeds\">\n    <span class=\"glyphicon glyphicon-cloud-download\"></span> {{ t \"app.fetch_all_feeds.button\" }}\n  </button>\n\n  {{#if showDeployPublicButton}}\n    <button type=\"button\" class=\"btn btn-primary deploy-public\">\n      <span class=\"glyphicon glyphicon-upload\"></span> <span class=\"button-label\">{{ t \"app.deploy-public\" }}</span>\n    </button>\n  {{/if}}\n\n  {{#showDeploymentButton}}\n  <a href=\"#deployments/{{ feedCollectionId }}\" class=\"btn btn-primary\">\n    <span class=\"glyphicon glyphicon-globe\"></span> {{ t \"app.deployment.manage_deployments\" }}\n  </a>\n  {{/showDeploymentButton}}\n\n\n  <a href=\"#osmconfig/{{ feedCollectionId }}\" class=\"btn btn-primary\">\n    <span class=\"glyphicon glyphicon-scissors\"></span> {{ t \"app.osm_config.configure\" }}\n  </a>\n\n  <a href=\"#otpconfig/{{ feedCollectionId }}\" class=\"btn btn-primary\">\n    <span class=\"glyphicon glyphicon-picture\"></span> {{ t \"app.otp_config.title\" }}\n  </a>\n\n  {{#showDownloadButton}}\n  <a href=\"/api/feedcollections/{{ feedCollectionId }}/download\" class=\"btn btn-primary\">\n    <span class=\"glyphicon glyphicon-download\"></span> {{ t \"app.feed_collection.download_gtfs\" }}\n  </a>\n  {{/showDownloadButton}}\n\n  <a href=\"api/feedcollections/{{ feedCollectionId }}.csv\" class=\"btn btn-primary\">\n    <span class=\"glyphicon glyphicon-download\"></span>&nbsp;{{ t \"app.download-as-csv\" }}\n  </a>\n</p>\n\n<div class=\"table-responsive table-fixed-header-wrapper\">\n  <table id=\"feedsources\" class=\"table table-striped table-hover table-condensed table-fixed-header\">\n    <thead>\n      <th><a href=\"#\" class=\"sort-by\" data-attr=\"name\">{{ t 'app.feed_source.name' }}</a></th>\n      <th><a href=\"#\" class=\"sort-by\" data-attr=\"isPublic\">{{ t 'app.feed_source.public' }}</a></th>\n      <th><a href=\"#\" class=\"sort-by\" data-attr=\"deployable\">{{ t 'app.feed_source.deployable' }}</a></th>\n      <th><a href=\"#\" class=\"sort-by\" data-attr=\"retrievalMethod\">{{ t 'app.feed_source.retrieval_method' }}</a></th>\n      <!-- can't sort by URL because this column actually contains both URLs and GTFS Editor agencies, so sorting does not make sense -->\n      <th>{{ t 'app.feed_source.url' }}</th>\n      <th><a href=\"#\" class=\"sort-by\" data-attr=\"lastUpdated\">{{ t 'app.feed_source.last_updated' }}</a></th>\n      <th><a href=\"#\" class=\"sort-by\" data-attr=\"latestValidation.loadStatus\">{{ t 'app.feed_version.loaded_successfully' }}</a></th>\n      <th><a href=\"#\" class=\"sort-by\" data-attr=\"latestValidation.errorCount\">{{ t 'app.feed_version.error_count' }}</a></th>\n      <th><a href=\"#\" class=\"sort-by\" data-attr=\"latestValidation.routeCount\">{{ t 'app.feed_version.route_count' }}</a></th>\n      <th><a href=\"#\" class=\"sort-by\" data-attr=\"latestValidation.tripCount\">{{ t 'app.feed_version.trip_count' }}</a></th>\n      <th><a href=\"#\" class=\"sort-by\" data-attr=\"latestValidation.stopTimesCount\">{{ t 'app.feed_version.stop_times_count' }}</a></th>\n      <th><a href=\"#\" class=\"sort-by\" data-attr=\"latestValidation.startDate\">{{ t 'app.feed_version.start_date' }}</a></th>\n      <th><a href=\"#\" class=\"sort-by\" data-attr=\"latestValidation.endDate\">{{ t 'app.feed_version.end_date' }}</a></th>\n      <th>{{!-- delete control --}}</th>\n    </thead>\n    <tbody></tbody>\n  </table>\n</div>\n");
+require.define("./client/feed-source-collection-view/feed-source-collection-view.html", "<p>\n  {{#if showNewFeedButton}}\n    <button type=\"button\" class=\"btn btn-success newfeedsource\">\n      <span class=\"glyphicon glyphicon-plus\"></span> {{ t \"app.add_feed_source\" }}\n    </button>\n    <button type=\"button\" class=\"btn btn-primary project-settings\">\n      <span class=\"glyphicon glyphicon-cog\"></span> {{ t \"app.project_settings\" }}\n    </button>\n    <button type=\"button\" class=\"btn btn-primary fetch-all-feeds\">\n      <span class=\"glyphicon glyphicon-cloud-download\"></span> {{ t \"app.fetch_all_feeds.button\" }}\n    </button>\n  {{/if}}\n\n  {{#if showDeployPublicButton}}\n    <button type=\"button\" class=\"btn btn-primary deploy-public\">\n      <span class=\"glyphicon glyphicon-upload\"></span> <span class=\"button-label\">{{ t \"app.deploy-public\" }}</span>\n    </button>\n  {{/if}}\n\n  {{#showDeploymentButton}}\n  <a href=\"#deployments/{{ feedCollectionId }}\" class=\"btn btn-primary\">\n    <span class=\"glyphicon glyphicon-globe\"></span> {{ t \"app.deployment.manage_deployments\" }}\n  </a>\n  <a href=\"#osmconfig/{{ feedCollectionId }}\" class=\"btn btn-primary\">\n    <span class=\"glyphicon glyphicon-scissors\"></span> {{ t \"app.osm_config.configure\" }}\n  </a>\n  <a href=\"#otpconfig/{{ feedCollectionId }}\" class=\"btn btn-primary\">\n    <span class=\"glyphicon glyphicon-picture\"></span> {{ t \"app.otp_config.title\" }}\n  </a>\n  {{/showDeploymentButton}}\n\n  {{#showDownloadButton}}\n  <a href=\"/api/feedcollections/{{ feedCollectionId }}/download\" class=\"btn btn-primary\">\n    <span class=\"glyphicon glyphicon-download\"></span> {{ t \"app.feed_collection.download_gtfs\" }}\n  </a>\n  {{/showDownloadButton}}\n  <a href=\"/publicfeeds\" class=\"btn btn-primary\">\n    <span class=\"glyphicon glyphicon-new-window\"></span> {{ t \"app.feed_collection.view_directory\" }}\n  </a>\n  <!--<a href=\"api/feedcollections/{{ feedCollectionId }}.csv\" class=\"btn btn-primary\">\n    <span class=\"glyphicon glyphicon-download\"></span>&nbsp;{{ t \"app.download-as-csv\" }}\n  </a>-->\n</p>\n\n<div class=\"table-responsive table-fixed-header-wrapper\">\n  <table id=\"feedsources\" class=\"table table-striped table-hover table-condensed table-fixed-header\">\n    <thead>\n      <th><a href=\"#\" class=\"sort-by\" data-attr=\"name\">{{ t 'app.feed_source.name' }}</a></th>\n      <th><a href=\"#\" class=\"sort-by\" data-attr=\"isPublic\">{{ t 'app.feed_source.public' }}</a></th>\n      <th><a href=\"#\" class=\"sort-by\" data-attr=\"deployable\">{{ t 'app.feed_source.deployable' }}</a></th>\n      <th><a href=\"#\" class=\"sort-by\" data-attr=\"retrievalMethod\">{{ t 'app.feed_source.retrieval_method' }}</a></th>\n      <!-- can't sort by URL because this column actually contains both URLs and GTFS Editor agencies, so sorting does not make sense -->\n      <th>{{ t 'app.feed_source.url' }}</th>\n      <th><a href=\"#\" class=\"sort-by\" data-attr=\"lastUpdated\">{{ t 'app.feed_source.last_updated' }}</a></th>\n      <th><a href=\"#\" class=\"sort-by\" data-attr=\"latestValidation.loadStatus\">{{ t 'app.feed_version.loaded_successfully' }}</a></th>\n      <th><a href=\"#\" class=\"sort-by\" data-attr=\"latestValidation.errorCount\">{{ t 'app.feed_version.error_count' }}</a></th>\n      <th><a href=\"#\" class=\"sort-by\" data-attr=\"latestValidation.routeCount\">{{ t 'app.feed_version.route_count' }}</a></th>\n      <th><a href=\"#\" class=\"sort-by\" data-attr=\"latestValidation.tripCount\">{{ t 'app.feed_version.trip_count' }}</a></th>\n      <th><a href=\"#\" class=\"sort-by\" data-attr=\"latestValidation.stopTimesCount\">{{ t 'app.feed_version.stop_times_count' }}</a></th>\n      <th><a href=\"#\" class=\"sort-by\" data-attr=\"latestValidation.startDate\">{{ t 'app.feed_version.start_date' }}</a></th>\n      <th><a href=\"#\" class=\"sort-by\" data-attr=\"latestValidation.endDate\">{{ t 'app.feed_version.end_date' }}</a></th>\n      <th>{{!-- delete control --}}</th>\n    </thead>\n    <tbody></tbody>\n  </table>\n</div>\n");
 
 require.define("./client/feed-source-collection-view/fetch-all-feeds-results.html", "{{#each this}}\n  <div>\n    <b>{{@key}}</b>: {{this}}\n  </div>\n{{/each}}");
+
+require.define("./client/feed-source-collection-view/project-settings.html", "<div class=\"form-group\">\n\t<label class=\"control-label\" for=\"timezone\"><strong>{{ t \"app.project_settings.location\" }}</strong></label>\n  <div>\n    <input type=\"text\" class=\"location-lat\" />,\n    <input type=\"text\" class=\"location-lon\" />\n  </div>\n</div>\n\n<div class=\"form-group\">\n\t<label class=\"control-label\" for=\"timezone\"><strong>{{ t \"app.project_settings.timezone\" }}</strong></label>\n\t<div class=\"controls\">\n\t\t<select required name=\"timezone\" id=\"timezone\" class=\"input-large input-xlarge timezone\" title=\"&{'manage.agencies.timezone'}\" data-content=\"&{'manage.agencies.timezone-content'}\">\n\t\t\t<option value=\"\"></option>\n\t\t\t<option value=\"Africa/Abidjan\">Africa/Abidjan</option>\n\t\t\t<option value=\"Africa/Accra\">Africa/Accra</option>\n\t\t\t<option value=\"Africa/Addis_Ababa\">Africa/Addis_Ababa</option>\n\t\t\t<option value=\"Africa/Algiers\">Africa/Algiers</option>\n\t\t\t<option value=\"Africa/Asmara\">Africa/Asmara</option>\n\t\t\t<option value=\"Africa/Bamako\">Africa/Bamako</option>\n\t\t\t<option value=\"Africa/Bangui\">Africa/Bangui</option>\n\t\t\t<option value=\"Africa/Banjul\">Africa/Banjul</option>\n\t\t\t<option value=\"Africa/Bissau\">Africa/Bissau</option>\n\t\t\t<option value=\"Africa/Blantyre\">Africa/Blantyre</option>\n\t\t\t<option value=\"Africa/Brazzaville\">Africa/Brazzaville</option>\n\t\t\t<option value=\"Africa/Bujumbura\">Africa/Bujumbura</option>\n\t\t\t<option value=\"Africa/Cairo\">Africa/Cairo</option>\n\t\t\t<option value=\"Africa/Casablanca\">Africa/Casablanca</option>\n\t\t\t<option value=\"Africa/Ceuta\">Africa/Ceuta</option>\n\t\t\t<option value=\"Africa/Conakry\">Africa/Conakry</option>\n\t\t\t<option value=\"Africa/Dakar\">Africa/Dakar</option>\n\t\t\t<option value=\"Africa/Dar_es_Salaam\">Africa/Dar_es_Salaam</option>\n\t\t\t<option value=\"Africa/Djibouti\">Africa/Djibouti</option>\n\t\t\t<option value=\"Africa/Douala\">Africa/Douala</option>\n\t\t\t<option value=\"Africa/El_Aaiun\">Africa/El_Aaiun</option>\n\t\t\t<option value=\"Africa/Freetown\">Africa/Freetown</option>\n\t\t\t<option value=\"Africa/Gaborone\">Africa/Gaborone</option>\n\t\t\t<option value=\"Africa/Harare\">Africa/Harare</option>\n\t\t\t<option value=\"Africa/Johannesburg\">Africa/Johannesburg</option>\n\t\t\t<option value=\"Africa/Juba\">Africa/Juba</option>\n\t\t\t<option value=\"Africa/Kampala\">Africa/Kampala</option>\n\t\t\t<option value=\"Africa/Khartoum\">Africa/Khartoum</option>\n\t\t\t<option value=\"Africa/Kigali\">Africa/Kigali</option>\n\t\t\t<option value=\"Africa/Kinshasa\">Africa/Kinshasa</option>\n\t\t\t<option value=\"Africa/Lagos\">Africa/Lagos</option>\n\t\t\t<option value=\"Africa/Libreville\">Africa/Libreville</option>\n\t\t\t<option value=\"Africa/Lome\">Africa/Lome</option>\n\t\t\t<option value=\"Africa/Luanda\">Africa/Luanda</option>\n\t\t\t<option value=\"Africa/Lubumbashi\">Africa/Lubumbashi</option>\n\t\t\t<option value=\"Africa/Lusaka\">Africa/Lusaka</option>\n\t\t\t<option value=\"Africa/Malabo\">Africa/Malabo</option>\n\t\t\t<option value=\"Africa/Maputo\">Africa/Maputo</option>\n\t\t\t<option value=\"Africa/Maseru\">Africa/Maseru</option>\n\t\t\t<option value=\"Africa/Mbabane\">Africa/Mbabane</option>\n\t\t\t<option value=\"Africa/Mogadishu\">Africa/Mogadishu</option>\n\t\t\t<option value=\"Africa/Monrovia\">Africa/Monrovia</option>\n\t\t\t<option value=\"Africa/Nairobi\">Africa/Nairobi</option>\n\t\t\t<option value=\"Africa/Ndjamena\">Africa/Ndjamena</option>\n\t\t\t<option value=\"Africa/Niamey\">Africa/Niamey</option>\n\t\t\t<option value=\"Africa/Nouakchott\">Africa/Nouakchott</option>\n\t\t\t<option value=\"Africa/Ouagadougou\">Africa/Ouagadougou</option>\n\t\t\t<option value=\"Africa/Porto-Novo\">Africa/Porto-Novo</option>\n\t\t\t<option value=\"Africa/Sao_Tome\">Africa/Sao_Tome</option>\n\t\t\t<option value=\"Africa/Tripoli\">Africa/Tripoli</option>\n\t\t\t<option value=\"Africa/Tunis\">Africa/Tunis</option>\n\t\t\t<option value=\"Africa/Windhoek\">Africa/Windhoek</option>\n\t\t\t<option value=\"America/Adak\">America/Adak</option>\n\t\t\t<option value=\"America/Anchorage\">America/Anchorage</option>\n\t\t\t<option value=\"America/Anguilla\">America/Anguilla</option>\n\t\t\t<option value=\"America/Antigua\">America/Antigua</option>\n\t\t\t<option value=\"America/Araguaina\">America/Araguaina</option>\n\t\t\t<option value=\"America/Argentina/Buenos_Aires\">America/Argentina/Buenos_Aires</option>\n\t\t\t<option value=\"America/Argentina/Catamarca\">America/Argentina/Catamarca</option>\n\t\t\t<option value=\"America/Argentina/Cordoba\">America/Argentina/Cordoba</option>\n\t\t\t<option value=\"America/Argentina/Jujuy\">America/Argentina/Jujuy</option>\n\t\t\t<option value=\"America/Argentina/La_Rioja\">America/Argentina/La_Rioja</option>\n\t\t\t<option value=\"America/Argentina/Mendoza\">America/Argentina/Mendoza</option>\n\t\t\t<option value=\"America/Argentina/Rio_Gallegos\">America/Argentina/Rio_Gallegos</option>\n\t\t\t<option value=\"America/Argentina/Salta\">America/Argentina/Salta</option>\n\t\t\t<option value=\"America/Argentina/San_Juan\">America/Argentina/San_Juan</option>\n\t\t\t<option value=\"America/Argentina/San_Luis\">America/Argentina/San_Luis</option>\n\t\t\t<option value=\"America/Argentina/Tucuman\">America/Argentina/Tucuman</option>\n\t\t\t<option value=\"America/Argentina/Ushuaia\">America/Argentina/Ushuaia</option>\n\t\t\t<option value=\"America/Aruba\">America/Aruba</option>\n\t\t\t<option value=\"America/Asuncion\">America/Asuncion</option>\n\t\t\t<option value=\"America/Atikokan\">America/Atikokan</option>\n\t\t\t<option value=\"America/Bahia\">America/Bahia</option>\n\t\t\t<option value=\"America/Bahia_Banderas\">America/Bahia_Banderas</option>\n\t\t\t<option value=\"America/Barbados\">America/Barbados</option>\n\t\t\t<option value=\"America/Belem\">America/Belem</option>\n\t\t\t<option value=\"America/Belize\">America/Belize</option>\n\t\t\t<option value=\"America/Blanc-Sablon\">America/Blanc-Sablon</option>\n\t\t\t<option value=\"America/Boa_Vista\">America/Boa_Vista</option>\n\t\t\t<option value=\"America/Bogota\">America/Bogota</option>\n\t\t\t<option value=\"America/Boise\">America/Boise</option>\n\t\t\t<option value=\"America/Cambridge_Bay\">America/Cambridge_Bay</option>\n\t\t\t<option value=\"America/Campo_Grande\">America/Campo_Grande</option>\n\t\t\t<option value=\"America/Cancun\">America/Cancun</option>\n\t\t\t<option value=\"America/Caracas\">America/Caracas</option>\n\t\t\t<option value=\"America/Cayenne\">America/Cayenne</option>\n\t\t\t<option value=\"America/Cayman\">America/Cayman</option>\n\t\t\t<option value=\"America/Chicago\">America/Chicago</option>\n\t\t\t<option value=\"America/Chihuahua\">America/Chihuahua</option>\n\t\t\t<option value=\"America/Costa_Rica\">America/Costa_Rica</option>\n\t\t\t<option value=\"America/Creston\">America/Creston</option>\n\t\t\t<option value=\"America/Cuiaba\">America/Cuiaba</option>\n\t\t\t<option value=\"America/Curacao\">America/Curacao</option>\n\t\t\t<option value=\"America/Danmarkshavn\">America/Danmarkshavn</option>\n\t\t\t<option value=\"America/Dawson\">America/Dawson</option>\n\t\t\t<option value=\"America/Dawson_Creek\">America/Dawson_Creek</option>\n\t\t\t<option value=\"America/Denver\">America/Denver</option>\n\t\t\t<option value=\"America/Detroit\">America/Detroit</option>\n\t\t\t<option value=\"America/Dominica\">America/Dominica</option>\n\t\t\t<option value=\"America/Edmonton\">America/Edmonton</option>\n\t\t\t<option value=\"America/Eirunepe\">America/Eirunepe</option>\n\t\t\t<option value=\"America/El_Salvador\">America/El_Salvador</option>\n\t\t\t<option value=\"America/Fortaleza\">America/Fortaleza</option>\n\t\t\t<option value=\"America/Glace_Bay\">America/Glace_Bay</option>\n\t\t\t<option value=\"America/Godthab\">America/Godthab</option>\n\t\t\t<option value=\"America/Goose_Bay\">America/Goose_Bay</option>\n\t\t\t<option value=\"America/Grand_Turk\">America/Grand_Turk</option>\n\t\t\t<option value=\"America/Grenada\">America/Grenada</option>\n\t\t\t<option value=\"America/Guadeloupe\">America/Guadeloupe</option>\n\t\t\t<option value=\"America/Guatemala\">America/Guatemala</option>\n\t\t\t<option value=\"America/Guayaquil\">America/Guayaquil</option>\n\t\t\t<option value=\"America/Guyana\">America/Guyana</option>\n\t\t\t<option value=\"America/Halifax\">America/Halifax</option>\n\t\t\t<option value=\"America/Havana\">America/Havana</option>\n\t\t\t<option value=\"America/Hermosillo\">America/Hermosillo</option>\n\t\t\t<option value=\"America/Indiana/Indianapolis\">America/Indiana/Indianapolis</option>\n\t\t\t<option value=\"America/Indiana/Knox\">America/Indiana/Knox</option>\n\t\t\t<option value=\"America/Indiana/Marengo\">America/Indiana/Marengo</option>\n\t\t\t<option value=\"America/Indiana/Petersburg\">America/Indiana/Petersburg</option>\n\t\t\t<option value=\"America/Indiana/Tell_City\">America/Indiana/Tell_City</option>\n\t\t\t<option value=\"America/Indiana/Vevay\">America/Indiana/Vevay</option>\n\t\t\t<option value=\"America/Indiana/Vincennes\">America/Indiana/Vincennes</option>\n\t\t\t<option value=\"America/Indiana/Winamac\">America/Indiana/Winamac</option>\n\t\t\t<option value=\"America/Inuvik\">America/Inuvik</option>\n\t\t\t<option value=\"America/Iqaluit\">America/Iqaluit</option>\n\t\t\t<option value=\"America/Jamaica\">America/Jamaica</option>\n\t\t\t<option value=\"America/Juneau\">America/Juneau</option>\n\t\t\t<option value=\"America/Kentucky/Louisville\">America/Kentucky/Louisville</option>\n\t\t\t<option value=\"America/Kentucky/Monticello\">America/Kentucky/Monticello</option>\n\t\t\t<option value=\"America/Kralendijk\">America/Kralendijk</option>\n\t\t\t<option value=\"America/La_Paz\">America/La_Paz</option>\n\t\t\t<option value=\"America/Lima\">America/Lima</option>\n\t\t\t<option value=\"America/Los_Angeles\">America/Los_Angeles</option>\n\t\t\t<option value=\"America/Lower_Princes\">America/Lower_Princes</option>\n\t\t\t<option value=\"America/Maceio\">America/Maceio</option>\n\t\t\t<option value=\"America/Managua\">America/Managua</option>\n\t\t\t<option value=\"America/Manaus\">America/Manaus</option>\n\t\t\t<option value=\"America/Marigot\">America/Marigot</option>\n\t\t\t<option value=\"America/Martinique\">America/Martinique</option>\n\t\t\t<option value=\"America/Matamoros\">America/Matamoros</option>\n\t\t\t<option value=\"America/Mazatlan\">America/Mazatlan</option>\n\t\t\t<option value=\"America/Menominee\">America/Menominee</option>\n\t\t\t<option value=\"America/Merida\">America/Merida</option>\n\t\t\t<option value=\"America/Metlakatla\">America/Metlakatla</option>\n\t\t\t<option value=\"America/Mexico_City\">America/Mexico_City</option>\n\t\t\t<option value=\"America/Miquelon\">America/Miquelon</option>\n\t\t\t<option value=\"America/Moncton\">America/Moncton</option>\n\t\t\t<option value=\"America/Monterrey\">America/Monterrey</option>\n\t\t\t<option value=\"America/Montevideo\">America/Montevideo</option>\n\t\t\t<option value=\"America/Montreal\">America/Montreal</option>\n\t\t\t<option value=\"America/Montserrat\">America/Montserrat</option>\n\t\t\t<option value=\"America/Nassau\">America/Nassau</option>\n\t\t\t<option value=\"America/New_York\">America/New_York</option>\n\t\t\t<option value=\"America/Nipigon\">America/Nipigon</option>\n\t\t\t<option value=\"America/Nome\">America/Nome</option>\n\t\t\t<option value=\"America/Noronha\">America/Noronha</option>\n\t\t\t<option value=\"America/North_Dakota/Beulah\">America/North_Dakota/Beulah</option>\n\t\t\t<option value=\"America/North_Dakota/Center\">America/North_Dakota/Center</option>\n\t\t\t<option value=\"America/North_Dakota/New_Salem\">America/North_Dakota/New_Salem</option>\n\t\t\t<option value=\"America/Ojinaga\">America/Ojinaga</option>\n\t\t\t<option value=\"America/Panama\">America/Panama</option>\n\t\t\t<option value=\"America/Pangnirtung\">America/Pangnirtung</option>\n\t\t\t<option value=\"America/Paramaribo\">America/Paramaribo</option>\n\t\t\t<option value=\"America/Phoenix\">America/Phoenix</option>\n\t\t\t<option value=\"America/Port_of_Spain\">America/Port_of_Spain</option>\n\t\t\t<option value=\"America/Port-au-Prince\">America/Port-au-Prince</option>\n\t\t\t<option value=\"America/Porto_Velho\">America/Porto_Velho</option>\n\t\t\t<option value=\"America/Puerto_Rico\">America/Puerto_Rico</option>\n\t\t\t<option value=\"America/Rainy_River\">America/Rainy_River</option>\n\t\t\t<option value=\"America/Rankin_Inlet\">America/Rankin_Inlet</option>\n\t\t\t<option value=\"America/Recife\">America/Recife</option>\n\t\t\t<option value=\"America/Regina\">America/Regina</option>\n\t\t\t<option value=\"America/Resolute\">America/Resolute</option>\n\t\t\t<option value=\"America/Rio_Branco\">America/Rio_Branco</option>\n\t\t\t<option value=\"America/Santa_Isabel\">America/Santa_Isabel</option>\n\t\t\t<option value=\"America/Santarem\">America/Santarem</option>\n\t\t\t<option value=\"America/Santiago\">America/Santiago</option>\n\t\t\t<option value=\"America/Santo_Domingo\">America/Santo_Domingo</option>\n\t\t\t<option value=\"America/Sao_Paulo\">America/Sao_Paulo</option>\n\t\t\t<option value=\"America/Scoresbysund\">America/Scoresbysund</option>\n\t\t\t<option value=\"America/Shiprock\">America/Shiprock</option>\n\t\t\t<option value=\"America/Sitka\">America/Sitka</option>\n\t\t\t<option value=\"America/St_Barthelemy\">America/St_Barthelemy</option>\n\t\t\t<option value=\"America/St_Johns\">America/St_Johns</option>\n\t\t\t<option value=\"America/St_Kitts\">America/St_Kitts</option>\n\t\t\t<option value=\"America/St_Lucia\">America/St_Lucia</option>\n\t\t\t<option value=\"America/St_Thomas\">America/St_Thomas</option>\n\t\t\t<option value=\"America/St_Vincent\">America/St_Vincent</option>\n\t\t\t<option value=\"America/Swift_Current\">America/Swift_Current</option>\n\t\t\t<option value=\"America/Tegucigalpa\">America/Tegucigalpa</option>\n\t\t\t<option value=\"America/Thule\">America/Thule</option>\n\t\t\t<option value=\"America/Thunder_Bay\">America/Thunder_Bay</option>\n\t\t\t<option value=\"America/Tijuana\">America/Tijuana</option>\n\t\t\t<option value=\"America/Toronto\">America/Toronto</option>\n\t\t\t<option value=\"America/Tortola\">America/Tortola</option>\n\t\t\t<option value=\"America/Vancouver\">America/Vancouver</option>\n\t\t\t<option value=\"America/Whitehorse\">America/Whitehorse</option>\n\t\t\t<option value=\"America/Winnipeg\">America/Winnipeg</option>\n\t\t\t<option value=\"America/Yakutat\">America/Yakutat</option>\n\t\t\t<option value=\"America/Yellowknife\">America/Yellowknife</option>\n\t\t\t<option value=\"Antarctica/Casey\">Antarctica/Casey</option>\n\t\t\t<option value=\"Antarctica/Davis\">Antarctica/Davis</option>\n\t\t\t<option value=\"Antarctica/DumontDUrville\">Antarctica/DumontDUrville</option>\n\t\t\t<option value=\"Antarctica/Macquarie\">Antarctica/Macquarie</option>\n\t\t\t<option value=\"Antarctica/Mawson\">Antarctica/Mawson</option>\n\t\t\t<option value=\"Antarctica/McMurdo\">Antarctica/McMurdo</option>\n\t\t\t<option value=\"Antarctica/Palmer\">Antarctica/Palmer</option>\n\t\t\t<option value=\"Antarctica/Rothera\">Antarctica/Rothera</option>\n\t\t\t<option value=\"Antarctica/South_Pole\">Antarctica/South_Pole</option>\n\t\t\t<option value=\"Antarctica/Syowa\">Antarctica/Syowa</option>\n\t\t\t<option value=\"Antarctica/Vostok\">Antarctica/Vostok</option>\n\t\t\t<option value=\"Arctic/Longyearbyen\">Arctic/Longyearbyen</option>\n\t\t\t<option value=\"Asia/Aden\">Asia/Aden</option>\n\t\t\t<option value=\"Asia/Almaty\">Asia/Almaty</option>\n\t\t\t<option value=\"Asia/Amman\">Asia/Amman</option>\n\t\t\t<option value=\"Asia/Anadyr\">Asia/Anadyr</option>\n\t\t\t<option value=\"Asia/Aqtau\">Asia/Aqtau</option>\n\t\t\t<option value=\"Asia/Aqtobe\">Asia/Aqtobe</option>\n\t\t\t<option value=\"Asia/Ashgabat\">Asia/Ashgabat</option>\n\t\t\t<option value=\"Asia/Baghdad\">Asia/Baghdad</option>\n\t\t\t<option value=\"Asia/Bahrain\">Asia/Bahrain</option>\n\t\t\t<option value=\"Asia/Baku\">Asia/Baku</option>\n\t\t\t<option value=\"Asia/Bangkok\">Asia/Bangkok</option>\n\t\t\t<option value=\"Asia/Beirut\">Asia/Beirut</option>\n\t\t\t<option value=\"Asia/Bishkek\">Asia/Bishkek</option>\n\t\t\t<option value=\"Asia/Brunei\">Asia/Brunei</option>\n\t\t\t<option value=\"Asia/Choibalsan\">Asia/Choibalsan</option>\n\t\t\t<option value=\"Asia/Chongqing\">Asia/Chongqing</option>\n\t\t\t<option value=\"Asia/Colombo\">Asia/Colombo</option>\n\t\t\t<option value=\"Asia/Damascus\">Asia/Damascus</option>\n\t\t\t<option value=\"Asia/Dhaka\">Asia/Dhaka</option>\n\t\t\t<option value=\"Asia/Dili\">Asia/Dili</option>\n\t\t\t<option value=\"Asia/Dubai\">Asia/Dubai</option>\n\t\t\t<option value=\"Asia/Dushanbe\">Asia/Dushanbe</option>\n\t\t\t<option value=\"Asia/Gaza\">Asia/Gaza</option>\n\t\t\t<option value=\"Asia/Harbin\">Asia/Harbin</option>\n\t\t\t<option value=\"Asia/Hebron\">Asia/Hebron</option>\n\t\t\t<option value=\"Asia/Ho_Chi_Minh\">Asia/Ho_Chi_Minh</option>\n\t\t\t<option value=\"Asia/Hong_Kong\">Asia/Hong_Kong</option>\n\t\t\t<option value=\"Asia/Hovd\">Asia/Hovd</option>\n\t\t\t<option value=\"Asia/Irkutsk\">Asia/Irkutsk</option>\n\t\t\t<option value=\"Asia/Jakarta\">Asia/Jakarta</option>\n\t\t\t<option value=\"Asia/Jayapura\">Asia/Jayapura</option>\n\t\t\t<option value=\"Asia/Jerusalem\">Asia/Jerusalem</option>\n\t\t\t<option value=\"Asia/Kabul\">Asia/Kabul</option>\n\t\t\t<option value=\"Asia/Kamchatka\">Asia/Kamchatka</option>\n\t\t\t<option value=\"Asia/Karachi\">Asia/Karachi</option>\n\t\t\t<option value=\"Asia/Kashgar\">Asia/Kashgar</option>\n\t\t\t<option value=\"Asia/Kathmandu\">Asia/Kathmandu</option>\n\t\t\t<option value=\"Asia/Kolkata\">Asia/Kolkata</option>\n\t\t\t<option value=\"Asia/Krasnoyarsk\">Asia/Krasnoyarsk</option>\n\t\t\t<option value=\"Asia/Kuala_Lumpur\">Asia/Kuala_Lumpur</option>\n\t\t\t<option value=\"Asia/Kuching\">Asia/Kuching</option>\n\t\t\t<option value=\"Asia/Kuwait\">Asia/Kuwait</option>\n\t\t\t<option value=\"Asia/Macau\">Asia/Macau</option>\n\t\t\t<option value=\"Asia/Magadan\">Asia/Magadan</option>\n\t\t\t<option value=\"Asia/Makassar\">Asia/Makassar</option>\n\t\t\t<option value=\"Asia/Manila\">Asia/Manila</option>\n\t\t\t<option value=\"Asia/Muscat\">Asia/Muscat</option>\n\t\t\t<option value=\"Asia/Nicosia\">Asia/Nicosia</option>\n\t\t\t<option value=\"Asia/Novokuznetsk\">Asia/Novokuznetsk</option>\n\t\t\t<option value=\"Asia/Novosibirsk\">Asia/Novosibirsk</option>\n\t\t\t<option value=\"Asia/Omsk\">Asia/Omsk</option>\n\t\t\t<option value=\"Asia/Oral\">Asia/Oral</option>\n\t\t\t<option value=\"Asia/Phnom_Penh\">Asia/Phnom_Penh</option>\n\t\t\t<option value=\"Asia/Pontianak\">Asia/Pontianak</option>\n\t\t\t<option value=\"Asia/Pyongyang\">Asia/Pyongyang</option>\n\t\t\t<option value=\"Asia/Qatar\">Asia/Qatar</option>\n\t\t\t<option value=\"Asia/Qyzylorda\">Asia/Qyzylorda</option>\n\t\t\t<option value=\"Asia/Rangoon\">Asia/Rangoon</option>\n\t\t\t<option value=\"Asia/Riyadh\">Asia/Riyadh</option>\n\t\t\t<option value=\"Asia/Sakhalin\">Asia/Sakhalin</option>\n\t\t\t<option value=\"Asia/Samarkand\">Asia/Samarkand</option>\n\t\t\t<option value=\"Asia/Seoul\">Asia/Seoul</option>\n\t\t\t<option value=\"Asia/Shanghai\">Asia/Shanghai</option>\n\t\t\t<option value=\"Asia/Singapore\">Asia/Singapore</option>\n\t\t\t<option value=\"Asia/Taipei\">Asia/Taipei</option>\n\t\t\t<option value=\"Asia/Tashkent\">Asia/Tashkent</option>\n\t\t\t<option value=\"Asia/Tbilisi\">Asia/Tbilisi</option>\n\t\t\t<option value=\"Asia/Tehran\">Asia/Tehran</option>\n\t\t\t<option value=\"Asia/Thimphu\">Asia/Thimphu</option>\n\t\t\t<option value=\"Asia/Tokyo\">Asia/Tokyo</option>\n\t\t\t<option value=\"Asia/Ulaanbaatar\">Asia/Ulaanbaatar</option>\n\t\t\t<option value=\"Asia/Urumqi\">Asia/Urumqi</option>\n\t\t\t<option value=\"Asia/Vientiane\">Asia/Vientiane</option>\n\t\t\t<option value=\"Asia/Vladivostok\">Asia/Vladivostok</option>\n\t\t\t<option value=\"Asia/Yakutsk\">Asia/Yakutsk</option>\n\t\t\t<option value=\"Asia/Yekaterinburg\">Asia/Yekaterinburg</option>\n\t\t\t<option value=\"Asia/Yerevan\">Asia/Yerevan</option>\n\t\t\t<option value=\"Atlantic/Azores\">Atlantic/Azores</option>\n\t\t\t<option value=\"Atlantic/Bermuda\">Atlantic/Bermuda</option>\n\t\t\t<option value=\"Atlantic/Canary\">Atlantic/Canary</option>\n\t\t\t<option value=\"Atlantic/Cape_Verde\">Atlantic/Cape_Verde</option>\n\t\t\t<option value=\"Atlantic/Faroe\">Atlantic/Faroe</option>\n\t\t\t<option value=\"Atlantic/Madeira\">Atlantic/Madeira</option>\n\t\t\t<option value=\"Atlantic/Reykjavik\">Atlantic/Reykjavik</option>\n\t\t\t<option value=\"Atlantic/South_Georgia\">Atlantic/South_Georgia</option>\n\t\t\t<option value=\"Atlantic/St_Helena\">Atlantic/St_Helena</option>\n\t\t\t<option value=\"Atlantic/Stanley\">Atlantic/Stanley</option>\n\t\t\t<option value=\"Australia/Adelaide\">Australia/Adelaide</option>\n\t\t\t<option value=\"Australia/Brisbane\">Australia/Brisbane</option>\n\t\t\t<option value=\"Australia/Broken_Hill\">Australia/Broken_Hill</option>\n\t\t\t<option value=\"Australia/Currie\">Australia/Currie</option>\n\t\t\t<option value=\"Australia/Darwin\">Australia/Darwin</option>\n\t\t\t<option value=\"Australia/Eucla\">Australia/Eucla</option>\n\t\t\t<option value=\"Australia/Hobart\">Australia/Hobart</option>\n\t\t\t<option value=\"Australia/Lindeman\">Australia/Lindeman</option>\n\t\t\t<option value=\"Australia/Lord_Howe\">Australia/Lord_Howe</option>\n\t\t\t<option value=\"Australia/Melbourne\">Australia/Melbourne</option>\n\t\t\t<option value=\"Australia/Perth\">Australia/Perth</option>\n\t\t\t<option value=\"Australia/Sydney\">Australia/Sydney</option>\n\t\t\t<option value=\"Europe/Amsterdam\">Europe/Amsterdam</option>\n\t\t\t<option value=\"Europe/Andorra\">Europe/Andorra</option>\n\t\t\t<option value=\"Europe/Athens\">Europe/Athens</option>\n\t\t\t<option value=\"Europe/Belgrade\">Europe/Belgrade</option>\n\t\t\t<option value=\"Europe/Berlin\">Europe/Berlin</option>\n\t\t\t<option value=\"Europe/Bratislava\">Europe/Bratislava</option>\n\t\t\t<option value=\"Europe/Brussels\">Europe/Brussels</option>\n\t\t\t<option value=\"Europe/Bucharest\">Europe/Bucharest</option>\n\t\t\t<option value=\"Europe/Budapest\">Europe/Budapest</option>\n\t\t\t<option value=\"Europe/Chisinau\">Europe/Chisinau</option>\n\t\t\t<option value=\"Europe/Copenhagen\">Europe/Copenhagen</option>\n\t\t\t<option value=\"Europe/Dublin\">Europe/Dublin</option>\n\t\t\t<option value=\"Europe/Gibraltar\">Europe/Gibraltar</option>\n\t\t\t<option value=\"Europe/Guernsey\">Europe/Guernsey</option>\n\t\t\t<option value=\"Europe/Helsinki\">Europe/Helsinki</option>\n\t\t\t<option value=\"Europe/Isle_of_Man\">Europe/Isle_of_Man</option>\n\t\t\t<option value=\"Europe/Istanbul\">Europe/Istanbul</option>\n\t\t\t<option value=\"Europe/Jersey\">Europe/Jersey</option>\n\t\t\t<option value=\"Europe/Kaliningrad\">Europe/Kaliningrad</option>\n\t\t\t<option value=\"Europe/Kiev\">Europe/Kiev</option>\n\t\t\t<option value=\"Europe/Lisbon\">Europe/Lisbon</option>\n\t\t\t<option value=\"Europe/Ljubljana\">Europe/Ljubljana</option>\n\t\t\t<option value=\"Europe/London\">Europe/London</option>\n\t\t\t<option value=\"Europe/Luxembourg\">Europe/Luxembourg</option>\n\t\t\t<option value=\"Europe/Madrid\">Europe/Madrid</option>\n\t\t\t<option value=\"Europe/Malta\">Europe/Malta</option>\n\t\t\t<option value=\"Europe/Mariehamn\">Europe/Mariehamn</option>\n\t\t\t<option value=\"Europe/Minsk\">Europe/Minsk</option>\n\t\t\t<option value=\"Europe/Monaco\">Europe/Monaco</option>\n\t\t\t<option value=\"Europe/Moscow\">Europe/Moscow</option>\n\t\t\t<option value=\"Europe/Oslo\">Europe/Oslo</option>\n\t\t\t<option value=\"Europe/Paris\">Europe/Paris</option>\n\t\t\t<option value=\"Europe/Podgorica\">Europe/Podgorica</option>\n\t\t\t<option value=\"Europe/Prague\">Europe/Prague</option>\n\t\t\t<option value=\"Europe/Riga\">Europe/Riga</option>\n\t\t\t<option value=\"Europe/Rome\">Europe/Rome</option>\n\t\t\t<option value=\"Europe/Samara\">Europe/Samara</option>\n\t\t\t<option value=\"Europe/San_Marino\">Europe/San_Marino</option>\n\t\t\t<option value=\"Europe/Sarajevo\">Europe/Sarajevo</option>\n\t\t\t<option value=\"Europe/Simferopol\">Europe/Simferopol</option>\n\t\t\t<option value=\"Europe/Skopje\">Europe/Skopje</option>\n\t\t\t<option value=\"Europe/Sofia\">Europe/Sofia</option>\n\t\t\t<option value=\"Europe/Stockholm\">Europe/Stockholm</option>\n\t\t\t<option value=\"Europe/Tallinn\">Europe/Tallinn</option>\n\t\t\t<option value=\"Europe/Tirane\">Europe/Tirane</option>\n\t\t\t<option value=\"Europe/Uzhgorod\">Europe/Uzhgorod</option>\n\t\t\t<option value=\"Europe/Vaduz\">Europe/Vaduz</option>\n\t\t\t<option value=\"Europe/Vatican\">Europe/Vatican</option>\n\t\t\t<option value=\"Europe/Vienna\">Europe/Vienna</option>\n\t\t\t<option value=\"Europe/Vilnius\">Europe/Vilnius</option>\n\t\t\t<option value=\"Europe/Volgograd\">Europe/Volgograd</option>\n\t\t\t<option value=\"Europe/Warsaw\">Europe/Warsaw</option>\n\t\t\t<option value=\"Europe/Zagreb\">Europe/Zagreb</option>\n\t\t\t<option value=\"Europe/Zaporozhye\">Europe/Zaporozhye</option>\n\t\t\t<option value=\"Europe/Zurich\">Europe/Zurich</option>\n\t\t\t<option value=\"Indian/Antananarivo\">Indian/Antananarivo</option>\n\t\t\t<option value=\"Indian/Chagos\">Indian/Chagos</option>\n\t\t\t<option value=\"Indian/Christmas\">Indian/Christmas</option>\n\t\t\t<option value=\"Indian/Cocos\">Indian/Cocos</option>\n\t\t\t<option value=\"Indian/Comoro\">Indian/Comoro</option>\n\t\t\t<option value=\"Indian/Kerguelen\">Indian/Kerguelen</option>\n\t\t\t<option value=\"Indian/Mahe\">Indian/Mahe</option>\n\t\t\t<option value=\"Indian/Maldives\">Indian/Maldives</option>\n\t\t\t<option value=\"Indian/Mauritius\">Indian/Mauritius</option>\n\t\t\t<option value=\"Indian/Mayotte\">Indian/Mayotte</option>\n\t\t\t<option value=\"Indian/Reunion\">Indian/Reunion</option>\n\t\t\t<option value=\"Pacific/Apia\">Pacific/Apia</option>\n\t\t\t<option value=\"Pacific/Auckland\">Pacific/Auckland</option>\n\t\t\t<option value=\"Pacific/Chatham\">Pacific/Chatham</option>\n\t\t\t<option value=\"Pacific/Chuuk\">Pacific/Chuuk</option>\n\t\t\t<option value=\"Pacific/Easter\">Pacific/Easter</option>\n\t\t\t<option value=\"Pacific/Efate\">Pacific/Efate</option>\n\t\t\t<option value=\"Pacific/Enderbury\">Pacific/Enderbury</option>\n\t\t\t<option value=\"Pacific/Fakaofo\">Pacific/Fakaofo</option>\n\t\t\t<option value=\"Pacific/Fiji\">Pacific/Fiji</option>\n\t\t\t<option value=\"Pacific/Funafuti\">Pacific/Funafuti</option>\n\t\t\t<option value=\"Pacific/Galapagos\">Pacific/Galapagos</option>\n\t\t\t<option value=\"Pacific/Gambier\">Pacific/Gambier</option>\n\t\t\t<option value=\"Pacific/Guadalcanal\">Pacific/Guadalcanal</option>\n\t\t\t<option value=\"Pacific/Guam\">Pacific/Guam</option>\n\t\t\t<option value=\"Pacific/Honolulu\">Pacific/Honolulu</option>\n\t\t\t<option value=\"Pacific/Johnston\">Pacific/Johnston</option>\n\t\t\t<option value=\"Pacific/Kiritimati\">Pacific/Kiritimati</option>\n\t\t\t<option value=\"Pacific/Kosrae\">Pacific/Kosrae</option>\n\t\t\t<option value=\"Pacific/Kwajalein\">Pacific/Kwajalein</option>\n\t\t\t<option value=\"Pacific/Majuro\">Pacific/Majuro</option>\n\t\t\t<option value=\"Pacific/Marquesas\">Pacific/Marquesas</option>\n\t\t\t<option value=\"Pacific/Midway\">Pacific/Midway</option>\n\t\t\t<option value=\"Pacific/Nauru\">Pacific/Nauru</option>\n\t\t\t<option value=\"Pacific/Niue\">Pacific/Niue</option>\n\t\t\t<option value=\"Pacific/Norfolk\">Pacific/Norfolk</option>\n\t\t\t<option value=\"Pacific/Noumea\">Pacific/Noumea</option>\n\t\t\t<option value=\"Pacific/Pago_Pago\">Pacific/Pago_Pago</option>\n\t\t\t<option value=\"Pacific/Palau\">Pacific/Palau</option>\n\t\t\t<option value=\"Pacific/Pitcairn\">Pacific/Pitcairn</option>\n\t\t\t<option value=\"Pacific/Pohnpei\">Pacific/Pohnpei</option>\n\t\t\t<option value=\"Pacific/Port_Moresby\">Pacific/Port_Moresby</option>\n\t\t\t<option value=\"Pacific/Rarotonga\">Pacific/Rarotonga</option>\n\t\t\t<option value=\"Pacific/Saipan\">Pacific/Saipan</option>\n\t\t\t<option value=\"Pacific/Tahiti\">Pacific/Tahiti</option>\n\t\t\t<option value=\"Pacific/Tarawa\">Pacific/Tarawa</option>\n\t\t\t<option value=\"Pacific/Tongatapu\">Pacific/Tongatapu</option>\n\t\t\t<option value=\"Pacific/Wake\">Pacific/Wake</option>\n\t\t\t<option value=\"Pacific/Wallis\">Pacific/Wallis</option>\n    </select>\n  </div>\n</div>\n\n<div class=\"form-group\">\n\t<label class=\"control-label\" for=\"lang\"><strong>{{ t \"app.project_settings.language\" }}</strong></label>\n\t<div class=\"controls\">\n\t\t<select required name=\"lang\" id=\"lang\" class=\"input-large input-xlarge language\" data-content=\"&{'manage.agencies.lang-content'}\">\n\t\t\t<option value=\"\"></option>\n\t\t\t<option value=\"ab\">Abkhazian</option>\n\t\t\t<option value=\"af\">Afrikaans</option>\n\t\t\t<option value=\"ak\">Akan</option>\n\t\t\t<option value=\"sq\">Albanian</option>\n\t\t\t<option value=\"am\">Amharic</option>\n\t\t\t<option value=\"ar\">Arabic</option>\n\t\t\t<option value=\"an\">Aragonese</option>\n\t\t\t<option value=\"hy\">Armenian</option>\n\t\t\t<option value=\"as\">Assamese</option>\n\t\t\t<option value=\"av\">Avaric</option>\n\t\t\t<option value=\"ae\">Avestan</option>\n\t\t\t<option value=\"ay\">Aymara</option>\n\t\t\t<option value=\"az\">Azerbaijani</option>\n\t\t\t<option value=\"bm\">Bambara</option>\n\t\t\t<option value=\"ba\">Bashkir</option>\n\t\t\t<option value=\"eu\">Basque</option>\n\t\t\t<option value=\"be\">Belarusian</option>\n\t\t\t<option value=\"bn\">Bengali</option>\n\t\t\t<option value=\"bh\">Bihari languages</option>\n\t\t\t<option value=\"bi\">Bislama</option>\n\t\t\t<option value=\"nb\">Bokmål, Norwegian</option>\n\t\t\t<option value=\"bs\">Bosnian</option>\n\t\t\t<option value=\"br\">Breton</option>\n\t\t\t<option value=\"bg\">Bulgarian</option>\n\t\t\t<option value=\"my\">Burmese</option>\n\t\t\t<option value=\"ca\">Catalan</option>\n\t\t\t<option value=\"km\">Central Khmer</option>\n\t\t\t<option value=\"ch\">Chamorro</option>\n\t\t\t<option value=\"ce\">Chechen</option>\n\t\t\t<option value=\"ny\">Chichewa</option>\n\t\t\t<option value=\"zh\">Chinese</option>\n\t\t\t<option value=\"cu\">Church Slavic</option>\n\t\t\t<option value=\"cv\">Chuvash</option>\n\t\t\t<option value=\"kw\">Cornish</option>\n\t\t\t<option value=\"co\">Corsican</option>\n\t\t\t<option value=\"cr\">Cree</option>\n\t\t\t<option value=\"hr\">Croatian</option>\n\t\t\t<option value=\"cs\">Czech</option>\n\t\t\t<option value=\"da\">Danish</option>\n\t\t\t<option value=\"dv\">Divehi</option>\n\t\t\t<option value=\"nl\">Dutch</option>\n\t\t\t<option value=\"dz\">Dzongkha</option>\n\t\t\t<option value=\"en\">English</option>\n\t\t\t<option value=\"eo\">Esperanto</option>\n\t\t\t<option value=\"et\">Estonian</option>\n\t\t\t<option value=\"ee\">Ewe</option>\n\t\t\t<option value=\"fo\">Faroese</option>\n\t\t\t<option value=\"fj\">Fijian</option>\n\t\t\t<option value=\"fi\">Finnish</option>\n\t\t\t<option value=\"fr\">French</option>\n\t\t\t<option value=\"ff\">Fulah</option>\n\t\t\t<option value=\"gd\">Gaelic</option>\n\t\t\t<option value=\"gl\">Galician</option>\n\t\t\t<option value=\"lg\">Ganda</option>\n\t\t\t<option value=\"ka\">Georgian</option>\n\t\t\t<option value=\"de\">German</option>\n\t\t\t<option value=\"el\">Greek, Modern (1453-)</option>\n\t\t\t<option value=\"gn\">Guarani</option>\n\t\t\t<option value=\"gu\">Gujarati</option>\n\t\t\t<option value=\"ht\">Haitian</option>\n\t\t\t<option value=\"ha\">Hausa</option>\n\t\t\t<option value=\"he\">Hebrew</option>\n\t\t\t<option value=\"hz\">Herero</option>\n\t\t\t<option value=\"hi\">Hindi</option>\n\t\t\t<option value=\"ho\">Hiri Motu</option>\n\t\t\t<option value=\"hu\">Hungarian</option>\n\t\t\t<option value=\"is\">Icelandic</option>\n\t\t\t<option value=\"io\">Ido</option>\n\t\t\t<option value=\"ig\">Igbo</option>\n\t\t\t<option value=\"id\">Indonesian</option>\n\t\t\t<option value=\"ia\">Interlingua (International Auxiliary Language Association)</option>\n\t\t\t<option value=\"ie\">Interlingue</option>\n\t\t\t<option value=\"iu\">Inuktitut</option>\n\t\t\t<option value=\"ik\">Inupiaq</option>\n\t\t\t<option value=\"ga\">Irish</option>\n\t\t\t<option value=\"it\">Italian</option>\n\t\t\t<option value=\"ja\">Japanese</option>\n\t\t\t<option value=\"jv\">Javanese</option>\n\t\t\t<option value=\"kl\">Kalaallisut</option>\n\t\t\t<option value=\"kn\">Kannada</option>\n\t\t\t<option value=\"kr\">Kanuri</option>\n\t\t\t<option value=\"ks\">Kashmiri</option>\n\t\t\t<option value=\"kk\">Kazakh</option>\n\t\t\t<option value=\"ki\">Kikuyu</option>\n\t\t\t<option value=\"rw\">Kinyarwanda</option>\n\t\t\t<option value=\"ky\">Kirghiz</option>\n\t\t\t<option value=\"kv\">Komi</option>\n\t\t\t<option value=\"kg\">Kongo</option>\n\t\t\t<option value=\"ko\">Korean</option>\n\t\t\t<option value=\"kj\">Kuanyama</option>\n\t\t\t<option value=\"ku\">Kurdish</option>\n\t\t\t<option value=\"lo\">Lao</option>\n\t\t\t<option value=\"la\">Latin</option>\n\t\t\t<option value=\"lv\">Latvian</option>\n\t\t\t<option value=\"li\">Limburgan</option>\n\t\t\t<option value=\"ln\">Lingala</option>\n\t\t\t<option value=\"lt\">Lithuanian</option>\n\t\t\t<option value=\"lu\">Luba-Katanga</option>\n\t\t\t<option value=\"lb\">Luxembourgish</option>\n\t\t\t<option value=\"mk\">Macedonian</option>\n\t\t\t<option value=\"mg\">Malagasy</option>\n\t\t\t<option value=\"ms\">Malay</option>\n\t\t\t<option value=\"ml\">Malayalam</option>\n\t\t\t<option value=\"mt\">Maltese</option>\n\t\t\t<option value=\"gv\">Manx</option>\n\t\t\t<option value=\"mi\">Maori</option>\n\t\t\t<option value=\"mr\">Marathi</option>\n\t\t\t<option value=\"mh\">Marshallese</option>\n\t\t\t<option value=\"mn\">Mongolian</option>\n\t\t\t<option value=\"na\">Nauru</option>\n\t\t\t<option value=\"nv\">Navajo</option>\n\t\t\t<option value=\"nd\">Ndebele, North</option>\n\t\t\t<option value=\"nr\">Ndebele, South</option>\n\t\t\t<option value=\"ng\">Ndonga</option>\n\t\t\t<option value=\"ne\">Nepali</option>\n\t\t\t<option value=\"se\">Northern Sami</option>\n\t\t\t<option value=\"no\">Norwegian</option>\n\t\t\t<option value=\"nn\">Norwegian Nynorsk</option>\n\t\t\t<option value=\"oc\">Occitan (post 1500)</option>\n\t\t\t<option value=\"oj\">Ojibwa</option>\n\t\t\t<option value=\"or\">Oriya</option>\n\t\t\t<option value=\"om\">Oromo</option>\n\t\t\t<option value=\"os\">Ossetian</option>\n\t\t\t<option value=\"pi\">Pali</option>\n\t\t\t<option value=\"pa\">Panjabi</option>\n\t\t\t<option value=\"fa\">Persian</option>\n\t\t\t<option value=\"pl\">Polish</option>\n\t\t\t<option value=\"pt\">Portuguese</option>\n\t\t\t<option value=\"ps\">Pushto</option>\n\t\t\t<option value=\"qu\">Quechua</option>\n\t\t\t<option value=\"ro\">Romanian</option>\n\t\t\t<option value=\"rm\">Romansh</option>\n\t\t\t<option value=\"rn\">Rundi</option>\n\t\t\t<option value=\"ru\">Russian</option>\n\t\t\t<option value=\"sm\">Samoan</option>\n\t\t\t<option value=\"sg\">Sango</option>\n\t\t\t<option value=\"sa\">Sanskrit</option>\n\t\t\t<option value=\"sc\">Sardinian</option>\n\t\t\t<option value=\"sr\">Serbian</option>\n\t\t\t<option value=\"sn\">Shona</option>\n\t\t\t<option value=\"ii\">Sichuan Yi</option>\n\t\t\t<option value=\"sd\">Sindhi</option>\n\t\t\t<option value=\"si\">Sinhala</option>\n\t\t\t<option value=\"sk\">Slovak</option>\n\t\t\t<option value=\"sl\">Slovenian</option>\n\t\t\t<option value=\"so\">Somali</option>\n\t\t\t<option value=\"st\">Sotho, Southern</option>\n\t\t\t<option value=\"es\">Spanish</option>\n\t\t\t<option value=\"su\">Sundanese</option>\n\t\t\t<option value=\"sw\">Swahili</option>\n\t\t\t<option value=\"ss\">Swati</option>\n\t\t\t<option value=\"sv\">Swedish</option>\n\t\t\t<option value=\"tl\">Tagalog</option>\n\t\t\t<option value=\"ty\">Tahitian</option>\n\t\t\t<option value=\"tg\">Tajik</option>\n\t\t\t<option value=\"ta\">Tamil</option>\n\t\t\t<option value=\"tt\">Tatar</option>\n\t\t\t<option value=\"te\">Telugu</option>\n\t\t\t<option value=\"th\">Thai</option>\n\t\t\t<option value=\"bo\">Tibetan</option>\n\t\t\t<option value=\"ti\">Tigrinya</option>\n\t\t\t<option value=\"to\">Tonga (Tonga Islands)</option>\n\t\t\t<option value=\"ts\">Tsonga</option>\n\t\t\t<option value=\"tn\">Tswana</option>\n\t\t\t<option value=\"tr\">Turkish</option>\n\t\t\t<option value=\"tk\">Turkmen</option>\n\t\t\t<option value=\"tw\">Twi</option>\n\t\t\t<option value=\"ug\">Uighur</option>\n\t\t\t<option value=\"uk\">Ukrainian</option>\n\t\t\t<option value=\"ur\">Urdu</option>\n\t\t\t<option value=\"uz\">Uzbek</option>\n\t\t\t<option value=\"ve\">Venda</option>\n\t\t\t<option value=\"vi\">Vietnamese</option>\n\t\t\t<option value=\"vo\">Volapük</option>\n\t\t\t<option value=\"wa\">Walloon</option>\n\t\t\t<option value=\"cy\">Welsh</option>\n\t\t\t<option value=\"fy\">Western Frisian</option>\n\t\t\t<option value=\"wo\">Wolof</option>\n\t\t\t<option value=\"xh\">Xhosa</option>\n\t\t\t<option value=\"yi\">Yiddish</option>\n\t\t\t<option value=\"yo\">Yoruba</option>\n\t\t\t<option value=\"za\">Zhuang</option>\n\t\t\t<option value=\"zu\">Zulu</option>\n\n\t   </select>\n   </div>\n</div>\n\n<div class=\"form-group\">\n\t<label class=\"control-label\">\n\t\t<input class=\"auto-fetch\" type=\"checkbox\"> {{ t \"app.project-settings.feed_auto_fetch\" }}\n\t</label>\n</div>\n<div class=\"form-group\">\n\t<label class=\"control-label\" for=\"fetch-time-hr\"><strong>{{ t \"app.project-settings.feed_auto_fetch.time\" }}</strong></label>\n\t<div class=\"controls\">\n\t\t<select required name=\"fetch-time-hr\" id=\"fetch-time-hr\" class=\"fetch-time-hr\">\n\t\t\t<option value=\"1\">01</option>\n\t\t\t<option value=\"2\">02</option>\n\t\t\t<option value=\"3\">03</option>\n\t\t\t<option value=\"4\">04</option>\n\t\t\t<option value=\"5\">05</option>\n\t\t\t<option value=\"6\">06</option>\n\t\t\t<option value=\"7\">07</option>\n\t\t\t<option value=\"8\">08</option>\n\t\t\t<option value=\"9\">09</option>\n\t\t\t<option value=\"10\">10</option>\n\t\t\t<option value=\"11\">11</option>\n\t\t\t<option value=\"0\">12</option>\n\t\t</select>\n\t\t<select required name=\"fetch-time-min\" id=\"fetch-time-min\" class=\"fetch-time-min\">\n\t\t\t<option value=\"0\">00</option>\n\t\t\t<option value=\"15\">15</option>\n\t\t\t<option value=\"30\">30</option>\n\t\t\t<option value=\"45\">45</option>\n\t\t</select>\n\t\t<select required name=\"fetch-time-am\" id=\"fetch-time-am\" class=\"fetch-time-am\">\n\t\t\t<option value=\"1\">AM</option>\n\t\t\t<option value=\"0\">PM</option>\n\t\t</select>\n\t</div>\n</div>\n<!--<div class=\"form-group\">-->\n\t<!--<label class=\"control-label\">-->\n\t\t<!--<input class=\"auto-fetch-feeds\" type=\"checkbox\"> {{ t \"app.project-settings.feed_auto_fetch\" }}-->\n\t<!--</label>-->\n<!--</div>-->");
 
 require.modules["feed-source-collection-view"] = require.modules["./client/feed-source-collection-view"];
 
@@ -37780,6 +37973,9 @@ var _ = require('jashkenas~underscore@1.7.0');\n\
 var FeedCollection = require('./client/feed-collection');\n\
 var EditableTextWidget = require('./client/editable-text-widget');\n\
 \n\
+var Handlebars = require('components~handlebars.js@v2.0.0');\n\
+var app = require('./client/application');\n\
+\n\
 /**\n\
  * An item view of a single FeedCollection\n\
  */\n\
@@ -37796,7 +37992,7 @@ var FeedCollectionItemView = EditableTextWidget.extend({\n\
       EditableTextWidget.prototype.onShow.call(this);\n\
 \n\
     if (!this.model.get('id'))\n\
-    // new feed\n\
+      // new feed\n\
       this.edit();\n\
   }\n\
 });\n\
@@ -37815,6 +38011,19 @@ module.exports = CompositeView.extend({\n\
   },\n\
   initialize: function() {\n\
     _.bindAll(this, 'add');\n\
+\n\
+    if(this.collection.length === 1 && !app.auth0User.canAdministerApp()) {\n\
+      window.location = '/#overview/' + this.collection.models[0].get('id');\n\
+    }\n\
+\n\
+    Handlebars.registerHelper(\n\
+      'canAdministerApp',\n\
+      function(name, options) {\n\
+        var canAdministerApp = app.auth0User.canAdministerApp();\n\
+        if(canAdministerApp) return options.fn(this);\n\
+        return options.inverse(this);\n\
+      }\n\
+    );\n\
   },\n\
 \n\
   /** Add an item to the collection */\n\
@@ -37824,13 +38033,24 @@ module.exports = CompositeView.extend({\n\
     this.collection.add(new FeedCollection({\n\
       name: window.Messages('app.new_feed_collection_name')\n\
     }));\n\
-  }\n\
+  },\n\
+\n\
+  /*serializeData: function() {\n\
+    // include the current user so that the view can figure out what is fair game for editing\n\
+    var ret = {\n\
+      canAdministerApp: true\n\
+    };\n\
+    return ret;\n\
+    //return Object.assign(ret, this.model.toJSON());\n\
+  },*/\n\
+\n\
+\n\
 });\n\
 \n\
 //# sourceURL=client/feed-collection-collection-view/feed-collection-collection-view.js"
 ));
 
-require.define("./client/feed-collection-collection-view/feed-collection-collection-view.html", "<p>\n  <button type=\"button\" class=\"btn btn-success newfeedcoll\">\n    <span class=\"glyphicon glyphicon-plus\"></span> {{ t \"app.add_feed_collection\" }}\n  </button>\n</p>\n\n<ul class=\"list-group\"></ul>\n");
+require.define("./client/feed-collection-collection-view/feed-collection-collection-view.html", "{{#canAdministerApp this}}\n  <p>\n    <button type=\"button\" class=\"btn btn-success newfeedcoll\">\n      <span class=\"glyphicon glyphicon-plus\"></span> {{ t \"app.add_feed_collection\" }}\n    </button>\n  </p>\n{{/canAdministerApp}}\n\n<ul class=\"list-group\"></ul>\n");
 
 require.modules["feed-collection-collection-view"] = require.modules["./client/feed-collection-collection-view"];
 
@@ -37928,6 +38148,131 @@ module.exports = function(feedCollectionId) {\n\
 require.define("./client/feed-collection-route/feed-collection-route.html", "\n<div id=\"feed-sources\"></div>\n");
 
 require.modules["feed-collection-route"] = require.modules["./client/feed-collection-route"];
+
+
+require.register("./client/feed-agency-view", Function("exports, module",
+"var ItemView = require('./client/item-view');\n\
+var FeedVersion = require('./client/feed-version');\n\
+var _ = require('jashkenas~underscore@1.7.0');\n\
+var app = require('./client/application');\n\
+\n\
+var UpdateLogoDialog = require('./client/feed-agency-view/update-logo.js');\n\
+\n\
+var Handlebars = require('components~handlebars.js@v2.0.0');\n\
+\n\
+module.exports = ItemView.extend({\n\
+  template: require('./client/feed-agency-view/feed-agency-view.html'),\n\
+\n\
+  events: {\n\
+      'click .update-logo-button': 'updateLogo'\n\
+  },\n\
+\n\
+  initialize: function(attr) {\n\
+    var self = this;\n\
+\n\
+    if (_.isUndefined(this.model)) {\n\
+      // we create a dummy model simply so we don't have to check in the view if the model exists, only if its properties exist\n\
+      // and so we can access the feedSource in a uniform way regardless of whether the version exists\n\
+      this.model = new FeedVersion({\n\
+        feedSource: attr.feedSource.toJSON()\n\
+      });\n\
+    }\n\
+\n\
+    Handlebars.registerHelper(\n\
+      'hasAgencyLogo',\n\
+      function(agencyId, options) {\n\
+        var branding = self.getAgencyBranding(agencyId);\n\
+        if(branding !== null && branding.hasLogo) return options.fn(this);\n\
+        return options.inverse(this);\n\
+      }\n\
+    );\n\
+\n\
+    Handlebars.registerHelper(\n\
+      'getAgencyLogoUrl',\n\
+      function(agencyId, options) {\n\
+        var branding = self.getAgencyBranding(agencyId);\n\
+        if(branding !== null && branding.hasLogo) {\n\
+          return branding.urlRoot + '/' + encodeURIComponent(agencyId) + '/logo.png?' + Date.now();\n\
+        }\n\
+      }\n\
+    );\n\
+\n\
+    Handlebars.registerHelper(\n\
+      'canManageBranding',\n\
+      function(agencyId, options) {\n\
+        var fs = self.model.get('feedSource');\n\
+        var canManageFeed = app.auth0User.canManageFeed(fs.feedCollection.id, fs.id);\n\
+        if(canManageFeed) return options.fn(this);\n\
+        return options.inverse(this);\n\
+      }\n\
+    );\n\
+  },\n\
+\n\
+  getAgencyBranding: function(agencyId) {\n\
+    var retval = null;\n\
+    _.each(this.model.get('feedSource').branding, function(agencyBranding) {\n\
+      if(agencyBranding.agencyId == agencyId) {\n\
+        retval = agencyBranding;\n\
+      }\n\
+    });\n\
+    return retval;\n\
+  },\n\
+\n\
+  updateLogo: function(evt) {\n\
+    //var dialogTemplate = Handlebars.compile(require('./update-branding.html'));\n\
+\n\
+    var agencyId = $(evt.target).data('agencyId');\n\
+    var view = this;\n\
+\n\
+    app.modalRegion.show(new UpdateLogoDialog ({\n\
+      agencyId : agencyId,\n\
+      feedSourceId : view.model.get('feedSource').id\n\
+    }));\n\
+  }\n\
+\n\
+ });\n\
+\n\
+//# sourceURL=client/feed-agency-view/feed-agency-view.js"
+));
+
+require.register("./client/feed-agency-view/update-logo.js", Function("exports, module",
+"var BB = require('./client/bb');\n\
+var ItemView = require('./client/item-view');\n\
+var _ = require('jashkenas~underscore@1.7.0');\n\
+\n\
+module.exports = ItemView.extend({\n\
+  template: require('./client/feed-agency-view/update-logo.html'),\n\
+\n\
+  events: {\n\
+    'submit form': 'onSubmit'\n\
+  },\n\
+\n\
+  initialize: function(attr) {\n\
+    this.model = new BB.Model(attr);\n\
+  },\n\
+\n\
+  onShow: function() {\n\
+    this.$el.find('.modal').modal();\n\
+    if(this.options.onShow) this.options.onShow.call(this);\n\
+  },\n\
+\n\
+  onSubmit: function(evt) {\n\
+    var filename = evt.target[0].value;\n\
+    if(!filename || filename.toLowerCase().indexOf('.png', filename.length - 4) === -1) {\n\
+      alert('Must be a PNG file');\n\
+      evt.preventDefault();\n\
+    }\n\
+  }\n\
+});\n\
+\n\
+//# sourceURL=client/feed-agency-view/update-logo.js"
+));
+
+require.define("./client/feed-agency-view/feed-agency-view.html", "<h3>Agencies</h3>\n\n<div class=\"table-responsive\">\n  <table class=\"table table-striped\">\n    <tbody>\n      <thead>\n        <th>Agency</th>\n        <th>Branding</th>\n        <th>Editor Snapshot</th>\n        <th></th>\n      </thead>\n      {{#each feedSource.latestValidation.agencies}}\n        <tr>\n          <td>{{ this }}</td>\n          <td>\n            {{#hasAgencyLogo this}}\n              <img src=\"{{getAgencyLogoUrl this}}\" style=\"max-width: 200px; max-height: 50px;\">\n            {{else}}\n              (No Branding)\n            {{/hasAgencyLogo}}\n            {{#canManageBranding this}}\n              <button class=\"btn btn-primary update-logo-button\" data-agency-id=\"{{this}}\">Update Logo</button>\n            {{/canManageBranding}}\n          </td>\n          <td>\n            <select id=\"snapshot-version\">\n              {{!-- default option --}}\n              <option></option>\n            </select>\n          </td>\n          <td>\n            <button class=\"btn btn-primary edit-agency-button\" data-agency-id=\"{{this}}\">Edit Agency GTFS</button>\n          </td>\n        </tr>\n      {{/each}}\n    </tbody>\n  </table>\n\n  <button class=\"btn btn-primary deploy\">Update Feed from Selected Snapshot</button>\n</div>\n");
+
+require.define("./client/feed-agency-view/update-logo.html", "<div class=\"modal\" role=\"dialog\" aria-labelledby=\"confirm-title\">\n  <div class=\"modal-dialog\">\n    <div class=\"modal-content\">\n      <div class=\"modal-header\">\n        <button type=\"button\" class=\"close cancel-action\" data-dismiss=\"modal\">\n          <span aria-hidden=\"true\">&times;</span><span class=\"sr-only\">{{ t 'app.close' }}</span>\n        </button>\n        <h4 class=\"modal-title\" id=\"confirm-title\">Update Logo for {{agencyId}}</h4>\n      </div>\n      <form name=\"imageUpload\" id=\"imageUploadForm\" action=\"/api/feedsources/{{feedSourceId}}/uploadAgencyLogo\" enctype=\"multipart/form-data\" method=\"post\">\n        <div class=\"modal-body\">\n          <p>\n            <input style=\"display: inline;\" type=\"file\" name=\"picture\" />\n            <input type=\"hidden\" name=\"agencyId\" value=\"{{agencyId}}\" />\n          </p>\n        </div>\n        <div class=\"modal-footer\">\n          <input style=\"display: inline;\" class=\"btn btn-primary upload-button\" type=\"submit\" />\n        </div>\n    </form>\n    </div>\n  </div>\n</div>\n");
+
+require.modules["feed-agency-view"] = require.modules["./client/feed-agency-view"];
 
 
 require.register("./client/feed-version-collection-view", Function("exports, module",
@@ -38094,7 +38439,7 @@ module.exports = CompositeView.extend({\n\
 
 require.define("./client/note-collection-view/note-collection-view.html", "<div class=\"new-comment\">\n  <form action=\"#\" class=\"col-sm-6\">\n    <div class=\"form-group\">\n      <label for=\"new-note\" class=\"sr-only\">{{ t 'app.note.new' }}</label>\n      <textarea class=\"form-control\" placeholder=\"{{ t 'app.note.new' }}\"></textarea>\n    </div>\n    <input type=\"submit\" class=\"btn btn-block btn-primary\" value=\"{{ t 'app.note.create' }}\">\n  </form>\n</div>\n");
 
-require.define("./client/note-collection-view/note-item-view.html", "<div class=\"col-sm-6\">\n  <div class=\"panel panel-default\">\n    <div class=\"panel-body\">\n      <p>{{ note }}</p>\n      <p>{{ t 'app.note.source' user.username }}, {{ dateRender date true }}</p>\n    </div>\n  </div>\n</div>\n");
+require.define("./client/note-collection-view/note-item-view.html", "<div class=\"col-sm-6\">\n  <div class=\"panel panel-default\">\n    <div class=\"panel-body\">\n      <p>{{ note }}</p>\n      <p>{{ t 'app.note.source' userEmail }}, {{ dateRender date true }}</p>\n    </div>\n  </div>\n</div>\n");
 
 require.modules["note-collection-view"] = require.modules["./client/note-collection-view"];
 
@@ -38260,81 +38605,6 @@ require.define("./client/feed-version-view/invalid-values-list.html", "<h4>{{tit
 require.modules["feed-version-view"] = require.modules["./client/feed-version-view"];
 
 
-require.register("./client/feed-branding-view", Function("exports, module",
-"var ItemView = require('./client/item-view');\n\
-var FeedVersion = require('./client/feed-version');\n\
-var _ = require('jashkenas~underscore@1.7.0');\n\
-\n\
-var Handlebars = require('components~handlebars.js@v2.0.0');\n\
-\n\
-module.exports = ItemView.extend({\n\
-  template: require('./client/feed-branding-view/feed-branding-view.html'),\n\
-\n\
-  events: {\n\
-      'click .upload-button': 'upload',\n\
-      'submit form': 'onSubmit'\n\
-  },\n\
-\n\
-  initialize: function(attr) {\n\
-    var self = this;\n\
-\n\
-    if (_.isUndefined(this.model)) {\n\
-      // we create a dummy model simply so we don't have to check in the view if the model exists, only if its properties exist\n\
-      // and so we can access the feedSource in a uniform way regardless of whether the version exists\n\
-      this.model = new FeedVersion({\n\
-        feedSource: attr.feedSource.toJSON()\n\
-      });\n\
-    }\n\
-\n\
-\n\
-    Handlebars.registerHelper(\n\
-      'hasAgencyLogo',\n\
-      function(agencyId, options) {\n\
-        var branding = self.getAgencyBranding(agencyId);\n\
-        if(branding !== null && branding.hasLogo) return options.fn(this);\n\
-        return options.inverse(this);;\n\
-      }\n\
-    );\n\
-\n\
-    Handlebars.registerHelper(\n\
-      'getAgencyLogoUrl',\n\
-      function(agencyId, options) {\n\
-        var branding = self.getAgencyBranding(agencyId);\n\
-        if(branding !== null && branding.hasLogo) {\n\
-          return branding.urlRoot + '/' + encodeURIComponent(agencyId) + '/logo.png?' + Date.now();\n\
-        }\n\
-      }\n\
-    );\n\
-\n\
-  },\n\
-\n\
-  getAgencyBranding: function(agencyId) {\n\
-    var retval = null;\n\
-    _.each(this.model.get('feedSource').branding, function(agencyBranding) {\n\
-      if(agencyBranding.agencyId == agencyId) {\n\
-        retval = agencyBranding;\n\
-      }\n\
-    });\n\
-    return retval;\n\
-  },\n\
-\n\
-  onSubmit: function(evt) {\n\
-    var filename = evt.target[0].value;\n\
-    if(!filename || filename.toLowerCase().indexOf('.png', filename.length - 4) === -1) {\n\
-      alert('Must be a PNG file');\n\
-      evt.preventDefault();\n\
-    }\n\
-  }\n\
-\n\
- });\n\
-//# sourceURL=client/feed-branding-view/feed-branding-view.js"
-));
-
-require.define("./client/feed-branding-view/feed-branding-view.html", "<h2>Branding</h2>\n\n<div class=\"table-responsive\">\n  <table class=\"table table-striped\">\n    <tbody>\n      <thead>\n        <th>Agency</th>\n        <th>Logo</th>\n        <th></th>\n      </thead>\n      {{#each feedSource.latestValidation.agencies}}\n        <tr>\n          <td>{{ this }}</td>\n          <td>\n            {{#hasAgencyLogo this}}\n              <img src=\"{{getAgencyLogoUrl this}}\" style=\"max-width: 200px; max-height: 50px;\">\n            {{else}}\n              (No Branding)\n            {{/hasAgencyLogo}}\n          </td>\n          <td>\n            <form name=\"imageUpload\" id=\"imageUploadForm\" action=\"/api/feedsources/{{ ../feedSource.id }}/uploadAgencyLogo\" enctype=\"multipart/form-data\" method=\"post\">\n              <input style=\"display: inline;\" type=\"file\" name=\"picture\">\n              <input type=\"hidden\" name=\"agencyId\" value=\"{{ this }}\">\n              <input style=\"display: inline;\" class=\"btn btn-primary upload-button\" type=\"submit\">\n            </form>\n            <!--<button class=\"btn btn-primary clear-button\" data-agencyid=\"{{ this }}\">Clear Branding</button>-->\n          </td>\n        </tr>\n      {{/each}}\n    </tbody>\n  </table>\n</div>\n");
-
-require.modules["feed-branding-view"] = require.modules["./client/feed-branding-view"];
-
-
 require.register("./client/feed-version-navigation-view", Function("exports, module",
 "var _ = require('jashkenas~underscore@1.7.0');\n\
 var FeedVersion = require('./client/feed-version');\n\
@@ -38350,6 +38620,15 @@ module.exports = LayoutView.extend({\n\
   events: {\n\
     'click .upload-feed': 'uploadFeed',\n\
     'click .update-feed': 'updateFeed'\n\
+  },\n\
+\n\
+  serializeData: function() {\n\
+    var feedSourceID = this.model.get('feedSource').id;\n\
+    var feedCollectionID = this.model.get('feedSource').feedCollection.id;\n\
+    var ret = {\n\
+      canManageFeed : app.auth0User.canManageFeed(feedCollectionID, feedSourceID)\n\
+    };\n\
+    return Object.assign(ret, this.model.toJSON());\n\
   },\n\
 \n\
   // show the feed upload dialog\n\
@@ -38412,7 +38691,7 @@ module.exports = LayoutView.extend({\n\
 //# sourceURL=client/feed-version-navigation-view/feed-version-navigation-view.js"
 ));
 
-require.define("./client/feed-version-navigation-view/feed-version-navigation-view.html", "<h2>{{ t 'app.feed_version.version_number' version }}\n  <div class=\"btn-group\">\n    <a href=\"#feed/{{ feedSource.id }}/{{ previousVersionId }}\" class=\"btn btn-default {{ ? (eq previousVersionId null) 'disabled' '' }}\">\n      <span class=\"glyphicon glyphicon-arrow-left\"></span>&nbsp;&nbsp;{{ t 'app.feed_version.previous_version' }}\n    </a>\n    <button class=\"btn btn-default\" disabled=\"disabled\">\n      {{#if (neq version null)}}\n        {{ t 'app.feed_version.version_number' version }}\n      {{else}}\n        {{ t 'app.feed_version.no_versions' }}\n      {{/if}}\n    </button>\n    <a class=\"btn btn-default {{ ? (neq version null) '' 'disabled' }}\" href=\"#versions/{{ feedSource.id }}\">\n      <span class=\"glyphicon glyphicon-globe sr-hidden\"></span>&nbsp;&nbsp;{{ t 'app.feed_version.show_all_versions' }}</a>\n\n    <a class=\"btn btn-default {{ ? (neq version null) '' 'disabled' }}\" href=\"/api/feedversions/gtfs/{{ id }}\">\n      <span class=\"glyphicon glyphicon-download sr-hidden\"></span>&nbsp;&nbsp;{{ t 'app.feed_version.download_gtfs' }}</a>\n\n    {{#if (eq feedSource.retrievalMethod 'MANUALLY_UPLOADED')}}\n      <button role=\"button\" class=\"btn btn-default upload-feed\">\n        <span class=\"glyphicon glyphicon-upload sr-hidden\"></span>&nbsp;&nbsp;{{ t 'app.feed_version.initiate_upload' }}\n      </button>\n    {{else}}\n      <button role=\"button\" class=\"btn btn-default update-feed\">\n        <span class=\"glyphicon glyphicon-repeat sr-hidden\"></span>&nbsp;&nbsp;<span class=\"button-label\">{{ t 'app.feed_version.update' }}</span>\n      </button>\n    {{/if}}\n\n    <a href=\"#feed/{{ feedSource.id }}/{{ nextVersionId }}\" class=\"btn btn-default {{ ? (eq nextVersionId null) 'disabled' '' }}\">{{ t 'app.feed_version.next_version' }}&nbsp;&nbsp;<span class=\"glyphicon glyphicon-arrow-right\"></span></a>\n  </div>\n</h2>\n");
+require.define("./client/feed-version-navigation-view/feed-version-navigation-view.html", "<h2>{{ t 'app.feed_version.version_number' version }}\n  <div class=\"btn-group\">\n    <a href=\"#feed/{{ feedSource.id }}/{{ previousVersionId }}\" class=\"btn btn-default {{ ? (eq previousVersionId null) 'disabled' '' }}\">\n      <span class=\"glyphicon glyphicon-arrow-left\"></span>&nbsp;&nbsp;{{ t 'app.feed_version.previous_version' }}\n    </a>\n    <button class=\"btn btn-default\" disabled=\"disabled\">\n      {{#if (neq version null)}}\n        {{ t 'app.feed_version.version_number' version }}\n      {{else}}\n        {{ t 'app.feed_version.no_versions' }}\n      {{/if}}\n    </button>\n    <a class=\"btn btn-default {{ ? (neq version null) '' 'disabled' }}\" href=\"#versions/{{ feedSource.id }}\">\n      <span class=\"glyphicon glyphicon-globe sr-hidden\"></span>&nbsp;&nbsp;{{ t 'app.feed_version.show_all_versions' }}</a>\n\n    <a class=\"btn btn-default {{ ? (neq version null) '' 'disabled' }}\" href=\"/api/feedversions/gtfs/{{ id }}\">\n      <span class=\"glyphicon glyphicon-download sr-hidden\"></span>&nbsp;&nbsp;{{ t 'app.feed_version.download_gtfs' }}</a>\n\n    {{#if canManageFeed}}\n      {{#if (eq feedSource.retrievalMethod 'MANUALLY_UPLOADED')}}\n        <button role=\"button\" class=\"btn btn-default upload-feed\">\n          <span class=\"glyphicon glyphicon-upload sr-hidden\"></span>&nbsp;&nbsp;{{ t 'app.feed_version.initiate_upload' }}\n        </button>\n      {{else}}\n        <button role=\"button\" class=\"btn btn-default update-feed\">\n          <span class=\"glyphicon glyphicon-repeat sr-hidden\"></span>&nbsp;&nbsp;<span class=\"button-label\">{{ t 'app.feed_version.update' }}</span>\n        </button>\n      {{/if}}\n    {{/if}}\n\n    <a href=\"#feed/{{ feedSource.id }}/{{ nextVersionId }}\" class=\"btn btn-default {{ ? (eq nextVersionId null) 'disabled' '' }}\">{{ t 'app.feed_version.next_version' }}&nbsp;&nbsp;<span class=\"glyphicon glyphicon-arrow-right\"></span></a>\n  </div>\n</h2>\n");
 
 require.modules["feed-version-navigation-view"] = require.modules["./client/feed-version-navigation-view"];
 
@@ -38426,7 +38705,7 @@ var _ = require('jashkenas~underscore@1.7.0');\n\
 var app = require('./client/application');\n\
 var FeedVersion = require('./client/feed-version');\n\
 var FeedVersionView = require('./client/feed-version-view');\n\
-var FeedBrandingView = require('./client/feed-branding-view');\n\
+var FeedAgencyView = require('./client/feed-agency-view');\n\
 var NoteCollectionView = require('./client/note-collection-view');\n\
 var FeedVersionNavigationView = require('./client/feed-version-navigation-view');\n\
 var LayoutView = require('./client/layout-view');\n\
@@ -38435,7 +38714,7 @@ module.exports = LayoutView.extend({\n\
   template: require(\"./client/feed-source-view/feed-source-view.html\"),\n\
   regions: {\n\
     validationRegion: '#validation',\n\
-    brandingRegion: '#branding',\n\
+    agencyRegion: '#agency',\n\
     notesRegion: '.source-notes',\n\
     versionNavigationRegion: '#version-navigation'\n\
   },\n\
@@ -38500,6 +38779,7 @@ module.exports = LayoutView.extend({\n\
     }\n\
 \n\
     // expose the copypastable URL to allow users to view/edit\n\
+    /*console.log(this.model)\n\
     if (app.user.admin) {\n\
       instance = this;\n\
       $.ajax({\n\
@@ -38510,7 +38790,7 @@ module.exports = LayoutView.extend({\n\
             '&key=' + encodeURIComponent(data.key));\n\
         }\n\
       });\n\
-    }\n\
+    }*/\n\
 \n\
     // set up comments\n\
     this.notesRegion.show(new NoteCollectionView({\n\
@@ -38519,14 +38799,15 @@ module.exports = LayoutView.extend({\n\
     }));\n\
 \n\
     // set up branding\n\
-    this.brandingRegion.show(new FeedBrandingView({\n\
+    this.agencyRegion.show(new FeedAgencyView({\n\
       feedSource: this.model\n\
     }));\n\
 \n\
     // set up changeable snapshot IDs\n\
-    if (this.model.get('retrievalMethod') == 'PRODUCED_IN_HOUSE' && this.model.get('editorId')) {\n\
+    /*if (this.model.get('retrievalMethod') == 'PRODUCED_IN_HOUSE') { //} && this.model.get('editorId') {\n\
+      console.log('getting ed snapshots..');\n\
       $.ajax({\n\
-        url: 'api/feedcollections/geteditorsnapshots/' + this.model.get('editorId'),\n\
+        url: 'api/feedsources/' + this.model.get('id') + '/getEditorSnapshots',\n\
         success: function (snapshots) {\n\
           snapshots = _.filter(snapshots, function (s) {\n\
             return s.validFrom && s.validTo;\n\
@@ -38541,7 +38822,7 @@ module.exports = LayoutView.extend({\n\
           });\n\
         }\n\
       })\n\
-    }\n\
+    }*/\n\
   },\n\
 \n\
   /** change snapshot version */\n\
@@ -38573,7 +38854,7 @@ module.exports.snapshots = null;\n\
 //# sourceURL=client/feed-source-view/feed-source-view.js"
 ));
 
-require.define("./client/feed-source-view/feed-source-view.html", "<h2>{{ name }}\n  <div class=\"btn-group\">\n    {{#if (admin)}}\n      <div class=\"btn-group\">\n        <button class=\"btn btn-primary dropdown-toggle\" data-toggle=\"dropdown\">{{ t 'app.feed_source.share' }} <span class=\"glyphicon glyphicon-share-alt\"></span></button>\n        <div class=\"dropdown-menu\">\n          <div class=\"container-fluid\">\n            <label for=\"share-url\" class=\"sr-only\">{{ t 'app.feed_source.share_url' }}</label>\n            {{!-- value to be filled in by the controller --}}\n            <input type=\"text\" size=\"80\" id=\"share-url\"></input>\n\n            <p>{{ t 'app.feed_source.share_desc' }}</p>\n          </div>\n        </div>\n      </div>\n    {{/if}}\n\n    <button class=\"btn btn-primary deploy\" {{#unless latestVersionId}}disabled{{/unless}}>\n      <span class=\"glyphicon glyphicon-globe\"></span>\n      {{ t 'app.deployment.deploy' }}\n    </button>\n\n    {{#if (and (eq retrievalMethod 'PRODUCED_IN_HOUSE') (neq editorId null) (neq editorId ''))}}\n      {{!-- /edit/id just redirects to GTFS Editor --}}\n      <a class=\"btn btn-primary edit-feed\" target=\"_blank\" href=\"edit/{{ id }}\">\n        <span class=\"glyphicon glyphicon-pencil\"></span>\n        {{ t 'app.feed_source.edit'}}\n      </a>\n    {{/if}}\n  </div>\n</h2>\n\n<div class=\"table-responsive\">\n  <table class=\"table table-striped\">\n    <tr>\n      <th>{{ t 'app.feed_source.name' }}</th>\n      <td>{{ name }}</td>\n    </tr>\n    <tr>\n      <th>{{ t 'app.feed_source.public' }}</th>\n      <td>{{ ? isPublic (t 'app.yes') (t 'app.no')}}</td>\n    </tr>\n    {{!--\n    <tr>\n      <th>{{ t 'app.feed_source.retrieval_method' }}</th>\n      <td>{{ t (('app.feed_source.retrieval_method') (retrievalMethod)}}</td>\n    </tr>\n    --}}\n    <tr>\n      <th>{{ t 'app.feed_source.url' }}</th>\n      <td>{{ url }}</td>\n    </tr>\n    <tr>\n      <th>{{ t 'app.feed_source.last_updated' }}</th>\n      <td>{{ dateRender lastUpdated true }}</td>\n    </tr>\n    <tr>\n      <th>{{ t 'app.feed_version.snapshot' }}</th>\n      <td>\n        <select id=\"snapshot-version\">\n          {{!-- default option --}}\n          <option></option>\n        </select>\n      </td>\n    </tr>\n  </table>\n</div>\n\n<h4>{{ t 'app.note.source_notes' }}</h4>\n<p class=\"source-notes\"></p>\n\n<div id=\"version-navigation\"></div>\n\n<div id=\"validation\"></div>\n\n<div id=\"branding\"></div>\n");
+require.define("./client/feed-source-view/feed-source-view.html", "<h2>{{ name }}\n  <div class=\"btn-group\">\n    {{#if (admin)}}\n      <div class=\"btn-group\">\n        <button class=\"btn btn-primary dropdown-toggle\" data-toggle=\"dropdown\">{{ t 'app.feed_source.share' }} <span class=\"glyphicon glyphicon-share-alt\"></span></button>\n        <div class=\"dropdown-menu\">\n          <div class=\"container-fluid\">\n            <label for=\"share-url\" class=\"sr-only\">{{ t 'app.feed_source.share_url' }}</label>\n            {{!-- value to be filled in by the controller --}}\n            <input type=\"text\" size=\"80\" id=\"share-url\"></input>\n\n            <p>{{ t 'app.feed_source.share_desc' }}</p>\n          </div>\n        </div>\n      </div>\n    {{/if}}\n\n    <!--<button class=\"btn btn-primary deploy\" {{#unless latestVersionId}}disabled{{/unless}}>\n      <span class=\"glyphicon glyphicon-globe\"></span>\n      {{ t 'app.deployment.deploy' }}\n    </button>-->\n\n    <!--\n    {{#if (and (eq retrievalMethod 'PRODUCED_IN_HOUSE') (neq editorId null) (neq editorId ''))}}\n      {{!-- /edit/id just redirects to GTFS Editor --}}\n      <a class=\"btn btn-primary edit-feed\" target=\"_blank\" href=\"edit/{{ id }}\">\n        <span class=\"glyphicon glyphicon-pencil\"></span>\n        {{ t 'app.feed_source.edit'}}\n      </a>\n    {{/if}}-->\n  </div>\n</h2>\n\n<div class=\"table-responsive\">\n  <table class=\"table table-striped\">\n    <tr>\n      <th>{{ t 'app.feed_source.name' }}</th>\n      <td>{{ name }}</td>\n    </tr>\n    <tr>\n      <th>{{ t 'app.feed_source.public' }}</th>\n      <td>{{ ? isPublic (t 'app.yes') (t 'app.no')}}</td>\n    </tr>\n    {{!--\n    <tr>\n      <th>{{ t 'app.feed_source.retrieval_method' }}</th>\n      <td>{{ t (('app.feed_source.retrieval_method') (retrievalMethod)}}</td>\n    </tr>\n    --}}\n    <tr>\n      <th>{{ t 'app.feed_source.url' }}</th>\n      <td>{{ url }}</td>\n    </tr>\n    <tr>\n      <th>{{ t 'app.feed_source.last_updated' }}</th>\n      <td>{{ dateRender lastUpdated true }}</td>\n    </tr>\n    <!--<tr>\n      <th>{{ t 'app.feed_version.snapshot' }}</th>\n      <td>\n        <select id=\"snapshot-version\">\n          {{!-- default option --}}\n          <option></option>\n        </select>\n      </td>\n    </tr>-->\n  </table>\n</div>\n\n<div id=\"agency\"></div>\n\n<div id=\"source-notes-container\">\n  <h3>{{ t 'app.note.source_notes' }}</h3>\n  <p class=\"source-notes\"></p>\n</div>\n\n<div id=\"version-navigation\"></div>\n\n<div id=\"validation\"></div>\n");
 
 require.modules["feed-source-view"] = require.modules["./client/feed-source-view"];
 
@@ -39466,6 +39747,7 @@ require.modules["otp-config-route"] = require.modules["./client/otp-config-route
 require.register("./client/routes", Function("exports, module",
 "var app = require('./client/application');\n\
 var BB = require('./client/bb');\n\
+var Auth0User = require('./client/auth0-user');\n\
 \n\
 var Router = BB.Router.extend({\n\
   routes: {\n\
@@ -39507,34 +39789,75 @@ var Router = BB.Router.extend({\n\
 $(document).ready(function() {\n\
   var router;\n\
 \n\
-  // determine whether the user is logged in or not\n\
+  var userToken = localStorage.getItem('userToken');\n\
+  //console.log('found userToken', userToken)\n\
+\n\
   $.ajax({\n\
-      url: '/loggedInUser'\n\
-    })\n\
-    .done(function(data) {\n\
-      $('#logged-in-user').text(window.Messages('app.account.logged_in_as', data.username));\n\
-      $('#logout').removeClass('hidden');\n\
+    url: 'config',\n\
+    success: function(data) {\n\
+      app.config = data;\n\
+      var lock = new Auth0Lock(data.auth0ClientId, data.auth0Domain);\n\
 \n\
-      $('#myAccount').removeClass('hidden').attr('href', '#user/' + data.id);\n\
+      if(userToken && userToken !== \"null\") {\n\
+        console.log('found token, calling tokeninfo');\n\
+        $.ajax({\n\
+          url: 'https://' + data.auth0Domain + '/tokeninfo',\n\
+          data: {\n\
+            id_token: userToken\n\
+          },\n\
+          contentType: \"application/json\",\n\
+          success: function(data) {\n\
+            console.log('got tokeninfo')\n\
+            app.userLoggedIn(userToken, data, lock);\n\
+            startApp();\n\
+          },\n\
+          error: function(err) {\n\
+            console.log('tokeninfo problem, logging out', err);\n\
+            app.logout();\n\
+          }\n\
+        });\n\
 \n\
-      if (data.admin)\n\
-        $('#manageUsers').removeClass('hidden');\n\
+      }\n\
+      else { // check for SSO login\n\
+        // check if this is an SSO callback\n\
+        var hash = lock.parseHash(window.location.hash);\n\
+        if (hash && hash.id_token) {\n\
+          // the user came back from the login (either SSO or regular login),\n\
+          // save the token\n\
+          localStorage.setItem('userToken', hash.id_token);\n\
 \n\
-      app.user = data;\n\
-    })\n\
-    .fail(function() {\n\
-      // assume that we are not logged in\n\
-      // don't let us go to #login/login/login/login/login/overview\n\
-      if (window.location.hash.indexOf('login') != 1\n\
-        && !/\\#feed\\/[0-9a-z\\-]+\\?userId=.+&key=.+/.exec(window.location.hash))\n\
-        document.location.hash = '#login/' + window.location.hash.slice(1);\n\
-    })\n\
-    .always(function() {\n\
-      app.start();\n\
-      router = new Router();\n\
-      BB.history.start();\n\
-    });\n\
+          // redirect to \"targetUrl\" if any\n\
+          window.location.href = hash.state || '';\n\
+          return;\n\
+        }\n\
+\n\
+        // check if logged in elsewhere via SSO\n\
+        lock.$auth0.getSSOData(function(err, data) {\n\
+          if (!err && data.sso) {\n\
+            // there is! redirect to Auth0 for SSO\n\
+            lock.$auth0.signin({\n\
+              callbackOnLocationHash: true\n\
+            });\n\
+          } else { // assume that we are not logged in\n\
+            // don't let us go to #login/login/login/login/login/overview\n\
+            if (window.location.hash.indexOf('login') != 1\n\
+              && !/\\#feed\\/[0-9a-z\\-]+\\?userId=.+&key=.+/.exec(window.location.hash)) {\n\
+              document.location.hash = '#login/' + window.location.hash.slice(1);\n\
+            }\n\
+            startApp();\n\
+          }\n\
+        });\n\
+      }\n\
+    }\n\
+  });\n\
+\n\
 });\n\
+\n\
+function startApp() {\n\
+  app.start();\n\
+  router = new Router();\n\
+  BB.history.start();\n\
+}\n\
 \n\
 //# sourceURL=client/routes/routes.js"
 ));

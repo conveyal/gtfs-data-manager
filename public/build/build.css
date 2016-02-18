@@ -767,6 +767,15 @@ button.iconic { background: transparent; border: 0px }
 button[disabled].iconic { color: #ddd }
 
 
+#source-notes-container {
+  margin-top: 3em;
+}
+
+#version-navigation {
+  margin-top: 3em;
+}
+
+
 
 legend > .btn {
   vertical-align: top;
