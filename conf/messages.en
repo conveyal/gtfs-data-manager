@@ -181,8 +181,8 @@ app.note.version_notes=Comments on this version of this feed
 app.username=username
 app.password=password
 
-app.name=NYSDOT GTFS Data Manager
-app.title={0} - NYSDOT GTFS Data Manager
+app.name=Transit Data Manager
+app.title={0} - Transit Data Manager
 
 app.confirm=Are you sure?
 app.confirm_delete=Are you sure you want to delete {0}?
