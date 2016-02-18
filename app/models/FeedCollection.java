@@ -41,6 +41,9 @@ public class FeedCollection extends Model implements Serializable {
 
     public Double defaultLocationLat, defaultLocationLon;
 
+    public Boolean autoFetchFeeds;
+    public int autoFetchHour, autoFetchMinute;
+
     public FeedCollection() {
         this.buildConfig = new OtpBuildConfig();
         this.routerConfig = new OtpRouterConfig();

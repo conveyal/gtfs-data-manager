@@ -156,6 +156,8 @@ app.project_settings=Project Settings
 app.project_settings.timezone=Default Timezone
 app.project_settings.language=Default Language
 app.project_settings.location=Default Location (Lat, Lon)
+app.project-settings.feed_auto_fetch=Auto fetch feeds
+app.project-settings.feed_auto_fetch.time=Time of day
 
 app.location.home=Home
 app.location.login=Log in

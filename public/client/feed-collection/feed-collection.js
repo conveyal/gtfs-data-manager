@@ -15,7 +15,8 @@ module.exports = BB.Model.extend({
     defaultTimeZone: null,
     defaultLanguage: null,
     defaultLocationLat: null,
-    defaultLocationLon: null
+    defaultLocationLon: null,
+    autoFetchFeeds: null
   },
   urlRoot: 'api/feedcollections/'
 });
