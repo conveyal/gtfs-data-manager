@@ -66,7 +66,16 @@ var App = BB.Marionette.Application.extend({
       var redirect = loc.protocol + "//" + loc.hostname + (loc.port ? ':' + loc.port: '');
       window.location.replace('https://' + self.config.auth0Domain + '/v2/logout?returnTo=' + redirect);
     });
+  },
+
+  resetPassword: function() {
+    console.log('resetPassword');
+    var lock = new Auth0Lock(this.config.auth0ClientId, this.config.auth0Domain);
+    lock.showReset(function(err) {
+      if (!err) lock.hide();
+    });
   }
+
 });
 
 var app = new App();
@@ -83,20 +92,18 @@ app.addRegions({
 app.nav = new Breadcrumb();
 
 app.on('before:start', function() {
+  RenderDatatoolsNavbar({
+    elementId: 'navbar',
+    title: Messages('app.name'),
+    managerUrl: '#',
+    editorUrl: app.config.editorUrl,
+    userAdminUrl: app.config.userAdminUrl,
+    username: this.auth0User ? this.auth0User.getEmail() : null,
+    logoutHandler: app.logout.bind(app),
+    resetPasswordHandler: app.resetPassword.bind(app)
+  });
+
   app.navRegion.show(app.nav);
-
-  // set up the name
-  $('#appName').text(Messages('app.name'));
-
-  $('#logout').text(Messages('app.logout'))
-    .click(function(e) {
-      e.preventDefault();
-      app.logout();
-    });
-
-  $('#editorLink').prop('href', app.config.editorUrl);
-  $('#userAdminLink').prop('href', app.config.userAdminUrl);
-
 });
 
 module.exports = app;
