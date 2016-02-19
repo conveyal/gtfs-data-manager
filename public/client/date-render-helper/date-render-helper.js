@@ -14,9 +14,8 @@ Handlebars.registerHelper(
     if (date === 0 || date === null)
       return '-';
 
-    var m = moment(date);
+    var m = moment.utc(date);
 
-    // TODO: time zone?
     return new Handlebars.SafeString(
       '<span>' +
       Handlebars.escapeExpression(m.format(window.Messages('app.date_format'))) + ' (' +
