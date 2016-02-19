@@ -22,6 +22,7 @@ var App = BB.Marionette.Application.extend({
   userLoggedIn: function(token, profile, lock) {
 
     this.auth0User = new Auth0User(profile);
+    this.showNavbar();
 
     $('#logged-in-user').text(window.Messages('app.account.logged_in_as', this.auth0User.getEmail()));
     $('#logout').removeClass('hidden');
@@ -74,8 +75,20 @@ var App = BB.Marionette.Application.extend({
     lock.showReset(function(err) {
       if (!err) lock.hide();
     });
-  }
+  },
 
+  showNavbar() {
+    RenderDatatoolsNavbar({
+      elementId: 'navbar',
+      title: Messages('app.name'),
+      managerUrl: '#',
+      editorUrl: this.config.editorUrl,
+      userAdminUrl: this.config.userAdminUrl,
+      username: this.auth0User ? this.auth0User.getEmail() : null,
+      logoutHandler: this.logout.bind(app),
+      resetPasswordHandler: this.resetPassword.bind(app)
+    });
+  }
 });
 
 var app = new App();
@@ -92,17 +105,7 @@ app.addRegions({
 app.nav = new Breadcrumb();
 
 app.on('before:start', function() {
-  RenderDatatoolsNavbar({
-    elementId: 'navbar',
-    title: Messages('app.name'),
-    managerUrl: '#',
-    editorUrl: app.config.editorUrl,
-    userAdminUrl: app.config.userAdminUrl,
-    username: this.auth0User ? this.auth0User.getEmail() : null,
-    logoutHandler: app.logout.bind(app),
-    resetPasswordHandler: app.resetPassword.bind(app)
-  });
-
+  app.showNavbar();
   app.navRegion.show(app.nav);
 });
 
