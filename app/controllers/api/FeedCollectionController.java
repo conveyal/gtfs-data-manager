@@ -101,7 +101,7 @@ public class FeedCollectionController extends Auth0SecuredController {
 //        DateTime now = DateTime.now().withZone(timezone);
 
         // NOW in UTC
-        DateTime now = DateTime.now();
+        DateTime now = DateTime.now().withZone(DateTimeZone.UTC);
         System.out.println(now.toString());
         System.out.println(timezone.getOffset(DateTime.now()) / 1000 / 60 / 60);
         DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/yyyy HH:mm");
@@ -110,12 +110,13 @@ public class FeedCollectionController extends Auth0SecuredController {
 
         DateTime startTime = formatter.parseDateTime(dtString);
 
-        
 
-        // add offset to UTC start time to get tz start time
+
+        // add offset to UTC start time to get tz-specific start time
         long startTimeMillis = startTime.getMillis() + timezone.getOffset(now);
-        System.out.println("Start time: " + startTime.toString());
-        System.out.println("Start time (millis): " + startTime.getMillis());
+        DateTime newStart = new DateTime(startTimeMillis);
+        System.out.println("Start time: " + newStart.toString());
+        System.out.println("Start time (millis): " + startTimeMillis);
         System.out.println("Now: " + now.toString());
         System.out.println("Now (millis): " + now.getMillis());
         long diffInMinutes = (startTimeMillis - now.getMillis()) / 1000 / 60;
