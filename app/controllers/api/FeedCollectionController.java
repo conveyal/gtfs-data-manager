@@ -15,6 +15,7 @@ import models.*;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
+import org.joda.time.MutableDateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
@@ -86,47 +87,38 @@ public class FeedCollectionController extends Auth0SecuredController {
         cancelAutoFetch(id);
 
         Cancellable task;
-        DateTimeZone.setDefault(DateTimeZone.UTC);
+
         DateTimeZone timezone;
         try {
             timezone = DateTimeZone.forID(timezoneId);
         }catch(Exception e){
             timezone = DateTimeZone.forID("America/New_York");
         }
-
+        DateTimeZone.setDefault(timezone);
         System.out.println("Using timezone: " + timezone.getID());
 
         long initialDelay = 0;
 
-//        DateTime now = DateTime.now().withZone(timezone);
 
         // NOW in UTC
-        DateTime now = DateTime.now().withZone(DateTimeZone.UTC);
-        System.out.println(now.toString());
-        System.out.println(timezone.getOffset(DateTime.now()) / 1000 / 60 / 60);
+        DateTime now = new DateTime().withZone(timezone);
+        System.out.println("Current time:" + now.toString());
+
+        // Format and parse datetime string
         DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/yyyy HH:mm");
         String dtString = String.valueOf(now.getDayOfMonth()) + "/" + String.valueOf(now.getMonthOfYear()) + "/" + String.valueOf(now.getYear()) + " " + String.valueOf(hour) + ":" + String.valueOf(minute);
-
-
         DateTime startTime = formatter.parseDateTime(dtString);
+        System.out.println("Start time:" + startTime.toString());
 
-
-
-        // add offset to UTC start time to get tz-specific start time
-        long startTimeMillis = startTime.getMillis() + timezone.getOffset(now);
-        DateTime newStart = new DateTime(startTimeMillis);
-        System.out.println("Start time: " + newStart.toString());
-        System.out.println("Start time (millis): " + startTimeMillis);
-        System.out.println("Now: " + now.toString());
-        System.out.println("Now (millis): " + now.getMillis());
-        long diffInMinutes = (startTimeMillis - now.getMillis()) / 1000 / 60;
-        System.out.println(diffInMinutes);
+        // Get diff between start time and current time
+        long diffInMinutes = (startTime.getMillis() - now.getMillis()) / 1000 / 60;
         if ( diffInMinutes >= 0 ){
             initialDelay = diffInMinutes; // delay in minutes
         }
         else{
             initialDelay = 24 * 60 + diffInMinutes; // wait for one day plus difference (which is negative)
         }
+        
         System.out.println("Scheduling the feed auto fetch daemon to kick off in " + String.valueOf(initialDelay / 60) + " hours." );
         ActorRef fetchActor = Akka.system().actorOf(FetchProjectFeedsActor.props(id), "fetch-feeds" + UUID.randomUUID());
 
