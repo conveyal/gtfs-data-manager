@@ -86,7 +86,7 @@ public class FeedCollectionController extends Auth0SecuredController {
         cancelAutoFetch(id);
 
         Cancellable task;
-
+        DateTimeZone.setDefault(DateTimeZone.UTC);
         DateTimeZone timezone;
         try {
             timezone = DateTimeZone.forID(timezoneId);
@@ -97,15 +97,28 @@ public class FeedCollectionController extends Auth0SecuredController {
         System.out.println("Using timezone: " + timezone.getID());
 
         long initialDelay = 0;
-        
-        DateTime now = DateTime.now().withZone(timezone);
 
+//        DateTime now = DateTime.now().withZone(timezone);
+
+        // NOW in UTC
+        DateTime now = DateTime.now();
+        System.out.println(now.toString());
+        System.out.println(timezone.getOffset(DateTime.now()) / 1000 / 60 / 60);
         DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/yyyy HH:mm");
         String dtString = String.valueOf(now.getDayOfMonth()) + "/" + String.valueOf(now.getMonthOfYear()) + "/" + String.valueOf(now.getYear()) + " " + String.valueOf(hour) + ":" + String.valueOf(minute);
-        System.out.println(dtString);
+
 
         DateTime startTime = formatter.parseDateTime(dtString);
-        long diffInMinutes = (startTime.getMillis() - now.getMillis()) / 1000 / 60;
+
+        
+
+        // add offset to UTC start time to get tz start time
+        long startTimeMillis = startTime.getMillis() + timezone.getOffset(now);
+        System.out.println("Start time: " + startTime.toString());
+        System.out.println("Start time (millis): " + startTime.getMillis());
+        System.out.println("Now: " + now.toString());
+        System.out.println("Now (millis): " + now.getMillis());
+        long diffInMinutes = (startTimeMillis - now.getMillis()) / 1000 / 60;
         System.out.println(diffInMinutes);
         if ( diffInMinutes >= 0 ){
             initialDelay = diffInMinutes; // delay in minutes
@@ -113,7 +126,7 @@ public class FeedCollectionController extends Auth0SecuredController {
         else{
             initialDelay = 24 * 60 + diffInMinutes; // wait for one day plus difference (which is negative)
         }
-        System.out.println("Scheduling the feed auto fetch daemon to kick off in " + String.valueOf(initialDelay) + " minutes." );
+        System.out.println("Scheduling the feed auto fetch daemon to kick off in " + String.valueOf(initialDelay / 60) + " hours." );
         ActorRef fetchActor = Akka.system().actorOf(FetchProjectFeedsActor.props(id), "fetch-feeds" + UUID.randomUUID());
 
         task = Akka.system().scheduler().schedule(
