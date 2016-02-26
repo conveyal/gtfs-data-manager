@@ -78,22 +78,27 @@ public class Auth0UserProfile {
 
         String project_id;
         Permission[] permissions;
+        String[] defaultFeeds;
 
         public Project() {
         }
 
-        public Project(String project_id, Permission[] permissions) {
+        public Project(String project_id, Permission[] permissions, String[] defaultFeeds) {
             this.project_id = project_id;
             this.permissions = permissions;
+            this.defaultFeeds = defaultFeeds;
         }
 
         public void setProject_id(String project_id) {
             this.project_id = project_id;
         }
 
-        public void setPermissions(Permission[] permissions) {
-            this.permissions = permissions;
+        public void setPermissions(Permission[] permissions) { this.permissions = permissions; }
+
+        public void setDefaultFeeds(String[] defaultFeeds) {
+            this.defaultFeeds = defaultFeeds;
         }
+
     }
 
     public static class Permission {
@@ -123,6 +128,7 @@ public class Auth0UserProfile {
     }
 
     public boolean hasProject(String projectID) {
+        if(app_metadata.datatools.projects == null) return false;
         for(Project project : app_metadata.datatools.projects) {
             if (project.project_id.equals(projectID)) return true;
         }
@@ -158,6 +164,7 @@ public class Auth0UserProfile {
         for(Project project : app_metadata.datatools.projects) {
             if (project.project_id.equals(projectID)) {
                 for(Permission permission : project.permissions) {
+
                     if(permission.type.equals("view-feed")) {
                         for(String thisFeedID : permission.feeds) {
                             if(thisFeedID.equals(feedID) || thisFeedID.equals("*")) return true;

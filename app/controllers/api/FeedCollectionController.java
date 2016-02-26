@@ -44,7 +44,7 @@ public class FeedCollectionController extends Auth0SecuredController {
 
         System.out.println("found projects: " + FeedCollection.getAll().size());
         for(FeedCollection fc : FeedCollection.getAll()) {
-            if(userProfile.hasProject(fc.id) || userProfile.canAdministerApplication()) {
+            if(userProfile.canAdministerApplication() || userProfile.hasProject(fc.id)) {
                 filteredFCs.add(fc);
             }
         }

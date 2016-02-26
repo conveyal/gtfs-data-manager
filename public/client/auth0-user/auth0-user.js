@@ -32,8 +32,9 @@ Auth0User.prototype.canManageFeed = function (projectID, feedID) {
           var permission = project.permissions[j];
           if(permission.type === "administer-project") return true;
           if(permission.type === "manage-feed") {
-            for (var k = 0; k < permission.feeds.length; k++) {
-              if (permission.feeds[k] === feedID || permission.feeds[k] === "*") {
+            var feeds = permission.feeds || this.getDefaultFeeds(projectID);
+            for (var k = 0; k < feeds.length; k++) {
+              if (feeds[k] === feedID || feeds[k] === "*") {
                 return true;
               }
             }
@@ -54,5 +55,17 @@ Auth0User.prototype.canAdministerApp = function () {
   }
   return false;
 };
+
+Auth0User.prototype.getDefaultFeeds = function (projectID) {
+  if(this.dt && this.dt.projects) {
+    for(var i=0; i< this.dt.projects.length; i++) {
+      var project = this.dt.projects[i];
+      if(project.project_id === projectID) {
+        if(project.defaultFeeds) return project.defaultFeeds;
+      }
+    }
+  }
+  return []
+}
 
 module.exports = Auth0User;
