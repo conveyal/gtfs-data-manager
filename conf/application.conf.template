@@ -41,6 +41,10 @@ application.data.mapdb=data/mapdb
 
 # this must be a dedicated directory
 application.data.gtfs=data/gtfs
+application.s3.gtfs_bucket=s3-bucket-name
+
+# if work_offline is true, use s3 for feed storage
+application.work_offline=true
 
 # where the public feed download files will be put
 # this can then be served by a front-end HTTP server, e.g. nginx

@@ -38,7 +38,7 @@ public class FeedVersion extends Model implements Serializable {
     private static final long serialVersionUID = 1L;
 
     static DataStore<FeedVersion> versionStore = new DataStore<FeedVersion>("feedversions");
-    private static FeedStore feedStore = new FeedStore(Play.application().configuration().getString("application.data.gtfs"));
+    private static FeedStore feedStore = new FeedStore();
     
     static {
         // set up indexing on feed versions by feed source, indexed by <FeedSource ID, version>
