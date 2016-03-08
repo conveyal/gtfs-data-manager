@@ -167,38 +167,19 @@ public class FeedSource extends Model implements Comparable<FeedSource>, Seriali
         if (this.retrievalMethod.equals(FeedRetrievalMethod.FETCHED_AUTOMATICALLY))
             url = this.url;
         else if (this.retrievalMethod.equals(FeedRetrievalMethod.PRODUCED_IN_HOUSE)) {
-            if (this.editorId == null || this.snapshotVersion == null) {
+            if (this.snapshotVersion == null) {
                 Logger.error("Feed {} has no editor id; cannot fetch", this); 
                 return null;
             }
             
-            // get an OAuth token, etc.
-            String baseUrl = Play.application().configuration().getString("application.editor.internal_url");
+            String baseUrl = Play.application().configuration().getString("application.editor_url");
             
             if (!baseUrl.endsWith("/"))
                 baseUrl += "/";
-            
-            String tokenUrl = baseUrl + "get_token?client_id=" + Play.application().configuration().getString("application.oauth.client_id");
-            tokenUrl += "&client_secret=" + Play.application().configuration().getString("application.oauth.client_secret");
-            
-            WSResponse resp;
-            try {
-                resp = WS.url(tokenUrl).get().get(30 * 1000L);
-            } catch (Exception e) {
-                Logger.error("Could not get OAuth token, skipping feed {}", this);
-                return null;
-            }
-            
-            if (resp.getStatus() != 200) {
-                Logger.error("Could not get OAuth token (status {}), skipping feed {}", resp.getStatus(), this);
-                return null;
-            }
-            
-            oauthToken = resp.getBody();
-            
+
             // build the URL
             try {
-                url = new URL(baseUrl + "api/snapshot/" + this.snapshotVersion + ".zip");
+                url = new URL(baseUrl + "api/mgrsnapshot/" + this.snapshotVersion + ".zip");
             } catch (MalformedURLException e) {
                 Logger.error("Invalid URL for editor, check your config.");
                 return null;

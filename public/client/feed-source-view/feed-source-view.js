@@ -105,10 +105,12 @@ module.exports = LayoutView.extend({
     }));
 
     // set up changeable snapshot IDs
-    /*if (this.model.get('retrievalMethod') == 'PRODUCED_IN_HOUSE') { //} && this.model.get('editorId') {
-      console.log('getting ed snapshots..');
+    if (this.model.get('retrievalMethod') == 'PRODUCED_IN_HOUSE') { //} && this.model.get('editorId') {
       $.ajax({
-        url: 'api/feedsources/' + this.model.get('id') + '/getEditorSnapshots',
+        url: app.config.editorUrl + '/api/mgrsnapshot',
+        data: {
+          sourceId: this.model.get('id')
+        },
         success: function (snapshots) {
           snapshots = _.filter(snapshots, function (s) {
             return s.validFrom && s.validTo;
@@ -123,7 +125,7 @@ module.exports = LayoutView.extend({
           });
         }
       })
-    }*/
+    }
   },
 
   /** change snapshot version */

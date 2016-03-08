@@ -106,10 +106,10 @@ module.exports = LayoutView.extend({
           return this.model.get('url');
         }
       }));
-    } else if (retrievalMethod == 'PRODUCED_IN_HOUSE') {
+    /*} else if (retrievalMethod == 'PRODUCED_IN_HOUSE') {
       this.urlRegion.show(new EditorAgencyView({
         model: this.model
-      }));
+      }));*/
     } else {
       this.urlRegion.empty();
     }
