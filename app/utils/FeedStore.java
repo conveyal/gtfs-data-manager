@@ -130,7 +130,7 @@ public class FeedStore {
     /**
      * Create a new feed with the given ID.
      */
-    public File newFeed (String id, InputStream inputStream) {
+    public File newFeed (String id, InputStream inputStream, String feedSourceId) {
         // local storage
         if (path != null) {
             File out = new File(path, id);
@@ -171,13 +171,6 @@ public class FeedStore {
                 String keyName = id;
 
                 try {
-                    // if content is passed in InputStream
-//                    byte[] resultByte = DigestUtils.md5(inputStream);
-//                    ObjectMetadata metaData = new ObjectMetadata();
-//                    String streamMD5 = new String(Base64.encodeBase64(resultByte));
-//                    metaData.setContentLength(IOUtils.toByteArray(inputStream).length);
-//                    metaData.setContentMD5(streamMD5);
-
                     // Use tempfile
                     File tempFile = File.createTempFile("test", ".zip");
                     tempFile.deleteOnExit();
@@ -192,12 +185,15 @@ public class FeedStore {
                     s3client.putObject(new PutObjectRequest(
                             s3Bucket, keyName, tempFile));
 
-                    Logger.info("Copying feed on s3 to latest version");
-                    // copy to [name]-latest.zip
-                    String copyKey = id + "-latest.zip";
-                    CopyObjectRequest copyObjRequest = new CopyObjectRequest(
-                            this.s3Bucket, keyName, this.s3Bucket, copyKey);
-                    s3client.copyObject(copyObjRequest);
+                    if (feedSourceId != null){
+                        Logger.info("Copying feed on s3 to latest version");
+                        // copy to [name]-latest.zip
+                        String copyKey = feedSourceId + "-latest.zip";
+                        CopyObjectRequest copyObjRequest = new CopyObjectRequest(
+                                this.s3Bucket, keyName, this.s3Bucket, copyKey);
+                        s3client.copyObject(copyObjRequest);
+                    }
+
 
                     return tempFile;
 
