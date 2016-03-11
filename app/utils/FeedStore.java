@@ -188,7 +188,7 @@ public class FeedStore {
                     if (feedSourceId != null){
                         Logger.info("Copying feed on s3 to latest version");
                         // copy to [name]-latest.zip
-                        String copyKey = feedSourceId + "-latest.zip";
+                        String copyKey = feedSourceId + ".zip";
                         CopyObjectRequest copyObjRequest = new CopyObjectRequest(
                                 this.s3Bucket, keyName, this.s3Bucket, copyKey);
                         s3client.copyObject(copyObjRequest);
