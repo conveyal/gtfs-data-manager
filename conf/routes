@@ -16,6 +16,8 @@ PUT           /api/feedcollections/:id                       controllers.api.Fee
 POST          /api/feedcollections/                          controllers.api.FeedCollectionController.create()
 POST          /api/feedcollections/:id/fetchAllFeeds         controllers.api.FeedCollectionController.fetchAllFeeds(id:String)
 GET           /api/feedcollections/:id/download              controllers.api.FeedCollectionController.downloadFeeds(id:String)
+GET           /api/feedcollections/:id/pullFromRtd           controllers.api.FeedCollectionController.pullFromRtd(id:String)
+POST          /api/feedcollections/:id/pushToRtd             controllers.api.FeedCollectionController.pushToRtd(id:String)
 
 GET           /api/users/:id                                 controllers.api.UserController.get(id:String)
 GET           /api/users                                     controllers.api.UserController.getAll()

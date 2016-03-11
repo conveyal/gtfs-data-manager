@@ -99,6 +99,8 @@ public class FeedSource extends Model implements Comparable<FeedSource>, Seriali
 
     public Collection<AgencyBranding> branding;
 
+    public String defaultGtfsId;
+
     /**
      * Create a new feed. This also creates a user to own this feed.
      */

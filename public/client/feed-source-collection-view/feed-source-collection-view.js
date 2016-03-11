@@ -22,7 +22,8 @@ module.exports = CompositeView.extend({
     'click .deploy-public': 'deployPublic',
     'click .fetch-all-feeds': 'fetchAllFeeds',
     'click .project-settings': 'projectSettings',
-    'click .sort-by': 'sortBy'
+    'click .sort-by': 'sortBy',
+    'click .pull-from-rtd': 'pullFromRtd'
   },
 
   onRender: function() {
@@ -248,6 +249,16 @@ module.exports = CompositeView.extend({
           this.$el.find('.location-lon').val(fc.get('defaultLocationLon'))
         }
       }));
+    });
+  },
+
+  pullFromRtd() {
+    var self = this;
+    var url = '/api/feedcollections/' + this.feedCollectionId + '/pullFromRtd'
+    $.ajax(url, {
+      success: function() {
+        window.location.reload(false);
+      }
     });
   }
 });

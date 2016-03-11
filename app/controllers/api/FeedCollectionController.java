@@ -1,9 +1,12 @@
 package controllers.api;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.ByteStreams;
 import com.google.common.net.UrlEscapers;
 import controllers.Auth0SecuredController;
@@ -19,9 +22,13 @@ import play.libs.ws.WSResponse;
 import play.mvc.Result;
 import utils.Auth0UserProfile;
 
+import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -30,21 +37,21 @@ public class FeedCollectionController extends Auth0SecuredController {
 
     public static final Logger LOG = LoggerFactory.getLogger(FeedCollectionController.class);
 
-    private static JsonManager<FeedCollection> json = 
+    private static JsonManager<FeedCollection> json =
             new JsonManager<FeedCollection>(FeedCollection.class, JsonViews.UserInterface.class);
-    
-    public static Result getAll () throws JsonProcessingException {
+
+    public static Result getAll() throws JsonProcessingException {
         String token = getToken();
-        if(token == null) return unauthorized("Could not find authorization token");
+        if (token == null) return unauthorized("Could not find authorization token");
         Auth0UserProfile userProfile = verifyUser();
-        if(userProfile == null) return unauthorized();
+        if (userProfile == null) return unauthorized();
 
 
         Collection<FeedCollection> filteredFCs = new ArrayList<FeedCollection>();
 
         System.out.println("found projects: " + FeedCollection.getAll().size());
-        for(FeedCollection fc : FeedCollection.getAll()) {
-            if(userProfile.canAdministerApplication() || userProfile.hasProject(fc.id)) {
+        for (FeedCollection fc : FeedCollection.getAll()) {
+            if (userProfile.canAdministerApplication() || userProfile.hasProject(fc.id)) {
                 filteredFCs.add(fc);
             }
         }
@@ -58,25 +65,25 @@ public class FeedCollectionController extends Auth0SecuredController {
         // we'll want to change this.
         //return ok(json.write(FeedCollection.getAll())).as("application/json");
     }
-    
-    public static Result get (String id) throws JsonProcessingException {
+
+    public static Result get(String id) throws JsonProcessingException {
         FeedCollection c = FeedCollection.get(id);
-        
+
         return ok(json.write(c)).as("application/json");
     }
-    
-    public static Result update (String id) throws JsonProcessingException {
+
+    public static Result update(String id) throws JsonProcessingException {
 
         String token = getToken();
-        if(token == null) return unauthorized("Could not find authorization token");
+        if (token == null) return unauthorized("Could not find authorization token");
         Auth0UserProfile userProfile = verifyUser();
-        if(userProfile == null) return unauthorized();
+        if (userProfile == null) return unauthorized();
 
         FeedCollection c = FeedCollection.get(id);
 
-        if(!userProfile.canAdministerProject(c.id))
+        if (!userProfile.canAdministerProject(c.id))
             return unauthorized();
-        
+
         JsonNode params = request().body().asJson();
 
         JsonNode name = params.get("name");
@@ -111,20 +118,20 @@ public class FeedCollectionController extends Auth0SecuredController {
 
         if (params.has("buildConfig")) {
             JsonNode buildConfig = params.get("buildConfig");
-            if(c.buildConfig == null) c.buildConfig = new OtpBuildConfig();
+            if (c.buildConfig == null) c.buildConfig = new OtpBuildConfig();
 
-            if(buildConfig.has("subwayAccessTime")) {
+            if (buildConfig.has("subwayAccessTime")) {
                 JsonNode subwayAccessTime = buildConfig.get("subwayAccessTime");
                 // allow client to un-set option via 'null' value
                 c.buildConfig.subwayAccessTime = subwayAccessTime.isNull() ? null : subwayAccessTime.asDouble();
             }
 
-            if(buildConfig.has("fetchElevationUS")) {
+            if (buildConfig.has("fetchElevationUS")) {
                 JsonNode fetchElevationUS = buildConfig.get("fetchElevationUS");
                 c.buildConfig.fetchElevationUS = fetchElevationUS.isNull() ? null : fetchElevationUS.asBoolean();
             }
 
-            if(buildConfig.has("stationTransfers")) {
+            if (buildConfig.has("stationTransfers")) {
                 JsonNode stationTransfers = buildConfig.get("stationTransfers");
                 c.buildConfig.stationTransfers = stationTransfers.isNull() ? null : stationTransfers.asBoolean();
             }
@@ -167,27 +174,27 @@ public class FeedCollectionController extends Auth0SecuredController {
                         JsonNode updater = updaters.get(i);
 
                         OtpRouterConfig.Updater updaterObj = new OtpRouterConfig.Updater();
-                        if(updater.has("type")) {
+                        if (updater.has("type")) {
                             JsonNode type = updater.get("type");
                             updaterObj.type = type.isNull() ? null : type.asText();
                         }
 
-                        if(updater.has("sourceType")) {
+                        if (updater.has("sourceType")) {
                             JsonNode sourceType = updater.get("sourceType");
                             updaterObj.sourceType = sourceType.isNull() ? null : sourceType.asText();
                         }
 
-                        if(updater.has("defaultAgencyId")) {
+                        if (updater.has("defaultAgencyId")) {
                             JsonNode defaultAgencyId = updater.get("defaultAgencyId");
                             updaterObj.defaultAgencyId = defaultAgencyId.isNull() ? null : defaultAgencyId.asText();
                         }
 
-                        if(updater.has("url")) {
+                        if (updater.has("url")) {
                             JsonNode url = updater.get("url");
                             updaterObj.url = url.isNull() ? null : url.asText();
                         }
 
-                        if(updater.has("frequencySec")) {
+                        if (updater.has("frequencySec")) {
                             JsonNode frequencySec = updater.get("frequencySec");
                             updaterObj.frequencySec = frequencySec.isNull() ? null : frequencySec.asInt();
                         }
@@ -198,22 +205,22 @@ public class FeedCollectionController extends Auth0SecuredController {
             }
         }
 
-        JsonNode defaultTimeZone  = params.get("defaultTimeZone");
+        JsonNode defaultTimeZone = params.get("defaultTimeZone");
         if (defaultTimeZone != null) {
             c.defaultTimeZone = defaultTimeZone.asText();
         }
 
-        JsonNode defaultLanguage  = params.get("defaultLanguage");
+        JsonNode defaultLanguage = params.get("defaultLanguage");
         if (defaultLanguage != null) {
             c.defaultLanguage = defaultLanguage.asText();
         }
 
-        JsonNode defaultLocationLat  = params.get("defaultLocationLat");
+        JsonNode defaultLocationLat = params.get("defaultLocationLat");
         if (defaultLocationLat != null) {
             c.defaultLocationLat = defaultLocationLat.asDouble();
         }
 
-        JsonNode defaultLocationLon  = params.get("defaultLocationLon");
+        JsonNode defaultLocationLon = params.get("defaultLocationLon");
         if (defaultLocationLon != null) {
             c.defaultLocationLon = defaultLocationLon.asDouble();
         }
@@ -231,25 +238,25 @@ public class FeedCollectionController extends Auth0SecuredController {
             if (u != null)
                 c.setUser(u);
         }*/
-        
+
         c.save();
-        
+
         return ok(json.write(c)).as("application/json");
     }
-    
-    public static Result create () throws JsonParseException, JsonMappingException, IOException {
+
+    public static Result create() throws JsonParseException, JsonMappingException, IOException {
 
         System.out.println("creating project");
         String token = getToken();
-        if(token == null) return unauthorized("Could not find authorization token");
+        if (token == null) return unauthorized("Could not find authorization token");
         Auth0UserProfile userProfile = verifyUser();
-        if(userProfile == null) return unauthorized();
+        if (userProfile == null) return unauthorized();
 
         //User currentUser = User.getUserByUsername(session("username"));
-        
+
         if (!userProfile.canAdministerApplication())
             return unauthorized();
-        
+
         JsonNode params = request().body().asJson();
 
         FeedCollection c = new FeedCollection();
@@ -268,46 +275,46 @@ public class FeedCollectionController extends Auth0SecuredController {
             u = currentUser;
             
         c.setUser(u);*/
-        
+
         c.save();
 
         return ok(json.write(c)).as("application/json");
     }
-    
-    public static Promise<Result> getEditorAgencies () {
+
+    public static Promise<Result> getEditorAgencies() {
         // note: this is accessible to anyone; for now this is fine but in the future we will want to handle this better
-        
+
         // first, get a token
         String url = Play.application().configuration().getString("application.editor.internal_url");
-        
+
         if (!url.endsWith("/"))
             url += "/";
-        
+
         final String baseUrl = url;
-        
+
         String tokenUrl = baseUrl + "get_token";
         tokenUrl += "?client_id=" + Play.application().configuration().getString("application.oauth.client_id");
         tokenUrl += "&client_secret=" + Play.application().configuration().getString("application.oauth.client_secret");
-        
-        final Promise<String> tokenPromise = WS.url(tokenUrl).get().map(new Function<WSResponse, String> () {
+
+        final Promise<String> tokenPromise = WS.url(tokenUrl).get().map(new Function<WSResponse, String>() {
             public String apply(WSResponse wsr) throws Throwable {
                 if (wsr.getStatus() != 200)
                     return null;
-                
+
                 else
                     return wsr.getBody();
             }
         });
-        
-        final Promise<WSResponse> agencyPromise = tokenPromise.flatMap(new Function<String, Promise<WSResponse>> () {
+
+        final Promise<WSResponse> agencyPromise = tokenPromise.flatMap(new Function<String, Promise<WSResponse>>() {
             public Promise<WSResponse> apply(String token) throws Throwable {
                 String agencyUrl = baseUrl + "api/agency?oauth_token=" + token;
                 return WS.url(agencyUrl).get();
             }
         });
-        
-        return agencyPromise.map(new Function<WSResponse, Result> () {
-            public Result apply (WSResponse wsr) {
+
+        return agencyPromise.map(new Function<WSResponse, Result>() {
+            public Result apply(WSResponse wsr) {
                 if (wsr.getStatus() != 200)
                     return internalServerError();
                 else
@@ -316,7 +323,7 @@ public class FeedCollectionController extends Auth0SecuredController {
         });
     }
 
-    public static Promise<Result> getEditorSnapshots (final String agencyId) {
+    public static Promise<Result> getEditorSnapshots(final String agencyId) {
         // note: this is accessible to anyone; for now this is fine but in the future we will want to handle this better
 
         // first, get a token
@@ -331,7 +338,7 @@ public class FeedCollectionController extends Auth0SecuredController {
         tokenUrl += "?client_id=" + Play.application().configuration().getString("application.oauth.client_id");
         tokenUrl += "&client_secret=" + Play.application().configuration().getString("application.oauth.client_secret");
 
-        final Promise<String> tokenPromise = WS.url(tokenUrl).get().map(new Function<WSResponse, String> () {
+        final Promise<String> tokenPromise = WS.url(tokenUrl).get().map(new Function<WSResponse, String>() {
             public String apply(WSResponse wsr) throws Throwable {
                 if (wsr.getStatus() != 200)
                     return null;
@@ -341,15 +348,15 @@ public class FeedCollectionController extends Auth0SecuredController {
             }
         });
 
-        final Promise<WSResponse> agencyPromise = tokenPromise.flatMap(new Function<String, Promise<WSResponse>> () {
+        final Promise<WSResponse> agencyPromise = tokenPromise.flatMap(new Function<String, Promise<WSResponse>>() {
             public Promise<WSResponse> apply(String token) throws Throwable {
                 String snapUrl = baseUrl + "api/snapshot?agencyId=" + UrlEscapers.urlFormParameterEscaper().escape(agencyId) + "&oauth_token=" + token;
                 return WS.url(snapUrl).get();
             }
         });
 
-        return agencyPromise.map(new Function<WSResponse, Result> () {
-            public Result apply (WSResponse wsr) {
+        return agencyPromise.map(new Function<WSResponse, Result>() {
+            public Result apply(WSResponse wsr) {
                 if (wsr.getStatus() != 200)
                     return internalServerError();
                 else
@@ -366,7 +373,7 @@ public class FeedCollectionController extends Auth0SecuredController {
         return ok(FeedVersionController.json.write(job.result)).as("application/json");
     }
 
-    public static Result downloadFeeds (String id) throws Exception {
+    public static Result downloadFeeds(String id) throws Exception {
         User currentUser = User.getUserByUsername(session("username"));
 
         if (!currentUser.admin)
@@ -417,5 +424,79 @@ public class FeedCollectionController extends Auth0SecuredController {
         response().setContentType("application/zip");
         response().setHeader("Content-Disposition", "attachment;filename=" + c.name.replaceAll("[^a-zA-Z0-9]", "") + ".zip");
         return ok(fis);
+    }
+
+    public static Result pullFromRtd(String id) throws Exception {
+        String token = getToken();
+        if (token == null) return unauthorized("Could not find authorization token");
+        Auth0UserProfile userProfile = verifyUser();
+        if (userProfile == null) return unauthorized();
+
+        FeedCollection feedColl = FeedCollection.get(id);
+
+        if (!userProfile.canAdministerProject(feedColl.id))
+            return unauthorized();
+
+        URL url = new URL(Play.application().configuration().getString("application.extensions.rtd_integration.api"));
+
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+        // optional default is GET
+        con.setRequestMethod("GET");
+
+        //add request header
+        con.setRequestProperty("User-Agent", USER_AGENT);
+
+        int responseCode = con.getResponseCode();
+        System.out.println("\nSending 'GET' request to URL : " + url);
+        System.out.println("Response Code : " + responseCode);
+
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+
+        String json = response.toString();
+        //System.out.println(json);
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        RtdCarrier[] carriers = mapper.readValue(json, RtdCarrier[].class);
+
+        for(int i=0; i < 3; i++) {
+            RtdCarrier car = carriers[i];
+            System.out.println("car id=" + car.AgencyId + " name=" + car.AgencyName);
+
+            FeedSource s = new FeedSource(car.AgencyName);
+            s.defaultGtfsId = car.AgencyId;
+            s.setFeedCollection(feedColl);
+
+            s.save();
+        }
+
+
+        return ok();
+    }
+
+    public static Result pushToRtd(String id) {
+        return ok();
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class RtdCarrier {
+
+        @JsonProperty
+        String AgencyId;
+
+        @JsonProperty
+        String AgencyName;
+
+        public RtdCarrier() {
+        }
     }
 }
