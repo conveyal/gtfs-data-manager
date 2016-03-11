@@ -224,21 +224,8 @@ public class FeedSource extends Model implements Comparable<FeedSource>, Seriali
             else if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
                 Logger.info("Saving feed {}", this);
 
-                File out = newFeed.newFeed();
-                
-                FileOutputStream outStream;
-                
-                try {
-                    outStream = new FileOutputStream(out);
-                } catch (FileNotFoundException e) {
-                    Logger.error("Unable to open {}", out);
-                    return null;
-                }
-                
-                // copy the file
-                ReadableByteChannel rbc = Channels.newChannel(conn.getInputStream());
-                outStream.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-                outStream.close();
+                File out = newFeed.newFeed(conn.getInputStream());
+
             }
             
             else {

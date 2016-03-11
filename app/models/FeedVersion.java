@@ -2,6 +2,7 @@ package models;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -38,7 +39,7 @@ public class FeedVersion extends Model implements Serializable {
     private static final long serialVersionUID = 1L;
 
     static DataStore<FeedVersion> versionStore = new DataStore<FeedVersion>("feedversions");
-    private static FeedStore feedStore = new FeedStore(Play.application().configuration().getString("application.data.gtfs"));
+    private static FeedStore feedStore = new FeedStore();
     
     static {
         // set up indexing on feed versions by feed source, indexed by <FeedSource ID, version>
@@ -120,8 +121,8 @@ public class FeedVersion extends Model implements Serializable {
         return feedStore.getFeed(id);
     }
     
-    public File newFeed() {
-        return feedStore.newFeed(id);
+    public File newFeed(InputStream inputStream) {
+        return feedStore.newFeed(id, inputStream, feedSourceId);
     }
     
     /** The results of validating this feed */
@@ -142,7 +143,7 @@ public class FeedVersion extends Model implements Serializable {
         return versionStore.getAll();
     }
 
-    public void validate() { 
+    public void validate() {
         File feed = getFeed();
         FeedProcessor fp = new FeedProcessor(feed);
         

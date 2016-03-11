@@ -127,42 +127,22 @@ public class FeedVersionController extends Auth0SecuredController {
         FeedVersion v = new FeedVersion(s);
         v.setUser(userProfile);
         
-        File toSave = v.newFeed();
+//        File toSave = v.newFeed(uploadStream);
         FilePart uploadPart = body.getFile("feed");
         File upload = uploadPart.getFile();
         
         Logger.info("Saving feed {} from upload", s);
-        
-        FileOutputStream outStream;
-        
-        try {
-            outStream = new FileOutputStream(toSave);
-        } catch (FileNotFoundException e) {
-            Logger.error("Unable to open {}", toSave);
-            return internalServerError("Unable to save feed");
-        }
+
         
         FileInputStream uploadStream;
+        File toSave;
         try {
             uploadStream = new FileInputStream(upload);
+            toSave = v.newFeed(uploadStream);
         } catch (FileNotFoundException e) {
             Logger.error("Unable to open input stream from upload {}", upload);
             
-            try {
-                outStream.close();
-            } catch (IOException e1) {}
-            
             return internalServerError("Unable to read uploaded feed");
-        }
-        
-        // copy the file
-        ReadableByteChannel rbc = Channels.newChannel(uploadStream);
-        try {
-            outStream.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-            outStream.close();
-        } catch (IOException e) {
-            Logger.error("Unable to transfer from upload to saved file.");
-            return internalServerError("Unable to save uploaded file");
         }
         
         v.hash();
