@@ -474,6 +474,7 @@ public class FeedCollectionController extends Auth0SecuredController {
 
             FeedSource s = new FeedSource(car.AgencyName);
             s.defaultGtfsId = car.AgencyId;
+            s.shortName = car.AgencyShortName;
             s.setFeedCollection(feedColl);
 
             s.save();
@@ -495,6 +496,9 @@ public class FeedCollectionController extends Auth0SecuredController {
 
         @JsonProperty
         String AgencyName;
+
+        @JsonProperty
+        String AgencyShortName;
 
         public RtdCarrier() {
         }

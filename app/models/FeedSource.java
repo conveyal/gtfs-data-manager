@@ -101,6 +101,8 @@ public class FeedSource extends Model implements Comparable<FeedSource>, Seriali
 
     public String defaultGtfsId;
 
+    public String shortName;
+
     /**
      * Create a new feed. This also creates a user to own this feed.
      */
