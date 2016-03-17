@@ -468,16 +468,40 @@ public class FeedCollectionController extends Auth0SecuredController {
 
         RtdCarrier[] carriers = mapper.readValue(json, RtdCarrier[].class);
 
-        for(int i=0; i < 3; i++) {
+        for(int i=0; i < carriers.length; i++) {
             RtdCarrier car = carriers[i];
             System.out.println("car id=" + car.AgencyId + " name=" + car.AgencyName);
 
-            FeedSource s = new FeedSource(car.AgencyName);
-            s.defaultGtfsId = car.AgencyId;
-            s.shortName = car.AgencyShortName;
-            s.setFeedCollection(feedColl);
+            FeedSource source = null;
+            for(FeedSource existingSource: feedColl.getFeedSources()) {
+                if(car.AgencyId.equals(existingSource.defaultGtfsId)) {
+                    System.out.println("already exists: "+ car.AgencyId);
+                    source = existingSource;
+                }
+            }
 
-            s.save();
+            if(source == null) source = new FeedSource(car.AgencyName);
+            else source.name = car.AgencyName;
+
+            source.defaultGtfsId = car.AgencyId;
+            source.shortName = car.AgencyShortName;
+            source.AgencyPhone = car.AgencyPhone;
+            source.RttAgencyName = car.RttAgencyName;
+            source.RttEnabled = car.RttEnabled;
+            source.AgencyShortName = car.AgencyShortName;
+            source.AgencyPublicId = car.AgencyPublicId;
+            source.AddressLat = car.AddressLat;
+            source.AddressLon = car.AddressLon;
+            source.DefaultRouteType = car.DefaultRouteType;
+            source.CarrierStatus = car.CarrierStatus;
+            source.AgencyAddress = car.AgencyAddress;
+            source.AgencyEmail = car.AgencyEmail;
+            source.AgencyUrl = car.AgencyUrl;
+            source.AgencyFareUrl = car.AgencyFareUrl;
+
+            source.setFeedCollection(feedColl);
+
+            source.save();
         }
 
 
@@ -498,7 +522,43 @@ public class FeedCollectionController extends Auth0SecuredController {
         String AgencyName;
 
         @JsonProperty
+        String AgencyPhone;
+
+        @JsonProperty
+        String RttAgencyName;
+
+        @JsonProperty
+        String RttEnabled;
+
+        @JsonProperty
         String AgencyShortName;
+
+        @JsonProperty
+        String AgencyPublicId;
+
+        @JsonProperty
+        String AddressLat;
+
+        @JsonProperty
+        String AddressLon;
+
+        @JsonProperty
+        String DefaultRouteType;
+
+        @JsonProperty
+        String CarrierStatus;
+
+        @JsonProperty
+        String AgencyAddress;
+
+        @JsonProperty
+        String AgencyEmail;
+
+        @JsonProperty
+        String AgencyUrl;
+
+        @JsonProperty
+        String AgencyFareUrl;
 
         public RtdCarrier() {
         }

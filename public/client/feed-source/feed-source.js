@@ -10,7 +10,21 @@ module.exports = BB.Model.extend({
     lastUpdated: null,
     url: null,
     latest: null,
-    feedCollection: null
+    feedCollection: null,
+    shortName: null,
+    AgencyPhone: null,
+    RttAgencyName: null,
+    RttEnabled: null,
+    AgencyShortName: null,
+    AgencyPublicId: null,
+    AddressLat: null,
+    AddressLon: null,
+    DefaultRouteType: null,
+    CarrierStatus: null,
+    AgencyAddress: null,
+    AgencyEmail: null,
+    AgencyUrl: null,
+    AgencyFareUrl: null,
   },
   urlRoot: 'api/feedsources/'
 });

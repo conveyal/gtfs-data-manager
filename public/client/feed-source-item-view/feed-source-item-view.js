@@ -30,8 +30,6 @@ module.exports = LayoutView.extend({
 
     var canManageFeed = app.auth0User.canManageFeed(this.model.get('feedCollection').id, this.model.get('id'));
     this.model.set('canManageFeed', canManageFeed);
-
-    console.log(this.model)
   },
 
   // edit a boolean value

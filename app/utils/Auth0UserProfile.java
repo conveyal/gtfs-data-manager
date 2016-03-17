@@ -163,13 +163,17 @@ public class Auth0UserProfile {
     public boolean canViewFeed(String projectID, String feedID) {
         for(Project project : app_metadata.datatools.projects) {
             if (project.project_id.equals(projectID)) {
-                for(Permission permission : project.permissions) {
+                String feeds[] = project.defaultFeeds;
 
+                // check for permission-specific feeds
+                for(Permission permission : project.permissions) {
                     if(permission.type.equals("view-feed")) {
-                        for(String thisFeedID : permission.feeds) {
-                            if(thisFeedID.equals(feedID) || thisFeedID.equals("*")) return true;
-                        }
+                        if(permission.feeds != null) feeds = permission.feeds;
                     }
+                }
+
+                for(String thisFeedID : feeds) {
+                    if(thisFeedID.equals(feedID) || thisFeedID.equals("*")) return true;
                 }
             }
         }

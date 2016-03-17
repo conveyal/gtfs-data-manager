@@ -10,10 +10,26 @@ var FeedAgencyView = require('feed-agency-view');
 var NoteCollectionView = require('note-collection-view');
 var FeedVersionNavigationView = require('feed-version-navigation-view');
 var LayoutView = require('layout-view');
+var EditableTextWidget = require('editable-text-widget');
 
 module.exports = LayoutView.extend({
   template: require("./feed-source-view.html"),
   regions: {
+    nameRegion: '.name',
+    shortNameRegion: '.shortName',
+    AgencyPhoneRegion: '.AgencyPhone',
+    RttAgencyNameRegion: '.RttAgencyName',
+    RttEnabledRegion: '.RttEnabled',
+    AgencyPublicIdRegion: '.AgencyPublicId',
+    AddressLatRegion: '.AddressLat',
+    AddressLonRegion: '.AddressLon',
+    DefaultRouteTypeRegion: '.DefaultRouteType',
+    CarrierStatusRegion: '.CarrierStatus',
+    AgencyAddressRegion: '.AgencyAddress',
+    AgencyEmailRegion: '.AgencyEmail',
+    AgencyUrlRegion: '.AgencyUrl',
+    AgencyFareUrlRegion: '.AgencyFareUrl',
+
     validationRegion: '#validation',
     agencyRegion: '#agency',
     notesRegion: '.source-notes',
@@ -126,6 +142,42 @@ module.exports = LayoutView.extend({
         }
       })
     }
+
+    // set up name edit
+    this.canManageFeed = app.auth0User.canManageFeed(this.model.get('feedCollection').id, this.model.get('id'));
+
+    this.setUpEditableField('name');//, this.nameRegion);
+    this.setUpEditableField('shortName');//, this.nameRegion);
+    this.setUpEditableField('AgencyPhone');
+    this.setUpEditableField('RttAgencyName');
+    this.setUpEditableField('RttEnabled');
+    this.setUpEditableField('AgencyPublicId');
+    this.setUpEditableField('AddressLat');
+    this.setUpEditableField('AddressLon');
+    this.setUpEditableField('DefaultRouteType');
+    this.setUpEditableField('CarrierStatus');
+    this.setUpEditableField('AgencyAddress');
+    this.setUpEditableField('AgencyEmail');
+    this.setUpEditableField('AgencyUrl');
+    this.setUpEditableField('AgencyFareUrl');
+  },
+
+  setUpEditableField (fieldName) {
+    var region = this[fieldName+'Region']
+    var nameField = new EditableTextWidget({
+      model: this.model,
+      attribute:  fieldName,
+      disabled: !this.canManageFeed,
+      /*href: function() {
+        if (this.model.id === null) {
+          // make it a no-op until saved
+          return '#overview/' + this.model.get('feedCollection').id;
+        } else {
+          return '#feed/' + this.model.get('id');
+        }
+      }*/
+    });
+    region.show(nameField);
   },
 
   /** change snapshot version */

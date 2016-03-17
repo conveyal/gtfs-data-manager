@@ -2,6 +2,7 @@ package controllers.api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import controllers.Auth0SecuredController;
 import jobs.FetchSingleFeedJob;
@@ -14,6 +15,8 @@ import play.mvc.Result;
 import utils.Auth0UserProfile;
 
 import java.io.File;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
@@ -64,7 +67,7 @@ public class FeedSourceController extends Auth0SecuredController {
             List<FeedSource> filtered = new ArrayList<FeedSource>();
 
             for (FeedSource fs : feedSources) {
-                if (userProfile.canViewFeed(fcId, fs.id)) {
+                if (userProfile.canViewFeed(fs.feedCollectionId, fs.id)) {
                     filtered.add(fs);
                 }
             }
@@ -76,16 +79,76 @@ public class FeedSourceController extends Auth0SecuredController {
     }
     
     // common code between create and update
-    private static void applyJsonToFeedSource (FeedSource s, JsonNode params) throws MalformedURLException {
+    private static void applyJsonToFeedSource (FeedSource s, JsonNode params) throws JsonProcessingException, MalformedURLException {
         s.name = params.get("name").asText();
-        s.retrievalMethod = FeedSource.FeedRetrievalMethod.valueOf(params.get("retrievalMethod").asText());
-        
+
+        if(params.has("retrievalMethod")) {
+            String retMethod = params.get("retrievalMethod").asText();
+            if(retMethod != "null") s.retrievalMethod = FeedSource.FeedRetrievalMethod.valueOf(params.get("retrievalMethod").asText());
+        }
+
         if (params.has("editorId"))
             s.editorId = params.get("editorId").asText();
 
         if (params.has("snapshotVersion"))
             s.snapshotVersion = params.get("snapshotVersion").asText();
-        
+
+        if (params.has("shortName")) {
+            s.shortName = params.get("shortName").asText();
+        }
+
+        if (params.has("AgencyPhone")) {
+            s.AgencyPhone = params.get("AgencyPhone").asText();
+        }
+
+        if (params.has("RttAgencyName")) {
+            s.RttAgencyName = params.get("RttAgencyName").asText();
+        }
+
+        if (params.has("RttEnabled")) {
+            s.RttEnabled = params.get("RttEnabled").asText();
+        }
+
+        if (params.has("AgencyShortName")) {
+            s.AgencyShortName = params.get("AgencyShortName").asText();
+        }
+
+        if (params.has("AgencyPublicId")) {
+            s.AgencyPublicId = params.get("AgencyPublicId").asText();
+        }
+
+        if (params.has("AddressLat")) {
+            s.AddressLat = params.get("AddressLat").asText();
+        }
+
+        if (params.has("AddressLon")) {
+            s.AddressLon = params.get("AddressLon").asText();
+        }
+
+        if (params.has("DefaultRouteType")) {
+            s.DefaultRouteType = params.get("DefaultRouteType").asText();
+        }
+
+        if (params.has("CarrierStatus")) {
+            s.CarrierStatus = params.get("CarrierStatus").asText();
+        }
+
+        if (params.has("AgencyAddress")) {
+            s.AgencyAddress = params.get("AgencyAddress").asText();
+        }
+
+        if (params.has("AgencyEmail")) {
+            s.AgencyEmail = params.get("AgencyEmail").asText();
+        }
+
+        if (params.has("AgencyUrl")) {
+            s.AgencyUrl = params.get("AgencyUrl").asText();
+        }
+
+        if (params.has("AgencyFareUrl")) {
+            s.AgencyFareUrl = params.get("AgencyFareUrl").asText();
+        }
+
         s.isPublic = params.get("isPublic").asBoolean();
         s.deployable = params.get("deployable").asBoolean();
         // the last fetched/updated cannot be updated from the web interface, only internally
@@ -100,6 +163,54 @@ public class FeedSourceController extends Auth0SecuredController {
                 s.lastFetched = null;
             }
         }
+
+        // sync w/ RTD
+        FeedCollectionController.RtdCarrier carrier = new FeedCollectionController.RtdCarrier();
+        carrier.AgencyId = checkValue(s.defaultGtfsId);
+        carrier.AgencyPhone = checkValue(s.AgencyPhone);
+        carrier.RttAgencyName = checkValue(s.RttAgencyName);
+        carrier.RttEnabled = checkValue(s.RttEnabled);
+        carrier.AgencyShortName = checkValue(s.shortName);
+        carrier.AgencyPublicId = checkValue(s.AgencyPublicId);
+        carrier.AddressLat = checkValue(s.AddressLat);
+        carrier.AddressLon = checkValue(s.AddressLon);
+        carrier.DefaultRouteType = checkValue(s.DefaultRouteType);
+        carrier.CarrierStatus = checkValue(s.CarrierStatus);
+        carrier.AgencyAddress = checkValue(s.AgencyAddress);
+        carrier.AgencyEmail = checkValue(s.AgencyEmail);
+        carrier.AgencyUrl = checkValue(s.AgencyUrl);
+        carrier.AgencyFareUrl = checkValue(s.AgencyFareUrl);
+        System.out.println("writing to RTD...");
+
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        String carrierJson = mapper.writeValueAsString(carrier);
+        System.out.println("carrierJson = " + carrierJson);
+
+        try {
+            URL rtdUrl = new URL(Play.application().configuration().getString("application.extensions.rtd_integration.api")+ "/" + carrier.AgencyId);
+            System.out.println("rtdUrl = " + rtdUrl);
+            HttpURLConnection connection = (HttpURLConnection) rtdUrl.openConnection();
+
+            connection.setRequestMethod("PUT");
+            connection.setDoOutput(true);
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Accept", "application/json");
+            OutputStreamWriter osw = new OutputStreamWriter(connection.getOutputStream());
+            osw.write(carrierJson);
+            osw.flush();
+            osw.close();
+            System.out.println(connection.getResponseCode());
+        } catch (Exception e) {
+            System.out.println("error writing to RTD");
+            e.printStackTrace();
+        }
+    }
+
+    public static String checkValue(String str) {
+        if(str == "null") return null;
+        return str;
     }
     
     public static Result update (String id) throws JsonProcessingException, MalformedURLException {

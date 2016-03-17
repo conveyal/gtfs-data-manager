@@ -6,6 +6,7 @@
   },
   "local": [
     "application",
+    "editable-text-widget",
     "feed-agency-view",
     "feed-version",
     "feed-version-collection",

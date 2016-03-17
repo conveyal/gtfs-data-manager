@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.mapdb.Fun;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -102,6 +103,19 @@ public class FeedSource extends Model implements Comparable<FeedSource>, Seriali
     public String defaultGtfsId;
 
     public String shortName;
+    public String AgencyPhone;
+    public String RttAgencyName;
+    public String RttEnabled;
+    public String AgencyShortName;
+    public String AgencyPublicId;
+    public String AddressLat;
+    public String AddressLon;
+    public String DefaultRouteType;
+    public String CarrierStatus;
+    public String AgencyAddress;
+    public String AgencyEmail;
+    public String AgencyUrl;
+    public String AgencyFareUrl;
 
     /**
      * Create a new feed. This also creates a user to own this feed.
