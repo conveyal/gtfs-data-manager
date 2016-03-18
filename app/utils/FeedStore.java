@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.model.*;
+import models.FeedSource;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
@@ -34,29 +35,39 @@ import com.amazonaws.services.s3.transfer.Upload;
 public class FeedStore {
 
     /** Local file storage path if working offline */
-    private File path;
+    private File path = null;
 
     /** An optional AWS S3 bucket to store the feeds */
-    private String s3Bucket;
+    private String s3Bucket = null;
 
     /** An AWS credentials file to use when uploading to S3 */
-    private String s3CredentialsFilename;
+    private String s3CredentialsFilename = null;
+    
+    private String s3Prefix = "";
+    private boolean s3UseFeedGtfsId = false;
 
     public FeedStore() {
         // s3 storage
-        if (Boolean.valueOf(Play.application().configuration().getString("application.work_offline"))){
-            this.s3Bucket = Play.application().configuration().getString("application.s3.gtfs_bucket");
+        this.s3Bucket = Play.application().configuration().getString("application.s3.gtfs_bucket");
+        if(this.s3Bucket != null) {
+            String prefix = Play.application().configuration().getString("application.s3.prefix");
+            if(prefix != null) this.s3Prefix = prefix;
+            
+            String s3UseFeedGtfsId = Play.application().configuration().getString("application.s3.use_feed_gtfs_id");
+            if(s3UseFeedGtfsId.equals("true")) this.s3UseFeedGtfsId = true;
+            
+            this.s3CredentialsFilename = Play.application().configuration().getString("application.s3.credentials_file");
         }
+
         // local storage
-        else {
-            String pathString = Play.application().configuration().getString("application.data.gtfs");
+        String pathString = Play.application().configuration().getString("application.data.gtfs");
+        if(pathString != null) {
             File path = new File(pathString);
             if (!path.exists() || !path.isDirectory()) {
                 throw new IllegalArgumentException("Not a directory or not found: " + path.getAbsolutePath());
             }
             this.path = path;
         }
-
     }
 
     public List<String> getAllFeeds () {
@@ -81,6 +92,7 @@ public class FeedStore {
     public File getFeed (String id) {
         // local storage
         if (path != null) {
+            System.out.println("Reading path from local store");
             File feed = new File(path, id);
             if (!feed.exists()) return null;
             // don't let folks get feeds outside of the directory
@@ -89,10 +101,11 @@ public class FeedStore {
         }
         // s3 storage
         else {
-
+            System.out.println("Reading path from S3");
             if(this.s3Bucket != null) {
                 AWSCredentials creds;
                 if (this.s3CredentialsFilename != null) {
+                    System.out.println("Reading from S3 using supplied credentials file");
                     creds = new ProfileCredentialsProvider(this.s3CredentialsFilename, "default").getCredentials();
                 } else {
                     // default credentials providers, e.g. IAM role
@@ -130,9 +143,14 @@ public class FeedStore {
     /**
      * Create a new feed with the given ID.
      */
-    public File newFeed (String id, InputStream inputStream, String feedSourceId) {
+    public File newFeed (String id, InputStream inputStream, FeedSource feedSource) {
+
+        File writtenFile = null;
+
         // local storage
         if (path != null) {
+
+            System.out.println("Writing feed to local store: " + path);
             File out = new File(path, id);
             FileOutputStream outStream;
 
@@ -148,30 +166,41 @@ public class FeedStore {
             try {
                 outStream.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
                 outStream.close();
-                return out;
+                writtenFile = out;
             } catch (IOException e) {
                 Logger.error("Unable to transfer from upload to saved file.");
-                return null;
+                e.printStackTrace();
             }
         }
+
         // s3 storage
-        else {
-            // upload to S3, if applicable
-            if(this.s3Bucket != null) {
-                AWSCredentials creds;
-                if (this.s3CredentialsFilename != null) {
-                    creds = new ProfileCredentialsProvider(this.s3CredentialsFilename, "default").getCredentials();
+        // upload to S3, if applicable
+        if(this.s3Bucket != null) {
+
+            AWSCredentials creds;
+            if (this.s3CredentialsFilename != null) {
+                creds = new ProfileCredentialsProvider(this.s3CredentialsFilename, "default").getCredentials();
+                Logger.info("Writing to S3 using supplied credentials file");
+            }
+            else {
+                // default credentials providers, e.g. IAM role
+                creds = new DefaultAWSCredentialsProviderChain().getCredentials();
+            }
+
+
+            //String keyName = id;
+            
+            String idForS3 = this.s3UseFeedGtfsId ? feedSource.defaultGtfsId : id;
+            String keyName = this.s3Prefix + idForS3 + ".zip";
+            System.out.println("keyName = " + keyName);
+
+            try {
+                File fileForS3 = null;
+
+                if(writtenFile != null) {
+                    fileForS3 = writtenFile;
                 }
-                else {
-                    // default credentials providers, e.g. IAM role
-                    creds = new DefaultAWSCredentialsProviderChain().getCredentials();
-                }
-
-
-                String keyName = id;
-
-                try {
-                    // Use tempfile
+                else { // Use tempfile
                     File tempFile = File.createTempFile("test", ".zip");
                     tempFile.deleteOnExit();
                     try (FileOutputStream out = new FileOutputStream(tempFile)) {
@@ -179,37 +208,35 @@ public class FeedStore {
                         out.close();
                         inputStream.close();
                     }
-
-                    Logger.info("Uploading feed to S3 from inputstream");
-                    AmazonS3 s3client = new AmazonS3Client(creds);
-                    s3client.putObject(new PutObjectRequest(
-                            s3Bucket, keyName, tempFile));
-
-                    if (feedSourceId != null){
-                        Logger.info("Copying feed on s3 to latest version");
-                        // copy to [name]-latest.zip
-                        String copyKey = feedSourceId + ".zip";
-                        CopyObjectRequest copyObjRequest = new CopyObjectRequest(
-                                this.s3Bucket, keyName, this.s3Bucket, copyKey);
-                        s3client.copyObject(copyObjRequest);
-                    }
-
-
-                    return tempFile;
-
-
                 }
 
-                catch (AmazonServiceException ase) {
-                    Logger.error("Error uploading feed to S3");
-                    ase.printStackTrace();
-                    return null;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
 
+                Logger.info("Uploading feed to S3 from inputstream");
+                AmazonS3 s3client = new AmazonS3Client(creds);
+                s3client.putObject(new PutObjectRequest(
+                        s3Bucket, keyName, fileForS3));
+
+                /*if (feedSourceId != null){
+                    Logger.info("Copying feed on s3 to latest version");
+                    // copy to [name]-latest.zip
+                    String copyKey = feedSourceId + ".zip";
+                    CopyObjectRequest copyObjRequest = new CopyObjectRequest(
+                            this.s3Bucket, keyName, this.s3Bucket, copyKey);
+                    s3client.copyObject(copyObjRequest);
+                }*/
+
+                if(writtenFile == null) writtenFile = fileForS3;
             }
-            return null;
+
+            catch (AmazonServiceException ase) {
+                Logger.error("Error uploading feed to S3");
+                ase.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         }
+
+        return writtenFile;
     }
 }

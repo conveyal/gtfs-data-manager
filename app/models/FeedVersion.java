@@ -122,7 +122,7 @@ public class FeedVersion extends Model implements Serializable {
     }
     
     public File newFeed(InputStream inputStream) {
-        return feedStore.newFeed(id, inputStream, feedSourceId);
+        return feedStore.newFeed(id, inputStream, getFeedSource());
     }
     
     /** The results of validating this feed */
