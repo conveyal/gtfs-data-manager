@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.io.ByteStreams;
 import controllers.api.JsonManager;
 import play.Logger;
@@ -341,8 +343,28 @@ public class Deployment extends Model implements Serializable {
                 out.putNextEntry(buildConfigEntry);
 
                 ObjectMapper mapper = new ObjectMapper();
+
+                ObjectNode node = JsonNodeFactory.instance.objectNode();
+                if(feedColl.buildConfig.fetchElevationUS != null) {
+                    node.set("fetchElevationUS", JsonNodeFactory.instance.booleanNode(feedColl.buildConfig.fetchElevationUS));
+                }
+                if(feedColl.buildConfig.stationTransfers != null) {
+                    node.set("stationTransfers", JsonNodeFactory.instance.booleanNode(feedColl.buildConfig.stationTransfers));
+                }
+                if(feedColl.buildConfig.subwayAccessTime != null) {
+                    node.set("subwayAccessTime", JsonNodeFactory.instance.numberNode(feedColl.buildConfig.subwayAccessTime));
+                }
+                if(feedColl.buildConfig.fares != null) {
+                    if(feedColl.buildConfig.fares.indexOf("{") != -1) {
+                        node.set("fares", mapper.readTree(feedColl.buildConfig.fares));
+                    }
+                    else {
+                        node.set("fares", JsonNodeFactory.instance.textNode(feedColl.buildConfig.fares) );
+                    }
+                }
+
                 mapper.setSerializationInclusion(Include.NON_NULL);
-                byte[] buildConfig = mapper.writer().writeValueAsBytes(feedColl.buildConfig);
+                byte[] buildConfig = mapper.writer().writeValueAsBytes(node);
                 out.write(buildConfig);
 
                 out.closeEntry();
