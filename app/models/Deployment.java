@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -320,7 +321,7 @@ public class Deployment extends Model implements Serializable {
             Rectangle2D bounds = getBounds();
 
             // call vex server
-            URL vexUrl = new URL(String.format("%s/?n=%.6f&e=%.6f&s=%.6f&w=%.6f",
+            URL vexUrl = new URL(String.format(Locale.US,"%s/?n=%.6f&e=%.6f&s=%.6f&w=%.6f",
                     Play.application().configuration().getString("application.deployment.osm_vex"),
                     bounds.getMaxY(), bounds.getMaxX(), bounds.getMinY(), bounds.getMinX()));
 
